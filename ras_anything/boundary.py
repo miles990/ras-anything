@@ -25,6 +25,7 @@ import subprocess
 import threading
 import time
 import urllib.error
+import urllib.parse
 import urllib.request
 from email.message import Message
 
@@ -63,7 +64,7 @@ class Req:
     def key(self) -> str:
         if self.kind == "subprocess":
             return "run " + " ".join(self.argv if isinstance(self.argv, list) else [str(self.argv)])
-        return "%s %s%s" % (self.method, self.url, (" #" + self.body_sha[:12]) if self.body_sha else "")
+        return "%s %s%s" % (self.method, _logical_url(self.url), (" #" + self.body_sha[:12]) if self.body_sha else "")
 
     @property
     def nonidempotent(self) -> bool:
@@ -76,6 +77,17 @@ class Req:
     def to_dict(self) -> dict:
         return {"kind": self.kind, "method": self.method, "url": self.url, "body_sha": self.body_sha,
                 "idempotency_key": self.idem_key, "timeout": self.timeout, "argv": self.argv, "key": self.key}
+
+
+def _logical_url(url: str) -> str:
+    """The URL without its port: local test upstreams bind a fresh port each run, and the same
+    logical request must get the same fault (and match the same recording) across runs."""
+    try:
+        u = urllib.parse.urlsplit(url)
+        host = u.hostname or ""
+        return urllib.parse.urlunsplit((u.scheme, host, u.path, u.query, ""))
+    except ValueError:
+        return url
 
 
 def _sha(body) -> str:

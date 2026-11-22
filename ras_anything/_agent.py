@@ -355,7 +355,17 @@ class Agent:
         prev_hook = sys.excepthook
 
         def hook(tp, val, tb):
-            self.uncaught = {"type": tp.__name__, "msg": str(val)[:300], "hang": issubclass(tp, faults.ChaosHang)}
+            where = None
+            t = tb
+            while t is not None:  # innermost frame of the user's code
+                k = self.user_key(t.tb_frame.f_code)
+                if k is not None:
+                    mod = t.tb_frame.f_globals.get("__name__", "")
+                    where = "%s.%s" % (os.path.splitext(os.path.basename(k[0]))[0] if mod == "__main__" else mod,
+                                       getattr(t.tb_frame.f_code, "co_qualname", k[2]))
+                t = t.tb_next
+            self.uncaught = {"type": tp.__name__, "msg": str(val)[:300], "hang": issubclass(tp, faults.ChaosHang),
+                             "where": where}
             prev_hook(tp, val, tb)
 
         sys.excepthook = hook
@@ -364,7 +374,7 @@ class Agent:
     def finish(self):
         sys.setprofile(None)
         sys.settrace(None)
-        out = {"mode": self.mode, "uncaught": self.uncaught, "sys_path": [p for p in sys.path if "_inject" not in p],
+        out = {"mode": self.mode, "uncaught": self.uncaught, "executable": sys.executable, "sys_path": [p for p in sys.path if "_inject" not in p],
                "main_file": os.path.realpath(sys.argv[0]) if sys.argv and sys.argv[0] else None,
                "boundary_total": self.boundary_total}
         out["functions"] = [

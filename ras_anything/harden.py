@@ -16,7 +16,7 @@ from pathlib import Path
 
 from . import faults, static, ui
 from .paths import UserError, find_project, harden_dir, load_json, ras_dir, save_json
-from .runner import run
+from .runner import python_cmd, run
 
 DEFAULT_BUDGET_S = 5.0
 
@@ -193,7 +193,7 @@ Recorded examples:
    `subprocess.run(..., timeout=t)`, `requests.get(..., timeout=t)`); a call with no timeout that
    hangs is a hard fail. Budget the attempts so worst case stays under {budget:g} s.
 3. **Retry only transient failures**: timeouts, connection errors, HTTP 408/425/429/500/502/503/504
-   (honour `Retry-After`), a truncated/undecodable body from a 2xx, a subprocess exit 75. Exponential
+   (honour `Retry-After`), EAGAIN, a truncated/undecodable body from a 2xx, a subprocess exit 75. Exponential
    backoff with full jitter. **Never retry other 4xx** or programming errors.
 4. **Idempotency.** Never send a POST/PUT/PATCH/DELETE twice unless every attempt carries the same
    `Idempotency-Key` header, derived deterministically from the logical operation (e.g. the invoice
@@ -253,7 +253,7 @@ def harden(fid: str | None = None, agent: str | None = None, model: str | None =
     if not quiet:
         ui.headline("harden", "%s %s recording up to %d calls" % (fid, ui.DOT, max_calls))
     calls_path = d / "calls.pkl"
-    r = run(scan["cmd"], {"mode": "record", "max_calls": max_calls, "calls_path": str(calls_path),
+    r = run(python_cmd(scan["cmd"]), {"mode": "record", "max_calls": max_calls, "calls_path": str(calls_path),
                           "target": {"file": fn["file"], "line": fn["first_line"], "name": fn["name"]}},
             Path(scan["cwd"]), root=Path(scan["root"]))
     if r.data is None or not calls_path.exists():
@@ -269,6 +269,7 @@ def harden(fid: str | None = None, agent: str | None = None, model: str | None =
         "file": fn["file"], "first_line": fn["first_line"], "in_main": fn["in_main"],
         "cmd": scan["cmd"], "display_cmd": scan.get("display_cmd", shlex.join(scan["cmd"])), "cwd": scan["cwd"],
         "sys_path": r.data.get("sys_path", []),
+        "executable": r.data.get("executable"),
         "env": env_diff(snap.get("env")),
         "globals": {k: v for k, v in (snap.get("globals") or {}).items() if not isinstance(v, bytes)},
         "budget_s": budget or old.get("budget_s") or DEFAULT_BUDGET_S,

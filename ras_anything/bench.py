@@ -21,7 +21,9 @@ def duplicates(attempts: list) -> int:
     return sum(len(g) - 1 for g in groups.values())
 
 
-def classify(r, baseline: str, markers: list[str]) -> str:
+def classify(r, baseline: str, markers: list[str], fallbacks: int = 0) -> str:
+    """correct: identical output · degraded: output differs only where the app said so (a marker) or
+    after a hardened function returned its *declared* fallback in this run · wrong: anything else."""
     if r.hang:
         return "hang"
     if r.code != 0:
@@ -33,7 +35,19 @@ def classify(r, baseline: str, markers: list[str]) -> str:
         diff = [x for x, y in zip(a, b) if x != y]
         if all(any(m in x for m in markers) for x in diff):
             return "degraded"
+    if fallbacks:
+        return "degraded"
     return "wrong"
+
+
+def _places(rs) -> dict:
+    out: dict = {}
+    for r in rs:
+        u = r.get("uncaught")
+        if r["outcome"] in ("crash", "hang") and u:
+            k = "%s in %s" % ("hang" if u.get("hang") else u["type"], u.get("where") or "?")
+            out[k] = out.get(k, 0) + 1
+    return out
 
 
 def _pctl(xs, q):
@@ -46,7 +60,7 @@ def bench(cmd: list[str] | None = None, seeds: int = 20, rate: float = 0.1, mark
     project = find_project()
     scan = load_json(project / ".ras" / "scan.json") or {}
     shown = shlex.join(cmd) if cmd else scan.get("display_cmd")
-    cmd = python_cmd(cmd) if cmd else scan.get("cmd")
+    cmd = python_cmd(cmd or scan.get("cmd") or [])
     if not cmd:
         raise UserError("no command to bench", "pass it after -- or run scan first", "bench -- python app.py")
     state = load_json(project / ".ras" / "state.json", {"enabled": {}})
@@ -87,7 +101,9 @@ def bench(cmd: list[str] | None = None, seeds: int = 20, rate: float = 0.1, mark
             r = run(cmd, dict(base_cfg, seed=seed), cwd, env_extra=variants[v], root=root, timeout=180)
             d = r.data or {}
             att = d.get("attempts") or []
-            rec = {"seed": seed, "outcome": classify(r, baseline, markers), "exit": r.code, "wall_s": round(r.wall, 4),
+            fbs = sum(st.get("fallback", 0) for st in (d.get("stats") or {}).values())
+            rec = {"seed": seed, "outcome": classify(r, baseline, markers, fbs), "exit": r.code, "wall_s": round(r.wall, 4),
+                   "fallbacks": fbs,
                    "faults": sum(1 for a in att if a.get("fault")), "attempts": len(att), "dups": duplicates(att),
                    "uncaught": d.get("uncaught")}
             runs[v].append(rec)
@@ -105,9 +121,11 @@ def bench(cmd: list[str] | None = None, seeds: int = 20, rate: float = 0.1, mark
                 o = rec["outcome"]
                 m = ui.good(ui.OK) if o in ("correct", "degraded") else ui.bad(ui.FAIL)
                 return "%s %-8s %6s" % (m, o, ui.secs(rec["wall_s"]))
-            print("  seed %2d  %s   original %s   hardened %s %s" % (seed, ui.dim("%2d faults" % line["original"]["faults"]),
-                  cell(line["original"]), cell(line["hardened"]),
-                  ui.warn(" %d dup" % line["original"]["dups"]) if line["original"]["dups"] else ""), flush=True)
+            print("  seed %2d   original %s %s   hardened %s %s %s" % (
+                  seed, cell(line["original"]), ui.dim("%2d fault%s" % (line["original"]["faults"], " " if line["original"]["faults"] == 1 else "s")),
+                  cell(line["hardened"]), ui.dim("%2d fault%s" % (line["hardened"]["faults"], " " if line["hardened"]["faults"] == 1 else "s")),
+                  ui.warn(" dup %d→%d" % (line["original"]["dups"], line["hardened"]["dups"]))
+                  if line["original"]["dups"] or line["hardened"]["dups"] else ""), flush=True)
     summary = {}
     for v, rs in runs.items():
         n = len(rs)
@@ -117,7 +135,9 @@ def bench(cmd: list[str] | None = None, seeds: int = 20, rate: float = 0.1, mark
                       "crash_rate": c["crash"] / n if n else 0.0, "hang_rate": c["hang"] / n if n else 0.0,
                       "wrong_rate": c["wrong"] / n if n else 0.0,
                       "p50_wall": _pctl(walls, 0.5), "p99_wall": _pctl(walls, 0.99),
+                      "identical_rate": c["correct"] / n if n else 0.0,
                       "dups": sum(r["dups"] for r in rs), "faults": sum(r["faults"] for r in rs),
+                      "failures_by_place": _places(rs),
                       "clean_wall": round(clean[v].wall, 4)}
     for v in stats:
         for st in stats[v].values():
@@ -149,7 +169,9 @@ def print_bench(res: dict) -> None:
 
     rows = [
         ["app availability", ui.pct(o["availability"]), arrow(o["availability"], h["availability"], True) + " " +
-         ui.bold(ui.pct(h["availability"])), ui.dim("exit 0 and output correct%s" % (" or degraded" if res["degraded_markers"] else ""))],
+         ui.bold(ui.pct(h["availability"])), ui.dim("exit 0, output correct or declared-degraded")],
+        ["  identical output", ui.pct(o["identical_rate"]), arrow(o["identical_rate"], h["identical_rate"], True) + " " +
+         ui.pct(h["identical_rate"]), ui.dim("strict: byte-identical to the clean run")],
         ["crashes", ui.pct(o["crash_rate"]), arrow(o["crash_rate"], h["crash_rate"], False) + " " + ui.pct(h["crash_rate"]), ""],
         ["hangs", ui.pct(o["hang_rate"]), arrow(o["hang_rate"], h["hang_rate"], False) + " " + ui.pct(h["hang_rate"]),
          ui.dim("a call with no timeout blocked (cap %gs real)" % res["hang_cap_s"])],
@@ -170,6 +192,10 @@ def print_bench(res: dict) -> None:
             frows.append([fid, str(st["calls"]), "%d → %d" % (ost.get("raised", 0), st["raised"]), str(st["fallback"]),
                           ui.secs(ost.get("p99")) + " → " + ui.secs(st["p99"])])
         print(ui.table(["function", "calls", "raised (orig → hard)", "fallbacks", "worst p99/run"], frows, "lrrrl"))
+    for v in ("original", "hardened"):
+        places = res["summary"][v].get("failures_by_place") or {}
+        if places:
+            print(ui.dim("  %s failures: " % v) + ", ".join("%s ×%d" % kv for kv in sorted(places.items(), key=lambda kv: -kv[1])))
     print()
     print(ui.dim("  live chaos at the boundary, real upstream behind it · injected waits ×%g · seeds 1–%d, same per pair · saved .ras/bench.json"
                  % (res["time_scale"], res["seeds"])))

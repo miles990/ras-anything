@@ -1,0 +1,12 @@
+ras-anything
+Copyright (c) 2026 miles990
+
+The design of ras-anything (measure first, change only the few weakest functions, let a coding
+agent write the change, prove it on recorded real calls before swapping, swap reversibly with one
+marked block and a kill switch, and the scan / port / verify / enable / bench / report command
+loop) is inspired by fast-anything by EL4CTEO:
+
+  fast-anything — https://github.com/EL4CTEO/fast-anything
+  Copyright (c) EL4CTEO, licensed under the MIT License.
+
+No source code from fast-anything is included in this repository.

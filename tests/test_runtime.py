@@ -79,6 +79,7 @@ class RetryTest(unittest.TestCase):
     def test_is_transient(self):
         self.assertTrue(is_transient(http_error(502)))
         self.assertTrue(is_transient(urllib.error.URLError(ConnectionRefusedError())))
+        self.assertTrue(is_transient(BlockingIOError(11, "Resource temporarily unavailable")))
         self.assertFalse(is_transient(http_error(400)))
         self.assertFalse(is_transient(KeyError("x")))
 

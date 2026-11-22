@@ -115,14 +115,23 @@ def markdown(title: str, data: dict) -> str:
                    % (b["display_cmd"], b["seeds"], b["seeds"], b["rate"]))
         out.append("![ras-anything card](ras-card.svg)\n")
         out.append("| whole app | original | hardened |\n|---|---:|---:|")
-        out.append("| availability (exit 0, output correct%s) | %s | **%s** |" % (
-            " or declared-degraded" if b["degraded_markers"] else "", _p(o["availability"], 1), _p(h["availability"], 1)))
+        out.append("| availability (exit 0, output correct or declared-degraded) | %s | **%s** |" % (
+            _p(o["availability"], 1), _p(h["availability"], 1)))
+        out.append("| byte-identical output (strict) | %s | %s |" % (_p(o.get("identical_rate"), 1), _p(h.get("identical_rate"), 1)))
         for label, k in (("crashes", "crash_rate"), ("hangs", "hang_rate"), ("wrong output", "wrong_rate")):
             out.append("| %s | %s | %s |" % (label, _p(o[k], 1), _p(h[k], 1)))
         out.append("| duplicate non-idempotent side effects | %d | %d |" % (o["dups"], h["dups"]))
         out.append("| p50 / p99 run time | %s / %s | %s / %s |" % (ui.secs(o["p50_wall"]), ui.secs(o["p99_wall"]),
                                                                 ui.secs(h["p50_wall"]), ui.secs(h["p99_wall"])))
         out.append("| faults injected (total) | %d | %d |" % (o["faults"], h["faults"]))
+        out.append("")
+        out.append("A run counts as *degraded* when its output differs only where a hardened function returned its "
+                   "declared `RAS_FALLBACK` in that run (originals declare none, so their differing output counts as wrong)%s.\n"
+                   % ((" or on lines containing %s" % ", ".join("`%s`" % m for m in b["degraded_markers"])) if b["degraded_markers"] else ""))
+        for v in ("original", "hardened"):
+            pl = b["summary"][v].get("failures_by_place") or {}
+            if pl:
+                out.append("- %s crashes/hangs: %s" % (v, ", ".join("%s ×%d" % kv for kv in sorted(pl.items(), key=lambda kv: -kv[1]))))
         out.append("")
         if not b["clean_outputs_equal"]:
             out.append("> ⚠ With no faults the hardened app printed different output than the original.\n")

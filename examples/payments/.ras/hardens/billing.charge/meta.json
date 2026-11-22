@@ -1,0 +1,35 @@
+{
+  "id": "billing.charge",
+  "module": "billing",
+  "qualname": "charge",
+  "name": "charge",
+  "kind": "function",
+  "file": "/workspace/ras-anything/examples/payments/billing.py",
+  "first_line": 13,
+  "in_main": false,
+  "cmd": [
+    "python",
+    "app.py"
+  ],
+  "display_cmd": "python app.py",
+  "cwd": "/workspace/ras-anything/examples/payments",
+  "sys_path": [
+    "/workspace/ras-anything/examples/payments",
+    "/workspace/ras-anything",
+    "/usr/lib/python313.zip",
+    "/usr/lib/python3.13",
+    "/usr/lib/python3.13/lib-dynload",
+    "/workspace/ras-anything/.venv/lib/python3.13/site-packages",
+    "__editable__.ras_anything-0.1.0.finder.__path_hook__"
+  ],
+  "env": {
+    "PAYMENTS_API_URL": "http://127.0.0.1:33455"
+  },
+  "globals": {},
+  "budget_s": 5.0,
+  "recorded": 16,
+  "seen": 16,
+  "skipped": 0,
+  "recorded_at": "2026-11-23T03:41:13+0800",
+  "python": "3.13.5"
+}

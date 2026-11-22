@@ -1,0 +1,646 @@
+{
+  "cmd": [
+    "python",
+    "app.py"
+  ],
+  "display_cmd": "python app.py",
+  "ids": [
+    "billing.charge",
+    "billing.render_receipt"
+  ],
+  "seeds": 20,
+  "rate": 0.1,
+  "outage_rate": 0.05,
+  "time_scale": 0.05,
+  "hang_cap_s": 2.0,
+  "degraded_markers": [],
+  "clean_outputs_equal": true,
+  "summary": {
+    "original": {
+      "runs": 20,
+      "correct": 1,
+      "degraded": 0,
+      "wrong": 4,
+      "crash": 12,
+      "hang": 3,
+      "availability": 0.05,
+      "crash_rate": 0.6,
+      "hang_rate": 0.15,
+      "wrong_rate": 0.2,
+      "p50_wall": 1.1819,
+      "p99_wall": 3.6273,
+      "identical_rate": 0.05,
+      "dups": 5,
+      "faults": 42,
+      "failures_by_place": {
+        "BlockingIOError in billing.render_receipt": 9,
+        "JSONDecodeError in billing.render_receipt": 3,
+        "hang in billing.render_receipt": 3
+      },
+      "clean_wall": 0.5053
+    },
+    "hardened": {
+      "runs": 20,
+      "correct": 10,
+      "degraded": 8,
+      "wrong": 0,
+      "crash": 2,
+      "hang": 0,
+      "availability": 0.9,
+      "crash_rate": 0.1,
+      "hang_rate": 0.0,
+      "wrong_rate": 0.0,
+      "p50_wall": 1.2714,
+      "p99_wall": 3.8457,
+      "identical_rate": 0.5,
+      "dups": 0,
+      "faults": 137,
+      "failures_by_place": {
+        "URLError in app.main": 2
+      },
+      "clean_wall": 0.4989
+    }
+  },
+  "runs": {
+    "original": [
+      {
+        "seed": 1,
+        "outcome": "crash",
+        "exit": 1,
+        "wall_s": 0.0849,
+        "fallbacks": 0,
+        "faults": 1,
+        "attempts": 2,
+        "dups": 0,
+        "uncaught": {
+          "type": "BlockingIOError",
+          "msg": "[Errno 11] Resource temporarily unavailable (fork)",
+          "hang": false,
+          "where": "billing.render_receipt"
+        }
+      },
+      {
+        "seed": 2,
+        "outcome": "wrong",
+        "exit": 0,
+        "wall_s": 2.5441,
+        "fallbacks": 0,
+        "faults": 3,
+        "attempts": 36,
+        "dups": 1,
+        "uncaught": null
+      },
+      {
+        "seed": 3,
+        "outcome": "crash",
+        "exit": 1,
+        "wall_s": 0.1426,
+        "fallbacks": 0,
+        "faults": 1,
+        "attempts": 4,
+        "dups": 0,
+        "uncaught": {
+          "type": "JSONDecodeError",
+          "msg": "Unterminated string starting at: line 1 column 37 (char 36)",
+          "hang": false,
+          "where": "billing.render_receipt"
+        }
+      },
+      {
+        "seed": 4,
+        "outcome": "crash",
+        "exit": 1,
+        "wall_s": 0.3948,
+        "fallbacks": 0,
+        "faults": 1,
+        "attempts": 24,
+        "dups": 0,
+        "uncaught": {
+          "type": "JSONDecodeError",
+          "msg": "Expecting value: line 1 column 1 (char 0)",
+          "hang": false,
+          "where": "billing.render_receipt"
+        }
+      },
+      {
+        "seed": 5,
+        "outcome": "hang",
+        "exit": 1,
+        "wall_s": 2.0969,
+        "fallbacks": 0,
+        "faults": 1,
+        "attempts": 2,
+        "dups": 0,
+        "uncaught": {
+          "type": "ChaosHang",
+          "msg": "boundary call with no timeout hung (chaos)",
+          "hang": true,
+          "where": "billing.render_receipt"
+        }
+      },
+      {
+        "seed": 6,
+        "outcome": "crash",
+        "exit": 1,
+        "wall_s": 0.1052,
+        "fallbacks": 0,
+        "faults": 1,
+        "attempts": 2,
+        "dups": 0,
+        "uncaught": {
+          "type": "BlockingIOError",
+          "msg": "[Errno 11] Resource temporarily unavailable (fork)",
+          "hang": false,
+          "where": "billing.render_receipt"
+        }
+      },
+      {
+        "seed": 7,
+        "outcome": "correct",
+        "exit": 0,
+        "wall_s": 1.0131,
+        "fallbacks": 0,
+        "faults": 1,
+        "attempts": 34,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 8,
+        "outcome": "wrong",
+        "exit": 0,
+        "wall_s": 1.5249,
+        "fallbacks": 0,
+        "faults": 2,
+        "attempts": 35,
+        "dups": 1,
+        "uncaught": null
+      },
+      {
+        "seed": 9,
+        "outcome": "crash",
+        "exit": 1,
+        "wall_s": 2.3202,
+        "fallbacks": 0,
+        "faults": 4,
+        "attempts": 21,
+        "dups": 1,
+        "uncaught": {
+          "type": "BlockingIOError",
+          "msg": "[Errno 11] Resource temporarily unavailable (fork)",
+          "hang": false,
+          "where": "billing.render_receipt"
+        }
+      },
+      {
+        "seed": 10,
+        "outcome": "crash",
+        "exit": 1,
+        "wall_s": 0.2439,
+        "fallbacks": 0,
+        "faults": 1,
+        "attempts": 10,
+        "dups": 0,
+        "uncaught": {
+          "type": "JSONDecodeError",
+          "msg": "Unterminated string starting at: line 1 column 37 (char 36)",
+          "hang": false,
+          "where": "billing.render_receipt"
+        }
+      },
+      {
+        "seed": 11,
+        "outcome": "wrong",
+        "exit": 0,
+        "wall_s": 1.9932,
+        "fallbacks": 0,
+        "faults": 3,
+        "attempts": 34,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 12,
+        "outcome": "crash",
+        "exit": 1,
+        "wall_s": 0.0824,
+        "fallbacks": 0,
+        "faults": 1,
+        "attempts": 2,
+        "dups": 0,
+        "uncaught": {
+          "type": "BlockingIOError",
+          "msg": "[Errno 11] Resource temporarily unavailable (fork)",
+          "hang": false,
+          "where": "billing.render_receipt"
+        }
+      },
+      {
+        "seed": 13,
+        "outcome": "crash",
+        "exit": 1,
+        "wall_s": 2.2434,
+        "fallbacks": 0,
+        "faults": 5,
+        "attempts": 16,
+        "dups": 0,
+        "uncaught": {
+          "type": "BlockingIOError",
+          "msg": "[Errno 11] Resource temporarily unavailable (fork)",
+          "hang": false,
+          "where": "billing.render_receipt"
+        }
+      },
+      {
+        "seed": 14,
+        "outcome": "hang",
+        "exit": 1,
+        "wall_s": 3.6273,
+        "fallbacks": 0,
+        "faults": 4,
+        "attempts": 9,
+        "dups": 0,
+        "uncaught": {
+          "type": "ChaosHang",
+          "msg": "boundary call with no timeout hung (chaos)",
+          "hang": true,
+          "where": "billing.render_receipt"
+        }
+      },
+      {
+        "seed": 15,
+        "outcome": "wrong",
+        "exit": 0,
+        "wall_s": 2.939,
+        "fallbacks": 0,
+        "faults": 5,
+        "attempts": 36,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 16,
+        "outcome": "hang",
+        "exit": 1,
+        "wall_s": 2.2224,
+        "fallbacks": 0,
+        "faults": 1,
+        "attempts": 14,
+        "dups": 0,
+        "uncaught": {
+          "type": "ChaosHang",
+          "msg": "boundary call with no timeout hung (chaos)",
+          "hang": true,
+          "where": "billing.render_receipt"
+        }
+      },
+      {
+        "seed": 17,
+        "outcome": "crash",
+        "exit": 1,
+        "wall_s": 0.9209,
+        "fallbacks": 0,
+        "faults": 3,
+        "attempts": 19,
+        "dups": 1,
+        "uncaught": {
+          "type": "BlockingIOError",
+          "msg": "[Errno 11] Resource temporarily unavailable (fork)",
+          "hang": false,
+          "where": "billing.render_receipt"
+        }
+      },
+      {
+        "seed": 18,
+        "outcome": "crash",
+        "exit": 1,
+        "wall_s": 0.0786,
+        "fallbacks": 0,
+        "faults": 1,
+        "attempts": 2,
+        "dups": 0,
+        "uncaught": {
+          "type": "BlockingIOError",
+          "msg": "[Errno 11] Resource temporarily unavailable (fork)",
+          "hang": false,
+          "where": "billing.render_receipt"
+        }
+      },
+      {
+        "seed": 19,
+        "outcome": "crash",
+        "exit": 1,
+        "wall_s": 0.1427,
+        "fallbacks": 0,
+        "faults": 1,
+        "attempts": 8,
+        "dups": 0,
+        "uncaught": {
+          "type": "BlockingIOError",
+          "msg": "[Errno 11] Resource temporarily unavailable (fork)",
+          "hang": false,
+          "where": "billing.render_receipt"
+        }
+      },
+      {
+        "seed": 20,
+        "outcome": "crash",
+        "exit": 1,
+        "wall_s": 1.1819,
+        "fallbacks": 0,
+        "faults": 2,
+        "attempts": 11,
+        "dups": 1,
+        "uncaught": {
+          "type": "BlockingIOError",
+          "msg": "[Errno 11] Resource temporarily unavailable (fork)",
+          "hang": false,
+          "where": "billing.render_receipt"
+        }
+      }
+    ],
+    "hardened": [
+      {
+        "seed": 1,
+        "outcome": "crash",
+        "exit": 1,
+        "wall_s": 1.3174,
+        "fallbacks": 1,
+        "faults": 9,
+        "attempts": 38,
+        "dups": 0,
+        "uncaught": {
+          "type": "URLError",
+          "msg": "<urlopen error [Errno 111] Connection refused>",
+          "hang": false,
+          "where": "app.main"
+        }
+      },
+      {
+        "seed": 2,
+        "outcome": "correct",
+        "exit": 0,
+        "wall_s": 1.1003,
+        "fallbacks": 0,
+        "faults": 6,
+        "attempts": 39,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 3,
+        "outcome": "degraded",
+        "exit": 0,
+        "wall_s": 2.2492,
+        "fallbacks": 2,
+        "faults": 16,
+        "attempts": 45,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 4,
+        "outcome": "correct",
+        "exit": 0,
+        "wall_s": 0.9696,
+        "fallbacks": 0,
+        "faults": 5,
+        "attempts": 38,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 5,
+        "outcome": "degraded",
+        "exit": 0,
+        "wall_s": 2.0172,
+        "fallbacks": 1,
+        "faults": 12,
+        "attempts": 43,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 6,
+        "outcome": "correct",
+        "exit": 0,
+        "wall_s": 0.7058,
+        "fallbacks": 0,
+        "faults": 3,
+        "attempts": 36,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 7,
+        "outcome": "correct",
+        "exit": 0,
+        "wall_s": 0.6917,
+        "fallbacks": 0,
+        "faults": 1,
+        "attempts": 34,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 8,
+        "outcome": "correct",
+        "exit": 0,
+        "wall_s": 1.2714,
+        "fallbacks": 0,
+        "faults": 6,
+        "attempts": 39,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 9,
+        "outcome": "correct",
+        "exit": 0,
+        "wall_s": 3.0432,
+        "fallbacks": 0,
+        "faults": 12,
+        "attempts": 45,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 10,
+        "outcome": "correct",
+        "exit": 0,
+        "wall_s": 1.1256,
+        "fallbacks": 0,
+        "faults": 4,
+        "attempts": 37,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 11,
+        "outcome": "degraded",
+        "exit": 0,
+        "wall_s": 0.5986,
+        "fallbacks": 1,
+        "faults": 3,
+        "attempts": 34,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 12,
+        "outcome": "correct",
+        "exit": 0,
+        "wall_s": 2.1414,
+        "fallbacks": 0,
+        "faults": 13,
+        "attempts": 44,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 13,
+        "outcome": "degraded",
+        "exit": 0,
+        "wall_s": 3.8457,
+        "fallbacks": 1,
+        "faults": 11,
+        "attempts": 42,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 14,
+        "outcome": "degraded",
+        "exit": 0,
+        "wall_s": 0.924,
+        "fallbacks": 1,
+        "faults": 4,
+        "attempts": 35,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 15,
+        "outcome": "degraded",
+        "exit": 0,
+        "wall_s": 1.7389,
+        "fallbacks": 1,
+        "faults": 5,
+        "attempts": 36,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 16,
+        "outcome": "correct",
+        "exit": 0,
+        "wall_s": 1.0249,
+        "fallbacks": 0,
+        "faults": 3,
+        "attempts": 36,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 17,
+        "outcome": "crash",
+        "exit": 1,
+        "wall_s": 0.9981,
+        "fallbacks": 0,
+        "faults": 3,
+        "attempts": 34,
+        "dups": 0,
+        "uncaught": {
+          "type": "URLError",
+          "msg": "<urlopen error timed out>",
+          "hang": false,
+          "where": "app.main"
+        }
+      },
+      {
+        "seed": 18,
+        "outcome": "correct",
+        "exit": 0,
+        "wall_s": 0.8007,
+        "fallbacks": 0,
+        "faults": 5,
+        "attempts": 38,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 19,
+        "outcome": "degraded",
+        "exit": 0,
+        "wall_s": 1.3941,
+        "fallbacks": 1,
+        "faults": 9,
+        "attempts": 40,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 20,
+        "outcome": "degraded",
+        "exit": 0,
+        "wall_s": 2.0759,
+        "fallbacks": 1,
+        "faults": 7,
+        "attempts": 38,
+        "dups": 0,
+        "uncaught": null
+      }
+    ]
+  },
+  "functions": {
+    "original": {
+      "billing.charge": {
+        "calls": 149,
+        "ok": 149,
+        "fallback": 0,
+        "raised": 0,
+        "p99": 1.5055193650005094
+      },
+      "billing.render_receipt": {
+        "calls": 145,
+        "ok": 130,
+        "fallback": 0,
+        "raised": 15,
+        "p99": 2.0003479459992377
+      }
+    },
+    "hardened": {
+      "billing.charge": {
+        "calls": 320,
+        "ok": 310,
+        "fallback": 10,
+        "raised": 0,
+        "p99": 1.0027877479988092
+      },
+      "billing.render_receipt": {
+        "calls": 310,
+        "ok": 310,
+        "fallback": 0,
+        "raised": 0,
+        "p99": 0.48542240700044204
+      }
+    }
+  },
+  "host": {
+    "machine": "x86_64",
+    "system": "Linux",
+    "release": "6.12.113+",
+    "python": "3.13.5",
+    "cpus": 8,
+    "node": null
+  },
+  "fault_model": {
+    "timeout": "no answer: caller's timeout fires; with no timeout it hangs (POST/PUT still reach the server)",
+    "refused": "connection refused",
+    "http5xx": "HTTP 503 (subprocess: exit 75 EX_TEMPFAIL)",
+    "http429": "HTTP 429 with Retry-After: 1",
+    "slow": "+3 s latency, then the correct answer",
+    "truncated": "body (or stdout) cut in half"
+  },
+  "created": "2026-11-23T04:15:14+0800"
+}

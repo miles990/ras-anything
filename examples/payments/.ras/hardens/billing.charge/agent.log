@@ -1,0 +1,25 @@
+
+===== 2026-11-23 03:41:13  claude -p --permission-mode acceptEdits --allowedTools 'Read,Edit,Write,Glob,Grep,Bash(ras-anything verify:*),Bash(ras-anything status:*)' --add-dir /workspace/ras-anything/examples/payments --model opus
+`ras-anything verify billing.charge` printed **PASS** on the first run. I only changed `hardened.py`. Nothing was enabled, and the original source, `calls.pkl` and `meta.json` weren't touched.
+
+| gate | original | hardened |
+|---|---|---|
+| happy-path replay | — | 16/16 identical |
+| availability under faults | 76.9% | 100% |
+| silent wrong results | 17 | 0 |
+| hangs | 20 | 0 |
+| p99 latency (5 s budget) | 13.5 s | 4.5 s |
+| duplicate charges | 38 | 0 |
+
+What the hardened `charge` does now:
+- **No double charges:** every attempt sends the same `Idempotency-Key: charge-<invoice id>`. This matters because a POST that times out may already have charged the card. The provider can only drop the duplicate if it honours that header.
+- **Stays under 5 s:** the whole call has a 4.5 s deadline. Each attempt waits at most 3.5 s or whatever time is left, whichever is shorter. That is long enough for the "+3 s slow" case to still succeed.
+- **Retries only temporary failures:** the transient errors listed in the contract, plus a cut-off or unreadable 2xx body. It makes up to 3 attempts with jittered exponential backoff and honours `Retry-After`. Other 4xx responses are not retried.
+- **Falls back openly:** it declares `RAS_FALLBACK = lambda *args, **kwargs: None`, because `app.py` already handles `None` as "PENDING, retry tomorrow". Every give-up writes a `billing.charge.gave_up` log line with the invoice id, amount, URL and error.
+- **Programming errors still raise:** a bad `invoice` dict, for example, raises as it did before instead of being swallowed.
+
+A non-retryable 4xx (say a 402 card decline) also logs and returns `None`. The invoice then shows as "PENDING, retry tomorrow", which is how the original behaved. If you'd rather a hard decline raise an error than be retried the next day, that's a one-line change.
+
+The next step is `ras-anything enable billing.charge`, whenever you want to switch it in.
+
+===== exit 0 after 33s

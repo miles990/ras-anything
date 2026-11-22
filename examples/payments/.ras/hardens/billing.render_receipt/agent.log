@@ -1,0 +1,21 @@
+
+===== 2026-11-23 03:52:28  claude -p --permission-mode acceptEdits --allowedTools 'Read,Edit,Write,Glob,Grep,Bash(ras-anything verify:*),Bash(ras-anything status:*)' --add-dir /workspace/ras-anything/examples/payments --model opus
+`verify` doesn't pass yet. I wrote `hardened.py`, but I can't check it: the one verify run that worked didn't test my code at all, and the permission prompts are blocking the runs that would.
+
+**What happened:** `ras-anything verify billing.render_receipt` ran but skipped all 16 recorded calls: `original_nondeterministic: 16` in `verify.json`, "the original itself didn't reproduce them." The unmodified original couldn't replay its own recording, so 0 trials ran and the happy-path, p99 and availability gates failed with nothing measured.
+
+**Likely cause (not confirmed):** replay matches a subprocess call by its full command line, including `sys.executable` (`ras_anything/boundary.py:66`). The calls were recorded under `/workspace/ras-anything/.venv/bin/python`. If the `ras-anything` on my PATH runs a different Python, nothing matches. I tried to confirm this and to rerun with the venv's own binary and the ras-anything verify tool, but all three were blocked waiting for your approval.
+
+**What's in `hardened.py`:**
+- **Timeouts:** every render has `timeout=1.0`, with up to 4 attempts and full-jitter backoff (0.1/0.2/0.3 s caps). Worst case is about 4.6 s, under the 5 s budget.
+- **Retries:** only on a timeout, an exit code of 75 (mapped to a `RenderTempFail` error, since `is_transient` doesn't cover exit codes), or stdout that won't parse. Retrying is safe because rendering has no side effects. Anything else is raised unchanged.
+- **When it gives up:** it logs `render_receipt.degraded` with the invoice id, charge id and the error. It then returns the declared `RAS_FALLBACK`, `{"pages": 0, "bytes": 0, "sha256": "unrendered"}`. That has the shape `app.py` already prints, so a paid invoice still shows as paid, with an obviously missing receipt rather than a crash.
+- **Trade-off:** the `slow` fault adds 3 s, which always exceeds the 1 s per-attempt timeout, so slow renders get the fallback instead of the real receipt.
+
+**To finish:** approve one of these, or run it yourself from `examples/payments`:
+```
+/workspace/ras-anything/.venv/bin/ras-anything verify billing.render_receipt
+```
+If that replays the 16 calls, I'll fix whatever gates still fail. If it still reports the original as nondeterministic, the problem is in how calls are recorded or replayed, not in this function. Your working tree already has uncommitted changes to `boundary.py`, the file that does the replay; I couldn't diff it because git access is limited to the example folders.
+
+===== exit 0 after 67s

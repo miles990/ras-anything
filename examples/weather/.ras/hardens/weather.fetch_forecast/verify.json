@@ -1,0 +1,160 @@
+{
+  "id": "weather.fetch_forecast",
+  "budget_s": 5.0,
+  "recorded": 12,
+  "happy": {
+    "total": 12,
+    "equal": 12,
+    "original_nondeterministic": 0,
+    "first_failure": null
+  },
+  "chaos": {
+    "calls": 12,
+    "scenarios": [
+      "timeout",
+      "refused",
+      "http5xx",
+      "http429",
+      "slow",
+      "truncated",
+      "outage",
+      "mixed:1",
+      "mixed:2",
+      "mixed:3"
+    ],
+    "by_scenario": {
+      "timeout": {
+        "original": {
+          "hang": 12
+        },
+        "hardened": {
+          "ok": 12
+        },
+        "n": 12
+      },
+      "refused": {
+        "original": {
+          "error": 12
+        },
+        "hardened": {
+          "ok": 12
+        },
+        "n": 12
+      },
+      "http5xx": {
+        "original": {
+          "error": 12
+        },
+        "hardened": {
+          "ok": 12
+        },
+        "n": 12
+      },
+      "http429": {
+        "original": {
+          "error": 12
+        },
+        "hardened": {
+          "ok": 12
+        },
+        "n": 12
+      },
+      "slow": {
+        "original": {
+          "ok": 12
+        },
+        "hardened": {
+          "ok": 12
+        },
+        "n": 12
+      },
+      "truncated": {
+        "original": {
+          "error": 12
+        },
+        "hardened": {
+          "ok": 12
+        },
+        "n": 12
+      },
+      "outage": {
+        "original": {
+          "error": 12
+        },
+        "hardened": {
+          "ok": 12
+        },
+        "n": 12
+      },
+      "mixed": {
+        "original": {
+          "hang": 3,
+          "ok": 27,
+          "error": 6
+        },
+        "hardened": {
+          "ok": 36
+        },
+        "n": 36
+      }
+    },
+    "first_failure": null,
+    "first_original_dup": null
+  },
+  "original": {
+    "trials": 120,
+    "ok": 39,
+    "degraded": 0,
+    "wrong": 0,
+    "error": 66,
+    "hang": 15,
+    "miss": 0,
+    "availability": 0.325,
+    "p50": 0.003538,
+    "p99": 60.0,
+    "max": 60.0,
+    "dups": 0,
+    "logged_failures": 0.0,
+    "structured_errors": 0.0
+  },
+  "hardened": {
+    "trials": 120,
+    "ok": 120,
+    "degraded": 0,
+    "wrong": 0,
+    "error": 0,
+    "hang": 0,
+    "miss": 0,
+    "availability": 1.0,
+    "p50": 0.081269,
+    "p99": 3.604174,
+    "max": 3.749258,
+    "dups": 0,
+    "logged_failures": null,
+    "structured_errors": null
+  },
+  "gates": {
+    "happy": true,
+    "no_wrong": true,
+    "no_hang": true,
+    "p99": true,
+    "dups": true,
+    "availability": true
+  },
+  "passed": true,
+  "fallback": "callable",
+  "elapsed_s": 0.02,
+  "hardened_sha256": "5a22519bc60a64ab87fd1b5a7c52cf8948f1dfce725637a7eeef2c292a0fdeb2",
+  "verified_at": "2026-11-23T04:14:00+0800",
+  "wall_s": 0.07,
+  "fault_model": {
+    "timeout": "no answer: caller's timeout fires; with no timeout it hangs (POST/PUT still reach the server)",
+    "refused": "connection refused",
+    "http5xx": "HTTP 503 (subprocess: exit 75 EX_TEMPFAIL)",
+    "http429": "HTTP 429 with Retry-After: 1",
+    "slow": "+3 s latency, then the correct answer",
+    "truncated": "body (or stdout) cut in half",
+    "outage": "dependency down (refused) for 3 consecutive attempts, then recovers",
+    "mixed": "seeded mix: each attempt faults with p=0.3, kind drawn uniformly"
+  }
+}

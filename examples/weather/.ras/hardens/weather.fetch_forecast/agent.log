@@ -1,0 +1,25 @@
+
+===== 2026-11-23 03:40:06  claude -p --permission-mode acceptEdits --allowedTools 'Read,Edit,Write,Glob,Grep,Bash(ras-anything verify:*),Bash(ras-anything status:*)' --add-dir /workspace/ras-anything/examples/weather --model opus
+`ras-anything verify weather.fetch_forecast` prints **PASS** on the first run. The only file I changed is `hardened.py`.
+
+| gate | original | hardened |
+|---|---|---|
+| Happy-path replay (no faults) | — | 12/12 identical |
+| Availability under faults | 32.5% | 100% |
+| Hangs | 15 | 0 |
+| p99 latency (5 s budget) | 60.00 s | 3.60 s |
+| Silent wrong results | 0 | 0 |
+| Duplicate side effects | 0 | 0 |
+
+Every fault scenario (timeout, refused, 503, 429, slow, truncated, outage, mixed) ended with the real answer on every call.
+
+What the new version does:
+- **Time limit:** the whole call has a 4.8 s deadline. Each attempt's `urlopen` timeout is the smaller of 3.5 s and whatever time is left. 3.5 s is long enough for the "slow" fault (+3 s) to still return the real data, and leaves room for one more attempt after a timeout.
+- **Retries:** up to 4 attempts, with jittered backoff that honours `Retry-After`. That is enough to ride out the 3-attempt outage. It retries only transient errors, plus a truncated body that fails to parse. Other 4xx errors and code bugs are logged and re-raised with their original type, so callers see the same exceptions as before. Retrying is safe because the request is a GET.
+- **Fallback:** if the provider stays down, it logs a `weather.fetch_forecast.degraded` event and returns `RAS_FALLBACK = lambda city: {"city": city, "status": "unavailable"}`. `summarize()` already turns that into an "unavailable" row in the dashboard.
+
+**Not tested:** retries recovered every faulted call, so the fallback path never ran during verify. The "failures logged w/ trace id" row shows "—" for the same reason.
+
+I haven't enabled anything, as instructed. The next step would be `ras-anything enable weather.fetch_forecast`.
+
+===== exit 0 after 35s

@@ -1,0 +1,607 @@
+{
+  "cmd": [
+    "python",
+    "app.py"
+  ],
+  "display_cmd": "python app.py",
+  "ids": [
+    "weather.fetch_forecast"
+  ],
+  "seeds": 20,
+  "rate": 0.1,
+  "outage_rate": 0.05,
+  "time_scale": 0.05,
+  "hang_cap_s": 2.0,
+  "degraded_markers": [
+    "unavailable"
+  ],
+  "clean_outputs_equal": true,
+  "summary": {
+    "original": {
+      "runs": 20,
+      "correct": 8,
+      "degraded": 0,
+      "wrong": 0,
+      "crash": 9,
+      "hang": 3,
+      "availability": 0.4,
+      "crash_rate": 0.45,
+      "hang_rate": 0.15,
+      "wrong_rate": 0.0,
+      "p50_wall": 0.0944,
+      "p99_wall": 2.0983,
+      "identical_rate": 0.4,
+      "dups": 0,
+      "faults": 14,
+      "failures_by_place": {
+        "URLError in weather.fetch_forecast": 6,
+        "JSONDecodeError in weather.fetch_forecast": 2,
+        "hang in weather.fetch_forecast": 3,
+        "HTTPError in weather.fetch_forecast": 1
+      },
+      "clean_wall": 0.0892
+    },
+    "hardened": {
+      "runs": 20,
+      "correct": 20,
+      "degraded": 0,
+      "wrong": 0,
+      "crash": 0,
+      "hang": 0,
+      "availability": 1.0,
+      "crash_rate": 0.0,
+      "hang_rate": 0.0,
+      "wrong_rate": 0.0,
+      "p50_wall": 0.3385,
+      "p99_wall": 1.041,
+      "identical_rate": 1.0,
+      "dups": 0,
+      "faults": 49,
+      "failures_by_place": {},
+      "clean_wall": 0.0892
+    }
+  },
+  "runs": {
+    "original": [
+      {
+        "seed": 1,
+        "outcome": "correct",
+        "exit": 0,
+        "wall_s": 0.0877,
+        "fallbacks": 0,
+        "faults": 0,
+        "attempts": 12,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 2,
+        "outcome": "crash",
+        "exit": 1,
+        "wall_s": 0.0788,
+        "fallbacks": 0,
+        "faults": 1,
+        "attempts": 2,
+        "dups": 0,
+        "uncaught": {
+          "type": "URLError",
+          "msg": "<urlopen error [Errno 111] Connection refused>",
+          "hang": false,
+          "where": "weather.fetch_forecast"
+        }
+      },
+      {
+        "seed": 3,
+        "outcome": "crash",
+        "exit": 1,
+        "wall_s": 0.0862,
+        "fallbacks": 0,
+        "faults": 1,
+        "attempts": 9,
+        "dups": 0,
+        "uncaught": {
+          "type": "JSONDecodeError",
+          "msg": "Unterminated string starting at: line 1 column 23 (char 22)",
+          "hang": false,
+          "where": "weather.fetch_forecast"
+        }
+      },
+      {
+        "seed": 4,
+        "outcome": "crash",
+        "exit": 1,
+        "wall_s": 0.079,
+        "fallbacks": 0,
+        "faults": 1,
+        "attempts": 1,
+        "dups": 0,
+        "uncaught": {
+          "type": "JSONDecodeError",
+          "msg": "Expecting property name enclosed in double quotes: line 1 column 112 (char 111)",
+          "hang": false,
+          "where": "weather.fetch_forecast"
+        }
+      },
+      {
+        "seed": 5,
+        "outcome": "correct",
+        "exit": 0,
+        "wall_s": 0.0841,
+        "fallbacks": 0,
+        "faults": 0,
+        "attempts": 12,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 6,
+        "outcome": "crash",
+        "exit": 1,
+        "wall_s": 0.1001,
+        "fallbacks": 0,
+        "faults": 1,
+        "attempts": 8,
+        "dups": 0,
+        "uncaught": {
+          "type": "URLError",
+          "msg": "<urlopen error [Errno 111] Connection refused>",
+          "hang": false,
+          "where": "weather.fetch_forecast"
+        }
+      },
+      {
+        "seed": 7,
+        "outcome": "correct",
+        "exit": 0,
+        "wall_s": 0.093,
+        "fallbacks": 0,
+        "faults": 0,
+        "attempts": 12,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 8,
+        "outcome": "correct",
+        "exit": 0,
+        "wall_s": 0.0944,
+        "fallbacks": 0,
+        "faults": 0,
+        "attempts": 12,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 9,
+        "outcome": "correct",
+        "exit": 0,
+        "wall_s": 0.0945,
+        "fallbacks": 0,
+        "faults": 0,
+        "attempts": 12,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 10,
+        "outcome": "hang",
+        "exit": 1,
+        "wall_s": 2.0977,
+        "fallbacks": 0,
+        "faults": 1,
+        "attempts": 6,
+        "dups": 0,
+        "uncaught": {
+          "type": "ChaosHang",
+          "msg": "boundary call with no timeout hung (chaos)",
+          "hang": true,
+          "where": "weather.fetch_forecast"
+        }
+      },
+      {
+        "seed": 11,
+        "outcome": "hang",
+        "exit": 1,
+        "wall_s": 2.0983,
+        "fallbacks": 0,
+        "faults": 1,
+        "attempts": 10,
+        "dups": 0,
+        "uncaught": {
+          "type": "ChaosHang",
+          "msg": "boundary call with no timeout hung (chaos)",
+          "hang": true,
+          "where": "weather.fetch_forecast"
+        }
+      },
+      {
+        "seed": 12,
+        "outcome": "crash",
+        "exit": 1,
+        "wall_s": 0.0809,
+        "fallbacks": 0,
+        "faults": 1,
+        "attempts": 2,
+        "dups": 0,
+        "uncaught": {
+          "type": "URLError",
+          "msg": "<urlopen error [Errno 111] Connection refused>",
+          "hang": false,
+          "where": "weather.fetch_forecast"
+        }
+      },
+      {
+        "seed": 13,
+        "outcome": "correct",
+        "exit": 0,
+        "wall_s": 0.2435,
+        "fallbacks": 0,
+        "faults": 1,
+        "attempts": 12,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 14,
+        "outcome": "crash",
+        "exit": 1,
+        "wall_s": 0.0841,
+        "fallbacks": 0,
+        "faults": 1,
+        "attempts": 2,
+        "dups": 0,
+        "uncaught": {
+          "type": "URLError",
+          "msg": "<urlopen error [Errno 111] Connection refused>",
+          "hang": false,
+          "where": "weather.fetch_forecast"
+        }
+      },
+      {
+        "seed": 15,
+        "outcome": "crash",
+        "exit": 1,
+        "wall_s": 0.0701,
+        "fallbacks": 0,
+        "faults": 1,
+        "attempts": 1,
+        "dups": 0,
+        "uncaught": {
+          "type": "URLError",
+          "msg": "<urlopen error [Errno 111] Connection refused>",
+          "hang": false,
+          "where": "weather.fetch_forecast"
+        }
+      },
+      {
+        "seed": 16,
+        "outcome": "crash",
+        "exit": 1,
+        "wall_s": 0.0907,
+        "fallbacks": 0,
+        "faults": 1,
+        "attempts": 6,
+        "dups": 0,
+        "uncaught": {
+          "type": "URLError",
+          "msg": "<urlopen error [Errno 111] Connection refused>",
+          "hang": false,
+          "where": "weather.fetch_forecast"
+        }
+      },
+      {
+        "seed": 17,
+        "outcome": "hang",
+        "exit": 1,
+        "wall_s": 2.0873,
+        "fallbacks": 0,
+        "faults": 1,
+        "attempts": 5,
+        "dups": 0,
+        "uncaught": {
+          "type": "ChaosHang",
+          "msg": "boundary call with no timeout hung (chaos)",
+          "hang": true,
+          "where": "weather.fetch_forecast"
+        }
+      },
+      {
+        "seed": 18,
+        "outcome": "correct",
+        "exit": 0,
+        "wall_s": 0.2469,
+        "fallbacks": 0,
+        "faults": 1,
+        "attempts": 12,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 19,
+        "outcome": "correct",
+        "exit": 0,
+        "wall_s": 0.1164,
+        "fallbacks": 0,
+        "faults": 0,
+        "attempts": 12,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 20,
+        "outcome": "crash",
+        "exit": 1,
+        "wall_s": 0.1056,
+        "fallbacks": 0,
+        "faults": 1,
+        "attempts": 5,
+        "dups": 0,
+        "uncaught": {
+          "type": "HTTPError",
+          "msg": "HTTP Error 503: Service Unavailable",
+          "hang": false,
+          "where": "weather.fetch_forecast"
+        }
+      }
+    ],
+    "hardened": [
+      {
+        "seed": 1,
+        "outcome": "correct",
+        "exit": 0,
+        "wall_s": 0.0851,
+        "fallbacks": 0,
+        "faults": 0,
+        "attempts": 12,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 2,
+        "outcome": "correct",
+        "exit": 0,
+        "wall_s": 0.8577,
+        "fallbacks": 0,
+        "faults": 6,
+        "attempts": 18,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 3,
+        "outcome": "correct",
+        "exit": 0,
+        "wall_s": 0.2741,
+        "fallbacks": 1,
+        "faults": 3,
+        "attempts": 15,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 4,
+        "outcome": "correct",
+        "exit": 0,
+        "wall_s": 0.6522,
+        "fallbacks": 0,
+        "faults": 4,
+        "attempts": 16,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 5,
+        "outcome": "correct",
+        "exit": 0,
+        "wall_s": 0.097,
+        "fallbacks": 0,
+        "faults": 0,
+        "attempts": 12,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 6,
+        "outcome": "correct",
+        "exit": 0,
+        "wall_s": 0.5536,
+        "fallbacks": 0,
+        "faults": 3,
+        "attempts": 15,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 7,
+        "outcome": "correct",
+        "exit": 0,
+        "wall_s": 0.0865,
+        "fallbacks": 0,
+        "faults": 0,
+        "attempts": 12,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 8,
+        "outcome": "correct",
+        "exit": 0,
+        "wall_s": 0.0907,
+        "fallbacks": 0,
+        "faults": 0,
+        "attempts": 12,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 9,
+        "outcome": "correct",
+        "exit": 0,
+        "wall_s": 0.0931,
+        "fallbacks": 0,
+        "faults": 0,
+        "attempts": 12,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 10,
+        "outcome": "correct",
+        "exit": 0,
+        "wall_s": 0.618,
+        "fallbacks": 0,
+        "faults": 3,
+        "attempts": 15,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 11,
+        "outcome": "correct",
+        "exit": 0,
+        "wall_s": 0.3385,
+        "fallbacks": 0,
+        "faults": 1,
+        "attempts": 13,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 12,
+        "outcome": "correct",
+        "exit": 0,
+        "wall_s": 0.6858,
+        "fallbacks": 0,
+        "faults": 4,
+        "attempts": 16,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 13,
+        "outcome": "correct",
+        "exit": 0,
+        "wall_s": 0.243,
+        "fallbacks": 0,
+        "faults": 1,
+        "attempts": 12,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 14,
+        "outcome": "correct",
+        "exit": 0,
+        "wall_s": 0.8238,
+        "fallbacks": 0,
+        "faults": 6,
+        "attempts": 18,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 15,
+        "outcome": "correct",
+        "exit": 0,
+        "wall_s": 0.4977,
+        "fallbacks": 0,
+        "faults": 4,
+        "attempts": 15,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 16,
+        "outcome": "correct",
+        "exit": 0,
+        "wall_s": 1.041,
+        "fallbacks": 0,
+        "faults": 6,
+        "attempts": 18,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 17,
+        "outcome": "correct",
+        "exit": 0,
+        "wall_s": 0.8836,
+        "fallbacks": 0,
+        "faults": 5,
+        "attempts": 17,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 18,
+        "outcome": "correct",
+        "exit": 0,
+        "wall_s": 0.2505,
+        "fallbacks": 0,
+        "faults": 1,
+        "attempts": 12,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 19,
+        "outcome": "correct",
+        "exit": 0,
+        "wall_s": 0.1024,
+        "fallbacks": 0,
+        "faults": 0,
+        "attempts": 12,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 20,
+        "outcome": "correct",
+        "exit": 0,
+        "wall_s": 0.2654,
+        "fallbacks": 0,
+        "faults": 2,
+        "attempts": 14,
+        "dups": 0,
+        "uncaught": null
+      }
+    ]
+  },
+  "functions": {
+    "original": {
+      "weather.fetch_forecast": {
+        "calls": 153,
+        "ok": 141,
+        "fallback": 0,
+        "raised": 12,
+        "p99": 2.00041865899766
+      }
+    },
+    "hardened": {
+      "weather.fetch_forecast": {
+        "calls": 240,
+        "ok": 239,
+        "fallback": 1,
+        "raised": 0,
+        "p99": 0.5341686650026531
+      }
+    }
+  },
+  "host": {
+    "machine": "x86_64",
+    "system": "Linux",
+    "release": "6.12.113+",
+    "python": "3.13.5",
+    "cpus": 8,
+    "node": null
+  },
+  "fault_model": {
+    "timeout": "no answer: caller's timeout fires; with no timeout it hangs (POST/PUT still reach the server)",
+    "refused": "connection refused",
+    "http5xx": "HTTP 503 (subprocess: exit 75 EX_TEMPFAIL)",
+    "http429": "HTTP 429 with Retry-After: 1",
+    "slow": "+3 s latency, then the correct answer",
+    "truncated": "body (or stdout) cut in half"
+  },
+  "created": "2026-11-23T04:14:16+0800"
+}

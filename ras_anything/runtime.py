@@ -189,11 +189,11 @@ def _http_status(exc: BaseException) -> int | None:
 
 
 def is_transient(exc: BaseException) -> bool:
-    """Timeouts, connection errors, truncated responses, 408/425/429/5xx(500, 502-504). Never other 4xx."""
+    """Timeouts, connection errors, EAGAIN, truncated responses, 408/425/429/500/502/503/504. Never other 4xx."""
     status = _http_status(exc)
     if status is not None:
         return status in TRANSIENT_HTTP
-    if isinstance(exc, (TimeoutError, socket.timeout, ConnectionError, subprocess.TimeoutExpired,
+    if isinstance(exc, (TimeoutError, socket.timeout, ConnectionError, BlockingIOError, subprocess.TimeoutExpired,
                         http.client.IncompleteRead, http.client.RemoteDisconnected)):
         return True
     if isinstance(exc, urllib.error.URLError):

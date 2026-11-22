@@ -46,7 +46,8 @@ def verify(fid: str | None = None, max_chaos: int = 60, quiet: bool = False) -> 
             fid, ui.DOT, meta["recorded"], ui.DOT, len(faults.MATRIX), ui.DOT))
     t0 = time.perf_counter()
     try:
-        p = subprocess.run([sys.executable, "-m", "ras_anything._verify_worker", str(d), out, str(max_chaos)],
+        exe = meta.get("executable") if meta.get("executable") and os.path.exists(meta["executable"]) else sys.executable
+        p = subprocess.run([exe, "-m", "ras_anything._verify_worker", str(d), out, str(max_chaos)],
                            env=env, capture_output=True, text=True, timeout=900)
         res = json.loads(Path(out).read_text() or "null")
     except subprocess.TimeoutExpired:
