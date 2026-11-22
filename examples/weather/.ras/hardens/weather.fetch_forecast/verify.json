@@ -99,7 +99,8 @@
       }
     },
     "first_failure": null,
-    "first_original_dup": null
+    "first_original_dup": null,
+    "new_crashes": []
   },
   "original": {
     "trials": 120,
@@ -110,7 +111,7 @@
     "hang": 15,
     "miss": 0,
     "availability": 0.325,
-    "p50": 0.003538,
+    "p50": 0.003709,
     "p99": 60.0,
     "max": 60.0,
     "dups": 0,
@@ -126,9 +127,9 @@
     "hang": 0,
     "miss": 0,
     "availability": 1.0,
-    "p50": 0.081269,
-    "p99": 3.604174,
-    "max": 3.749258,
+    "p50": 0.080795,
+    "p99": 3.613943,
+    "max": 3.69451,
     "dups": 0,
     "logged_failures": null,
     "structured_errors": null
@@ -137,6 +138,7 @@
     "happy": true,
     "no_wrong": true,
     "no_hang": true,
+    "no_new_crashes": true,
     "p99": true,
     "dups": true,
     "availability": true
@@ -145,8 +147,8 @@
   "fallback": "callable",
   "elapsed_s": 0.02,
   "hardened_sha256": "5a22519bc60a64ab87fd1b5a7c52cf8948f1dfce725637a7eeef2c292a0fdeb2",
-  "verified_at": "2026-11-23T04:14:00+0800",
-  "wall_s": 0.07,
+  "verified_at": "2026-11-23T05:03:36+0800",
+  "wall_s": 0.08,
   "fault_model": {
     "timeout": "no answer: caller's timeout fires; with no timeout it hangs (POST/PUT still reach the server)",
     "refused": "connection refused",

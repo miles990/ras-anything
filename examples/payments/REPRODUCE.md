@@ -48,11 +48,11 @@ Measured (from the commands above):
 | verify `billing.charge`: availability (160 trials) | 76.9% | 100.0% |
 | verify `billing.charge`: duplicate charges | 38 | 0 |
 | verify `billing.render_receipt`: availability (160 trials) | 33.1% | 100.0% |
-| bench: app availability (correct or declared-degraded), 20 seeds | 5.0% | 90.0% |
-| bench: byte-identical output | 5.0% | 50.0% |
-| bench: crashes / hangs / wrong output | 60.0% / 15.0% / 20.0% | 10.0% / 0.0% / 0.0% |
+| bench: app availability (correct or declared-degraded), 20 seeds | 0.0% | 90.0% |
+| bench: byte-identical output | 0.0% | 45.0% |
+| bench: crashes / hangs / wrong output | 60.0% / 25.0% / 15.0% | 10.0% / 0.0% / 0.0% |
 | bench: duplicate charges | 5 | 0 |
-| bench: p50 / p99 run time | 1.18s / 3.63s | 1.27s / 3.85s |
+| bench: p50 / p99 run time | 1.79s / 3.94s | 1.28s / 3.87s |
 
 Degraded runs are runs where `charge` returned its declared fallback (`None`, which the app already
 prints as `PENDING (payment failed, retry tomorrow)`; safe now because the retry tomorrow reuses the

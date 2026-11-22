@@ -50,12 +50,16 @@ class Plan:
 
 
 class FirstAttempt(Plan):
-    """The first attempt of every distinct request gets `kind`; outage = first OUTAGE_K attempts."""
+    """The first attempt of every distinct request (or just `target_key`) gets `kind`;
+    outage = first OUTAGE_K attempts."""
 
-    def __init__(self, kind: str):
+    def __init__(self, kind: str, target_key: str | None = None):
         self.kind = self.name = kind
+        self.target_key = target_key
 
     def fault(self, key, n, nonidempotent=False):
+        if self.target_key is not None and key != self.target_key:
+            return None
         if self.kind == "outage":
             return "refused" if n < OUTAGE_K else None
         return self.kind if n == 0 else None

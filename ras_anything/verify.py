@@ -129,7 +129,8 @@ def print_verify(res: dict, fid: str) -> None:
         att = fd["original"]["attempts"]
         steps = ", ".join("%s #%d %s%s" % (a["method"] or "run", a["n"], a["fault"] or "ok",
                                           " (reached server)" if a["reached"] and a["fault"] else "") for a in att)
-        print("  " + ui.warn(ui.WARN + " the original double-sends: call #%d %s under %s" % (fd["call"], ui.clip(fd["args"], 70), fd["scenario"])))
+        hdr = "the original double-sends" if fd["original"]["dups"] else "hardened double-sends"
+        print("  " + ui.warn(ui.WARN + " %s: call #%d %s under %s" % (hdr, fd["call"], ui.clip(fd["args"], 70), fd["scenario"])))
         print("    original: %s %s %d duplicate%s" % (steps, ui.ARROW, fd["original"]["dups"], "" if fd["original"]["dups"] == 1 else "s"))
         hatt = fd["hardened"]["attempts"]
         keys = {a["idem"] for a in hatt if a["reached"]}

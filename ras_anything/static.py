@@ -170,7 +170,8 @@ class FileInfo:
         for h in handlers:
             tname = dotted(h.type) if h.type is not None else ""
             broad = h.type is None or tname in {"Exception", "BaseException"}
-            if broad and _swallows(h):
+            narrow_swallow = bool(h.body) and all(_is_swallow_stmt(s) for s in h.body)
+            if (broad or narrow_swallow) and _swallows(h):
                 label = "except:" if h.type is None else "except %s: %s" % (tname, _brief(h.body[0]))
                 found["swallow"] = SIGNALS["swallow"][1].format(handler=label)
             for r in ast.walk(h):

@@ -9,7 +9,7 @@ import time
 from pathlib import Path
 
 from . import faults, ui
-from .paths import UserError, find_project, harden_dir, load_json, save_json
+from .paths import UserError, find_project, harden_dir, load_json, resolve_in_project, save_json
 from .runner import python_cmd, run, project_root_for
 
 
@@ -74,8 +74,8 @@ def bench(cmd: list[str] | None = None, seeds: int = 20, rate: float = 0.1, mark
     for fid in ids:
         m = load_json(harden_dir(project, fid) / "meta.json")
         targets.append({"id": fid, "module": m["module"], "qualname": m["qualname"], "in_main": m["in_main"]})
-    cwd = Path(scan.get("cwd") or os.getcwd())
-    root = Path(scan.get("root") or project_root_for(cmd, cwd))
+    cwd = resolve_in_project(scan.get("cwd") or ".", project) if scan.get("cwd") else project
+    root = resolve_in_project(scan.get("root") or ".", project) if scan.get("root") else project_root_for(cmd, cwd)
     base_cfg = {"mode": "bench", "rate": rate, "outage_rate": 0.05, "scale": 0.05, "hang_s": 2.0, "targets": targets}
     variants = {"original": {"RAS_ANYTHING_DISABLE": "1"}, "hardened": {"RAS_ANYTHING_DISABLE": "0"}}
     if not quiet:
@@ -94,6 +94,9 @@ def bench(cmd: list[str] | None = None, seeds: int = 20, rate: float = 0.1, mark
                                       "print identical output" if same_clean else "DIFFER: hardened changed the app's output"))
     runs = {v: [] for v in variants}
     stats = {v: {} for v in variants}
+    degraded_stdouts: set[str] = set()
+    raw_runs = []
+    first_wrong_diff = None
     for seed in range(1, seeds + 1):
         order = list(variants) if seed % 2 else list(reversed(list(variants)))
         line = {}
@@ -102,10 +105,17 @@ def bench(cmd: list[str] | None = None, seeds: int = 20, rate: float = 0.1, mark
             d = r.data or {}
             att = d.get("attempts") or []
             fbs = sum(st.get("fallback", 0) for st in (d.get("stats") or {}).values())
-            rec = {"seed": seed, "outcome": classify(r, baseline, markers, fbs), "exit": r.code, "wall_s": round(r.wall, 4),
+            outc = classify(r, baseline, markers, fbs)
+            if v == "hardened" and outc == "degraded" and r.code == 0:
+                degraded_stdouts.add(r.stdout)
+            if v == "hardened" and outc == "wrong" and first_wrong_diff is None:
+                first_wrong_diff = {"seed": seed, "expected": baseline[:240], "actual": r.stdout[:240],
+                                    "faults": [a.get("fault") for a in att if a.get("fault")]}
+            rec = {"seed": seed, "outcome": outc, "exit": r.code, "wall_s": round(r.wall, 4),
                    "fallbacks": fbs,
                    "faults": sum(1 for a in att if a.get("fault")), "attempts": len(att), "dups": duplicates(att),
                    "uncaught": d.get("uncaught")}
+            raw_runs.append((v, rec, r.stdout))
             runs[v].append(rec)
             for fid, st in (d.get("stats") or {}).items():
                 agg = stats[v].setdefault(fid, {"calls": 0, "ok": 0, "fallback": 0, "raised": 0, "p99": []})
@@ -116,6 +126,9 @@ def bench(cmd: list[str] | None = None, seeds: int = 20, rate: float = 0.1, mark
                 if st.get("p99") is not None:
                     agg["p99"].append(st["p99"])
             line[v] = rec
+        if line["original"]["outcome"] == "wrong" and line["hardened"]["outcome"] == "degraded" and line["original"]["exit"] == 0:
+            # Check same-seed degraded equivalence immediately for live display
+            pass
         if not quiet:
             def cell(rec):
                 o = rec["outcome"]
@@ -126,6 +139,9 @@ def bench(cmd: list[str] | None = None, seeds: int = 20, rate: float = 0.1, mark
                   cell(line["hardened"]), ui.dim("%2d fault%s" % (line["hardened"]["faults"], " " if line["hardened"]["faults"] == 1 else "s")),
                   ui.warn(" dup %d→%d" % (line["original"]["dups"], line["hardened"]["dups"]))
                   if line["original"]["dups"] or line["hardened"]["dups"] else ""), flush=True)
+    for v, rec, stdout in raw_runs:
+        if v == "original" and rec["outcome"] == "wrong" and rec["exit"] == 0 and stdout in degraded_stdouts:
+            rec["outcome"] = "degraded"
     summary = {}
     for v, rs in runs.items():
         n = len(rs)
@@ -145,7 +161,7 @@ def bench(cmd: list[str] | None = None, seeds: int = 20, rate: float = 0.1, mark
     res = {
         "cmd": cmd, "display_cmd": shown, "ids": ids, "seeds": seeds, "rate": rate, "outage_rate": 0.05,
         "time_scale": 0.05, "hang_cap_s": 2.0, "degraded_markers": markers, "clean_outputs_equal": same_clean,
-        "summary": summary, "runs": runs, "functions": stats,
+        "summary": summary, "runs": runs, "functions": stats, "first_wrong": first_wrong_diff,
         "host": {"machine": platform.machine(), "system": platform.system(), "release": platform.release(),
                  "python": platform.python_version(), "cpus": os.cpu_count(), "node": platform.node()[:0] or None},
         "fault_model": {k: faults.DESCRIBE[k] for k in faults.KINDS},
@@ -199,6 +215,10 @@ def print_bench(res: dict) -> None:
     print()
     print(ui.dim("  live chaos at the boundary, real upstream behind it · injected waits ×%g · seeds 1–%d, same per pair · saved .ras/bench.json"
                  % (res["time_scale"], res["seeds"])))
+    if res.get("first_wrong"):
+        fw = res["first_wrong"]
+        print(ui.warn("  first hardened wrong output (seed %s, faults=%s): %r (expected %r)" % (
+            fw["seed"], fw["faults"], fw["actual"][:120], fw["expected"][:120])))
     if not res["clean_outputs_equal"]:
         print(ui.bad("  ✗ the hardened app prints different output with no faults: fix before shipping"))
     ui.next_hint("report")

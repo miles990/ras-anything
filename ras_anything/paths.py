@@ -62,3 +62,32 @@ def sha256_file(path: Path) -> str:
 
 def safe_name(fid: str) -> str:
     return fid.replace(".", "__").replace("/", "_")
+
+
+def rel_to_project(path: str | os.PathLike, project: Path) -> str:
+    """Store path relative to `project` when inside it; otherwise return resolved string."""
+    proj = project.resolve()
+    p = Path(path)
+    if not p.is_absolute():
+        p = (proj / p).resolve()
+    else:
+        p = p.resolve()
+    try:
+        return p.relative_to(proj).as_posix() or "."
+    except ValueError:
+        return str(p)
+
+
+def resolve_in_project(path: str | os.PathLike, project: Path) -> Path:
+    """Resolve `path` against `project` and refuse any path (or symlink) escaping `project`."""
+    proj = project.resolve()
+    raw = Path(path)
+    cand = raw if raw.is_absolute() else (proj / raw)
+    resolved = cand.resolve()
+    if not resolved.is_relative_to(proj):
+        raise UserError(
+            "path %s escapes project %s" % (path, proj),
+            "refusing to read or write outside the project directory",
+            "scan",
+        )
+    return resolved

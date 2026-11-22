@@ -89,28 +89,30 @@
       "mixed": {
         "original": {
           "ok": 37,
-          "error": 10,
-          "hang": 1
+          "error": 9,
+          "hang": 2
         },
         "hardened": {
-          "ok": 48
+          "ok": 47,
+          "degraded": 1
         },
         "n": 48
       }
     },
     "first_failure": null,
-    "first_original_dup": null
+    "first_original_dup": null,
+    "new_crashes": []
   },
   "original": {
     "trials": 160,
     "ok": 53,
     "degraded": 0,
     "wrong": 0,
-    "error": 90,
-    "hang": 17,
+    "error": 89,
+    "hang": 18,
     "miss": 0,
     "availability": 0.33125,
-    "p50": 0.021397,
+    "p50": 0.021214,
     "p99": 60.0,
     "max": 60.0,
     "dups": 0,
@@ -119,34 +121,35 @@
   },
   "hardened": {
     "trials": 160,
-    "ok": 160,
-    "degraded": 0,
+    "ok": 159,
+    "degraded": 1,
     "wrong": 0,
     "error": 0,
     "hang": 0,
     "miss": 0,
     "availability": 1.0,
-    "p50": 0.087562,
-    "p99": 1.214939,
-    "max": 1.304993,
+    "p50": 0.094178,
+    "p99": 1.169588,
+    "max": 1.239328,
     "dups": 0,
-    "logged_failures": null,
+    "logged_failures": 1.0,
     "structured_errors": null
   },
   "gates": {
     "happy": true,
     "no_wrong": true,
     "no_hang": true,
+    "no_new_crashes": true,
     "p99": true,
     "dups": true,
     "availability": true
   },
   "passed": true,
   "fallback": "callable",
-  "elapsed_s": 0.02,
+  "elapsed_s": 0.03,
   "hardened_sha256": "472bdf2e4a392293c094675d57951598236c5040efb726ea53fbd9aa09ee1c93",
-  "verified_at": "2026-11-23T04:14:17+0800",
-  "wall_s": 0.07,
+  "verified_at": "2026-11-23T05:03:36+0800",
+  "wall_s": 0.08,
   "fault_model": {
     "timeout": "no answer: caller's timeout fires; with no timeout it hangs (POST/PUT still reach the server)",
     "refused": "connection refused",

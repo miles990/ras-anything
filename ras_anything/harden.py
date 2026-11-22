@@ -15,7 +15,7 @@ import time
 from pathlib import Path
 
 from . import faults, static, ui
-from .paths import UserError, find_project, harden_dir, load_json, ras_dir, save_json
+from .paths import UserError, find_project, harden_dir, load_json, ras_dir, rel_to_project, resolve_in_project, save_json
 from .runner import python_cmd, run
 
 DEFAULT_BUDGET_S = 5.0
@@ -46,8 +46,9 @@ def pick(scan: dict, fid: str | None) -> dict:
     raise UserError("no function %r in the last scan" % fid, "hardenable: " + ids, "status")
 
 
-def function_source(fn: dict) -> str:
-    fi = static.load(fn["file"])
+def function_source(fn: dict, project: Path | None = None) -> str:
+    fpath = str(resolve_in_project(fn["file"], project)) if project else fn["file"]
+    fi = static.load(fpath)
     info = fi.functions[fn["first_line"]]
     node = info["node"]
     lines = fi.src.splitlines()
@@ -62,7 +63,7 @@ def function_source(fn: dict) -> str:
 def stub(fn: dict, project: Path) -> str:
     """hardened.py to start from: the module's imports, the module-level names the function uses,
     a fallback declaration, and the original function."""
-    fi = static.load(fn["file"])
+    fi = static.load(str(resolve_in_project(fn["file"], project)))
     node = fi.functions[fn["first_line"]]["node"]
     imports = [ast.get_source_segment(fi.src, n) for n in fi.tree.body if isinstance(n, (ast.Import, ast.ImportFrom))]
     imports = [i for i in imports if i and "__future__" not in i]
@@ -97,7 +98,7 @@ def stub(fn: dict, project: Path) -> str:
         "RAS_FALLBACK = None",
         "",
         "",
-        function_source(fn),
+        function_source(fn, project),
         "",
     ]
     return "\n".join(lines)
@@ -128,7 +129,7 @@ def _short(v, n=240) -> str:
     return r if len(r) <= n else r[: n - 1] + "…"
 
 
-def task_md(fn: dict, meta: dict, calls: list, scan: dict, root: Path) -> str:
+def task_md(fn: dict, meta: dict, calls: list, scan: dict, root: Path, project: Path | None = None) -> str:
     fid = fn["id"]
     budget = meta["budget_s"]
     reqs = {}
@@ -163,7 +164,7 @@ folder) and iterate until it passes. Do not enable anything; do not edit the ori
 
 ## The function
 
-`{fid}` in `{os.path.relpath(fn['file'], root)}` line {fn['line']}. Recorded **{len(calls)} real calls** from
+`{fid}` in `{os.path.relpath(str(resolve_in_project(fn['file'], project)) if project else fn['file'], root)}` line {fn['line']}. Recorded **{len(calls)} real calls** from
 `{meta['display_cmd']}`. Dependency requests it made:
 {chr(10).join("- %d× `%s`" % (n, k) for k, n in reqs.items())}
 
@@ -172,7 +173,7 @@ What the scan found:
 {dyn_line}
 
 ```python
-{function_source(fn)}
+{function_source(fn, project)}
 ```
 
 How callers use the result (a fallback must be something they already handle):
@@ -253,9 +254,12 @@ def harden(fid: str | None = None, agent: str | None = None, model: str | None =
     if not quiet:
         ui.headline("harden", "%s %s recording up to %d calls" % (fid, ui.DOT, max_calls))
     calls_path = d / "calls.pkl"
+    scan_cwd = resolve_in_project(scan.get("cwd") or ".", project)
+    scan_root = resolve_in_project(scan.get("root") or ".", project)
+    fn_abs = str(resolve_in_project(fn["file"], project))
     r = run(python_cmd(scan["cmd"]), {"mode": "record", "max_calls": max_calls, "calls_path": str(calls_path),
-                          "target": {"file": fn["file"], "line": fn["first_line"], "name": fn["name"]}},
-            Path(scan["cwd"]), root=Path(scan["root"]))
+                          "target": {"file": fn_abs, "line": fn["first_line"], "name": fn["name"]}},
+            scan_cwd, root=scan_root)
     if r.data is None or not calls_path.exists():
         raise UserError("recording failed (exit %s)" % r.code, (r.stderr or "").strip()[-300:], "doctor")
     calls = pickle.loads(calls_path.read_bytes())
@@ -266,9 +270,10 @@ def harden(fid: str | None = None, agent: str | None = None, model: str | None =
     old = load_json(d / "meta.json", {}) or {}
     meta = {
         "id": fid, "module": fn["module"], "qualname": fn["qualname"], "name": fn["name"], "kind": fn["kind"],
-        "file": fn["file"], "first_line": fn["first_line"], "in_main": fn["in_main"],
-        "cmd": scan["cmd"], "display_cmd": scan.get("display_cmd", shlex.join(scan["cmd"])), "cwd": scan["cwd"],
-        "sys_path": r.data.get("sys_path", []),
+        "file": rel_to_project(fn_abs, project), "first_line": fn["first_line"], "in_main": fn["in_main"],
+        "cmd": scan["cmd"], "display_cmd": scan.get("display_cmd", shlex.join(scan["cmd"])),
+        "cwd": rel_to_project(scan_cwd, project),
+        "sys_path": [rel_to_project(p, project) if Path(p).resolve().is_relative_to(project.resolve()) else p for p in (r.data.get("sys_path") or [])],
         "executable": r.data.get("executable"),
         "env": env_diff(snap.get("env")),
         "globals": {k: v for k, v in (snap.get("globals") or {}).items() if not isinstance(v, bytes)},
@@ -282,7 +287,7 @@ def harden(fid: str | None = None, agent: str | None = None, model: str | None =
     kept = hp.exists() and not force
     if not kept:
         hp.write_text(stub(fn, project))
-    (d / "TASK.md").write_text(task_md(fn, meta, calls, scan, Path(scan["root"])))
+    (d / "TASK.md").write_text(task_md(fn, meta, calls, scan, scan_root, project))
     nio = sum(len(c["io"]) for c in calls)
     if not quiet:
         print("  %s recorded %d calls (of %d seen) with %d dependency exchanges %s %s" % (

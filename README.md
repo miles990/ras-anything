@@ -17,7 +17,7 @@ functions cause almost all of it.
 your coding agent harden *only them*, proves on real recorded calls that the happy path is unchanged
 and that availability went up, then swaps them in. One command, fully reversible.
 
-<p align="center"><img src="docs/cards/payments.svg" alt="payments example: app availability under faults 5% to 90%" width="760"></p>
+<p align="center"><img src="docs/cards/payments.svg" alt="payments example: app availability under faults 0% to 90%" width="760"></p>
 
 ## Install
 
@@ -28,13 +28,16 @@ pip install -e .
 ```
 
 Standard library only, Python 3.10+. Your agent (`claude`, `codex`, or anything that reads a prompt on
-stdin) writes the hardened code.
+stdin) writes the hardened code. Or omit `--agent` to write `TASK.md` + a `hardened.py` stub
+and edit `hardened.py` yourself.
 
 ## Use
 
 ```sh
 ras-anything go --agent claude -- python app.py
 ```
+
+`go` leaves the verified swap enabled after `bench` + `report`; inspect `RAS-REPORT.md` or run `ras-anything disable <id>` to roll back.
 
 Or step by step:
 
@@ -46,7 +49,7 @@ Or step by step:
 | `enable` / `disable [id]` | swaps the hardened function in or out (one marked block, removed byte for byte) |
 | `bench [-- <cmd>]` | whole-app runs under live seeded chaos, original vs hardened interleaved, same seed per pair |
 | `report` | `RAS-REPORT.md` + `ras-card.svg` for your PR, with measured numbers only |
-| `status` · `doctor` | where you are and what's next · checks Python, agents, git, `.ras/` |
+| `status` · `doctor` | where you are and what's next · checks Python, agents on PATH, git, `.ras/` |
 
 A scan looks like this (examples/payments):
 
@@ -71,14 +74,15 @@ hardened module declares in `RAS_FALLBACK`), **wrong** (any other value: silent 
 Nothing can be enabled until every gate passes:
 
 - happy-path replay: 100% identical (where the original raised, the same exception type)
-- no `wrong` results, and no requests the original never made
+- no `wrong` results (degraded fallbacks must log with a `trace_id`), no new crash types, and no requests the original never made
 - no hangs, and p99 latency within the budget (default 5 s per call)
 - duplicate non-idempotent side effects ≤ the original's (POST/PUT/PATCH/DELETE that reached the server under different or missing `Idempotency-Key`s)
 - availability (ok + degraded) strictly higher than the original's
 
 Hangs raise `ChaosHang`, a `BaseException`, so `except Exception` can't hide one. The test suite
-checks that verify **rejects** a version that swallows everything and returns `None`, one that adds
-retries to a POST with no idempotency key, and one that changes the happy-path result. Enable also
+checks that verify **rejects** a version that swallows everything and returns `None` (even with an
+unlogged `RAS_FALLBACK`), one that retries a POST without an idempotency key (including after a GET),
+and one that changes the happy-path result. Enable also
 refuses any `hardened.py` whose hash differs from the verified one.
 
 When the original double-sends, verify shows you the exact recorded call:
@@ -100,12 +104,12 @@ Claude Code (Opus) through `--agent claude`. Exact commands and caveats are in e
 
 | example | verify: availability under the fault matrix | bench: app availability, 20 seeds | other bench numbers |
 |---|---|---|---|
-| [weather dashboard](examples/weather) (`fetch_forecast`, urlopen with no timeout) | 32.5% → **100.0%** (120 trials) | 40.0% → **100.0%** | hangs 15% → 0% · p99 run 2.10s → 1.04s |
-| [billing run](examples/payments) (`charge` naive POST retry + `render_receipt` subprocess) | charge 76.9% → **100.0%** · render 33.1% → **100.0%** (160 trials each) | 5.0% → **90.0%** | duplicate charges 5 → 0 · hangs 15% → 0% · p99 run 3.63s → 3.85s |
+| [weather dashboard](examples/weather) (`fetch_forecast`, urlopen with no timeout) | 32.5% → **100.0%** (120 trials) | 40.0% → **100.0%** | hangs 15% → 0% · p99 run 2.10s → 889ms |
+| [billing run](examples/payments) (`charge` naive POST retry + `render_receipt` subprocess) | charge 76.9% → **100.0%** · render 33.1% → **100.0%** (160 trials each) | 0.0% → **90.0%** | identical 0% → 45% · dups 5 → 0 · hangs 25% → 0% · p99 3.94s → 3.87s |
 
 In the billing run, verify counted 38 duplicate charges for the original across its trials and 0 for
 the hardened version. The 10% of bench runs that still fail are the ledger read in `app.main`, which
-was not hardened. 50% of the hardened billing runs printed byte-identical output; the rest were
+was not hardened. 45% of the hardened billing runs printed byte-identical output; the rest were
 declared-degraded (`PENDING`, with a stable idempotency key for tomorrow's retry). Hardened runs are
 sometimes slower at p50, because they wait out faults instead of dying on them.
 
@@ -154,7 +158,7 @@ total time budget, re-raises the original error), `is_transient`, `call_with_tim
 ## Tests
 
 ```sh
-python -m unittest        # offline, ~2 s
+python -m unittest        # offline, ~3 s (from the repo root)
 ```
 
 ## Credits

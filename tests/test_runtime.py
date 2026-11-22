@@ -110,6 +110,33 @@ class BreakerTest(unittest.TestCase):
             cb.call(Flaky([KeyError()]))
         self.assertEqual(cb.state, "closed")
 
+    def test_half_open_admits_single_probe(self):
+        import threading
+        now = [0.0]
+        with mock.patch("ras_anything.runtime._now", side_effect=lambda: now[0]):
+            cb = CircuitBreaker(fail_threshold=1, cooldown_s=5.0)
+            with self.assertRaises(TimeoutError):
+                cb.call(Flaky([TimeoutError()]))
+            now[0] += 5.0
+            entered = threading.Event()
+            release = threading.Event()
+
+            def probe():
+                entered.set()
+                release.wait(2.0)
+                return "ok"
+
+            out = {}
+            t = threading.Thread(target=lambda: out.setdefault("v", cb.call(probe)))
+            t.start()
+            entered.wait(2.0)
+            with self.assertRaises(CircuitOpenError):
+                cb.call(lambda: "second")
+            release.set()
+            t.join(2.0)
+            self.assertEqual(out.get("v"), "ok")
+            self.assertEqual(cb.state, "closed")
+
 
 class ErrorsAndLogsTest(unittest.TestCase):
     def test_ras_error(self):

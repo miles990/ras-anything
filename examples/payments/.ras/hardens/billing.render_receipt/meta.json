@@ -4,17 +4,17 @@
   "qualname": "render_receipt",
   "name": "render_receipt",
   "kind": "function",
-  "file": "/workspace/ras-anything/examples/payments/billing.py",
+  "file": "billing.py",
   "first_line": 29,
   "in_main": false,
   "cmd": [
-    "python",
+    "/workspace/ras-anything/.venv/bin/python",
     "app.py"
   ],
-  "display_cmd": "python app.py",
-  "cwd": "/workspace/ras-anything/examples/payments",
+  "display_cmd": "/workspace/ras-anything/.venv/bin/python app.py",
+  "cwd": ".",
   "sys_path": [
-    "/workspace/ras-anything/examples/payments",
+    ".",
     "/workspace/ras-anything",
     "/usr/lib/python313.zip",
     "/usr/lib/python3.13",
@@ -24,7 +24,7 @@
   ],
   "executable": "/workspace/ras-anything/.venv/bin/python",
   "env": {
-    "PAYMENTS_API_URL": "http://127.0.0.1:41535"
+    "PAYMENTS_API_URL": "http://127.0.0.1:37161"
   },
   "globals": {
     "RENDER": "/workspace/ras-anything/examples/payments/render.py"
@@ -33,6 +33,6 @@
   "recorded": 16,
   "seen": 16,
   "skipped": 0,
-  "recorded_at": "2026-11-23T03:53:50+0800",
+  "recorded_at": "2026-11-23T05:02:11+0800",
   "python": "3.13.5"
 }

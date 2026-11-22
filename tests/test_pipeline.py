@@ -164,12 +164,81 @@ class AgentHardenedExamplesTest(unittest.TestCase):
             self.skipTest("no agent-hardened examples recorded yet")
 
 
+class SecurityAndSafetyTest(unittest.TestCase):
+    def test_rejects_unlogged_self_declared_fallback(self):
+        p = Project(REPO / "examples" / "weather")
+        try:
+            with quiet():
+                scan([sys.executable, "app.py"], seeds=1, quiet=True)
+                harden("weather.fetch_forecast", quiet=True)
+            hp = p.dir / ".ras" / "hardens" / "weather.fetch_forecast" / "hardened.py"
+            hp.write_text((FIX / "weather_swallow_none.py").read_text() + "\nRAS_FALLBACK = lambda *a, **k: None\n")
+            with quiet():
+                v = verify("weather.fetch_forecast", quiet=True)
+            self.assertFalse(v["passed"])
+            self.assertFalse(v["gates"]["no_wrong"])
+        finally:
+            p.close()
+
+    def test_copied_example_enable_does_not_modify_repo(self):
+        repo_weather = REPO / "examples" / "weather" / "weather.py"
+        before_repo = hashlib.sha256(repo_weather.read_bytes()).hexdigest()
+        p = Project(REPO / "examples" / "weather")
+        try:
+            shutil.copytree(REPO / "examples" / "weather" / ".ras", p.dir / ".ras")
+            with quiet():
+                enable("weather.fetch_forecast", quiet=True)
+                self.assertEqual(hashlib.sha256(repo_weather.read_bytes()).hexdigest(), before_repo)
+                r = disable("weather.fetch_forecast", quiet=True)
+            self.assertTrue(r["restored"])
+        finally:
+            p.close()
+
+    def test_enable_refuses_escaping_meta_path(self):
+        import json
+        from ras_anything.paths import UserError
+        p = Project(REPO / "examples" / "weather")
+        try:
+            shutil.copytree(REPO / "examples" / "weather" / ".ras", p.dir / ".ras")
+            mp = p.dir / ".ras" / "hardens" / "weather.fetch_forecast" / "meta.json"
+            m = json.loads(mp.read_text())
+            m["file"] = str(REPO / "examples" / "weather" / "weather.py")
+            mp.write_text(json.dumps(m))
+            with self.assertRaises(UserError):
+                enable("weather.fetch_forecast", quiet=True)
+        finally:
+            p.close()
+
+    def test_stacked_enable_disable_crlf_preserves_bytes(self):
+        p = Project(REPO / "examples" / "payments")
+        try:
+            billing = p.dir / "billing.py"
+            raw = billing.read_bytes().replace(b"\n", b"\r\n")
+            billing.write_bytes(raw)
+            before = hashlib.sha256(raw).hexdigest()
+            shutil.copytree(REPO / "examples" / "payments" / ".ras", p.dir / ".ras")
+            with quiet():
+                verify("billing.charge", quiet=True)
+                verify("billing.render_receipt", quiet=True)
+                enable("billing.charge", quiet=True)
+                enable("billing.render_receipt", quiet=True)
+                r1 = disable("billing.charge", quiet=True)
+                r2 = disable("billing.render_receipt", quiet=True)
+            self.assertTrue(r1["restored"])
+            self.assertTrue(r2["restored"])
+            self.assertEqual(hashlib.sha256(billing.read_bytes()).hexdigest(), before)
+        finally:
+            p.close()
+
+
 class McpTest(unittest.TestCase):
     def test_initialize_and_list(self):
         from ras_anything import mcp
 
         r = mcp.handle({"jsonrpc": "2.0", "id": 1, "method": "initialize", "params": {}})
         self.assertEqual(r["result"]["serverInfo"]["name"], "ras-anything")
+        r_bad = mcp.handle({"jsonrpc": "2.0", "id": 1, "method": "initialize", "params": {"protocolVersion": "2099-01-01"}})
+        self.assertEqual(r_bad["result"]["protocolVersion"], mcp.PROTOCOL)
         tools = mcp.handle({"jsonrpc": "2.0", "id": 2, "method": "tools/list"})["result"]["tools"]
         self.assertEqual({t["name"] for t in tools}, {"ras_scan", "ras_harden", "ras_verify", "ras_enable",
                                                        "ras_disable", "ras_bench", "ras_report", "ras_status"})

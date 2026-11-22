@@ -9,7 +9,7 @@ import time
 from pathlib import Path
 
 from . import static, ui
-from .paths import UserError, find_project, harden_dir, load_json, safe_name, save_json, sha256_file
+from .paths import UserError, find_project, harden_dir, load_json, rel_to_project, resolve_in_project, safe_name, save_json, sha256_file
 from .verify import resolve_id
 
 
@@ -86,29 +86,37 @@ def enable(fid: str | None = None, quiet: bool = False) -> dict:
             print("  %s already enabled" % ui.good(ui.OK))
             ui.next_hint("bench")
         return state["enabled"][fid]
-    src_path = Path(meta["file"])
+    src_path = resolve_in_project(meta["file"], project)
+    if src_path.is_symlink():
+        raise UserError("refusing symlink target %s" % src_path, "enable only modifies regular files inside the project", "status")
     raw = src_path.read_bytes()
     sha_before = hashlib.sha256(raw).hexdigest()
     text = raw.decode("utf-8")
+    eol = "\r\n" if "\r\n" in text else "\n"
     copy_rel = "_ras_hardened/%s.py" % safe_name(fid)
-    copy_abs = src_path.parent / copy_rel
+    copy_abs = resolve_in_project(src_path.parent / copy_rel, project)
     copy_abs.parent.mkdir(exist_ok=True)
     shutil.copyfile(d / "hardened.py", copy_abs)
     shutil.copyfile(Path(__file__).with_name("runtime.py"), copy_abs.parent / "_runtime.py")
     blk = block(fid, meta, copy_rel, vres)
+    if eol == "\r\n":
+        blk = blk.replace("\n", "\r\n")
     fi = static.FileInfo(str(src_path))
     if fi.has_main_guard:  # must bind before the entry point runs
         lines = text.splitlines(keepends=True)
         at = sum(len(ln) for ln in lines[: fi.main_guard_line - 1])
-        insert = blk + "\n\n"
+        insert = blk + eol + eol
     else:
         at = len(text)
-        insert = ("\n" if text.endswith("\n") else "\n\n") + "\n" + blk
+        insert = (eol if text.endswith(eol) else eol + eol) + eol + blk
     new = text[:at] + insert + text[at:]
-    src_path.write_text(new, encoding="utf-8")
-    entry = {"file": str(src_path), "offset": at, "inserted": insert, "sha_before": sha_before,
-             "sha_after": sha256_file(src_path), "hardened_sha256": cur, "copy": str(copy_abs),
-             "enabled_at": time.strftime("%Y-%m-%dT%H:%M:%S%z")}
+    src_path.write_bytes(new.encode("utf-8"))
+    rel_src = rel_to_project(src_path, project)
+    orig_sha = next((v.get("file_sha_before") or v["sha_before"] for v in state["enabled"].values()
+                     if rel_to_project(resolve_in_project(v["file"], project), project) == rel_src), sha_before)
+    entry = {"file": rel_src, "offset": at, "inserted": insert, "sha_before": sha_before,
+             "file_sha_before": orig_sha, "sha_after": sha256_file(src_path), "hardened_sha256": cur,
+             "copy": rel_to_project(copy_abs, project), "enabled_at": time.strftime("%Y-%m-%dT%H:%M:%S%z")}
     state["enabled"][fid] = entry
     save_json(state_path, state)
     if not quiet:
@@ -133,8 +141,10 @@ def disable(fid: str | None = None, quiet: bool = False) -> dict:
     if fid not in state["enabled"]:
         raise UserError("%s isn't enabled" % fid, "enabled: " + ", ".join(state["enabled"]), "status")
     e = state["enabled"][fid]
-    p = Path(e["file"])
-    text = p.read_text(encoding="utf-8")
+    p = resolve_in_project(e["file"], project)
+    if p.is_symlink():
+        raise UserError("refusing symlink target %s" % p, "disable only modifies regular files inside the project", "status")
+    text = p.read_bytes().decode("utf-8")
     start, end = markers(fid)
     exact = text.find(e["inserted"])
     if exact >= 0:
@@ -145,11 +155,15 @@ def disable(fid: str | None = None, quiet: bool = False) -> dict:
             raise UserError("can't find the ras-anything block for %s in %s" % (fid, p), "was it removed by hand?", "status")
         j += len(end) + 1
         new = text[:i] + text[j:]
-    p.write_text(new, encoding="utf-8")
-    restored = sha256_file(p) == e["sha_before"]
+    p.write_bytes(new.encode("utf-8"))
+    rel_p = rel_to_project(p, project)
+    others_same = [k for k, v in state["enabled"].items() if k != fid and rel_to_project(resolve_in_project(v["file"], project), project) == rel_p]
+    orig_sha = e.get("file_sha_before") or e["sha_before"]
+    restored = (sha256_file(p) == orig_sha) if not others_same else (exact >= 0)
     try:
-        os.unlink(e["copy"])
-        cdir = Path(e["copy"]).parent
+        cp = resolve_in_project(e["copy"], project)
+        os.unlink(cp)
+        cdir = cp.parent
         if cdir.name == "_ras_hardened" and not any(x for x in cdir.iterdir() if x.name not in ("__pycache__", "_runtime.py")):
             shutil.rmtree(cdir)
     except OSError:
@@ -158,8 +172,10 @@ def disable(fid: str | None = None, quiet: bool = False) -> dict:
     save_json(state_path, state)
     if not quiet:
         ui.headline("disable", fid)
-        if restored:
-            print("  %s %s restored byte for byte %s" % (ui.good(ui.OK), os.path.relpath(p), ui.dim("(sha256 %s…)" % e["sha_before"][:12])))
+        if others_same and exact >= 0:
+            print("  %s block removed from %s %s" % (ui.good(ui.OK), os.path.relpath(p), ui.dim("(%d other hardened function(s) still enabled)" % len(others_same))))
+        elif restored:
+            print("  %s %s restored byte for byte %s" % (ui.good(ui.OK), os.path.relpath(p), ui.dim("(sha256 %s…)" % orig_sha[:12])))
         else:
             print("  %s block removed, but %s differs from before enable (edited since?)" % (ui.warn(ui.WARN), os.path.relpath(p)))
         ui.next_hint("status")

@@ -327,6 +327,9 @@ class Agent:
             threading.setprofile(self.profile)
         elif mode in ("chaos", "bench"):
             seed = self.cfg.get("seed")
+            if seed is not None:
+                from . import runtime
+                runtime.seed(seed)
             plan = faults.Seeded(seed, self.cfg.get("rate", 0.2), self.cfg.get("outage_rate", 0.05)) \
                 if seed is not None else faults.Plan()
             clock = faults.LiveClock(self.cfg.get("scale", 0.05), self.cfg.get("hang_s", 2.0))

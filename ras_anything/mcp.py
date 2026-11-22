@@ -71,7 +71,9 @@ def call_tool(name: str, args: dict) -> dict:
 def handle(msg: dict):
     mid, method, params = msg.get("id"), msg.get("method"), msg.get("params") or {}
     if method == "initialize":
-        result = {"protocolVersion": params.get("protocolVersion", PROTOCOL),
+        req_ver = params.get("protocolVersion")
+        ver = req_ver if req_ver in ("2024-11-05", "2025-03-26") else PROTOCOL
+        result = {"protocolVersion": ver,
                   "capabilities": {"tools": {"listChanged": False}},
                   "serverInfo": {"name": "ras-anything", "version": __version__},
                   "instructions": "ras-anything hardens the few functions that break under dependency faults. Loop: "

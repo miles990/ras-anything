@@ -34,14 +34,15 @@ def collect(project: Path) -> dict:
 
 def card_svg(title: str, data: dict) -> str:
     b = data["bench"]
-    W, H = 800, 304
+    W, H = 800, 334
     sans = "system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif"
     mono = "ui-monospace,SFMono-Regular,Menlo,Consolas,monospace"
     if b:
         o, h = b["summary"]["original"], b["summary"]["hardened"]
         before, after = o["availability"], h["availability"]
         metric = "app availability under injected dependency faults"
-        rows = [("crashes", _p(o["crash_rate"]), _p(h["crash_rate"])),
+        rows = [("identical output", _p(o.get("identical_rate")), _p(h.get("identical_rate"))),
+                ("crashes", _p(o["crash_rate"]), _p(h["crash_rate"])),
                 ("hangs", _p(o["hang_rate"]), _p(h["hang_rate"])),
                 ("p99 run time", ui.secs(o["p99_wall"]), ui.secs(h["p99_wall"])),
                 ("duplicate side effects", str(o["dups"]), str(h["dups"]))]
@@ -95,11 +96,11 @@ def card_svg(title: str, data: dict) -> str:
   <line x1="{bx}" y1="144" x2="{bx}" y2="206" stroke="#484f58"/>
   <text x="{bx}" y="222" font-family="{mono}" font-size="10" fill="#6e7681" text-anchor="middle">0%</text>
   <text x="{bx + bw}" y="222" font-family="{mono}" font-size="10" fill="#6e7681" text-anchor="middle">100%</text>
-  <line x1="516" y1="80" x2="516" y2="222" stroke="#21262d"/>
+  <line x1="516" y1="80" x2="516" y2="246" stroke="#21262d"/>
   {"".join(metrics)}
-  <line x1="32" y1="246" x2="768" y2="246" stroke="#21262d"/>
-  <text x="32" y="266" font-family="{sans}" font-size="11" fill="#8b949e">{_x(caption1)}</text>
-  <text x="32" y="284" font-family="{sans}" font-size="11" fill="#8b949e">{_x(caption2)}</text>
+  <line x1="32" y1="274" x2="768" y2="274" stroke="#21262d"/>
+  <text x="32" y="294" font-family="{sans}" font-size="11" fill="#8b949e">{_x(caption1)}</text>
+  <text x="32" y="312" font-family="{sans}" font-size="11" fill="#8b949e">{_x(caption2)}</text>
 </svg>
 '''
 
@@ -126,7 +127,7 @@ def markdown(title: str, data: dict) -> str:
         out.append("| faults injected (total) | %d | %d |" % (o["faults"], h["faults"]))
         out.append("")
         out.append("A run counts as *degraded* when its output differs only where a hardened function returned its "
-                   "declared `RAS_FALLBACK` in that run (originals declare none, so their differing output counts as wrong)%s.\n"
+                   "declared `RAS_FALLBACK` in that run (and symmetrically for the original if its output matches a declared-degraded output)%s.\n"
                    % ((" or on lines containing %s" % ", ".join("`%s`" % m for m in b["degraded_markers"])) if b["degraded_markers"] else ""))
         for v in ("original", "hardened"):
             pl = b["summary"][v].get("failures_by_place") or {}

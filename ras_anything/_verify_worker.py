@@ -23,11 +23,18 @@ from .faults import ChaosHang
 _perf = time.perf_counter  # real time, saved before the virtual clock is installed
 
 
+def _req_key(raw_req: dict, meta_cwd: str | None = None) -> str:
+    if raw_req.get("kind") == "subprocess" and raw_req.get("argv"):
+        return boundary.norm_subproc_key(raw_req["argv"], meta_cwd)
+    return raw_req["key"]
+
+
 class Replay(boundary.FaultingHandler):
     """Serves dependency calls from one recorded call's cassette, with faults from a plan."""
 
-    def __init__(self, clock):
+    def __init__(self, clock, meta_cwd: str | None = None):
         super().__init__(faults.Plan(), clock)
+        self.meta_cwd = meta_cwd
         self.io, self.used, self.misses = [], [], []
         self.active = False
 
@@ -42,7 +49,8 @@ class Replay(boundary.FaultingHandler):
     def match(self, req):
         last = None
         for i, x in enumerate(self.io):
-            if x["req"]["key"] == req.key:
+            k = _req_key(x["req"], self.meta_cwd)
+            if k == req.key or x["req"]["key"] == req.key:
                 if not self.used[i]:
                     return i
                 last = i
@@ -103,16 +111,25 @@ def main(argv):
     hpath = os.path.join(hdir, "hardened.py")
     result = {"id": meta["id"], "budget_s": meta["budget_s"], "recorded": len(calls)}
 
+    project_dir = os.path.abspath(os.path.join(hdir, "..", "..", ".."))
+    def _proj_path(p):
+        if not p:
+            return project_dir
+        return p if os.path.isabs(p) else os.path.abspath(os.path.join(project_dir, p))
+    orig_cwd = meta.get("cwd") or "."
+    work_cwd = _proj_path(orig_cwd)
+    meta = dict(meta, file=_proj_path(meta["file"]), cwd=work_cwd)
     os.environ.update(meta.get("env") or {})
     os.environ["RAS_ANYTHING_DISABLE"] = "1"
     try:
-        os.chdir(meta["cwd"])
+        os.chdir(work_cwd)
     except OSError:
         pass
-    sys.path[:0] = [p for p in meta.get("sys_path", []) if p not in sys.path]
+    resolved_sp = [_proj_path(p) if not os.path.isabs(p) else p for p in meta.get("sys_path", [])]
+    sys.path[:0] = [p for p in resolved_sp if p not in sys.path]
 
     clock = faults.VirtualClock()
-    handler = Replay(clock)
+    handler = Replay(clock, meta_cwd=orig_cwd if os.path.isabs(orig_cwd) else work_cwd)
     boundary.install(handler)
 
     def fail(stage, msg):
@@ -185,12 +202,17 @@ def main(argv):
         else:
             cls = "wrong"
         logs = sum(1 for ln in err.getvalue().splitlines() if '"trace_id"' in ln)
+        if cls == "degraded" and fb is not None and logs == 0:
+            cls = "wrong"
         structured = exc is not None and (isinstance(exc, runtime.RasError) or exc.__cause__ is not None)
+        exc_type = None if exc is None else type(exc).__name__
+        cause_type = type(exc.__cause__).__name__ if (exc is not None and exc.__cause__ is not None) else None
         return {
             "class": cls, "latency": round(lat, 6), "dups": handler.duplicates(), "miss": miss or None,
             "result": None if exc is not None or hang else _short(res),
             "expected": _short(expected) if not exp_exc else "raises " + exp_exc["type"],
-            "exc": None if exc is None else "%s: %s" % (type(exc).__name__, str(exc)[:200]),
+            "exc": None if exc is None else "%s: %s" % (exc_type, str(exc)[:200]),
+            "exc_type": exc_type, "cause_type": cause_type,
             "logs": logs, "structured": structured,
             "attempts": [{"key": a["key"], "n": a["n"], "fault": a["fault"], "reached": a["reached"],
                           "idem": a["idem"], "method": a["method"]} for a in handler.attempts],
@@ -215,42 +237,83 @@ def main(argv):
     result["happy"] = happy
 
     # (b) chaos replay ---------------------------------------------------------------------------
-    plans = [(k, None) for k in faults.MATRIX] + [("mixed", s) for s in (1, 2, 3)]
     chaos_idx = usable[:max_chaos]
+    base_plans = [(k, None) for k in faults.MATRIX] + [("mixed", s) for s in (1, 2, 3)]
     sides = {"original": [], "hardened": []}
     per_scn = {}
     first_bad = None
     first_dup = None
-    for name, s in plans:
-        row = per_scn.setdefault(name if s is None else "mixed", {"original": {}, "hardened": {}, "n": 0})
+    has_per_key = False
+    for name, s in base_plans:
+        scn_label = "mixed" if s is not None else name
+        row = per_scn.setdefault(scn_label, {"original": {}, "hardened": {}, "n": 0})
         for i in chaos_idx:
             call = calls[i]
             plan = faults.FirstAttempt(name) if s is None else faults.Seeded(s, 0.3, 0.0, salt="call%d" % i)
-            seedval = int(faults._u(name, s, i) * 2 ** 32)
+            seedval = int(faults._u(name, None, s, i) * 2 ** 32)
             o = trial(original, call, plan, seedval, None)
             h = trial(hardened, call, plan, seedval, fallback)
             row["n"] += 1
             for side, t in (("original", o), ("hardened", h)):
                 sides[side].append(t)
                 row[side][t["class"]] = row[side].get(t["class"], 0) + 1
-            if o["dups"] and first_dup is None:
-                first_dup = {"call": i, "args": _args(call), "scenario": name if s is None else "mixed seed %d" % s,
-                             "original": o, "hardened": h}
+            if (o["dups"] or h["dups"]) and first_dup is None:
+                scn_txt = ("mixed seed %d" % s) if s is not None else name
+                first_dup = {"call": i, "args": _args(call), "scenario": scn_txt, "original": o, "hardened": h}
             bad = h["class"] in ("wrong", "hang", "miss") or h["dups"] > o["dups"]
             if bad and first_bad is None:
-                first_bad = {"call": i, "args": _args(call), "scenario": name if s is None else "mixed seed %d" % s,
-                             "original": o, "hardened": h}
+                scn_txt = ("mixed seed %d" % s) if s is not None else name
+                first_bad = {"call": i, "args": _args(call), "scenario": scn_txt, "original": o, "hardened": h}
+    # For calls that make >=2 distinct requests (e.g., GET then POST), also isolate faults per key
+    for i in chaos_idx:
+        call = calls[i]
+        call_keys = list(dict.fromkeys(_req_key(x["req"], handler.meta_cwd) for x in call["io"]))
+        if len(call_keys) <= 1:
+            continue
+        has_per_key = True
+        for key in call_keys:
+            for name in faults.MATRIX:
+                scn_label = "%s (per-key)" % name
+                row = per_scn.setdefault(scn_label, {"original": {}, "hardened": {}, "n": 0})
+                plan = faults.FirstAttempt(name, target_key=key)
+                seedval = int(faults._u(name, key, None, i) * 2 ** 32)
+                o = trial(original, call, plan, seedval, None)
+                h = trial(hardened, call, plan, seedval, fallback)
+                row["n"] += 1
+                for side, t in (("original", o), ("hardened", h)):
+                    sides[side].append(t)
+                    row[side][t["class"]] = row[side].get(t["class"], 0) + 1
+                if (o["dups"] or h["dups"]) and first_dup is None:
+                    first_dup = {"call": i, "args": _args(call), "scenario": "%s on %s" % (name, key), "original": o, "hardened": h}
+                bad = h["class"] in ("wrong", "hang", "miss") or h["dups"] > o["dups"]
+                if bad and first_bad is None:
+                    first_bad = {"call": i, "args": _args(call), "scenario": "%s on %s" % (name, key), "original": o, "hardened": h}
+    plans_list = [p[0] if p[1] is None else ("mixed:%d" % p[1]) for p in base_plans]
+    if has_per_key:
+        plans_list.append("per-key")
+    # dummy loop header removal check:
     clock.uninstall()
-    result["chaos"] = {"calls": len(chaos_idx), "scenarios": [p[0] if p[1] is None else "mixed:%d" % p[1] for p in plans],
+    BUG_EXC = {"TypeError", "KeyError", "ValueError", "AttributeError", "IndexError",
+               "NameError", "ZeroDivisionError", "AssertionError", "UnboundLocalError", "SyntaxError", "ImportError"}
+    orig_exc_types = {t["exc_type"] for t in sides["original"] if t.get("exc_type")}
+    new_crashes = []
+    for t in sides["hardened"]:
+        if t["class"] == "error" and t.get("exc_type"):
+            et = t["cause_type"] if t["exc_type"] == "RasError" and t.get("cause_type") else t["exc_type"]
+            if et in BUG_EXC and et not in orig_exc_types:
+                new_crashes.append(et)
+    result["chaos"] = {"calls": len(chaos_idx),
+                       "scenarios": plans_list,
                        "by_scenario": per_scn, "first_failure": first_bad,
-                       "first_original_dup": first_dup}
+                       "first_original_dup": first_dup, "new_crashes": sorted(set(new_crashes))}
     for side, ts in sides.items():
         result[side] = summarize(ts, budget)
     o, h = result["original"], result["hardened"]
     gates = {
-        "happy": happy["total"] > 0 and happy["equal"] == happy["total"],
+        "happy": happy["total"] > 0 and happy["equal"] == happy["total"] and happy["original_nondeterministic"] == 0,
         "no_wrong": h["wrong"] == 0 and h["miss"] == 0,
         "no_hang": h["hang"] == 0,
+        "no_new_crashes": len(new_crashes) == 0,
         "p99": h["p99"] is not None and h["p99"] <= budget,
         "dups": h["dups"] <= o["dups"],
         "availability": h["availability"] > o["availability"],

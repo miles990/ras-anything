@@ -106,12 +106,14 @@
       "scenario": "timeout",
       "original": {
         "class": "hang",
-        "latency": 10.512722,
+        "latency": 10.511732,
         "dups": 1,
         "miss": null,
         "result": "{'id': 'ch_0001', 'invoice': 'INV-1001', 'amount_cents': 1500, 'currency': 'usd', 'status': 'succeeded'}",
         "expected": "{'id': 'ch_0001', 'invoice': 'INV-1001', 'amount_cents': 1500, 'currency': 'usd', 'status': 'succeeded'}",
         "exc": null,
+        "exc_type": null,
+        "cause_type": null,
         "logs": 0,
         "structured": false,
         "attempts": [
@@ -135,12 +137,14 @@
       },
       "hardened": {
         "class": "ok",
-        "latency": 3.536821,
+        "latency": 3.708461,
         "dups": 0,
         "miss": null,
         "result": "{'id': 'ch_0001', 'invoice': 'INV-1001', 'amount_cents': 1500, 'currency': 'usd', 'status': 'succeeded'}",
         "expected": "{'id': 'ch_0001', 'invoice': 'INV-1001', 'amount_cents': 1500, 'currency': 'usd', 'status': 'succeeded'}",
         "exc": null,
+        "exc_type": null,
+        "cause_type": null,
         "logs": 0,
         "structured": false,
         "attempts": [
@@ -162,7 +166,8 @@
           }
         ]
       }
-    }
+    },
+    "new_crashes": []
   },
   "original": {
     "trials": 160,
@@ -173,8 +178,8 @@
     "hang": 20,
     "miss": 0,
     "availability": 0.76875,
-    "p50": 0.507096,
-    "p99": 13.503691,
+    "p50": 0.504287,
+    "p99": 13.503531,
     "max": 21.5,
     "dups": 38,
     "logged_failures": null,
@@ -189,7 +194,7 @@
     "hang": 0,
     "miss": 0,
     "availability": 1.0,
-    "p50": 0.194597,
+    "p50": 0.171449,
     "p99": 4.5,
     "max": 4.5,
     "dups": 0,
@@ -200,6 +205,7 @@
     "happy": true,
     "no_wrong": true,
     "no_hang": true,
+    "no_new_crashes": true,
     "p99": true,
     "dups": true,
     "availability": true
@@ -208,8 +214,8 @@
   "fallback": "callable",
   "elapsed_s": 0.03,
   "hardened_sha256": "bf773e849ada07b84d650a91238e0acd7d435b75faae4643d38c09f7cc523de0",
-  "verified_at": "2026-11-23T04:14:17+0800",
-  "wall_s": 0.09,
+  "verified_at": "2026-11-23T05:03:36+0800",
+  "wall_s": 0.08,
   "fault_model": {
     "timeout": "no answer: caller's timeout fires; with no timeout it hangs (POST/PUT still reach the server)",
     "refused": "connection refused",

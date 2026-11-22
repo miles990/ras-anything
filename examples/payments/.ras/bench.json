@@ -1,9 +1,9 @@
 {
   "cmd": [
-    "python",
+    "/workspace/ras-anything/.venv/bin/python",
     "app.py"
   ],
-  "display_cmd": "python app.py",
+  "display_cmd": "/workspace/ras-anything/.venv/bin/python app.py",
   "ids": [
     "billing.charge",
     "billing.render_receipt"
@@ -18,31 +18,31 @@
   "summary": {
     "original": {
       "runs": 20,
-      "correct": 1,
+      "correct": 0,
       "degraded": 0,
-      "wrong": 4,
+      "wrong": 3,
       "crash": 12,
-      "hang": 3,
-      "availability": 0.05,
+      "hang": 5,
+      "availability": 0.0,
       "crash_rate": 0.6,
-      "hang_rate": 0.15,
-      "wrong_rate": 0.2,
-      "p50_wall": 1.1819,
-      "p99_wall": 3.6273,
-      "identical_rate": 0.05,
+      "hang_rate": 0.25,
+      "wrong_rate": 0.15,
+      "p50_wall": 1.7919,
+      "p99_wall": 3.9423,
+      "identical_rate": 0.0,
       "dups": 5,
-      "faults": 42,
+      "faults": 44,
       "failures_by_place": {
-        "BlockingIOError in billing.render_receipt": 9,
-        "JSONDecodeError in billing.render_receipt": 3,
-        "hang in billing.render_receipt": 3
+        "hang in billing.render_receipt": 5,
+        "JSONDecodeError in billing.render_receipt": 9,
+        "BlockingIOError in billing.render_receipt": 3
       },
-      "clean_wall": 0.5053
+      "clean_wall": 0.4722
     },
     "hardened": {
       "runs": 20,
-      "correct": 10,
-      "degraded": 8,
+      "correct": 9,
+      "degraded": 9,
       "wrong": 0,
       "crash": 2,
       "hang": 0,
@@ -50,83 +50,24 @@
       "crash_rate": 0.1,
       "hang_rate": 0.0,
       "wrong_rate": 0.0,
-      "p50_wall": 1.2714,
-      "p99_wall": 3.8457,
-      "identical_rate": 0.5,
+      "p50_wall": 1.2812,
+      "p99_wall": 3.8684,
+      "identical_rate": 0.45,
       "dups": 0,
-      "faults": 137,
+      "faults": 144,
       "failures_by_place": {
         "URLError in app.main": 2
       },
-      "clean_wall": 0.4989
+      "clean_wall": 0.4369
     }
   },
   "runs": {
     "original": [
       {
         "seed": 1,
-        "outcome": "crash",
-        "exit": 1,
-        "wall_s": 0.0849,
-        "fallbacks": 0,
-        "faults": 1,
-        "attempts": 2,
-        "dups": 0,
-        "uncaught": {
-          "type": "BlockingIOError",
-          "msg": "[Errno 11] Resource temporarily unavailable (fork)",
-          "hang": false,
-          "where": "billing.render_receipt"
-        }
-      },
-      {
-        "seed": 2,
-        "outcome": "wrong",
-        "exit": 0,
-        "wall_s": 2.5441,
-        "fallbacks": 0,
-        "faults": 3,
-        "attempts": 36,
-        "dups": 1,
-        "uncaught": null
-      },
-      {
-        "seed": 3,
-        "outcome": "crash",
-        "exit": 1,
-        "wall_s": 0.1426,
-        "fallbacks": 0,
-        "faults": 1,
-        "attempts": 4,
-        "dups": 0,
-        "uncaught": {
-          "type": "JSONDecodeError",
-          "msg": "Unterminated string starting at: line 1 column 37 (char 36)",
-          "hang": false,
-          "where": "billing.render_receipt"
-        }
-      },
-      {
-        "seed": 4,
-        "outcome": "crash",
-        "exit": 1,
-        "wall_s": 0.3948,
-        "fallbacks": 0,
-        "faults": 1,
-        "attempts": 24,
-        "dups": 0,
-        "uncaught": {
-          "type": "JSONDecodeError",
-          "msg": "Expecting value: line 1 column 1 (char 0)",
-          "hang": false,
-          "where": "billing.render_receipt"
-        }
-      },
-      {
-        "seed": 5,
         "outcome": "hang",
         "exit": 1,
-        "wall_s": 2.0969,
+        "wall_s": 2.0835,
         "fallbacks": 0,
         "faults": 1,
         "attempts": 2,
@@ -139,14 +80,100 @@
         }
       },
       {
-        "seed": 6,
+        "seed": 2,
+        "outcome": "wrong",
+        "exit": 0,
+        "wall_s": 2.45,
+        "fallbacks": 0,
+        "faults": 3,
+        "attempts": 36,
+        "dups": 1,
+        "uncaught": null
+      },
+      {
+        "seed": 3,
         "outcome": "crash",
         "exit": 1,
-        "wall_s": 0.1052,
+        "wall_s": 0.1269,
         "fallbacks": 0,
         "faults": 1,
-        "attempts": 2,
+        "attempts": 6,
         "dups": 0,
+        "uncaught": {
+          "type": "JSONDecodeError",
+          "msg": "Expecting value: line 1 column 1 (char 0)",
+          "hang": false,
+          "where": "billing.render_receipt"
+        }
+      },
+      {
+        "seed": 4,
+        "outcome": "crash",
+        "exit": 1,
+        "wall_s": 0.1265,
+        "fallbacks": 0,
+        "faults": 1,
+        "attempts": 6,
+        "dups": 0,
+        "uncaught": {
+          "type": "JSONDecodeError",
+          "msg": "Expecting value: line 1 column 1 (char 0)",
+          "hang": false,
+          "where": "billing.render_receipt"
+        }
+      },
+      {
+        "seed": 5,
+        "outcome": "wrong",
+        "exit": 0,
+        "wall_s": 3.4399,
+        "fallbacks": 0,
+        "faults": 5,
+        "attempts": 36,
+        "dups": 1,
+        "uncaught": null
+      },
+      {
+        "seed": 6,
+        "outcome": "hang",
+        "exit": 1,
+        "wall_s": 2.1065,
+        "fallbacks": 0,
+        "faults": 1,
+        "attempts": 4,
+        "dups": 0,
+        "uncaught": {
+          "type": "ChaosHang",
+          "msg": "boundary call with no timeout hung (chaos)",
+          "hang": true,
+          "where": "billing.render_receipt"
+        }
+      },
+      {
+        "seed": 7,
+        "outcome": "crash",
+        "exit": 1,
+        "wall_s": 0.1071,
+        "fallbacks": 0,
+        "faults": 1,
+        "attempts": 4,
+        "dups": 0,
+        "uncaught": {
+          "type": "JSONDecodeError",
+          "msg": "Expecting value: line 1 column 1 (char 0)",
+          "hang": false,
+          "where": "billing.render_receipt"
+        }
+      },
+      {
+        "seed": 8,
+        "outcome": "crash",
+        "exit": 1,
+        "wall_s": 0.7662,
+        "fallbacks": 0,
+        "faults": 2,
+        "attempts": 17,
+        "dups": 1,
         "uncaught": {
           "type": "BlockingIOError",
           "msg": "[Errno 11] Resource temporarily unavailable (fork)",
@@ -155,51 +182,45 @@
         }
       },
       {
-        "seed": 7,
-        "outcome": "correct",
-        "exit": 0,
-        "wall_s": 1.0131,
-        "fallbacks": 0,
-        "faults": 1,
-        "attempts": 34,
-        "dups": 0,
-        "uncaught": null
-      },
-      {
-        "seed": 8,
-        "outcome": "wrong",
-        "exit": 0,
-        "wall_s": 1.5249,
-        "fallbacks": 0,
-        "faults": 2,
-        "attempts": 35,
-        "dups": 1,
-        "uncaught": null
-      },
-      {
         "seed": 9,
         "outcome": "crash",
         "exit": 1,
-        "wall_s": 2.3202,
+        "wall_s": 0.6374,
         "fallbacks": 0,
-        "faults": 4,
-        "attempts": 21,
-        "dups": 1,
+        "faults": 2,
+        "attempts": 7,
+        "dups": 0,
         "uncaught": {
-          "type": "BlockingIOError",
-          "msg": "[Errno 11] Resource temporarily unavailable (fork)",
+          "type": "JSONDecodeError",
+          "msg": "Expecting value: line 1 column 1 (char 0)",
           "hang": false,
           "where": "billing.render_receipt"
         }
       },
       {
         "seed": 10,
-        "outcome": "crash",
+        "outcome": "hang",
         "exit": 1,
-        "wall_s": 0.2439,
+        "wall_s": 2.1261,
         "fallbacks": 0,
         "faults": 1,
-        "attempts": 10,
+        "attempts": 4,
+        "dups": 0,
+        "uncaught": {
+          "type": "ChaosHang",
+          "msg": "boundary call with no timeout hung (chaos)",
+          "hang": true,
+          "where": "billing.render_receipt"
+        }
+      },
+      {
+        "seed": 11,
+        "outcome": "crash",
+        "exit": 1,
+        "wall_s": 2.0618,
+        "fallbacks": 0,
+        "faults": 5,
+        "attempts": 29,
         "dups": 0,
         "uncaught": {
           "type": "JSONDecodeError",
@@ -209,21 +230,10 @@
         }
       },
       {
-        "seed": 11,
-        "outcome": "wrong",
-        "exit": 0,
-        "wall_s": 1.9932,
-        "fallbacks": 0,
-        "faults": 3,
-        "attempts": 34,
-        "dups": 0,
-        "uncaught": null
-      },
-      {
         "seed": 12,
         "outcome": "crash",
         "exit": 1,
-        "wall_s": 0.0824,
+        "wall_s": 0.0833,
         "fallbacks": 0,
         "faults": 1,
         "attempts": 2,
@@ -239,26 +249,42 @@
         "seed": 13,
         "outcome": "crash",
         "exit": 1,
-        "wall_s": 2.2434,
+        "wall_s": 1.6902,
         "fallbacks": 0,
-        "faults": 5,
-        "attempts": 16,
+        "faults": 4,
+        "attempts": 11,
         "dups": 0,
         "uncaught": {
-          "type": "BlockingIOError",
-          "msg": "[Errno 11] Resource temporarily unavailable (fork)",
+          "type": "JSONDecodeError",
+          "msg": "Unterminated string starting at: line 1 column 37 (char 36)",
           "hang": false,
           "where": "billing.render_receipt"
         }
       },
       {
         "seed": 14,
-        "outcome": "hang",
+        "outcome": "crash",
         "exit": 1,
-        "wall_s": 3.6273,
+        "wall_s": 1.7919,
         "fallbacks": 0,
         "faults": 4,
-        "attempts": 9,
+        "attempts": 21,
+        "dups": 0,
+        "uncaught": {
+          "type": "JSONDecodeError",
+          "msg": "Expecting value: line 1 column 1 (char 0)",
+          "hang": false,
+          "where": "billing.render_receipt"
+        }
+      },
+      {
+        "seed": 15,
+        "outcome": "hang",
+        "exit": 1,
+        "wall_s": 2.1413,
+        "fallbacks": 0,
+        "faults": 1,
+        "attempts": 6,
         "dups": 0,
         "uncaught": {
           "type": "ChaosHang",
@@ -268,29 +294,18 @@
         }
       },
       {
-        "seed": 15,
-        "outcome": "wrong",
-        "exit": 0,
-        "wall_s": 2.939,
-        "fallbacks": 0,
-        "faults": 5,
-        "attempts": 36,
-        "dups": 0,
-        "uncaught": null
-      },
-      {
         "seed": 16,
-        "outcome": "hang",
+        "outcome": "crash",
         "exit": 1,
-        "wall_s": 2.2224,
+        "wall_s": 0.1056,
         "fallbacks": 0,
         "faults": 1,
-        "attempts": 14,
+        "attempts": 4,
         "dups": 0,
         "uncaught": {
-          "type": "ChaosHang",
-          "msg": "boundary call with no timeout hung (chaos)",
-          "hang": true,
+          "type": "BlockingIOError",
+          "msg": "[Errno 11] Resource temporarily unavailable (fork)",
+          "hang": false,
           "where": "billing.render_receipt"
         }
       },
@@ -298,31 +313,31 @@
         "seed": 17,
         "outcome": "crash",
         "exit": 1,
-        "wall_s": 0.9209,
+        "wall_s": 0.7243,
         "fallbacks": 0,
-        "faults": 3,
-        "attempts": 19,
+        "faults": 2,
+        "attempts": 15,
         "dups": 1,
         "uncaught": {
-          "type": "BlockingIOError",
-          "msg": "[Errno 11] Resource temporarily unavailable (fork)",
+          "type": "JSONDecodeError",
+          "msg": "Expecting value: line 1 column 1 (char 0)",
           "hang": false,
           "where": "billing.render_receipt"
         }
       },
       {
         "seed": 18,
-        "outcome": "crash",
+        "outcome": "hang",
         "exit": 1,
-        "wall_s": 0.0786,
+        "wall_s": 2.1296,
         "fallbacks": 0,
         "faults": 1,
-        "attempts": 2,
+        "attempts": 6,
         "dups": 0,
         "uncaught": {
-          "type": "BlockingIOError",
-          "msg": "[Errno 11] Resource temporarily unavailable (fork)",
-          "hang": false,
+          "type": "ChaosHang",
+          "msg": "boundary call with no timeout hung (chaos)",
+          "hang": true,
           "where": "billing.render_receipt"
         }
       },
@@ -330,33 +345,28 @@
         "seed": 19,
         "outcome": "crash",
         "exit": 1,
-        "wall_s": 0.1427,
+        "wall_s": 0.1502,
         "fallbacks": 0,
         "faults": 1,
-        "attempts": 8,
+        "attempts": 6,
         "dups": 0,
         "uncaught": {
-          "type": "BlockingIOError",
-          "msg": "[Errno 11] Resource temporarily unavailable (fork)",
+          "type": "JSONDecodeError",
+          "msg": "Unterminated string starting at: line 1 column 37 (char 36)",
           "hang": false,
           "where": "billing.render_receipt"
         }
       },
       {
         "seed": 20,
-        "outcome": "crash",
-        "exit": 1,
-        "wall_s": 1.1819,
+        "outcome": "wrong",
+        "exit": 0,
+        "wall_s": 3.9423,
         "fallbacks": 0,
-        "faults": 2,
-        "attempts": 11,
+        "faults": 6,
+        "attempts": 37,
         "dups": 1,
-        "uncaught": {
-          "type": "BlockingIOError",
-          "msg": "[Errno 11] Resource temporarily unavailable (fork)",
-          "hang": false,
-          "where": "billing.render_receipt"
-        }
+        "uncaught": null
       }
     ],
     "hardened": [
@@ -364,7 +374,7 @@
         "seed": 1,
         "outcome": "crash",
         "exit": 1,
-        "wall_s": 1.3174,
+        "wall_s": 1.2544,
         "fallbacks": 1,
         "faults": 9,
         "attempts": 38,
@@ -380,10 +390,10 @@
         "seed": 2,
         "outcome": "correct",
         "exit": 0,
-        "wall_s": 1.1003,
+        "wall_s": 1.0383,
         "fallbacks": 0,
-        "faults": 6,
-        "attempts": 39,
+        "faults": 3,
+        "attempts": 36,
         "dups": 0,
         "uncaught": null
       },
@@ -391,10 +401,10 @@
         "seed": 3,
         "outcome": "degraded",
         "exit": 0,
-        "wall_s": 2.2492,
+        "wall_s": 1.2812,
         "fallbacks": 2,
-        "faults": 16,
-        "attempts": 45,
+        "faults": 9,
+        "attempts": 38,
         "dups": 0,
         "uncaught": null
       },
@@ -402,7 +412,7 @@
         "seed": 4,
         "outcome": "correct",
         "exit": 0,
-        "wall_s": 0.9696,
+        "wall_s": 0.5917,
         "fallbacks": 0,
         "faults": 5,
         "attempts": 38,
@@ -413,21 +423,21 @@
         "seed": 5,
         "outcome": "degraded",
         "exit": 0,
-        "wall_s": 2.0172,
+        "wall_s": 1.3686,
         "fallbacks": 1,
-        "faults": 12,
-        "attempts": 43,
+        "faults": 5,
+        "attempts": 36,
         "dups": 0,
         "uncaught": null
       },
       {
         "seed": 6,
-        "outcome": "correct",
+        "outcome": "degraded",
         "exit": 0,
-        "wall_s": 0.7058,
-        "fallbacks": 0,
-        "faults": 3,
-        "attempts": 36,
+        "wall_s": 1.4764,
+        "fallbacks": 1,
+        "faults": 11,
+        "attempts": 43,
         "dups": 0,
         "uncaught": null
       },
@@ -435,40 +445,7 @@
         "seed": 7,
         "outcome": "correct",
         "exit": 0,
-        "wall_s": 0.6917,
-        "fallbacks": 0,
-        "faults": 1,
-        "attempts": 34,
-        "dups": 0,
-        "uncaught": null
-      },
-      {
-        "seed": 8,
-        "outcome": "correct",
-        "exit": 0,
-        "wall_s": 1.2714,
-        "fallbacks": 0,
-        "faults": 6,
-        "attempts": 39,
-        "dups": 0,
-        "uncaught": null
-      },
-      {
-        "seed": 9,
-        "outcome": "correct",
-        "exit": 0,
-        "wall_s": 3.0432,
-        "fallbacks": 0,
-        "faults": 12,
-        "attempts": 45,
-        "dups": 0,
-        "uncaught": null
-      },
-      {
-        "seed": 10,
-        "outcome": "correct",
-        "exit": 0,
-        "wall_s": 1.1256,
+        "wall_s": 0.6635,
         "fallbacks": 0,
         "faults": 4,
         "attempts": 37,
@@ -476,13 +453,46 @@
         "uncaught": null
       },
       {
+        "seed": 8,
+        "outcome": "correct",
+        "exit": 0,
+        "wall_s": 0.7438,
+        "fallbacks": 0,
+        "faults": 4,
+        "attempts": 37,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 9,
+        "outcome": "correct",
+        "exit": 0,
+        "wall_s": 2.4123,
+        "fallbacks": 0,
+        "faults": 10,
+        "attempts": 43,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 10,
+        "outcome": "correct",
+        "exit": 0,
+        "wall_s": 1.1622,
+        "fallbacks": 0,
+        "faults": 5,
+        "attempts": 38,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
         "seed": 11,
         "outcome": "degraded",
         "exit": 0,
-        "wall_s": 0.5986,
+        "wall_s": 0.943,
         "fallbacks": 1,
-        "faults": 3,
-        "attempts": 34,
+        "faults": 5,
+        "attempts": 36,
         "dups": 0,
         "uncaught": null
       },
@@ -490,10 +500,10 @@
         "seed": 12,
         "outcome": "correct",
         "exit": 0,
-        "wall_s": 2.1414,
+        "wall_s": 2.2364,
         "fallbacks": 0,
-        "faults": 13,
-        "attempts": 44,
+        "faults": 15,
+        "attempts": 46,
         "dups": 0,
         "uncaught": null
       },
@@ -501,10 +511,10 @@
         "seed": 13,
         "outcome": "degraded",
         "exit": 0,
-        "wall_s": 3.8457,
+        "wall_s": 3.8684,
         "fallbacks": 1,
-        "faults": 11,
-        "attempts": 42,
+        "faults": 16,
+        "attempts": 47,
         "dups": 0,
         "uncaught": null
       },
@@ -512,7 +522,7 @@
         "seed": 14,
         "outcome": "degraded",
         "exit": 0,
-        "wall_s": 0.924,
+        "wall_s": 0.8303,
         "fallbacks": 1,
         "faults": 4,
         "attempts": 35,
@@ -523,10 +533,10 @@
         "seed": 15,
         "outcome": "degraded",
         "exit": 0,
-        "wall_s": 1.7389,
+        "wall_s": 1.9912,
         "fallbacks": 1,
-        "faults": 5,
-        "attempts": 36,
+        "faults": 7,
+        "attempts": 38,
         "dups": 0,
         "uncaught": null
       },
@@ -534,10 +544,10 @@
         "seed": 16,
         "outcome": "correct",
         "exit": 0,
-        "wall_s": 1.0249,
+        "wall_s": 1.3316,
         "fallbacks": 0,
-        "faults": 3,
-        "attempts": 36,
+        "faults": 8,
+        "attempts": 41,
         "dups": 0,
         "uncaught": null
       },
@@ -545,10 +555,10 @@
         "seed": 17,
         "outcome": "crash",
         "exit": 1,
-        "wall_s": 0.9981,
+        "wall_s": 1.5758,
         "fallbacks": 0,
-        "faults": 3,
-        "attempts": 34,
+        "faults": 8,
+        "attempts": 39,
         "dups": 0,
         "uncaught": {
           "type": "URLError",
@@ -561,10 +571,10 @@
         "seed": 18,
         "outcome": "correct",
         "exit": 0,
-        "wall_s": 0.8007,
+        "wall_s": 0.9425,
         "fallbacks": 0,
-        "faults": 5,
-        "attempts": 38,
+        "faults": 6,
+        "attempts": 39,
         "dups": 0,
         "uncaught": null
       },
@@ -572,10 +582,10 @@
         "seed": 19,
         "outcome": "degraded",
         "exit": 0,
-        "wall_s": 1.3941,
+        "wall_s": 0.8713,
         "fallbacks": 1,
-        "faults": 9,
-        "attempts": 40,
+        "faults": 4,
+        "attempts": 35,
         "dups": 0,
         "uncaught": null
       },
@@ -583,10 +593,10 @@
         "seed": 20,
         "outcome": "degraded",
         "exit": 0,
-        "wall_s": 2.0759,
+        "wall_s": 2.2894,
         "fallbacks": 1,
-        "faults": 7,
-        "attempts": 38,
+        "faults": 6,
+        "attempts": 37,
         "dups": 0,
         "uncaught": null
       }
@@ -595,18 +605,18 @@
   "functions": {
     "original": {
       "billing.charge": {
-        "calls": 149,
-        "ok": 149,
+        "calls": 120,
+        "ok": 120,
         "fallback": 0,
         "raised": 0,
-        "p99": 1.5055193650005094
+        "p99": 1.5022582129968214
       },
       "billing.render_receipt": {
-        "calls": 145,
-        "ok": 130,
+        "calls": 115,
+        "ok": 98,
         "fallback": 0,
-        "raised": 15,
-        "p99": 2.0003479459992377
+        "raised": 17,
+        "p99": 2.0004788730002474
       }
     },
     "hardened": {
@@ -615,17 +625,18 @@
         "ok": 310,
         "fallback": 10,
         "raised": 0,
-        "p99": 1.0027877479988092
+        "p99": 1.002454398003465
       },
       "billing.render_receipt": {
         "calls": 310,
-        "ok": 310,
-        "fallback": 0,
+        "ok": 309,
+        "fallback": 1,
         "raised": 0,
-        "p99": 0.48542240700044204
+        "p99": 0.4186052680015564
       }
     }
   },
+  "first_wrong": null,
   "host": {
     "machine": "x86_64",
     "system": "Linux",
@@ -642,5 +653,5 @@
     "slow": "+3 s latency, then the correct answer",
     "truncated": "body (or stdout) cut in half"
   },
-  "created": "2026-11-23T04:15:14+0800"
+  "created": "2026-11-23T05:03:10+0800"
 }

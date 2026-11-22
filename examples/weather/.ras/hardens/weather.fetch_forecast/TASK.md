@@ -9,8 +9,8 @@ folder) and iterate until it passes. Do not enable anything; do not edit the ori
 ## The function
 
 `weather.fetch_forecast` in `weather.py` line 9. Recorded **12 real calls** from
-`python app.py`. Dependency requests it made:
-- 12× `GET http://127.0.0.1:41597/v1/forecast?…`
+`/workspace/ras-anything/.venv/bin/python app.py`. Dependency requests it made:
+- 12× `GET http://127.0.0.1:43347/v1/forecast?…`
 
 What the scan found:
 - urlopen() without timeout
@@ -41,11 +41,11 @@ How callers use the result (a fallback must be something they already handle):
 
 Recorded examples:
 - `fetch_forecast('Taipei')` → {'city': 'Taipei', 'daily': [{'day': 'Mon', 'hi_c': 8, 'lo_c': -1, 'rain_mm': 3.3}, {'day': 'Tue', 'hi_c': 13, 'lo_c': 3, 'rain_mm': 1.9}, {'day': 'Wed', 'hi_c': 20, 'lo_c': 14, 'rain_mm': 4.8}], 'source': 'local-upstream'}
-  dependency I/O: GET http://127.0.0.1:41597/v1/forecast?city=Taipei -> 200
+  dependency I/O: GET http://127.0.0.1:43347/v1/forecast?city=Taipei -> 200
 - `fetch_forecast('Tokyo')` → {'city': 'Tokyo', 'daily': [{'day': 'Mon', 'hi_c': 19, 'lo_c': 14, 'rain_mm': 2.8}, {'day': 'Tue', 'hi_c': 28, 'lo_c': 22, 'rain_mm': 7.9}, {'day': 'Wed', 'hi_c': 8, 'lo_c': 2, 'rain_mm': 0.6}], 'source': 'local-upstream'}
-  dependency I/O: GET http://127.0.0.1:41597/v1/forecast?city=Tokyo -> 200
+  dependency I/O: GET http://127.0.0.1:43347/v1/forecast?city=Tokyo -> 200
 - `fetch_forecast('Seoul')` → {'city': 'Seoul', 'daily': [{'day': 'Mon', 'hi_c': 8, 'lo_c': 2, 'rain_mm': 0.7}, {'day': 'Tue', 'hi_c': 15, 'lo_c': 7, 'rain_mm': 5.9}, {'day': 'Wed', 'hi_c': 10, 'lo_c': 6, 'rain_mm': 1.0}], 'source': 'local-upstream'}
-  dependency I/O: GET http://127.0.0.1:41597/v1/forecast?city=Seoul -> 200
+  dependency I/O: GET http://127.0.0.1:43347/v1/forecast?city=Seoul -> 200
 
 ## The contract (what `verify` enforces)
 
@@ -58,7 +58,7 @@ Recorded examples:
    `subprocess.run(..., timeout=t)`, `requests.get(..., timeout=t)`); a call with no timeout that
    hangs is a hard fail. Budget the attempts so worst case stays under 5 s.
 3. **Retry only transient failures**: timeouts, connection errors, HTTP 408/425/429/500/502/503/504
-   (honour `Retry-After`), a truncated/undecodable body from a 2xx, a subprocess exit 75. Exponential
+   (honour `Retry-After`), EAGAIN, a truncated/undecodable body from a 2xx, a subprocess exit 75. Exponential
    backoff with full jitter. **Never retry other 4xx** or programming errors.
 4. **Idempotency.** Never send a POST/PUT/PATCH/DELETE twice unless every attempt carries the same
    `Idempotency-Key` header, derived deterministically from the logical operation (e.g. the invoice

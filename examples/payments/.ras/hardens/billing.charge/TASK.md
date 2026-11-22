@@ -9,8 +9,8 @@ folder) and iterate until it passes. Do not enable anything; do not edit the ori
 ## The function
 
 `billing.charge` in `billing.py` line 13. Recorded **16 real calls** from
-`python app.py`. Dependency requests it made:
-- 16× `POST http://127.0.0.1:33455/v1/charges`
+`/workspace/ras-anything/.venv/bin/python app.py`. Dependency requests it made:
+- 16× `POST http://127.0.0.1:37515/v1/charges`
 
 What the scan found:
 - retries a POST with no Idempotency-Key
@@ -50,11 +50,11 @@ How callers use the result (a fallback must be something they already handle):
 
 Recorded examples:
 - `charge({'id': 'INV-1001', 'customer': 'Acme Co', 'amount_cents': 1500, 'currency': 'us…)` → {'id': 'ch_0001', 'invoice': 'INV-1001', 'amount_cents': 1500, 'currency': 'usd', 'status': 'succeeded'}
-  dependency I/O: POST http://127.0.0.1:33455/v1/charges -> 200
+  dependency I/O: POST http://127.0.0.1:37515/v1/charges -> 200
 - `charge({'id': 'INV-1002', 'customer': 'Globex', 'amount_cents': 2237, 'currency': 'usd…)` → {'id': 'ch_0002', 'invoice': 'INV-1002', 'amount_cents': 2237, 'currency': 'usd', 'status': 'succeeded'}
-  dependency I/O: POST http://127.0.0.1:33455/v1/charges -> 200
+  dependency I/O: POST http://127.0.0.1:37515/v1/charges -> 200
 - `charge({'id': 'INV-1003', 'customer': 'Initech', 'amount_cents': 2974, 'currency': 'us…)` → {'id': 'ch_0003', 'invoice': 'INV-1003', 'amount_cents': 2974, 'currency': 'usd', 'status': 'succeeded'}
-  dependency I/O: POST http://127.0.0.1:33455/v1/charges -> 200
+  dependency I/O: POST http://127.0.0.1:37515/v1/charges -> 200
 
 ## The contract (what `verify` enforces)
 
@@ -67,7 +67,7 @@ Recorded examples:
    `subprocess.run(..., timeout=t)`, `requests.get(..., timeout=t)`); a call with no timeout that
    hangs is a hard fail. Budget the attempts so worst case stays under 5 s.
 3. **Retry only transient failures**: timeouts, connection errors, HTTP 408/425/429/500/502/503/504
-   (honour `Retry-After`), a truncated/undecodable body from a 2xx, a subprocess exit 75. Exponential
+   (honour `Retry-After`), EAGAIN, a truncated/undecodable body from a 2xx, a subprocess exit 75. Exponential
    backoff with full jitter. **Never retry other 4xx** or programming errors.
 4. **Idempotency.** Never send a POST/PUT/PATCH/DELETE twice unless every attempt carries the same
    `Idempotency-Key` header, derived deterministically from the logical operation (e.g. the invoice

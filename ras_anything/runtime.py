@@ -289,6 +289,7 @@ class CircuitBreaker:
         self.count = count
         self.failures = 0
         self.opened_at: float | None = None
+        self._probing = False
         self._lock = threading.Lock()
 
     @property
@@ -301,18 +302,23 @@ class CircuitBreaker:
         with self._lock:
             self.failures = 0
             self.opened_at = None
+            self._probing = False
 
     def call(self, fn, *args, **kwargs):
         with self._lock:
             st = self.state
-            if st == "open":
+            if st == "open" or (st == "half_open" and self._probing):
                 raise CircuitOpenError("circuit open for %s" % self.name,
                                        context={"failures": self.failures, "cooldown_s": self.cooldown_s})
+            if st == "half_open":
+                self._probing = True
         try:
             result = fn(*args, **kwargs)
         except Exception as e:
-            if self.count(e):
-                with self._lock:
+            with self._lock:
+                if st == "half_open":
+                    self._probing = False
+                if self.count(e):
                     self.failures += 1
                     if st == "half_open" or self.failures >= self.fail_threshold:
                         self.opened_at = _now()
@@ -320,6 +326,7 @@ class CircuitBreaker:
         with self._lock:
             self.failures = 0
             self.opened_at = None
+            self._probing = False
         return result
 
     __call__ = call

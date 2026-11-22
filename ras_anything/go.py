@@ -57,8 +57,11 @@ def go(cmd: list[str], agent: str, model: str | None = None, seeds: int = 20, ma
     enable(fid)
     print()
     ui.rule()
-    bench(None, seeds=seeds, markers=markers)
+    bres = bench(None, seeds=seeds, markers=markers)
     print()
     ui.rule()
     report()
+    hs = bres["summary"]["hardened"]
+    if hs["wrong_rate"] > 0 or not bres["clean_outputs_equal"]:
+        print("  " + ui.warn(ui.WARN + " bench saw wrong output while %s is enabled — inspect RAS-REPORT.md or run: ras-anything disable %s" % (fid, fid)))
     return 0

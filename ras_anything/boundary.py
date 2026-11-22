@@ -47,6 +47,26 @@ class ReplayMiss(BaseException):
 # --------------------------------------------------------------------------- requests and outcomes
 
 
+
+def norm_subproc_key(argv, cwd: str | None = None) -> str:
+    parts = argv if isinstance(argv, list) else [str(argv)]
+    norm = []
+    base = cwd or os.getcwd()
+    for idx, part in enumerate(parts):
+        s = str(part)
+        if idx == 0 and os.path.basename(s).startswith("python"):
+            norm.append("python")
+        elif os.path.isabs(s):
+            try:
+                rel = os.path.relpath(s, base)
+                norm.append(rel if not rel.startswith("..") else s)
+            except ValueError:
+                norm.append(s)
+        else:
+            norm.append(s)
+    return "run " + " ".join(norm)
+
+
 class Req:
     __slots__ = ("kind", "method", "url", "body_sha", "headers", "timeout", "argv", "text")
 
@@ -63,7 +83,7 @@ class Req:
     @property
     def key(self) -> str:
         if self.kind == "subprocess":
-            return "run " + " ".join(self.argv if isinstance(self.argv, list) else [str(self.argv)])
+            return norm_subproc_key(self.argv)
         return "%s %s%s" % (self.method, _logical_url(self.url), (" #" + self.body_sha[:12]) if self.body_sha else "")
 
     @property

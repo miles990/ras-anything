@@ -1,15 +1,15 @@
 {
   "version": 1,
   "cmd": [
-    "python",
+    "/workspace/ras-anything/.venv/bin/python",
     "app.py"
   ],
-  "display_cmd": "python app.py",
-  "cwd": "/workspace/ras-anything/examples/payments",
-  "root": "/workspace/ras-anything/examples/payments",
-  "created": "2026-11-23T03:41:13+0800",
+  "display_cmd": "/workspace/ras-anything/.venv/bin/python app.py",
+  "cwd": ".",
+  "root": ".",
+  "created": "2026-11-23T05:02:10+0800",
   "clean": {
-    "wall_s": 0.481,
+    "wall_s": 0.47,
     "stdout_sha256": "ebe99fcc08dee5da092ce71548ff6d1f9773ee4d71c7a0d780a37930cc857fe6",
     "boundary_calls": 33
   },
@@ -20,58 +20,67 @@
     "runs": [
       {
         "seed": 1,
-        "outcome": "crash",
+        "outcome": "hang",
         "exit": 1,
-        "wall_s": 0.074,
+        "wall_s": 2.081,
         "faults": 1,
         "uncaught": {
-          "type": "BlockingIOError",
-          "msg": "[Errno 11] Resource temporarily unavailable (fork)",
-          "hang": false
+          "type": "ChaosHang",
+          "msg": "boundary call with no timeout hung (chaos)",
+          "hang": true,
+          "where": "billing.render_receipt"
         }
       },
       {
         "seed": 2,
-        "outcome": "wrong",
-        "exit": 0,
-        "wall_s": 3.445,
-        "faults": 5,
-        "uncaught": null
+        "outcome": "hang",
+        "exit": 1,
+        "wall_s": 2.112,
+        "faults": 1,
+        "uncaught": {
+          "type": "ChaosHang",
+          "msg": "boundary call with no timeout hung (chaos)",
+          "hang": true,
+          "where": "billing.render_receipt"
+        }
       },
       {
         "seed": 3,
         "outcome": "crash",
         "exit": 1,
-        "wall_s": 0.119,
+        "wall_s": 0.143,
         "faults": 1,
         "uncaught": {
           "type": "JSONDecodeError",
-          "msg": "Unterminated string starting at: line 1 column 37 (char 36)",
-          "hang": false
+          "msg": "Expecting value: line 1 column 1 (char 0)",
+          "hang": false,
+          "where": "billing.render_receipt"
         }
       },
       {
         "seed": 4,
         "outcome": "crash",
         "exit": 1,
-        "wall_s": 0.163,
-        "faults": 1,
+        "wall_s": 0.289,
+        "faults": 2,
         "uncaught": {
-          "type": "BlockingIOError",
-          "msg": "[Errno 11] Resource temporarily unavailable (fork)",
-          "hang": false
+          "type": "JSONDecodeError",
+          "msg": "Expecting value: line 1 column 1 (char 0)",
+          "hang": false,
+          "where": "billing.render_receipt"
         }
       },
       {
         "seed": 5,
-        "outcome": "hang",
+        "outcome": "crash",
         "exit": 1,
-        "wall_s": 2.076,
-        "faults": 1,
+        "wall_s": 3.55,
+        "faults": 7,
         "uncaught": {
-          "type": "ChaosHang",
-          "msg": "boundary call with no timeout hung (chaos)",
-          "hang": true
+          "type": "JSONDecodeError",
+          "msg": "Expecting value: line 1 column 1 (char 0)",
+          "hang": false,
+          "where": "billing.render_receipt"
         }
       }
     ]
@@ -84,7 +93,7 @@
       "name": "charge",
       "kind": "function",
       "async": false,
-      "file": "/workspace/ras-anything/examples/payments/billing.py",
+      "file": "billing.py",
       "line": 13,
       "first_line": 13,
       "in_main": false,
@@ -106,7 +115,7 @@
         "runs": 1,
         "failed": 1,
         "outcomes": {
-          "wrong": 1
+          "crash": 1
         }
       },
       "dynamic_risk": 1.0,
@@ -115,7 +124,7 @@
       "hardenable": true,
       "verdict": "harden it",
       "score": 40.7,
-      "why": "app failed in 1/1 chaos runs that hit it (wrong 1) \u00b7 retries a POST with no Idempotency-Key \u00b7 `except Exception: time.sleep(0.5)` swallows errors \u00b7 no logging on the failure path"
+      "why": "app failed in 1/1 chaos runs that hit it (crash 1) \u00b7 retries a POST with no Idempotency-Key \u00b7 `except Exception: time.sleep(0.5)` swallows errors \u00b7 no logging on the failure path"
     },
     {
       "id": "billing.render_receipt",
@@ -124,7 +133,7 @@
       "name": "render_receipt",
       "kind": "function",
       "async": false,
-      "file": "/workspace/ras-anything/examples/payments/billing.py",
+      "file": "billing.py",
       "line": 29,
       "first_line": 29,
       "in_main": false,
@@ -143,11 +152,11 @@
       },
       "static_risk": 0.544,
       "chaos": {
-        "runs": 4,
-        "failed": 4,
+        "runs": 5,
+        "failed": 5,
         "outcomes": {
-          "crash": 3,
-          "hang": 1
+          "hang": 2,
+          "crash": 3
         }
       },
       "dynamic_risk": 1.0,
@@ -156,7 +165,7 @@
       "hardenable": true,
       "verdict": "harden it",
       "score": 39.6,
-      "why": "app failed in 4/4 chaos runs that hit it (crash 3, hang 1) \u00b7 subprocess.run() without timeout \u00b7 no retry on transient errors \u00b7 no logging on the failure path"
+      "why": "app failed in 5/5 chaos runs that hit it (crash 3, hang 2) \u00b7 subprocess.run() without timeout \u00b7 no retry on transient errors \u00b7 no logging on the failure path"
     },
     {
       "id": "app.main",
@@ -165,7 +174,7 @@
       "name": "main",
       "kind": "function",
       "async": false,
-      "file": "/workspace/ras-anything/examples/payments/app.py",
+      "file": "app.py",
       "line": 21,
       "first_line": 21,
       "in_main": true,
@@ -198,7 +207,7 @@
       "name": "invoices",
       "kind": "function",
       "async": false,
-      "file": "/workspace/ras-anything/examples/payments/app.py",
+      "file": "app.py",
       "line": 16,
       "first_line": 16,
       "in_main": true,
@@ -226,7 +235,7 @@
       "name": "_send",
       "kind": "method",
       "async": false,
-      "file": "/workspace/ras-anything/examples/payments/upstream.py",
+      "file": "upstream.py",
       "line": 24,
       "first_line": 24,
       "in_main": false,
@@ -254,7 +263,7 @@
       "name": "do_GET",
       "kind": "method",
       "async": false,
-      "file": "/workspace/ras-anything/examples/payments/upstream.py",
+      "file": "upstream.py",
       "line": 50,
       "first_line": 50,
       "in_main": false,
@@ -282,7 +291,7 @@
       "name": "do_POST",
       "kind": "method",
       "async": false,
-      "file": "/workspace/ras-anything/examples/payments/upstream.py",
+      "file": "upstream.py",
       "line": 32,
       "first_line": 32,
       "in_main": false,
@@ -310,7 +319,7 @@
       "name": "log_message",
       "kind": "method",
       "async": false,
-      "file": "/workspace/ras-anything/examples/payments/upstream.py",
+      "file": "upstream.py",
       "line": 62,
       "first_line": 62,
       "in_main": false,
@@ -338,7 +347,7 @@
       "name": "__init__",
       "kind": "method",
       "async": false,
-      "file": "/workspace/ras-anything/examples/payments/upstream.py",
+      "file": "upstream.py",
       "line": 15,
       "first_line": 15,
       "in_main": false,
@@ -366,7 +375,7 @@
       "name": "start",
       "kind": "function",
       "async": false,
-      "file": "/workspace/ras-anything/examples/payments/upstream.py",
+      "file": "upstream.py",
       "line": 66,
       "first_line": 66,
       "in_main": false,
@@ -388,5 +397,5 @@
       "why": ""
     }
   ],
-  "elapsed_s": 6.36
+  "elapsed_s": 8.65
 }

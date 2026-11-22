@@ -9,7 +9,7 @@ import time
 from pathlib import Path
 
 from . import static, ui
-from .paths import UserError, ras_dir, save_json
+from .paths import UserError, ras_dir, rel_to_project, save_json
 from .runner import project_root_for, python_cmd, run
 
 W_DYNAMIC = 0.6  # measured chaos failures weigh more than static smells
@@ -100,7 +100,7 @@ def scan(cmd: list[str], seeds: int = 5, rate: float = 0.25, cwd: Path | None = 
             "id": func_id(f["module"], info["qualname"], f["file"]),
             "module": f["module"] if not in_main else Path(f["file"]).stem,
             "qualname": info["qualname"], "name": f["name"], "kind": info["kind"], "async": info["async"],
-            "file": f["file"], "line": info["line"], "first_line": f["line"], "in_main": in_main,
+            "file": rel_to_project(f["file"], cwd), "line": info["line"], "first_line": f["line"], "in_main": in_main,
             "calls": f["calls"], "boundary": f.get("boundary", 0), "boundary_kinds": f.get("kinds", {}),
             "gen": f.get("gen"), "arg_ok": f.get("arg_ok"), "ret_ok": f.get("ret_ok"),
             "signals": a["signals"], "static_risk": a["static_risk"],
@@ -122,7 +122,7 @@ def scan(cmd: list[str], seeds: int = 5, rate: float = 0.25, cwd: Path | None = 
     functions.sort(key=lambda d: (-d["score"], -(d["risk"] * d["exposure"]), -d["boundary"], d["id"]))
     result = {
         "version": 1,
-        "cmd": cmd, "display_cmd": shown, "cwd": str(cwd), "root": str(root),
+        "cmd": cmd, "display_cmd": shown, "cwd": ".", "root": rel_to_project(root, cwd),
         "created": time.strftime("%Y-%m-%dT%H:%M:%S%z"),
         "clean": {"wall_s": round(clean.wall, 3), "stdout_sha256": hashlib.sha256(clean.stdout.encode()).hexdigest(),
                   "boundary_calls": total},

@@ -9,14 +9,14 @@ folder) and iterate until it passes. Do not enable anything; do not edit the ori
 ## The function
 
 `billing.render_receipt` in `billing.py` line 29. Recorded **16 real calls** from
-`python app.py`. Dependency requests it made:
+`/workspace/ras-anything/.venv/bin/python app.py`. Dependency requests it made:
 - 16× `RUN /workspace/ras-anything/.venv/bin/python /workspace/ras-anything/examples/paymen`
 
 What the scan found:
 - subprocess.run() without timeout
 - no retry on transient errors
 - no logging on the failure path
-- under seeded chaos the app failed in 4/4 runs where this function's dependency calls were faulted
+- under seeded chaos the app failed in 5/5 runs where this function's dependency calls were faulted
 
 ```python
 def render_receipt(invoice, charge_record):
@@ -59,7 +59,7 @@ Recorded examples:
    `subprocess.run(..., timeout=t)`, `requests.get(..., timeout=t)`); a call with no timeout that
    hangs is a hard fail. Budget the attempts so worst case stays under 5 s.
 3. **Retry only transient failures**: timeouts, connection errors, HTTP 408/425/429/500/502/503/504
-   (honour `Retry-After`), a truncated/undecodable body from a 2xx, a subprocess exit 75. Exponential
+   (honour `Retry-After`), EAGAIN, a truncated/undecodable body from a 2xx, a subprocess exit 75. Exponential
    backoff with full jitter. **Never retry other 4xx** or programming errors.
 4. **Idempotency.** Never send a POST/PUT/PATCH/DELETE twice unless every attempt carries the same
    `Idempotency-Key` header, derived deterministically from the logical operation (e.g. the invoice
