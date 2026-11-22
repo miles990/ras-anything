@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "ras-anything": {
+      "command": "ras-anything",
+      "args": ["mcp"]
+    }
+  }
+}

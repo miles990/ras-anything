@@ -192,7 +192,8 @@ def main(argv):
             "expected": _short(expected) if not exp_exc else "raises " + exp_exc["type"],
             "exc": None if exc is None else "%s: %s" % (type(exc).__name__, str(exc)[:200]),
             "logs": logs, "structured": structured,
-            "attempts": [{"key": a["key"], "n": a["n"], "fault": a["fault"]} for a in handler.attempts],
+            "attempts": [{"key": a["key"], "n": a["n"], "fault": a["fault"], "reached": a["reached"],
+                          "idem": a["idem"], "method": a["method"]} for a in handler.attempts],
         }
 
     # (a) happy replay ---------------------------------------------------------------------------
@@ -219,6 +220,7 @@ def main(argv):
     sides = {"original": [], "hardened": []}
     per_scn = {}
     first_bad = None
+    first_dup = None
     for name, s in plans:
         row = per_scn.setdefault(name if s is None else "mixed", {"original": {}, "hardened": {}, "n": 0})
         for i in chaos_idx:
@@ -231,13 +233,17 @@ def main(argv):
             for side, t in (("original", o), ("hardened", h)):
                 sides[side].append(t)
                 row[side][t["class"]] = row[side].get(t["class"], 0) + 1
+            if o["dups"] and first_dup is None:
+                first_dup = {"call": i, "args": _args(call), "scenario": name if s is None else "mixed seed %d" % s,
+                             "original": o, "hardened": h}
             bad = h["class"] in ("wrong", "hang", "miss") or h["dups"] > o["dups"]
             if bad and first_bad is None:
                 first_bad = {"call": i, "args": _args(call), "scenario": name if s is None else "mixed seed %d" % s,
                              "original": o, "hardened": h}
     clock.uninstall()
     result["chaos"] = {"calls": len(chaos_idx), "scenarios": [p[0] if p[1] is None else "mixed:%d" % p[1] for p in plans],
-                       "by_scenario": per_scn, "first_failure": first_bad}
+                       "by_scenario": per_scn, "first_failure": first_bad,
+                       "first_original_dup": first_dup}
     for side, ts in sides.items():
         result[side] = summarize(ts, budget)
     o, h = result["original"], result["hardened"]

@@ -122,6 +122,19 @@ def print_verify(res: dict, fid: str) -> None:
         srows.append([name, "%d/%d" % (ok_o, n), "%d/%d" % (ok_h, n), _cls_line({**{k: 0 for k in CLASSES}, **r["original"]}),
                       _cls_line({**{k: 0 for k in CLASSES}, **r["hardened"]})])
     print(ui.table(["fault", "orig avail", "hard avail", "original", "hardened"], srows, "lrrll"))
+    fd = res["chaos"].get("first_original_dup")
+    if fd:
+        print()
+        att = fd["original"]["attempts"]
+        steps = ", ".join("%s #%d %s%s" % (a["method"] or "run", a["n"], a["fault"] or "ok",
+                                          " (reached server)" if a["reached"] and a["fault"] else "") for a in att)
+        print("  " + ui.warn(ui.WARN + " the original double-sends: call #%d %s under %s" % (fd["call"], ui.clip(fd["args"], 70), fd["scenario"])))
+        print("    original: %s %s %d duplicate%s" % (steps, ui.ARROW, fd["original"]["dups"], "" if fd["original"]["dups"] == 1 else "s"))
+        hatt = fd["hardened"]["attempts"]
+        keys = {a["idem"] for a in hatt if a["reached"]}
+        print("    hardened: %s %s %d duplicates%s" % (
+            ", ".join("%s #%d %s" % (a["method"] or "run", a["n"], a["fault"] or "ok") for a in hatt), ui.ARROW,
+            fd["hardened"]["dups"], (" (one Idempotency-Key: %s)" % ui.clip(str(next(iter(keys))), 32)) if len(keys) == 1 and None not in keys else ""))
     ff = res["happy"].get("first_failure") if not g["happy"] else None
     cf = res["chaos"].get("first_failure")
     if ff or (cf and not res["passed"]):

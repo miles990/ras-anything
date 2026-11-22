@@ -1,0 +1,14 @@
+{
+  "name": "ras-anything",
+  "owner": {
+    "name": "miles990"
+  },
+  "plugins": [
+    {
+      "name": "ras-anything",
+      "source": "./",
+      "description": "Harden the functions that break under dependency faults and prove it on recorded calls."
+    }
+  ],
+  "description": "ras-anything: harden the 5% of your app that breaks, with proof."
+}

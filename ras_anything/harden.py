@@ -92,7 +92,8 @@ def stub(fn: dict, project: Path) -> str:
     lines += [
         "",
         "# What this function returns when it degrades on purpose (dependency down, budget spent).",
-        "# A value, or a callable taking the same arguments. None = no fallback: raise a RasError instead.",
+        "# A value, or a callable taking the same arguments (lambda *a, **k: None declares None).",
+        "# RAS_FALLBACK = None means no fallback: raise a RasError instead.",
         "RAS_FALLBACK = None",
         "",
         "",
@@ -199,7 +200,8 @@ Recorded examples:
    id), not random per attempt. A timed-out POST may already have taken effect.
 5. **Degrade explicitly, never silently.** When the dependency stays down, either raise a structured
    error (`raise RasError("...", cause=e, context={{...}}) from e`) or return the declared fallback.
-   Declare it at module level as `RAS_FALLBACK` (a value, or a callable taking the same arguments).
+   Declare it at module level as `RAS_FALLBACK` (a value, or a callable taking the same arguments;
+   to declare `None` as the fallback use `RAS_FALLBACK = lambda *args, **kwargs: None`).
    Any other value that differs from the happy result counts as **silent wrong data** and fails.
    Swallowing errors (`except Exception: return None`) is the defect you are fixing.
 6. **Serviceable errors.** Log each give-up with `log_event("...", **context)` (JSON line on stderr,
