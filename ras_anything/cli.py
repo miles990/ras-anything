@@ -39,6 +39,17 @@ def main(argv=None) -> int:
     v.add_argument("id", nargs="?")
     v.add_argument("--chaos-calls", type=int, default=60, help="recorded calls replayed under each fault (default 60)")
 
+    for name, text in (("enable", "swap the verified hardened function in (one marked block)"),
+                       ("disable", "remove the block, restoring the file byte for byte")):
+        e = sub.add_parser(name, help=text)
+        e.add_argument("id", nargs="?")
+
+    b = sub.add_parser("bench", help="whole-app runs under live chaos, original vs hardened (-- <cmd>)")
+    b.add_argument("--seeds", type=int, default=20)
+    b.add_argument("--rate", type=float, default=0.1, help="fault probability per dependency attempt (default 0.1)")
+    b.add_argument("--degraded-marker", action="append", dest="markers",
+                   help="text that marks a deliberately degraded output line (repeatable)")
+
     a = p.parse_args(head)
     try:
         if a.command == "scan":
@@ -56,6 +67,18 @@ def main(argv=None) -> int:
             from .verify import verify
 
             return 0 if verify(a.id, max_chaos=a.chaos_calls).get("passed") else 1
+        elif a.command == "enable":
+            from .enable import enable
+
+            enable(a.id)
+        elif a.command == "disable":
+            from .enable import disable
+
+            disable(a.id)
+        elif a.command == "bench":
+            from .bench import bench
+
+            bench(cmd or None, seeds=a.seeds, rate=a.rate, markers=a.markers)
         else:
             p.print_help()
             return 2

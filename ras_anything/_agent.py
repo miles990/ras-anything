@@ -273,6 +273,8 @@ class Agent:
 
         @functools.wraps(fn)
         def wrapper(*a, **kw):
+            h = self.handler
+            before = len(h.attempts) if isinstance(h, boundary.FaultingHandler) else 0
             t0 = time.perf_counter()
             st["calls"] += 1
             try:
@@ -288,7 +290,8 @@ class Agent:
                 fb = fallback(*a, **kw) if callable(fallback) else fallback
             except Exception:
                 pass
-            if fallback is not None and res == fb:
+            faulted = isinstance(h, boundary.FaultingHandler) and any(x["fault"] for x in h.attempts[before:])
+            if fallback is not None and faulted and res == fb:
                 st["fallback"] += 1
             else:
                 st["ok"] += 1
