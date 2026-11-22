@@ -27,6 +27,18 @@ def main(argv=None) -> int:
     s.add_argument("--seeds", type=int, default=5)
     s.add_argument("--rate", type=float, default=0.25)
 
+    h = sub.add_parser("harden", help="record real calls of one function, write TASK.md, run your agent")
+    h.add_argument("id", nargs="?")
+    h.add_argument("--agent", help="claude | codex | any shell command that reads the task on stdin")
+    h.add_argument("--model", help="model for the agent (e.g. opus)")
+    h.add_argument("--budget", type=float, help="latency budget per call in seconds (default 5)")
+    h.add_argument("--calls", type=int, default=500, help="max calls to record (default 500)")
+    h.add_argument("--force", action="store_true", help="overwrite an existing hardened.py with a fresh stub")
+
+    v = sub.add_parser("verify", help="replay recorded calls: happy path, then the fault matrix")
+    v.add_argument("id", nargs="?")
+    v.add_argument("--chaos-calls", type=int, default=60, help="recorded calls replayed under each fault (default 60)")
+
     a = p.parse_args(head)
     try:
         if a.command == "scan":
@@ -36,6 +48,14 @@ def main(argv=None) -> int:
             from .scan import scan
 
             scan(cmd, seeds=a.seeds, rate=a.rate)
+        elif a.command == "harden":
+            from .harden import harden
+
+            harden(a.id, agent=a.agent, model=a.model, budget=a.budget, max_calls=a.calls, force=a.force)
+        elif a.command == "verify":
+            from .verify import verify
+
+            return 0 if verify(a.id, max_chaos=a.chaos_calls).get("passed") else 1
         else:
             p.print_help()
             return 2

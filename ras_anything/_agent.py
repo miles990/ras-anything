@@ -124,6 +124,7 @@ class Agent:
         self.tls = threading.local()
         self.calls_path = self.cfg["calls_path"]
         self.target_seen = 0
+        self.snapshot = None
 
         agent = self
 
@@ -160,6 +161,12 @@ class Agent:
         if depth > 0:
             return self._local_depth_only
         self.target_seen += 1
+        if self.snapshot is None:
+            g = frame.f_globals
+            simple = (str, int, float, bool, type(None), bytes)
+            self.snapshot = {"env": dict(os.environ),
+                             "globals": {n: g[n] for n in frame.f_code.co_names
+                                         if n in g and isinstance(g[n], simple)}}
         rec = None
         if len(self.records) < self.max_calls:
             code = frame.f_code
@@ -371,6 +378,7 @@ class Agent:
             out["recorded"] = len(self.records)
             out["seen"] = self.target_seen
             out["skipped"] = self.skipped
+            out["snapshot"] = self.snapshot
         if self.stats:
             for st in self.stats.values():
                 lat = sorted(st.pop("lat"))
