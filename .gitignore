@@ -11,3 +11,7 @@ dist/
 *.egg-info/
 build/
 .ras/runs/
+
+# wow: intermediate/test artifacts stay local (Alex 2026-11-23). Finals go in wow/proof/.
+wow/work/
+wow/brief.md
