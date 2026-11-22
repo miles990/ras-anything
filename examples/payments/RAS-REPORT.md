@@ -2,7 +2,7 @@
 
 `python app.py`, 20 whole-app runs per variant (seeds 1–20, original and hardened interleaved, same fault seed per pair), faults injected live at the dependency boundary with p=0.1 per attempt.
 
-![ras-anything card](ras-card.svg)
+![ras-anything card](../../docs/cards/payments.svg)
 
 | whole app | original | hardened |
 |---|---:|---:|

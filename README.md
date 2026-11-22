@@ -17,7 +17,7 @@ functions cause almost all of it.
 your coding agent harden *only them*, proves on real recorded calls that the happy path is unchanged
 and that availability went up, then swaps them in. One command, fully reversible.
 
-<p align="center"><img src="examples/payments/ras-card.svg" alt="payments example: app availability under faults 5% to 90%" width="760"></p>
+<p align="center"><img src="docs/cards/payments.svg" alt="payments example: app availability under faults 5% to 90%" width="760"></p>
 
 ## Install
 
