@@ -37,7 +37,8 @@ def dotted(node) -> str:
 class FileInfo:
     def __init__(self, path: str):
         self.path = path
-        self.src = open(path, encoding="utf-8", errors="replace").read()
+        with open(path, encoding="utf-8", errors="replace") as f:
+            self.src = f.read()
         self.tree = ast.parse(self.src, filename=path)
         self.imports: dict[str, str] = {}  # local name -> full dotted origin
         self.has_main_guard = False
