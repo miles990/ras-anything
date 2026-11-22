@@ -8,6 +8,21 @@ import sys
 from . import __version__, ui
 from .paths import UserError
 
+USAGE = """\
+Find the functions that break when dependencies misbehave, have a coding agent harden only those,
+prove it on recorded calls, and swap them in reversibly.
+
+  ras-anything go --agent claude -- python app.py     everything below, in one go
+
+  scan -- <cmd>          rank functions by risk × exposure × hardenability (clean + seeded chaos runs)
+  harden [id] [--agent]  record real calls + their dependency I/O, write TASK.md, run your agent
+  verify [id]            replay: happy path must be identical, then the fault matrix vs the original
+  enable / disable [id]  swap the hardened function in / out (one marked block, byte-for-byte undo)
+  bench [-- <cmd>]       whole-app runs under live chaos, original vs hardened, interleaved
+  report                 RAS-REPORT.md + ras-card.svg (measured numbers only)
+  status · doctor · mcp
+"""
+
 
 def _split(argv):
     if "--" in argv:
@@ -16,16 +31,14 @@ def _split(argv):
     return argv, []
 
 
-def main(argv=None) -> int:
-    argv = list(sys.argv[1:] if argv is None else argv)
-    head, cmd = _split(argv)
-    p = argparse.ArgumentParser(prog="ras-anything", description="Harden the 5% of your app that breaks.")
+def parser() -> argparse.ArgumentParser:
+    p = argparse.ArgumentParser(prog="ras-anything", description=USAGE, formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument("--version", action="version", version="ras-anything " + __version__)
     sub = p.add_subparsers(dest="command", metavar="<command>")
 
     s = sub.add_parser("scan", help="rank functions by risk × exposure × hardenability (-- <cmd>)")
-    s.add_argument("--seeds", type=int, default=5)
-    s.add_argument("--rate", type=float, default=0.25)
+    s.add_argument("--seeds", type=int, default=5, help="chaos runs (default 5)")
+    s.add_argument("--rate", type=float, default=0.25, help="fault probability per dependency attempt (default 0.25)")
 
     h = sub.add_parser("harden", help="record real calls of one function, write TASK.md, run your agent")
     h.add_argument("id", nargs="?")
@@ -50,35 +63,76 @@ def main(argv=None) -> int:
     b.add_argument("--degraded-marker", action="append", dest="markers",
                    help="text that marks a deliberately degraded output line (repeatable)")
 
+    r = sub.add_parser("report", help="RAS-REPORT.md + ras-card.svg")
+    r.add_argument("--title", help="project name on the card (default: folder name)")
+
+    sub.add_parser("status", help="what's scanned, hardened, verified, enabled; the next step")
+    sub.add_parser("doctor", help="check python, agents, git, .ras")
+    sub.add_parser("mcp", help="stdio MCP server")
+
+    g = sub.add_parser("go", help="scan → harden → verify → enable → bench → report (-- <cmd>)")
+    g.add_argument("--agent", required=True, help="claude | codex | any shell command that reads the task on stdin")
+    g.add_argument("--model")
+    g.add_argument("--seeds", type=int, default=20)
+    g.add_argument("--budget", type=float)
+    g.add_argument("--degraded-marker", action="append", dest="markers")
+    return p
+
+
+def main(argv=None) -> int:
+    argv = list(sys.argv[1:] if argv is None else argv)
+    head, cmd = _split(argv)
+    p = parser()
     a = p.parse_args(head)
     try:
-        if a.command == "scan":
-            if not cmd:
-                raise UserError("no command given", "scan runs your app: put its command after --",
-                                "scan -- python app.py")
+        c = a.command
+        if c in ("scan", "go") and not cmd:
+            raise UserError("no command given", "%s runs your app: put its command after --" % c,
+                            "%s -- python app.py" % ("scan" if c == "scan" else "go --agent claude"))
+        if c == "scan":
             from .scan import scan
 
             scan(cmd, seeds=a.seeds, rate=a.rate)
-        elif a.command == "harden":
+        elif c == "harden":
             from .harden import harden
 
             harden(a.id, agent=a.agent, model=a.model, budget=a.budget, max_calls=a.calls, force=a.force)
-        elif a.command == "verify":
+        elif c == "verify":
             from .verify import verify
 
             return 0 if verify(a.id, max_chaos=a.chaos_calls).get("passed") else 1
-        elif a.command == "enable":
+        elif c == "enable":
             from .enable import enable
 
             enable(a.id)
-        elif a.command == "disable":
+        elif c == "disable":
             from .enable import disable
 
             disable(a.id)
-        elif a.command == "bench":
+        elif c == "bench":
             from .bench import bench
 
             bench(cmd or None, seeds=a.seeds, rate=a.rate, markers=a.markers)
+        elif c == "report":
+            from .report import report
+
+            report(a.title)
+        elif c == "status":
+            from .doctor import status
+
+            status()
+        elif c == "doctor":
+            from .doctor import doctor
+
+            return doctor()
+        elif c == "mcp":
+            from .mcp import serve
+
+            return serve()
+        elif c == "go":
+            from .go import go
+
+            return go(cmd, a.agent, model=a.model, seeds=a.seeds, markers=a.markers, budget=a.budget)
         else:
             p.print_help()
             return 2
