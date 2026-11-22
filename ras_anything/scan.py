@@ -61,7 +61,8 @@ def scan(cmd: list[str], seeds: int = 5, rate: float = 0.25, cwd: Path | None = 
     if clean.code != 0 or clean.data is None:
         tail = (clean.stderr or "").strip().splitlines()[-3:]
         raise UserError("the clean run failed (exit %s)%s" % (clean.code, (": " + tail[-1]) if tail else ""),
-                        "scan needs a workload that succeeds without faults: " + " | ".join(tail[:-1]),
+                        "scan needs a workload that succeeds without faults" + (
+                            ": " + " | ".join(tail[:-1]) if len(tail) > 1 else " (the command printed no error)"),
                         "doctor")
     runs = []
     per_fn: dict = {}

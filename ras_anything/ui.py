@@ -102,7 +102,7 @@ def table(headers, rows, align=None, indent: int = 2, sub=None) -> str:
 
 
 def headline(title: str, detail: str = "") -> None:
-    print(bold(accent("ras-anything")) + " " + bold(title) + ((" " + dim(DOT + " " + detail)) if detail else ""))
+    print(bold(accent("ras-anything")) + " " + bold(title) + ((" " + dim(DOT + " " + detail)) if detail else ""), flush=True)
 
 
 def rule() -> None:
@@ -115,6 +115,7 @@ def next_hint(cmd: str) -> None:
 
 
 def error(what: str, impact: str = "", nxt: str = "") -> None:
+    sys.stdout.flush()
     print(bad(FAIL + " " + what), file=sys.stderr)
     if impact:
         print("  " + impact, file=sys.stderr)
