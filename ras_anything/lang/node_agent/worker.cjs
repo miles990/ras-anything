@@ -288,8 +288,8 @@ async function runJob(job) {
       exc_type: error === null ? null : bugType(error), cause_type: cause === null ? null : bugType(cause),
       structured: error !== null && (error instanceof runtime.RasError || cause !== null),
       state: t.plan.type === "none" ? { args: digest(args) } : null,
-      attempts: handler.attempts.map(({ key, n, fault, reached, failed, idem, method, nonidempotent }) =>
-        ({ key, n, fault, reached, failed, idem, method, nonidempotent })),
+      attempts: handler.attempts.map(({ key, n, fault, reached, failed, idem, method, nonidempotent, outage }) =>
+        ({ key, n, fault, reached, failed, idem, method, nonidempotent, outage })),
     };
   }
 

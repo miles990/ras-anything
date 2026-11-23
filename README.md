@@ -172,7 +172,7 @@ after 2 s. In async code the waits are `asyncio.sleep`, so `asyncio.wait_for` ar
 - Responses handed to your code are complete, already-decoded bodies: streaming works, but reads can't fail half way. `aiohttp` responses carry no live connection, and `httpx` response history is empty.
 - Async calls are replayed one at a time, each in its own event loop.
 - Fault decisions ignore the port, so two dependencies on the same host and path share a schedule.
-- Verify checks that a fallback is *declared* and *earned* (a request failed with an exception, timeout, 5xx/429, a cut-off body, or a temp-failed process, and never got a good answer). An open circuit breaker makes no request, so return-the-fallback-while-open counts as wrong: raise instead.
+- Verify checks that a fallback is *declared* and *earned* (a request failed with an exception, timeout, 5xx/429, a cut-off body, or a temp-failed process, and never got a good answer). An open circuit makes no request: there the fallback is earned only if the dependency was seen to fail, and not to answer since, within the last 60 s.
 - The checks catch mistakes and shortcuts, not sabotage: hardened code runs in the same process as the recorder.
 - Recordings hold real arguments and responses in `.ras/hardens/*/calls.json`: review before committing. Session auth/cookie headers are left out.
 - Whole-app availability is judged by output: byte-identical to a clean run, a declared fallback in that run, or lines with `--degraded-marker`. Apps with nondeterministic output need a marker or a deterministic mode.

@@ -125,8 +125,9 @@ Recorded examples:
    Any other value that differs from the happy result counts as **silent wrong data** and fails.
    Swallowing errors ({tx['swallow']}) is the defect you are fixing.
    A fallback counts only in a call where a dependency request really failed and never got a good
-   answer (the recorder watches the boundary; a log line alone proves nothing). An open
-   `CircuitBreaker` makes no request, so raise then.
+   answer (the recorder watches the boundary; a log line alone proves nothing). The one exception is an open
+   circuit: no request is needed if this dependency was seen to fail, and not to answer since, in the
+   last 60 s (verify also runs your function through a long outage and recovery, state kept).
 6. **Serviceable errors.** {tx['errors']}
 
 `verify` replays every recorded call against recorded dependency answers (no network), on a

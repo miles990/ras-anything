@@ -24,6 +24,18 @@ def _places(rs) -> dict:
     return out
 
 
+def _x(v) -> str:
+    return "—" if v is None else "%.2f" % v
+
+
+def _amplification(stats) -> dict:
+    """Dependency attempts per call of the enabled functions, over all calls and over those that met an outage."""
+    stats = list(stats)
+    calls, hit = sum(s["calls"] for s in stats), sum(s.get("outage_calls", 0) for s in stats)
+    return {"amplification": sum(s.get("attempts", 0) for s in stats) / calls if calls else None,
+            "outage_amplification": sum(s.get("outage_attempts", 0) for s in stats) / hit if hit else None, "outage_calls": hit}
+
+
 def _pctl(xs, q):
     xs = sorted(xs)
     return xs[min(len(xs) - 1, int(q * len(xs)))] if xs else None
@@ -96,11 +108,14 @@ def bench(cmd: list[str] | None = None, seeds: int = 20, rate: float = 0.1, mark
             raw_runs.append((v, rec, r.stdout))
             runs[v].append(rec)
             for fid, st in (d.get("stats") or {}).items():
-                agg = stats[v].setdefault(fid, {"calls": 0, "ok": 0, "fallback": 0, "raised": 0, "p99": []})
+                agg = stats[v].setdefault(fid, {"calls": 0, "ok": 0, "fallback": 0, "raised": 0, "attempts": 0, "outage_calls": 0,
+                                                "outage_attempts": 0, "p99": []})
                 agg["calls"] += st["calls"]
                 agg["ok"] += st["ok"]
                 agg["fallback"] += st["fallback"]
                 agg["raised"] += sum(st["raised"].values())
+                for k in ("attempts", "outage_calls", "outage_attempts"):
+                    agg[k] += st.get(k, 0)
                 if st.get("p99") is not None:
                     agg["p99"].append(st["p99"])
             line[v] = rec
@@ -128,7 +143,8 @@ def bench(cmd: list[str] | None = None, seeds: int = 20, rate: float = 0.1, mark
                       "p50_wall": _pctl(walls, 0.5), "p99_wall": _pctl(walls, 0.99),
                       "identical_rate": c["correct"] / n if n else 0.0,
                       "dups": sum(r["dups"] for r in rs), "faults": sum(r["faults"] for r in rs),
-                      "failures_by_place": _places(rs),
+                      "failures_by_place": _places(rs), **_amplification(stats[v].values()),
+                      "clean_per_call": _amplification((clean[v].data or {}).get("stats", {}).values())["amplification"],
                       "clean_wall": round(clean[v].wall, 4)}
     for v in stats:
         for st in stats[v].values():
@@ -171,6 +187,10 @@ def print_bench(res: dict) -> None:
         ["wrong output", ui.pct(o["wrong_rate"]), arrow(o["wrong_rate"], h["wrong_rate"], False) + " " + ui.pct(h["wrong_rate"]), ""],
         ["duplicate side effects", str(o["dups"]), arrow(o["dups"], h["dups"], False) + " " + str(h["dups"]),
          ui.dim("non-idempotent requests that reached the server twice")],
+        ["attempts per call", _x(o["amplification"]), _x(h["amplification"]),
+         ui.dim("retry amplification, enabled functions (no faults: %s)" % _x(h["clean_per_call"]))],
+        ["  in an outage", _x(o["outage_amplification"]), _x(h["outage_amplification"]),
+         ui.dim("calls that met one: %d / %d" % (o["outage_calls"], h["outage_calls"]))],
         ["p50 wall", ui.secs(o["p50_wall"]), ui.secs(h["p50_wall"]), ""],
         ["p99 wall", ui.secs(o["p99_wall"]), arrow(o["p99_wall"], h["p99_wall"], False) + " " + ui.secs(h["p99_wall"]), ""],
         ["faults injected", str(o["faults"]), str(h["faults"]), ui.dim("hardened retries see more attempts")],

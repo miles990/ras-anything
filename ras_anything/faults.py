@@ -51,6 +51,22 @@ class Plan:
     def fault(self, key: str, n: int, nonidempotent: bool = False) -> str | None:
         return None
 
+    def outage(self, key: str, n: int) -> bool:
+        """Is this attempt inside an outage window? (for counting what is sent into one)"""
+        return False
+
+
+class Down(Plan):
+    """Every attempt of every request is refused: the dependency is down."""
+
+    name = "down"
+
+    def fault(self, key, n, nonidempotent=False):
+        return "refused"
+
+    def outage(self, key, n):
+        return True
+
 
 class FirstAttempt(Plan):
     """The first attempt of every distinct request (or just `target_key`) gets `kind`;
@@ -67,6 +83,9 @@ class FirstAttempt(Plan):
             return "refused" if n < OUTAGE_K else None
         return self.kind if n == 0 else None
 
+    def outage(self, key, n):
+        return self.kind == "outage" and n < OUTAGE_K and self.target_key in (None, key)
+
 
 class Seeded(Plan):
     """Each attempt faults with probability `rate` (kind uniform over KINDS); with probability
@@ -77,11 +96,14 @@ class Seeded(Plan):
         self.name = "mixed"
 
     def fault(self, key, n, nonidempotent=False):
-        if self.outage_rate and _u(self.seed, self.salt, key, "outage") < self.outage_rate and n < OUTAGE_K:
+        if self.outage(key, n):
             return "refused"
         if _u(self.seed, self.salt, key, n, "p") < self.rate:
             return KINDS[int(_u(self.seed, self.salt, key, n, "k") * len(KINDS)) % len(KINDS)]
         return None
+
+    def outage(self, key, n):
+        return bool(self.outage_rate) and n < OUTAGE_K and _u(self.seed, self.salt, key, "outage") < self.outage_rate
 
 
 def schedule(plan: Plan, keys: list[str], attempts: int = 4) -> list[list[str | None]]:

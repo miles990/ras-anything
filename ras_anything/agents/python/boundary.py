@@ -258,7 +258,7 @@ class FaultingHandler(Handler):
         if req.kind == "socket" and fault in ("http5xx", "http429", "truncated"):
             fault = None  # nothing a connection can do
         rec = {"key": req.key, "n": n, "fault": fault, "reached": False, "nonidempotent": req.nonidempotent,
-               "idem": req.idem_key, "method": req.method, "failed": True}
+               "idem": req.idem_key, "method": req.method, "failed": True, "outage": self.plan.outage(req.key, n)}
         self.attempts.append(rec)
         for calls in _scopes.get():
             calls.append(rec)

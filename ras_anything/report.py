@@ -18,6 +18,10 @@ def _p(x, d=0) -> str:
     return "—" if x is None else ("%." + str(d) + "f%%") % (100 * x)
 
 
+def _n(x) -> str:
+    return "—" if x is None else "%.2f" % x
+
+
 def _runtime(host: dict) -> str:
     return host.get("runtime") or "Python %s" % host.get("python", "")
 
@@ -50,6 +54,8 @@ def card_svg(title: str, data: dict) -> str:
                 ("hangs", _p(o["hang_rate"]), _p(h["hang_rate"])),
                 ("p99 run time", ui.secs(o["p99_wall"]), ui.secs(h["p99_wall"])),
                 ("duplicate side effects", str(o["dups"]), str(h["dups"]))]
+        if h.get("amplification") is not None:
+            rows.append(("dependency attempts per call", _n(o.get("amplification")), _n(h["amplification"])))
         n = "%d runs per variant, seeds 1–%d, interleaved" % (b["seeds"], b["seeds"])
         rate = "p=%g per attempt" % b["rate"]
     else:
@@ -86,7 +92,7 @@ def card_svg(title: str, data: dict) -> str:
                            f'<tspan fill="#9da7b3">{_x(a)}</tspan> → <tspan font-weight="700">{_x(c)}</tspan></text>')
         else:
             metrics.append(f'<text x="768" y="{y}" font-family="{mono}" font-size="12" text-anchor="end" fill="#e6edf3">{_x(c)}</text>')
-        y += 30
+        y += 25
     return f'''<svg xmlns="http://www.w3.org/2000/svg" width="{W}" height="{H}" viewBox="0 0 {W} {H}" role="img" aria-label="{_x(title)}: {_x(metric)} {_p(before, 1)} to {_p(after, 1)}">
   <title>{_x(title)}: {_x(metric)} {_p(before, 1)} → {_p(after, 1)}</title>
   <rect width="{W}" height="{H}" rx="14" fill="#0d1117"/>
@@ -126,6 +132,11 @@ def markdown(title: str, data: dict) -> str:
         for label, k in (("crashes", "crash_rate"), ("hangs", "hang_rate"), ("wrong output", "wrong_rate")):
             out.append("| %s | %s | %s |" % (label, _p(o[k], 1), _p(h[k], 1)))
         out.append("| duplicate non-idempotent side effects | %d | %d |" % (o["dups"], h["dups"]))
+        if h.get("amplification") is not None:
+            out.append("| retry amplification (dependency attempts per call of the enabled functions; no faults: %s) | %s | %s |" % (
+                _n(h.get("clean_per_call")), _n(o["amplification"]), _n(h["amplification"])))
+            out.append("| … for calls that met an outage (%d / %d calls) | %s | %s |" % (
+                o["outage_calls"], h["outage_calls"], _n(o["outage_amplification"]), _n(h["outage_amplification"])))
         out.append("| p50 / p99 run time | %s / %s | %s / %s |" % (ui.secs(o["p50_wall"]), ui.secs(o["p99_wall"]),
                                                                 ui.secs(h["p50_wall"]), ui.secs(h["p99_wall"])))
         out.append("| faults injected (total) | %d | %d |" % (o["faults"], h["faults"]))
@@ -156,6 +167,25 @@ def markdown(title: str, data: dict) -> str:
                 o["wrong"], h["wrong"], o["hang"], h["hang"], ui.secs(o["p99"]), ui.secs(h["p99"]),
                 ui.secs(v["budget_s"]), o["dups"], h["dups"], "✓ pass" if v["passed"] else "✗ fail"))
         out.append("")
+        ox = [x for x in hs if x["verify"].get("outage")]
+        if ox:
+            t = ox[0]["verify"]["outage"]
+            out.append("### Retry amplification and outages\n")
+            out.append("Attempts per call over the fault matrix, and in a sustained outage: %d recorded calls in a row, %g s apart, with the "
+                       "dependency down (after %d healthy ones, before %d with it back, %g s apart). Nothing is reset in between, so breakers, "
+                       "retry budgets and caches work as they would. `answered` = ok + degraded; `back after` = virtual seconds from the "
+                       "first call after the outage until a real answer.\n" % (
+                           t["down"]["calls"], t["down"]["gap_s"], t["healthy"]["calls"], t["recovered"]["calls"], t["recovered"]["gap_s"]))
+            out.append("| function | healthy | fault matrix | in the outage | answered in the outage | back after |")
+            out.append("|---|---|---|---|---|---|")
+            for x in ox:
+                v = x["verify"]
+                a, b = v["outage"]["original"], v["outage"]["hardened"]
+                back = ["never" if s["recovered_after_s"] is None else "%g s" % round(s["recovered_after_s"], 1) for s in (a, b)]
+                out.append("| `%s` | %s → %s | %s → %s | %s → **%s** | %d → %d of %d | %s → %s |" % (
+                    x["id"], _n(a["healthy_per_call"]), _n(b["healthy_per_call"]), _n(v["original"]["amplification"]), _n(v["hardened"]["amplification"]),
+                    _n(a["amplification"]), _n(b["amplification"]), a["ok"] + a["degraded"], b["ok"] + b["degraded"], b["calls"], *back))
+            out.append("")
     out.append("## Fault model\n")
     out.append("| fault | effect at the boundary |\n|---|---|")
     for k in faults.MATRIX + ("mixed",):

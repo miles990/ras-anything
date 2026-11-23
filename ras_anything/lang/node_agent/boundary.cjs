@@ -182,7 +182,7 @@ class Faulting {
     const n = this.counts.get(req.key) ?? 0;
     this.counts.set(req.key, n + 1);
     const rec = { key: req.key, n, fault: this.plan(req.key, n), reached: false, nonidempotent: req.nonidempotent, idem: req.idem,
-      method: req.method, failed: true };
+      method: req.method, failed: true, outage: this.plan.outage(req.key, n) };
     this.attempts.push(rec);
     this.onAttempt(req, rec);
     this.clock.touch();

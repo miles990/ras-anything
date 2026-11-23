@@ -101,6 +101,34 @@ def chaos_plan(calls: list[dict], keys: list[list[str]], usable: list[int], max_
     return out
 
 
+OUTAGE = {"healthy": (10, 0.5), "down": (40, 0.5), "recovered": (90, 1.0)}  # phase: calls, seconds between them
+
+
+def outage_trials(usable: list[int], side: str) -> tuple[list[str], list[dict]]:
+    """The recorded calls one after the other, while the dependency is fine, then down, then back (for longer than
+    judge.KNOWN_DOWN_S). Nothing is reset in between: here breakers, budgets and caches show what they do."""
+    phases = [p for p, (n, _) in OUTAGE.items() for _ in range(n)]
+    return phases, [{"call": usable[k % len(usable)], "side": side, "plan": {"type": "down"} if p == "down" else NONE,
+                     "seed": k, "gap_s": OUTAGE[p][1]} for k, p in enumerate(phases)]
+
+
+def measure_outage(adapter, project, d, meta, calls, keys, usable, deadline) -> dict | None:
+    if not usable:
+        return None
+    budget, out = float(meta["budget_s"]), {p: {"calls": n, "gap_s": gap} for p, (n, gap) in OUTAGE.items()}
+    for side in ("original", "hardened"):  # each in a process of its own
+        phases, trials = outage_trials(usable, side)
+        raw = replay(adapter, project, d, meta, trials, deadline)["results"]
+        ts = judge.classify_sequence(raw, [calls[t["call"]] for t in trials], [keys[t["call"]] for t in trials], budget,
+                                     side == "hardened", [t["gap_s"] for t in trials])
+        out[side] = judge.summarize_outage(phases, ts)
+        bad = next((i for i, t in enumerate(ts) if t["class"] in ("wrong", "miss", "hang")), None)
+        if side == "hardened" and bad is not None:
+            out["first_failure"] = {"call": trials[bad]["call"], "args": _args(calls[trials[bad]["call"]]),
+                                    "scenario": "sustained outage (%s)" % phases[bad], "original": None, "hardened": ts[bad]}
+    return out
+
+
 def measure(adapter, project: Path, d: Path, meta: dict, max_chaos: int) -> dict:
     budget = float(meta["budget_s"])
     try:
@@ -158,12 +186,16 @@ def measure(adapter, project: Path, d: Path, meta: dict, max_chaos: int) -> dict
     crashes = judge.new_crashes(sides["original"], sides["hardened"], adapter.bug_exceptions)
     scenarios = list(dict.fromkeys(s["scenario"].replace(" seed ", ":") if s["row"] == "mixed" else
                                    ("per-key" if s["row"].endswith("(per-key)") else s["row"]) for s in specs))
-    gates = judge.gates(happy, o, h, crashes, budget)
+    # (c) the dependency goes down and comes back, state kept -----------------------------------------
+    outage = measure_outage(adapter, project, d, meta, calls, keys, usable, deadline)
+    if outage:
+        first_bad = first_bad or outage.pop("first_failure", None)
+    gates = judge.gates(happy, o, h, crashes, budget, outage)
     return {
         "id": meta["id"], "lang": adapter.name, "budget_s": budget, "recorded": len(calls), "happy": happy,
         "chaos": {"calls": len(usable[:max_chaos]), "scenarios": scenarios, "by_scenario": rows, "first_failure": first_bad,
                   "first_original_dup": first_dup, "new_crashes": crashes},
-        "original": o, "hardened": h, "gates": gates, "passed": all(gates.values()), "fallback": raw["fallback"],
+        "original": o, "hardened": h, "outage": outage, "gates": gates, "passed": all(gates.values()), "fallback": raw["fallback"],
         "elapsed_s": round(time.perf_counter() - t0, 2),
     }
 
@@ -240,6 +272,11 @@ def print_verify(res: dict, fid: str, hname: str) -> None:
         ["p99 latency (budget %s)" % ui.secs(budget), ui.secs(o["p99"]), ui.secs(h["p99"]), mark(g["p99"])],
         ["duplicate side effects", str(o["dups"]), str(h["dups"]), mark(g["dups"])],
     ]
+    if o.get("amplification") is not None:
+        rows.append(["attempts per call under faults", "%.2f" % o["amplification"], "%.2f" % h["amplification"], ui.dim("info")])
+    if res.get("outage"):
+        oo, oh = res["outage"]["original"], res["outage"]["hardened"]
+        rows.append(["  with the dependency down", "%.2f" % oo["amplification"], "%.2f" % oh["amplification"], ui.dim("info")])
     if h.get("logged_failures") is not None or o.get("logged_failures") is not None:
         rows.append(["failures logged w/ trace id", ui.pct(o.get("logged_failures"), 0),
                      ui.pct(h.get("logged_failures"), 0), ui.dim("info")])
@@ -247,6 +284,8 @@ def print_verify(res: dict, fid: str, hname: str) -> None:
     print(ui.dim("  %d trials each: %d calls × %d fault scenarios · availability = (ok + degraded) / trials" % (
         h["trials"], res["chaos"]["calls"], len(res["chaos"]["scenarios"]))))
     print(ui.dim("  wrong = neither the real answer nor the declared fallback · hang = no timeout, or over budget"))
+    if res.get("outage"):
+        print(ui.dim("  dependency down: %d calls in a row, nothing reset in between · attempts per call = retry amplification" % res["outage"]["down"]["calls"]))
     if nd:
         print(ui.warn("  %d recorded calls excluded: the original itself didn't reproduce them" % nd))
     print()

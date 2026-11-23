@@ -17,9 +17,21 @@ function u(...parts) {
   return Number(h.readBigUInt64BE(0)) / 2 ** 64;
 }
 
-/** fault(key, n) for a plan in the wire format. */
+/** fault(key, n) for a plan in the wire format; its .outage(key, n) says whether that attempt is inside an outage window. */
 function plan(p) {
+  const fault = faultOf(p);
+  fault.outage = (key, n) => {
+    if (p?.type === "down") return true;
+    if (!(n < C.outage_k)) return false;
+    if (p?.type === "first") return p.fault === "outage" && [null, undefined, key].includes(p.key);
+    return p?.type === "seeded" && p.outage_rate > 0 && u(p.seed, p.salt ?? "", key, "outage") < p.outage_rate;
+  };
+  return fault;
+}
+
+function faultOf(p) {
   if (!p || p.type === "none") return () => null;
+  if (p.type === "down") return () => "refused";
   if (p.type === "first") {
     return (key, n) => {
       if (p.key !== null && p.key !== undefined && key !== p.key) return null;

@@ -123,6 +123,8 @@ def apply_globals(mod, snap):
 def plan_of(p):
     if p["type"] == "none":
         return faults.Plan()
+    if p["type"] == "down":
+        return faults.Down()
     if p["type"] == "first":
         return faults.FirstAttempt(p["fault"], target_key=p.get("key"))
     if p["type"] == "seeded":
@@ -239,7 +241,7 @@ def run_job(job: dict) -> dict:
             "cause_type": None if cause is None else type(cause).__name__,
             "structured": exc is not None and (isinstance(exc, runtime.RasError) or cause is not None),
             "state": _state(codec, meta, args, kwargs) if t["plan"]["type"] == "none" else None,
-            "attempts": [{k: a[k] for k in ("key", "n", "fault", "reached", "failed", "idem", "method", "nonidempotent")}
+            "attempts": [{k: a[k] for k in ("key", "n", "fault", "reached", "failed", "idem", "method", "nonidempotent", "outage")}
                          for a in handler.attempts],
         }
 

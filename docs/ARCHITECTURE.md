@@ -115,11 +115,13 @@ Written to `cfg.out` as JSON when the process exits, however it exits (uncaught 
     "method": "GET", "nonidempotent": false, "idem": null,          // Idempotency-Key header
     "fault": "timeout" | null,      // what was injected
     "reached": false,               // did the request reach the server?
-    "failed": true                  // what was OBSERVED: see "Observed failure"
+    "failed": true,                 // what was OBSERVED: see "Observed failure"
+    "outage": false                 // inside an outage window of the plan (retry amplification)
   }],
   "hangs": 0,
   // bench
-  "stats": {"weather.fetch_forecast": {"calls", "ok", "fallback", "raised": {"URLError": 1}, "hardened": true, "p50", "p99"}},
+  "stats": {"weather.fetch_forecast": {"calls", "ok", "fallback", "raised": {"URLError": 1}, "hardened": true, "p50", "p99",
+             "attempts", "outage_calls", "outage_attempts"}},   // dependency attempts made inside its calls; calls that met an outage
   // record
   "recorded": 12, "seen": 12, "skipped": 0,
   "snapshot": {"env": {…}, "globals": {…}},   // before the first recorded call; values encoded as in cassettes
@@ -156,6 +158,7 @@ Which attempt gets which fault is decided by a *plan*, a pure function of (key, 
 | plan JSON | `fault(key, n)` |
 |---|---|
 | `{"type": "none"}` | none |
+| `{"type": "down"}` | `refused`, always |
 | `{"type": "first", "fault": F, "key": K \| null}` | attempt 0 gets F (`outage`: attempts 0–2 get `refused`); only key K unless null |
 | `{"type": "seeded", "seed": S, "rate": R, "outage_rate": O, "salt": T}` | `refused` if n < 3 and u(S,T,key,"outage") < O; else if u(S,T,key,n,"p") < R: `KINDS[floor(u(S,T,key,n,"k") * 6)]` |
 
@@ -221,7 +224,8 @@ app's code; the answer goes to `job.out`.
 {"protocol": 1, "lang": "python", "project": "/abs", "meta": {…meta.json…},
  "cassette": "/abs/…/calls.json", "hardened": "/abs/…/hardened.py",
  "constants": {"slow_s": 3.0, "hang_cap_s": 60.0, "outage_k": 3, "retry_after": "1"},
- "trials": [{"call": 0, "side": "original" | "hardened", "plan": {…}, "seed": 12345}],
+ "trials": [{"call": 0, "side": "original" | "hardened", "plan": {…}, "seed": 12345,
+             "gap_s": 0.5}],   // optional: part of a sequence, see below
  "out": "/tmp/…/out.json"}
 
 // answer
@@ -233,7 +237,7 @@ app's code; the answer goes to `job.out`.
 The worker imports the original module (with `RAS_ANYTHING_DISABLE=1`, the recorded `env`, `globals`
 and working directory), then the hardened file, then runs the trials in order in one process. For each:
 fresh arguments decoded from the cassette, boundary calls served from that call's `io` by key (first
-unused match, else the last match), faults from the plan, a virtual clock (sleeps and timeouts cost no
+unused match, else the last match), faults from the plan, the runtime's state (breakers, budgets, caches) reset, a virtual clock (sleeps and timeouts cost no
 real time; `slow` and recorded durations are added to it; event-loop timers advance it too, so
 `asyncio.sleep` and `wait_for` work), an event loop of its own for async functions, randomness seeded with `seed`. No network: a
 request that isn't in the recording raises an uncatchable miss.
@@ -252,6 +256,9 @@ request that isn't in the recording raises an uncatchable miss.
  "result": "<short repr>", "expected": "<short repr>"}
 ```
 
+A trial with `gap_s` belongs to a **sequence**: nothing is reset before it, and `gap_s` virtual seconds pass first.
+Module state in the hardened code itself is never reset between trials of one process.
+
 **Judging** (`judge.py`, in the ras-anything process): *hang* if it hung or took longer than the budget ·
 *miss* · *ok* if `matches` · *degraded* if `is_fallback` in a fault trial, at least one attempt has
 `failed`, some request of the original stayed unanswered (its key has no attempt without `failed`), and
@@ -262,6 +269,16 @@ does.
 Trials: no fault on every recorded call; then for the first 60 calls the original reproduces, every
 `MATRIX` fault on first attempts, three seeded mixes (p = 0.3), and, for calls with two or more distinct
 requests, every fault on each request alone. Gates: see `judge.gates`.
+
+**Sustained outage.** One more sequence per side, each in a process of its own: 10 calls with the dependency healthy,
+40 with it down (plan `down`), 90 with it back (half a second apart, then a second). It gives the retry amplification
+in an outage (attempts / calls while down) and how long until a real answer again. Here a fallback without a request
+(open circuit) is also earned when the agent's last observation of every dependency of that call (scheme and host, or
+program) was a failure at most 60 virtual seconds ago (`judge.KNOWN_DOWN_S`) and it was logged. Wrong, missing and
+hanging results and added duplicates in the sequence fail the same gates as in the trials.
+
+**Retry amplification** = dependency attempts / logical calls: per trial set (`amplification`), in the outage sequence,
+and in bench per call of the enabled functions (and per call that met an outage window of the plan).
 
 ## Files in `.ras/`
 

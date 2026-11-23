@@ -333,6 +333,7 @@ class Agent:
         if fn is None:
             return
         st = self.stats.setdefault(t["id"], {"calls": 0, "ok": 0, "raised": {}, "fallback": 0, "lat": [],
+                                             "attempts": 0, "outage_calls": 0, "outage_attempts": 0,
                                              "hardened": "_ras_hardened" in (getattr(fn, "__code__", None) and fn.__code__.co_filename or "")})
         fallback = getattr(fn, "__globals__", {}).get("RAS_FALLBACK")
 
@@ -352,6 +353,10 @@ class Agent:
             finally:
                 boundary._scopes.reset(token)
                 st["lat"].append(time.perf_counter() - t0)
+                st["attempts"] += len(attempts)
+                if any(x["outage"] for x in attempts):
+                    st["outage_calls"] += 1
+                    st["outage_attempts"] += len(attempts)
             fb = None
             try:
                 fb = fallback(*a, **kw) if callable(fallback) else fallback

@@ -7,6 +7,8 @@ deciding what that is worth happens here, outside the process that runs the code
 
 from __future__ import annotations
 
+from urllib.parse import urlsplit
+
 from . import cassette
 
 CLASSES = ("ok", "degraded", "wrong", "error", "hang", "miss")
@@ -78,8 +80,10 @@ def summarize(ts: list[dict]) -> dict:
     lat = sorted(t["latency"] for t in ts)
     failures = [t for t in ts if t["class"] in ("error", "degraded")]
     errors = [t for t in ts if t["class"] == "error"]
+    attempts = sum(len(t["attempts"]) for t in ts)
     return {
         "trials": n, **c,
+        "attempts": attempts, "amplification": attempts / n if n else None,
         "availability": (c["ok"] + c["degraded"]) / n if n else 0.0,
         "p50": lat[n // 2] if n else None,
         "p99": lat[min(n - 1, int(0.99 * n))] if n else None,
@@ -102,14 +106,63 @@ def new_crashes(original: list[dict], hardened: list[dict], bug_types) -> list[s
     return sorted(found)
 
 
-def gates(happy: dict, o: dict, h: dict, crashes: list, budget: float) -> dict:
+def dependency_of(key: str) -> str:
+    """What a request key talks to: scheme and host, or the program."""
+    words = key.split(" ")
+    if words[0] in ("run", "CONNECT"):
+        return " ".join(words[:3])
+    u = urlsplit(words[1]) if len(words) > 1 else urlsplit("")
+    return "%s://%s" % (u.scheme, u.netloc)
+
+
+KNOWN_DOWN_S = 60.0  # how long a failed request is evidence that its dependency is down
+
+
+def classify_sequence(raw: list[dict], calls: list[dict], keys: list[list[str]], budget: float, fallback_allowed: bool, gaps: list[float]) -> list[dict]:
+    """classify_trial for calls made one after the other with the code's own state kept (an outage). Here a
+    fallback may also be earned without a request: an open circuit is the point. The evidence is the agent's, from
+    the calls before: the last thing it saw of every dependency of this call was a failure, recently."""
+    out, seen, now = [], {}, 0.0  # seen: dependency -> (when, failed)
+    for r, call, ks, gap in zip(raw, calls, keys, gaps):
+        now += gap
+        t = classify_trial(r, call, ks, budget, fallback_allowed)
+        if t["note"] and not r["attempts"] and r["logs"]:
+            known = [seen.get(dependency_of(k)) for k in ks]
+            if known and all(x and x[1] and now - x[0] <= KNOWN_DOWN_S for x in known):
+                t.update({"class": "degraded", "note": None})
+        now += r["latency"]
+        for a in r["attempts"]:
+            seen[dependency_of(a["key"])] = (now, a["failed"])
+        out.append({**t, "at": now - r["latency"]})
+    return out
+
+
+def summarize_outage(phases: list[str], ts: list[dict]) -> dict:
+    """What one side did in the sequence healthy -> dependency down -> recovered."""
+    part = {p: [t for t, q in zip(ts, phases) if q == p] for p in ("healthy", "down", "recovered")}
+    n = {p: len(x) for p, x in part.items()}
+    attempts = {p: sum(len(t["attempts"]) for t in x) for p, x in part.items()}
+    fresh = next((i for i, t in enumerate(part["recovered"]) if t["class"] == "ok" and any(not a["failed"] for a in t["attempts"])), None)
+    c = {k: sum(t["class"] == k for t in (ts if k in ("wrong", "miss", "hang") else part["down"])) for k in CLASSES}
+    return {
+        "calls": n["down"], "attempts": attempts["down"], **c,
+        "amplification": attempts["down"] / n["down"] if n["down"] else None,
+        "healthy_per_call": attempts["healthy"] / n["healthy"] if n["healthy"] else None,
+        "max_latency": max((t["latency"] for t in part["down"]), default=None),
+        "recovered_after_s": None if fresh is None else round(part["recovered"][fresh]["at"] - part["recovered"][0]["at"], 3),
+        "dups": sum(t["dups"] for t in ts),
+    }
+
+
+def gates(happy: dict, o: dict, h: dict, crashes: list, budget: float, outage: dict | None = None) -> dict:
+    oo, oh = (outage["original"], outage["hardened"]) if outage else ({}, {})
     return {
         "happy": happy["total"] > 0 and happy["equal"] == happy["total"] and happy["original_nondeterministic"] == 0,
-        "no_wrong": h["wrong"] == 0 and h["miss"] == 0,
-        "no_hang": h["hang"] == 0,
+        "no_wrong": h["wrong"] == 0 and h["miss"] == 0 and oh.get("wrong", 0) + oh.get("miss", 0) == 0,
+        "no_hang": h["hang"] == 0 and oh.get("hang", 0) == 0,
         "no_new_crashes": not crashes,
         "p99": h["p99"] is not None and h["p99"] <= budget,
-        "dups": h["dups"] <= o["dups"],
+        "dups": h["dups"] <= o["dups"] and oh.get("dups", 0) <= oo.get("dups", 0),
         "availability": h["availability"] > o["availability"],
     }
 

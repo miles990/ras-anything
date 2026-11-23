@@ -161,17 +161,25 @@ function start(cfg) {
     watch = (fn, target, self, args) => {
       const id = ids.get(`${fn.file}\n${fn.qualname}`);
       if (!id) return Reflect.apply(target, self, args);
-      const st = (out.stats[id] ??= { calls: 0, ok: 0, raised: {}, fallback: 0, lat: [], hardened: false });
+      const st = (out.stats[id] ??= { calls: 0, ok: 0, raised: {}, fallback: 0, lat: [], attempts: 0, outage_calls: 0, outage_attempts: 0, hardened: false });
       const attempts = [];
       const t0 = now();
       st.calls++;
-      const raised = (e) => {
+      const ended = () => {
         st.lat.push((now() - t0) / 1000);
+        st.attempts += attempts.length;
+        if (attempts.some((a) => a.outage)) {
+          st.outage_calls++;
+          st.outage_attempts += attempts.length;
+        }
+      };
+      const raised = (e) => {
+        ended();
         const name = e?.name ?? typeof e;
         st.raised[name] = (st.raised[name] ?? 0) + 1;
       };
       const returned = (v) => {
-        st.lat.push((now() - t0) / 1000);
+        ended();
         const mod = swaps.get(id)?.module;
         st.hardened = Boolean(mod);
         let fb = mod?.RAS_FALLBACK;
