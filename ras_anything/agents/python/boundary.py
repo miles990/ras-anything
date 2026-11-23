@@ -7,7 +7,7 @@ recorded into a cassette and replayed):
 
     http:       {"status", "reason", "headers": [[k, v]...], "body": bytes, "url"}
     subprocess: {"returncode", "stdout", "stderr"}
-    any:        {"exc": {"type", "module", "msg", ...}}   (see cassette.dump_exc)
+    any:        {"exc": {"type", "module", "msg", ...}}   (see values.dump_exc)
 
 A live exception also travels as out["_live"] so running code gets the original object; it is never
 recorded. The adapter then turns the outcome back into exactly what the API returns or raises.
@@ -29,7 +29,8 @@ import urllib.parse
 import urllib.request
 from email.message import Message
 
-from . import cassette, faults, runtime
+from ... import faults, runtime
+from . import values
 
 NONIDEMPOTENT = frozenset({"POST", "PUT", "PATCH", "DELETE"})
 
@@ -128,7 +129,7 @@ def _sha(body) -> str:
 
 
 def exc_outcome(e: BaseException) -> dict:
-    return {"exc": cassette.dump_exc(e), "_live": e}
+    return {"exc": values.dump_exc(e), "_live": e}
 
 
 def recorded(out: dict) -> dict:
@@ -137,7 +138,7 @@ def recorded(out: dict) -> dict:
 
 
 def raise_outcome(out: dict):
-    raise out.get("_live") or cassette.build_exc(out["exc"])
+    raise out.get("_live") or values.build_exc(out["exc"])
 
 
 def is_failure(out: dict) -> bool:
@@ -192,11 +193,6 @@ class FaultingHandler(Handler):
 
     def on_attempt(self, req: Req, rec: dict) -> None:  # hook for attribution / counting
         pass
-
-    def unanswered(self, keys) -> bool:
-        """Is there a request among `keys` that never got a good answer?"""
-        good = {a["key"] for a in self.attempts if not a["failed"]}
-        return any(k not in good for k in keys)
 
     def perform(self, req, serve):
         n = self.counts.get(req.key, 0)

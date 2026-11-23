@@ -8,9 +8,9 @@ import shlex
 import time
 from pathlib import Path
 
-from . import static, ui
+from . import lang, signals, ui
 from .paths import UserError, portable_cmd, ras_dir, rel_to_project, save_json, save_local, scrub
-from .runner import project_root_for, python_cmd, run
+from .runner import run
 
 W_DYNAMIC = 0.6  # measured chaos failures weigh more than static smells
 
@@ -25,51 +25,31 @@ def classify_run(r, clean_stdout: str) -> str:
     return "ok"
 
 
-def func_id(module: str, qualname: str, file: str) -> str:
-    mod = Path(file).stem if module in ("__main__", "") else module
-    return "%s.%s" % (mod, qualname)
-
-
-def hardenability(fn: dict, fi) -> str | None:
-    """None if hardenable, else the reason it isn't (yet)."""
-    if fn["kind"] == "nested":
-        return "nested function (v0.1: top-level functions only)"
-    if fn["kind"] in ("method", "classmethod"):
-        return "%s of a class (v0.1: top-level functions and @staticmethod)" % fn["kind"].replace("classmethod", "classmethod")
-    if fn.get("async") or fn.get("gen"):
-        return "async/generator function (not supported yet)"
-    if fn["in_main"] and not (fi and fi.has_main_guard):
-        return "in the entry script with no `if __name__ == \"__main__\"` guard"
-    if fn.get("arg_ok") is False:
-        return "arguments can't be stored as JSON, so calls can't be recorded"
-    if fn.get("ret_ok") is False:
-        return "return value can't be stored as JSON, so results can't be compared"
-    if not fn["boundary"]:
-        return "makes no dependency calls"
-    return None
-
-
 def scan(cmd: list[str], seeds: int = 5, rate: float = 0.25, cwd: Path | None = None, quiet: bool = False) -> dict:
     cwd = Path(cwd or os.getcwd()).resolve()
+    adapter = lang.detect(cmd)
     stored = portable_cmd(cmd, cwd)
     shown = shlex.join(stored)
     typed = list(cmd)
-    cmd = python_cmd(cmd)
-    root = project_root_for(cmd, cwd)
+    cmd = adapter.resolve(cmd, cwd)
+    root = adapter.project_root(cmd, cwd)
     t0 = time.perf_counter()
     if not quiet:
         ui.headline("scan", "%s %s 1 clean + %d chaos runs" % (shown, ui.DOT, seeds))
-    clean = run(cmd, {"mode": "scan"}, cwd, root=root)
-    if clean.code != 0 or clean.data is None:
+    clean = run(adapter, cmd, {"mode": "scan"}, cwd, root=root)
+    if clean.code != 0:
         tail = (clean.stderr or "").strip().splitlines()[-3:]
         raise UserError("the clean run failed (exit %s)%s" % (clean.code, (": " + tail[-1]) if tail else ""),
                         "scan needs a workload that succeeds without faults" + (
                             ": " + " | ".join(tail[:-1]) if len(tail) > 1 else " (the command printed no error)"),
                         "doctor")
+    if clean.data is None:
+        raise UserError("the app ran, but ras-anything couldn't watch it", "its %s agent never loaded: is the app started through "
+                        "a wrapper, or with flags that ignore the environment?" % adapter.label, "scan -- " + adapter.example)
     runs = []
     per_fn: dict = {}
     for seed in range(1, seeds + 1):
-        r = run(cmd, {"mode": "chaos", "seed": seed, "rate": rate, "outage_rate": 0.05}, cwd, root=root, timeout=120)
+        r = run(adapter, cmd, {"mode": "chaos", "seed": seed, "rate": rate, "outage_rate": 0.05}, cwd, root=root, timeout=120)
         outcome = classify_run(r, clean.stdout)
         hit = set()
         nfaults = 0
@@ -92,20 +72,13 @@ def scan(cmd: list[str], seeds: int = 5, rate: float = 0.25, cwd: Path | None = 
     total = clean.data.get("boundary_total") or 0
     functions = []
     for f in clean.data["functions"]:
-        fi = static.load(f["file"])
-        info = fi.functions.get(f["line"]) if fi else None
-        if info is None:
+        facts = adapter.describe(f)
+        if facts is None:
             continue
-        a = fi.analyze(info)
-        in_main = f["module"] == "__main__"
         d = {
-            "id": func_id(f["module"], info["qualname"], f["file"]),
-            "module": f["module"] if not in_main else Path(f["file"]).stem,
-            "qualname": info["qualname"], "name": f["name"], "kind": info["kind"], "async": info["async"],
-            "file": rel_to_project(f["file"], cwd), "line": info["line"], "first_line": f["line"], "in_main": in_main,
+            **facts, "file": rel_to_project(f["file"], cwd), "first_line": f["line"],
             "calls": f["calls"], "boundary": f.get("boundary", 0), "boundary_kinds": f.get("kinds", {}),
             "gen": f.get("gen"), "arg_ok": f.get("arg_ok"), "ret_ok": f.get("ret_ok"),
-            "signals": a["signals"], "static_risk": a["static_risk"],
         }
         dyn = per_fn.get((f["file"], f["line"], f["name"]))
         d["chaos"] = dyn
@@ -114,7 +87,7 @@ def scan(cmd: list[str], seeds: int = 5, rate: float = 0.25, cwd: Path | None = 
             (1 - W_DYNAMIC) * d["static_risk"] + W_DYNAMIC * d["dynamic_risk"]
         d["risk"] = round(risk, 4)
         d["exposure"] = round(d["boundary"] / total, 4) if total else 0.0
-        reason = hardenability(d, fi)
+        reason = adapter.hardenability(d)
         d["hardenable"] = reason is None
         d["verdict"] = "harden it" if reason is None else reason
         d["score"] = round(100 * d["risk"] * d["exposure"] * (1.0 if reason is None else 0.0), 1)
@@ -123,7 +96,7 @@ def scan(cmd: list[str], seeds: int = 5, rate: float = 0.25, cwd: Path | None = 
 
     functions.sort(key=lambda d: (-d["score"], -(d["risk"] * d["exposure"]), -d["boundary"], d["id"]))
     result = {
-        "version": 1,
+        "version": 1, "lang": adapter.name,
         "cmd": stored, "display_cmd": shown, "cwd": ".", "root": rel_to_project(root, cwd),
         "created": time.strftime("%Y-%m-%dT%H:%M:%S%z"),
         "clean": {"wall_s": round(clean.wall, 3), "stdout_sha256": hashlib.sha256(clean.stdout.encode()).hexdigest(),
@@ -137,12 +110,12 @@ def scan(cmd: list[str], seeds: int = 5, rate: float = 0.25, cwd: Path | None = 
     save_json(ras_dir(cwd) / "scan.json", result)
     (ras_dir(cwd) / "clean.stdout").write_text(clean.stdout)
     if not quiet:
-        print_scan(result)
+        print_scan(result, adapter)
     return result
 
 
 def why(d: dict) -> str:
-    parts = [txt for k, txt in sorted(d["signals"].items(), key=lambda kv: -static.SIGNALS[kv[0]][0])][:3]
+    parts = signals.by_weight(d["signals"])[:3]
     dyn = d.get("chaos")
     if dyn and dyn["runs"]:
         bad = {k: v for k, v in dyn["outcomes"].items() if k != "ok"}
@@ -154,7 +127,7 @@ def why(d: dict) -> str:
     return " · ".join(parts)
 
 
-def print_scan(result: dict, limit: int = 10) -> None:
+def print_scan(result: dict, adapter, limit: int = 10) -> None:
     fns = [d for d in result["functions"] if d["boundary"] or d["signals"]]
     runs = result["chaos"]["runs"]
     failed = sum(r["outcome"] != "ok" for r in runs)
@@ -174,7 +147,7 @@ def print_scan(result: dict, limit: int = 10) -> None:
                      ui.bold("%.1f" % d["score"]) if d["score"] else ui.dim("0"), verdict])
         subs.append(d["why"])
     if not rows:
-        print("  " + ui.warn("no function in your project makes dependency calls (urlopen, subprocess.run, requests)"))
+        print("  " + ui.warn("no function in your project makes dependency calls (%s)" % adapter.boundaries))
         return
     print(ui.table(["#", "function", "calls", "dep", "risk", "exposure", "chaos fail", "score", "verdict"], rows,
                    "rlrrrrrrl", sub=subs))

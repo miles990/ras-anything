@@ -1,5 +1,6 @@
 {
   "id": "billing.charge",
+  "lang": "python",
   "module": "billing",
   "qualname": "charge",
   "name": "charge",
@@ -13,18 +14,18 @@
   ],
   "display_cmd": "python app.py",
   "cwd": ".",
+  "env": {
+    "PAYMENTS_API_URL": "http://127.0.0.1:36677"
+  },
+  "globals": {},
   "sys_path": [
     "."
   ],
-  "env": {
-    "PAYMENTS_API_URL": "http://127.0.0.1:39901"
-  },
-  "globals": {},
   "type_modules": [],
   "budget_s": 5.0,
   "recorded": 16,
   "seen": 16,
   "skipped": 0,
-  "recorded_at": "2026-11-23T12:16:33+0800",
-  "python": "3.13.5"
+  "recorded_at": "2026-11-23T12:28:21+0800",
+  "runtime": "Python 3.13.5"
 }

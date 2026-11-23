@@ -5,6 +5,7 @@ import sys
 import unittest
 
 from ras_anything import bench as bench_mod
+from ras_anything import judge
 from ras_anything.enable import enable
 from ras_anything.harden import harden
 from ras_anything.runner import RunResult
@@ -15,10 +16,10 @@ from tests.test_pipeline import FIX, REPO, Project, quiet
 class ClassifyTest(unittest.TestCase):
     def test_marker_or_fallback_needs_an_observed_failure(self):
         r = RunResult(0, "a unavailable\n", "", 0.1, {})
-        self.assertEqual(bench_mod.classify(r, "a 20\n", ["unavailable"], 0, failures=1), "degraded")
-        self.assertEqual(bench_mod.classify(r, "a 20\n", ["unavailable"], 0, failures=0), "wrong")
-        self.assertEqual(bench_mod.classify(r, "a 20\n", [], 1, failures=0), "wrong")
-        self.assertEqual(bench_mod.classify(r, "a 20\n", [], 1, failures=2), "degraded")
+        self.assertEqual(judge.classify_run(r, "a 20\n", ["unavailable"], 0, failures=1), "degraded")
+        self.assertEqual(judge.classify_run(r, "a 20\n", ["unavailable"], 0, failures=0), "wrong")
+        self.assertEqual(judge.classify_run(r, "a 20\n", [], 1, failures=0), "wrong")
+        self.assertEqual(judge.classify_run(r, "a 20\n", [], 1, failures=2), "degraded")
 
 
 class FallbackCreditTest(unittest.TestCase):

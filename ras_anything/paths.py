@@ -13,7 +13,6 @@ import tempfile
 from pathlib import Path
 
 PKG_DIR = Path(__file__).resolve().parent
-INJECT_DIR = PKG_DIR / "_inject"
 
 
 class UserError(Exception):

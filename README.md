@@ -139,7 +139,7 @@ after 2 s.
 
 ## What it can't do yet
 
-- Python only. No Node, Go or other runtimes yet.
+- Python only for now. Node.js/TypeScript is next (the adapter seam is in place), then others.
 - Top-level functions and `@staticmethod`s only: no methods, nested functions, async functions or generators. Arguments and results must be storable as JSON (plain data, bytes, dates, decimals, and instances of your project's own classes).
 - Boundaries: `urlopen`, `subprocess.run` (and `check_output`, which goes through it) and `requests`. Not raw sockets, `http.client` used directly, database drivers, `asyncio`, `Popen` used directly, or file I/O faults.
 - Fault decisions ignore the port, so two dependencies on the same host and path share a schedule.
@@ -148,6 +148,14 @@ after 2 s.
 - Recordings hold real arguments and responses in `.ras/hardens/*/calls.json`: review before committing. Session auth/cookie headers are left out.
 - Whole-app availability is judged by output: byte-identical to a clean run, a declared fallback in that run, or lines with `--degraded-marker`. Apps with nondeterministic output need a marker or a deterministic mode.
 - Wall-clock numbers in `bench` are real time on a shared host and can be noisy. `verify` latencies are virtual and exact.
+
+## How it works
+
+The pipeline (ranking, gates, bench, report) is language-neutral and talks JSON to a small agent inside
+your app's process; everything language-specific sits behind one adapter interface. The interface, the
+wire formats and the cassette format are in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md). Commands may
+start with `python`, `python3`, `pypy`, `py`, or `uv`/`poetry`/`pipenv`/`pdm`/`hatch`/`rye run`; anything
+else gets an error saying what to run instead.
 
 ## Agents
 
@@ -163,7 +171,7 @@ total time budget, re-raises the original error), `is_transient`, `call_with_tim
 ## Tests
 
 ```sh
-python -m unittest        # offline, ~3 s (from the repo root)
+python -m unittest discover -s tests        # offline, ~15 s (from the repo root)
 ```
 
 ## Credits

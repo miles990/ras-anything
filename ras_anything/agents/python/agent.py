@@ -1,6 +1,6 @@
 """Runs inside the user's Python process (loaded by _inject/sitecustomize.py). Not for direct use.
 
-Modes (from the JSON in RAS_ANYTHING_CFG):
+Modes (from the JSON in RAS_ANYTHING_CFG; the wire format is docs/ARCHITECTURE.md):
   scan    count calls of the project's functions, attribute boundary calls to the innermost one
   chaos   inject seeded faults at the boundary (live), attribute each fault to a function
   record  record up to N calls of one function: args, result/exception and its boundary I/O
@@ -15,11 +15,13 @@ import functools
 import importlib.abc
 import json
 import os
+import platform
 import sys
 import threading
 import time
 
-from . import boundary, cassette, faults
+from ... import cassette, faults, runtime
+from . import boundary, values
 
 CO_GEN = 0x20 | 0x80 | 0x100 | 0x200  # generator, coroutine, iterable coroutine, async generator
 
@@ -30,7 +32,7 @@ class Agent:
         self.mode = cfg["mode"]
         self.root = os.path.realpath(cfg["root"])
         self.exclude = [os.path.realpath(p) for p in cfg.get("exclude", [])]
-        self.codec = cassette.Codec(cfg.get("project") or self.root, owns=self.owns_class)
+        self.codec = values.Codec(cfg.get("project") or self.root, owns=self.owns_class)
         self._owned: dict = {}
         self.type_modules: set = set()
         self._user: dict = {}
@@ -218,7 +220,7 @@ class Agent:
                 exc = tls.pending_exc
                 try:
                     if exc is not None:
-                        rec["exc"] = cassette.dump_exc(exc)
+                        rec["exc"] = values.dump_exc(exc)
                     else:
                         rec["result"] = self.codec.enc(arg)
                     with self.lock:
@@ -337,7 +339,6 @@ class Agent:
         elif mode in ("chaos", "bench"):
             seed = self.cfg.get("seed")
             if seed is not None:
-                from . import runtime
                 runtime.seed(seed)
             plan = faults.Seeded(seed, self.cfg.get("rate", 0.2), self.cfg.get("outage_rate", 0.05)) \
                 if seed is not None else faults.Plan()
@@ -386,8 +387,9 @@ class Agent:
     def finish(self):
         sys.setprofile(None)
         sys.settrace(None)
-        out = {"mode": self.mode, "uncaught": self.uncaught, "executable": sys.executable, "sys_path": [p for p in sys.path if "_inject" not in p and not p.startswith("__editable__")],
-               "main_file": os.path.realpath(sys.argv[0]) if sys.argv and sys.argv[0] else None,
+        out = {"protocol": 1, "mode": self.mode, "uncaught": self.uncaught, "executable": sys.executable,
+               "runtime": {"name": platform.python_implementation(), "version": platform.python_version()},
+               "sys_path": [p for p in sys.path if "_inject" not in p and not p.startswith("__editable__")],
                "boundary_total": self.boundary_total}
         out["functions"] = [
             {"file": k[0], "line": k[1], "name": k[2], **{kk: vv for kk, vv in st.items()}}

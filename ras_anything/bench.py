@@ -8,39 +8,10 @@ import shlex
 import time
 from pathlib import Path
 
-from . import faults, ui
+from . import faults, lang, ui
+from .judge import classify_run, duplicates
 from .paths import UserError, find_project, harden_dir, load_json, portable_cmd, resolve_in_project, runnable_cmd, save_json, scrub
-from .runner import python_cmd, run, project_root_for
-
-
-def duplicates(attempts: list) -> int:
-    groups: dict = {}
-    for n, a in enumerate(attempts or []):
-        if a.get("nonidempotent") and a.get("reached"):
-            groups.setdefault(a["key"], set()).add(a.get("idem") or "<no key #%d>" % n)
-    return sum(len(g) - 1 for g in groups.values())
-
-
-def classify(r, baseline: str, markers: list[str], fallbacks: int = 0, failures: int = 1) -> str:
-    """correct: identical output · degraded: output differs only where the app said so (a marker) or
-    after a hardened function returned its *declared* fallback in this run, and a dependency was
-    seen to fail in it · wrong: anything else."""
-    if r.hang:
-        return "hang"
-    if r.code != 0:
-        return "crash"
-    if r.stdout == baseline:
-        return "correct"
-    if not failures:
-        return "wrong"
-    a, b = r.stdout.splitlines(), baseline.splitlines()
-    if markers and len(a) == len(b):
-        diff = [x for x, y in zip(a, b) if x != y]
-        if all(any(m in x for m in markers) for x in diff):
-            return "degraded"
-    if fallbacks:
-        return "degraded"
-    return "wrong"
+from .runner import run
 
 
 def _places(rs) -> dict:
@@ -64,9 +35,10 @@ def bench(cmd: list[str] | None = None, seeds: int = 20, rate: float = 0.1, mark
     scan = load_json(project / ".ras" / "scan.json") or {}
     stored = portable_cmd(cmd or scan.get("cmd") or [], project)
     shown = shlex.join(stored)
-    cmd = python_cmd(cmd or runnable_cmd(scan.get("cmd") or [], project))
-    if not cmd:
+    typed = cmd or runnable_cmd(scan.get("cmd") or [], project)
+    if not typed:
         raise UserError("no command to bench", "pass it after -- or run scan first", "bench -- python app.py")
+    adapter = lang.detect(typed)
     state = load_json(project / ".ras" / "state.json", {"enabled": {}})
     ids = list(state["enabled"])
     if not ids:
@@ -77,9 +49,11 @@ def bench(cmd: list[str] | None = None, seeds: int = 20, rate: float = 0.1, mark
     targets = []
     for fid in ids:
         m = load_json(harden_dir(project, fid) / "meta.json")
-        targets.append({"id": fid, "module": m["module"], "qualname": m["qualname"], "in_main": m["in_main"]})
+        targets.append({"id": fid, "module": m["module"], "qualname": m["qualname"], "in_main": m["in_main"],
+                        "file": str(resolve_in_project(m["file"], project))})
     cwd = resolve_in_project(scan.get("cwd") or ".", project) if scan.get("cwd") else project
-    root = resolve_in_project(scan.get("root") or ".", project) if scan.get("root") else project_root_for(cmd, cwd)
+    cmd = adapter.resolve(typed, cwd)
+    root = resolve_in_project(scan.get("root") or ".", project) if scan.get("root") else adapter.project_root(cmd, cwd)
     base_cfg = {"mode": "bench", "rate": rate, "outage_rate": 0.05, "scale": 0.05, "hang_s": 2.0, "targets": targets}
     variants = {"original": {"RAS_ANYTHING_DISABLE": "1"}, "hardened": {"RAS_ANYTHING_DISABLE": "0"}}
     if not quiet:
@@ -87,7 +61,7 @@ def bench(cmd: list[str] | None = None, seeds: int = 20, rate: float = 0.1, mark
             shown, ui.DOT, seeds, ui.DOT, ui.pct(rate, 0)))
     clean = {}
     for v, env in variants.items():
-        r = run(cmd, dict(base_cfg, seed=None), cwd, env_extra=env, root=root, timeout=300)
+        r = run(adapter, cmd, dict(base_cfg, seed=None), cwd, env_extra=env, root=root, timeout=300)
         clean[v] = r
         if r.code != 0:
             raise UserError("the clean %s run failed (exit %d)" % (v, r.code), (r.stderr or "").strip()[-300:], "doctor")
@@ -105,11 +79,11 @@ def bench(cmd: list[str] | None = None, seeds: int = 20, rate: float = 0.1, mark
         order = list(variants) if seed % 2 else list(reversed(list(variants)))
         line = {}
         for v in order:
-            r = run(cmd, dict(base_cfg, seed=seed), cwd, env_extra=variants[v], root=root, timeout=180)
+            r = run(adapter, cmd, dict(base_cfg, seed=seed), cwd, env_extra=variants[v], root=root, timeout=180)
             d = r.data or {}
             att = d.get("attempts") or []
             fbs = sum(st.get("fallback", 0) for st in (d.get("stats") or {}).values())
-            outc = classify(r, baseline, markers, fbs, sum(1 for a in att if a.get("failed")))
+            outc = classify_run(r, baseline, markers, fbs, sum(1 for a in att if a.get("failed")))
             if v == "hardened" and outc == "degraded" and r.code == 0:
                 degraded_stdouts.add(r.stdout)
             if v == "hardened" and outc == "wrong" and first_wrong_diff is None:
@@ -130,9 +104,6 @@ def bench(cmd: list[str] | None = None, seeds: int = 20, rate: float = 0.1, mark
                 if st.get("p99") is not None:
                     agg["p99"].append(st["p99"])
             line[v] = rec
-        if line["original"]["outcome"] == "wrong" and line["hardened"]["outcome"] == "degraded" and line["original"]["exit"] == 0:
-            # Check same-seed degraded equivalence immediately for live display
-            pass
         if not quiet:
             def cell(rec):
                 o = rec["outcome"]
@@ -163,11 +134,12 @@ def bench(cmd: list[str] | None = None, seeds: int = 20, rate: float = 0.1, mark
         for st in stats[v].values():
             st["p99"] = max(st["p99"]) if st["p99"] else None
     res = {
-        "cmd": stored, "display_cmd": shown, "ids": ids, "seeds": seeds, "rate": rate, "outage_rate": 0.05,
+        "lang": adapter.name, "cmd": stored, "display_cmd": shown, "ids": ids, "seeds": seeds, "rate": rate, "outage_rate": 0.05,
         "time_scale": 0.05, "hang_cap_s": 2.0, "degraded_markers": markers, "clean_outputs_equal": same_clean,
         "summary": summary, "runs": runs, "functions": stats, "first_wrong": first_wrong_diff,
         "host": {"machine": platform.machine(), "system": platform.system(), "release": platform.release(),
-                 "python": platform.python_version(), "cpus": os.cpu_count(), "node": platform.node()[:0] or None},
+                 "python": platform.python_version(),
+                 "runtime": adapter.runtime_label(clean["original"].data), "cpus": os.cpu_count(), "node": platform.node()[:0] or None},
         "fault_model": {k: faults.DESCRIBE[k] for k in faults.KINDS},
         "created": time.strftime("%Y-%m-%dT%H:%M:%S%z"),
     }

@@ -25,7 +25,7 @@ ras-anything = "ras_anything.cli:main"
 Homepage = "https://github.com/miles990/ras-anything"
 
 [tool.setuptools]
-packages = ["ras_anything", "ras_anything._inject"]
+packages = ["ras_anything", "ras_anything.lang", "ras_anything.agents", "ras_anything.agents.python", "ras_anything.agents.python._inject"]
 
 [tool.setuptools.package-data]
-ras_anything = ["_inject/*.py"]
+"ras_anything.agents.python" = ["_inject/*.py"]

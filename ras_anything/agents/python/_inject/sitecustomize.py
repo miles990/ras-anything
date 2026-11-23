@@ -13,9 +13,9 @@ def _ras_anything_start():
     if not os.environ.get("RAS_ANYTHING_CFG"):
         return
     try:
-        from ras_anything import _agent
+        from ras_anything.agents.python import agent
 
-        _agent.start()
+        agent.start()
     except Exception as e:  # never break the app
         sys.stderr.write("ras-anything: can't watch this process: %r\n" % (e,))
 

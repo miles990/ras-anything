@@ -18,7 +18,7 @@ def failure_note(res: dict) -> str:
         ff = res[key].get("first_failure")
         if ff:
             parts.append("first failing call (%s):\n```\n%s\n```\n" % (key, json.dumps(ff, indent=1, default=str)[:3000]))
-    parts.append("Fix hardened.py so every gate passes, then run `ras-anything verify %s` again." % res["id"])
+    parts.append("Fix the hardened file so every gate passes, then run `ras-anything verify %s` again." % res["id"])
     return "\n".join(parts)
 
 

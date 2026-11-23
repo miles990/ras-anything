@@ -1,5 +1,6 @@
 {
   "id": "weather.fetch_forecast",
+  "lang": "python",
   "budget_s": 5.0,
   "recorded": 12,
   "happy": {
@@ -111,7 +112,7 @@
     "hang": 15,
     "miss": 0,
     "availability": 0.325,
-    "p50": 0.004006,
+    "p50": 0.003583,
     "p99": 60.0,
     "max": 60.0,
     "dups": 0,
@@ -127,9 +128,9 @@
     "hang": 0,
     "miss": 0,
     "availability": 1.0,
-    "p50": 0.081143,
-    "p99": 3.614895,
-    "max": 3.694494,
+    "p50": 0.080928,
+    "p99": 3.61295,
+    "max": 3.695946,
     "dups": 0,
     "logged_failures": null,
     "structured_errors": null
@@ -145,10 +146,10 @@
   },
   "passed": true,
   "fallback": "callable",
-  "elapsed_s": 0.02,
+  "elapsed_s": 0.24,
   "hardened_sha256": "5a22519bc60a64ab87fd1b5a7c52cf8948f1dfce725637a7eeef2c292a0fdeb2",
-  "verified_at": "2026-11-23T12:16:23+0800",
-  "wall_s": 0.14,
+  "verified_at": "2026-11-23T12:28:11+0800",
+  "wall_s": 0.25,
   "fault_model": {
     "timeout": "no answer: caller's timeout fires; with no timeout it hangs (POST/PUT still reach the server)",
     "refused": "connection refused",

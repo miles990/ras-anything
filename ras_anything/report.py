@@ -18,6 +18,10 @@ def _p(x, d=0) -> str:
     return "—" if x is None else ("%." + str(d) + "f%%") % (100 * x)
 
 
+def _runtime(host: dict) -> str:
+    return host.get("runtime") or "Python %s" % host.get("python", "")
+
+
 def collect(project: Path) -> dict:
     bench = load_json(project / ".ras" / "bench.json")
     scan = load_json(project / ".ras" / "scan.json")
@@ -62,8 +66,8 @@ def card_svg(title: str, data: dict) -> str:
     rows.append(("recorded calls, same result", "", "%d/%d" % (eq, tot) if tot else "—"))
     host = (b or {}).get("host") or {}
     caption1 = "Faults: timeout/hang, refused, HTTP 503, 429 + Retry-After, slow, truncated body, outage · " + rate
-    caption2 = "%s · %s %s, Python %s · %s · measured by ras-anything" % (
-        n, host.get("system", ""), host.get("machine", ""), host.get("python", ""), ((b or {}).get("created") or "")[:10])
+    caption2 = "%s · %s %s, %s · %s · measured by ras-anything" % (
+        n, host.get("system", ""), host.get("machine", ""), _runtime(host), ((b or {}).get("created") or "")[:10])
     bx, bw = 152, 300
 
     def bar(y, label, frac, color, value_color):
@@ -164,8 +168,8 @@ def markdown(title: str, data: dict) -> str:
                    "after %gs; the real local upstream answers everything else.\n"
                    % (100 * b["outage_rate"], b["time_scale"], b["hang_cap_s"]))
         host = b.get("host") or {}
-        out.append("Host: %s %s %s, %s CPUs, Python %s · %s\n" % (host.get("system"), host.get("release"), host.get("machine"),
-                                                                 host.get("cpus"), host.get("python"), b["created"]))
+        out.append("Host: %s %s %s, %s CPUs, %s · %s\n" % (host.get("system"), host.get("release"), host.get("machine"),
+                                                                 host.get("cpus"), _runtime(host), b["created"]))
     out.append("Undo: `ras-anything disable <id>` removes the swap byte for byte; `RAS_ANYTHING_DISABLE=1` runs the originals.\n")
     out.append("<sub>Made with ras-anything · design inspired by [fast-anything](https://github.com/EL4CTEO/fast-anything) (MIT)</sub>\n")
     return "\n".join(out)

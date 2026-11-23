@@ -1,5 +1,6 @@
 {
   "id": "weather.fetch_forecast",
+  "lang": "python",
   "module": "weather",
   "qualname": "fetch_forecast",
   "name": "fetch_forecast",
@@ -13,18 +14,18 @@
   ],
   "display_cmd": "python app.py",
   "cwd": ".",
+  "env": {
+    "WEATHER_API_URL": "http://127.0.0.1:37803"
+  },
+  "globals": {},
   "sys_path": [
     "."
   ],
-  "env": {
-    "WEATHER_API_URL": "http://127.0.0.1:44083"
-  },
-  "globals": {},
   "type_modules": [],
   "budget_s": 5.0,
   "recorded": 12,
   "seen": 12,
   "skipped": 0,
-  "recorded_at": "2026-11-23T12:16:23+0800",
-  "python": "3.13.5"
+  "recorded_at": "2026-11-23T12:28:11+0800",
+  "runtime": "Python 3.13.5"
 }

@@ -46,7 +46,7 @@ def parser() -> argparse.ArgumentParser:
     h.add_argument("--model", help="model for the agent (e.g. opus)")
     h.add_argument("--budget", type=float, help="latency budget per call in seconds (default 5)")
     h.add_argument("--calls", type=int, default=500, help="max calls to record (default 500)")
-    h.add_argument("--force", action="store_true", help="overwrite an existing hardened.py with a fresh stub")
+    h.add_argument("--force", action="store_true", help="overwrite the existing hardened code with a fresh stub")
 
     v = sub.add_parser("verify", help="replay recorded calls: happy path, then the fault matrix")
     v.add_argument("id", nargs="?")

@@ -28,6 +28,7 @@ SLOW_S = 3.0          # latency the "slow" fault adds (virtual seconds)
 HANG_CAP_S = 60.0     # how long a call with no timeout "hangs" before we call it a hang (virtual)
 OUTAGE_K = 3          # consecutive failing attempts in an outage
 RETRY_AFTER = "1"
+CONSTANTS = {"slow_s": SLOW_S, "hang_cap_s": HANG_CAP_S, "outage_k": OUTAGE_K, "retry_after": RETRY_AFTER}  # for agents
 
 
 class ChaosHang(BaseException):

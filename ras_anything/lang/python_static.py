@@ -5,21 +5,11 @@ from __future__ import annotations
 import ast
 from functools import lru_cache
 
+from ..signals import SIGNALS
+
 HTTP_VERBS = {"get", "post", "put", "patch", "delete", "head", "options", "request"}
 WRITE_VERBS = {"post", "put", "patch", "delete"}
 SUBPROCESS = {"run", "call", "check_call", "check_output", "Popen"}
-
-# weight: how much each signal alone says "this will hurt under faults"
-SIGNALS = {
-    "no_timeout": (0.40, "{call}() without timeout"),
-    "unsafe_retry": (0.40, "retries a {verb} with no Idempotency-Key"),
-    "swallow": (0.30, "`{handler}` swallows errors"),
-    "no_retry": (0.20, "no retry on transient errors"),
-    "write_no_key": (0.15, "{verb} without Idempotency-Key"),
-    "no_context": (0.10, "re-raises without `from`/context"),
-    "open_no_with": (0.10, "open() outside `with`"),
-    "no_logging": (0.05, "no logging on the failure path"),
-}
 
 
 def dotted(node) -> str:
@@ -181,12 +171,8 @@ class FileInfo:
         if (boundary_calls or handlers) and not logs:
             found["no_logging"] = SIGNALS["no_logging"][1]
 
-        risk = 1.0
-        for k in found:
-            risk *= 1.0 - SIGNALS[k][0]
         return {
             "signals": found,
-            "static_risk": round(1.0 - risk, 4),
             "boundary_calls": [list(b) for b in boundary_calls],
             "write_verb": verb_in_fn,
         }

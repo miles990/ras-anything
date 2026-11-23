@@ -21,8 +21,8 @@ _cmd = {"cmd": {"type": "array", "items": {"type": "string"}, "description": "co
 TOOLS = {
     "ras_scan": ("Run the app clean and under seeded dependency chaos; rank functions by risk × exposure × hardenability.",
                  {**_cwd, **_cmd, "seeds": {"type": "integer"}}, ["cmd"]),
-    "ras_harden": ("Record real calls of one function with their dependency I/O and write TASK.md + a hardened.py stub "
-                   "(optionally run an agent). Then edit hardened.py following TASK.md.",
+    "ras_harden": ("Record real calls of one function with their dependency I/O and write TASK.md + a stub "
+                   "(optionally run an agent). Then edit the hardened file following TASK.md.",
                    {**_cwd, **_id, "agent": {"type": "string", "description": "claude | codex | shell command (optional)"}}, []),
     "ras_verify": ("Replay recorded calls (happy path, then the fault matrix, virtual clock) for original vs hardened; "
                    "report gates.", {**_cwd, **_id}, []),
@@ -77,7 +77,7 @@ def handle(msg: dict):
                   "capabilities": {"tools": {"listChanged": False}},
                   "serverInfo": {"name": "ras-anything", "version": __version__},
                   "instructions": "ras-anything hardens the few functions that break under dependency faults. Loop: "
-                                  "ras_scan -> ras_harden -> edit hardened.py per TASK.md -> ras_verify (until PASS) -> "
+                                  "ras_scan -> ras_harden -> edit the hardened file per TASK.md -> ras_verify (until PASS) -> "
                                   "ras_enable -> ras_bench -> ras_report."}
     elif method == "tools/list":
         result = {"tools": [{"name": n, "description": d,

@@ -1,20 +1,23 @@
-"""verify: prove the hardened function keeps the happy path and is more available under faults."""
+"""verify: prove the hardened function keeps the happy path and is more available under faults.
+
+This decides which trials to run and what they mean; a replay worker in the app's own language runs
+them (docs/ARCHITECTURE.md, "Replay worker").
+"""
 
 from __future__ import annotations
 
 import json
 import os
-import shutil
 import subprocess
-import sys
 import tempfile
 import time
 from pathlib import Path
 
-from . import faults, static, ui
-from .paths import PKG_DIR, UserError, find_project, harden_dir, load_json, load_local, save_json, scrub, sha256_file
+from . import cassette, faults, judge, lang, ui
+from .paths import UserError, find_project, harden_dir, load_json, save_json, scrub, sha256_file
 
 CLASSES = ("ok", "degraded", "error", "wrong", "hang")
+TIMEOUT_S = 900
 
 
 def resolve_id(project: Path, fid: str | None) -> str:
@@ -26,11 +29,147 @@ def resolve_id(project: Path, fid: str | None) -> str:
                             "harden %s" % fid)
         return fid
     if not have:
-        raise UserError("nothing hardened yet", "verify checks .ras/hardens/<id>/hardened.py", "harden")
+        raise UserError("nothing hardened yet", "verify checks the hardened code in .ras/hardens/<id>/", "harden")
     if len(have) > 1:
-        newest = max(have, key=lambda h: (base / h / "hardened.py").stat().st_mtime)
-        return newest
+        def changed(h):
+            a = lang.by_name((load_json(base / h / "meta.json") or {}).get("lang"))
+            f = base / h / a.hardened_name
+            return f.stat().st_mtime if f.exists() else 0
+        return max(have, key=changed)
     return have[0]
+
+
+class ReplayFailed(Exception):
+    def __init__(self, fatal: dict):
+        super().__init__(fatal["message"])
+        self.fatal = fatal
+
+
+def replay(adapter, project: Path, d: Path, meta: dict, trials: list[dict], deadline: float) -> dict:
+    """Run trials in one worker process: [{"call", "side", "plan", "seed"}] -> one raw result each."""
+    with tempfile.TemporaryDirectory(prefix="ras-verify-") as tmp:
+        job, out = Path(tmp) / "job.json", Path(tmp) / "out.json"
+        job.write_text(json.dumps({
+            "protocol": 1, "lang": adapter.name, "project": str(project), "meta": meta, "cassette": str(d / "calls.json"),
+            "hardened": str(d / adapter.hardened_name), "trials": trials, "out": str(out), "constants": faults.CONSTANTS}))
+        argv, env = adapter.worker_cmd(adapter.interpreter(project, meta), job)
+        try:
+            p = subprocess.run(argv, env=env, capture_output=True, text=True, timeout=max(1.0, deadline - time.perf_counter()))
+        except subprocess.TimeoutExpired:
+            raise ReplayFailed({"stage": "replay", "message": "verify ran for %d minutes without finishing: a busy loop that "
+                                "never calls the dependency or sleeps?" % (TIMEOUT_S // 60)})
+        except OSError as e:
+            raise ReplayFailed({"stage": "start the replay worker", "message": "%s: %s" % (argv[0], e.strerror)})
+        try:
+            res = json.loads(out.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            raise ReplayFailed({"stage": "replay", "message": (p.stderr or "").strip()[-1500:] or
+                                "the worker ended (exit %d) without an answer" % p.returncode})
+    if res.get("fatal"):
+        raise ReplayFailed(res["fatal"])
+    if res.get("protocol") != 1 or len(res.get("results") or []) != len(trials):
+        raise ReplayFailed({"stage": "replay", "message": "the %s worker's answer doesn't match the protocol" % adapter.label})
+    return res
+
+
+NONE = {"type": "none"}
+
+
+def chaos_plan(calls: list[dict], keys: list[list[str]], usable: list[int], max_chaos: int) -> list[dict]:
+    """The fault matrix and the seeded mixes over every usable call; then, for calls that make several
+    distinct requests (a GET, then a POST), every fault on each request alone."""
+    idx = usable[:max_chaos]
+    out = []
+
+    def add(i, row, label, plan, seed):
+        out.append({"call": i, "row": row, "scenario": label, "plan": plan, "seed": int(seed * 2 ** 32)})
+
+    for name in faults.MATRIX:
+        for i in idx:
+            add(i, name, name, {"type": "first", "fault": name, "key": None}, faults._u(name, None, None, i))
+    for s in (1, 2, 3):
+        for i in idx:
+            add(i, "mixed", "mixed seed %d" % s,
+                {"type": "seeded", "seed": s, "rate": 0.3, "outage_rate": 0.0, "salt": "call%d" % i}, faults._u("mixed", None, s, i))
+    for i in idx:
+        if len(keys[i]) < 2:
+            continue
+        for key in keys[i]:
+            for name in faults.MATRIX:
+                add(i, "%s (per-key)" % name, "%s on %s" % (name, key), {"type": "first", "fault": name, "key": key},
+                    faults._u(name, key, None, i))
+    return out
+
+
+def measure(adapter, project: Path, d: Path, meta: dict, max_chaos: int) -> dict:
+    budget = float(meta["budget_s"])
+    try:
+        calls = cassette.load(d / "calls.json")
+    except (cassette.BadCassette, OSError) as e:
+        raise ReplayFailed({"stage": "read calls.json", "message": "%s (record again: harden %s)" % (e, meta["id"])})
+    keys = [judge.keys_of(c, project) for c in calls]
+    deadline = time.perf_counter() + TIMEOUT_S
+    t0 = time.perf_counter()
+
+    def pairs(specs):
+        """Each spec run for both sides, original first; judged."""
+        trials = [{"call": s["call"], "side": side, "plan": s["plan"], "seed": s["seed"]}
+                  for s in specs for side in ("original", "hardened")]
+        raw = replay(adapter, project, d, meta, trials, deadline)
+        out = [judge.classify_trial(r, calls[t["call"]], keys[t["call"]], budget,
+                                    fallback_allowed=t["side"] == "hardened" and t["plan"] is not NONE)
+               for t, r in zip(trials, raw["results"])]
+        return raw, list(zip(out[::2], out[1::2]))
+
+    # (a) happy path ------------------------------------------------------------------------------
+    happy = {"total": 0, "equal": 0, "original_nondeterministic": 0, "first_failure": None}
+    usable = []
+    raw, results = pairs([{"call": i, "plan": NONE, "seed": i} for i in range(len(calls))])
+    for i, (o, h) in enumerate(results):
+        if o["class"] != "ok":
+            happy["original_nondeterministic"] += 1
+            continue
+        usable.append(i)
+        happy["total"] += 1
+        if h["class"] == "ok" and not judge.same_side_effects(o, h):
+            h.update({"class": "wrong", "note": "left its arguments (or self) in a different state than the original"})
+        if h["class"] == "ok":
+            happy["equal"] += 1
+        elif happy["first_failure"] is None:
+            happy["first_failure"] = {"call": i, "args": _args(calls[i]), **h}
+
+    # (b) faults ----------------------------------------------------------------------------------
+    specs = chaos_plan(calls, keys, usable, max_chaos)
+    raw2, results = pairs(specs)
+    sides = {"original": [o for o, _ in results], "hardened": [h for _, h in results]}
+    rows: dict = {}
+    first_bad = first_dup = None
+    for s, (o, h) in zip(specs, results):
+        row = rows.setdefault(s["row"], {"original": {}, "hardened": {}, "n": 0})
+        row["n"] += 1
+        for side, t in (("original", o), ("hardened", h)):
+            row[side][t["class"]] = row[side].get(t["class"], 0) + 1
+        seen = {"call": s["call"], "args": _args(calls[s["call"]]), "scenario": s["scenario"], "original": o, "hardened": h}
+        if first_dup is None and (o["dups"] or h["dups"]):
+            first_dup = seen
+        if first_bad is None and (h["class"] in ("wrong", "hang", "miss") or h["dups"] > o["dups"]):
+            first_bad = seen
+    o, h = judge.summarize(sides["original"]), judge.summarize(sides["hardened"])
+    crashes = judge.new_crashes(sides["original"], sides["hardened"], adapter.bug_exceptions)
+    scenarios = list(dict.fromkeys(s["scenario"].replace(" seed ", ":") if s["row"] == "mixed" else
+                                   ("per-key" if s["row"].endswith("(per-key)") else s["row"]) for s in specs))
+    gates = judge.gates(happy, o, h, crashes, budget)
+    return {
+        "id": meta["id"], "lang": adapter.name, "budget_s": budget, "recorded": len(calls), "happy": happy,
+        "chaos": {"calls": len(usable[:max_chaos]), "scenarios": scenarios, "by_scenario": rows, "first_failure": first_bad,
+                  "first_original_dup": first_dup, "new_crashes": crashes},
+        "original": o, "hardened": h, "gates": gates, "passed": all(gates.values()), "fallback": raw["fallback"],
+        "elapsed_s": round(time.perf_counter() - t0, 2),
+    }
+
+
+def _args(call: dict) -> str:
+    return cassette.show({"$tuple": call["args"]}, 200) + (" " + cassette.show(call["kwargs"], 100) if call["kwargs"] else "")
 
 
 def verify(fid: str | None = None, max_chaos: int = 60, quiet: bool = False) -> dict:
@@ -38,56 +177,32 @@ def verify(fid: str | None = None, max_chaos: int = 60, quiet: bool = False) -> 
     fid = resolve_id(project, fid)
     d = harden_dir(project, fid)
     meta = load_json(d / "meta.json")
-    fd, out = tempfile.mkstemp(prefix="ras-verify-", suffix=".json")
-    os.close(fd)
-    env = dict(os.environ, PYTHONPATH=os.pathsep.join([str(PKG_DIR.parent)] + ([os.environ["PYTHONPATH"]] if os.environ.get("PYTHONPATH") else [])))
-    env.pop("RAS_ANYTHING_CFG", None)
+    adapter = lang.by_name(meta.get("lang"))
+    hp = d / adapter.hardened_name
+    if not hp.exists():
+        raise UserError("%s is missing" % os.path.relpath(hp), "verify replays the calls through it", "harden %s" % fid)
     if not quiet:
         ui.headline("verify", "%s %s %d recorded calls %s %d faults + 3 seeded mixes %s virtual clock" % (
             fid, ui.DOT, meta["recorded"], ui.DOT, len(faults.MATRIX), ui.DOT))
     t0 = time.perf_counter()
-    peek = static.forbidden_imports(d / "hardened.py")
-    if peek:
-        res = {"passed": False, "id": fid, "fatal": {"stage": "accept hardened.py", "message":
-               "hardened.py imports %s. Hardened code may use ras_anything.runtime only: the rest of ras-anything is "
-               "the harness that judges it." % ", ".join(peek)}}
-        return _save(res, d, fid, t0, quiet)
+    sha = sha256_file(hp)  # of the code that is replayed, not of whatever is there afterwards
+    refused = adapter.refuse_hardened(hp)
     try:
-        exe = interpreter(project, meta)
-        p = subprocess.run([exe, "-m", "ras_anything._verify_worker", str(d), out, str(max_chaos)],
-                           env=env, capture_output=True, text=True, timeout=900)
-        res = json.loads(Path(out).read_text() or "null")
-    except subprocess.TimeoutExpired:
-        res = {"passed": False, "fatal": {"stage": "replay", "message": "verify ran for 15 minutes without finishing: "
-                                          "a busy loop that never calls the dependency or sleeps?"}}
-    except json.JSONDecodeError:
-        res = {"passed": False, "fatal": {"stage": "replay", "message": (p.stderr or "worker crashed")[-1500:]}}
-    finally:
-        try:
-            os.unlink(out)
-        except OSError:
-            pass
-    return _save(scrub(res, project), d, fid, t0, quiet)
-
-
-def interpreter(project: Path, meta: dict) -> str:
-    """The app's Python: the one that ran it here, else the command's own, else this one."""
-    exe = load_local(project).get("executable")
-    if exe and os.path.exists(exe):
-        return exe
-    prog = (meta.get("cmd") or [""])[0]
-    cand = str(project / prog) if "/" in prog else (shutil.which(prog) if os.path.basename(prog).startswith("python") else None)
-    return cand if cand and os.path.exists(cand) else sys.executable
-
-
-def _save(res: dict, d: Path, fid: str, t0: float, quiet: bool) -> dict:
-    res["hardened_sha256"] = sha256_file(d / "hardened.py")
+        if refused:
+            raise ReplayFailed({"stage": "accept %s" % adapter.hardened_name, "message": refused})
+        res = measure(adapter, project, d, meta, max_chaos)
+        if sha256_file(hp) != sha:
+            raise ReplayFailed({"stage": "verify %s" % adapter.hardened_name, "message": "the file changed while it was being verified"})
+    except ReplayFailed as e:
+        res = {"id": fid, "passed": False, "fatal": e.fatal}
+    res = scrub(res, project)
+    res["hardened_sha256"] = sha
     res["verified_at"] = time.strftime("%Y-%m-%dT%H:%M:%S%z")
     res["wall_s"] = round(time.perf_counter() - t0, 2)
     res["fault_model"] = {k: faults.DESCRIBE[k] for k in faults.MATRIX + ("mixed",)}
     save_json(d / "verify.json", res)
     if not quiet:
-        print_verify(res, fid)
+        print_verify(res, fid, adapter.hardened_name)
     return res
 
 
@@ -95,14 +210,14 @@ def _cls_line(s: dict) -> str:
     return " ".join("%s %d" % (k, s[k]) for k in CLASSES if s.get(k)) or "—"
 
 
-def print_verify(res: dict, fid: str) -> None:
+def print_verify(res: dict, fid: str, hname: str) -> None:
     print()
     if res.get("fatal"):
         f = res["fatal"]
         print("  " + ui.bad(ui.FAIL + " couldn't %s" % f["stage"]))
         for ln in f["message"].strip().splitlines()[-8:]:
             print("    " + ui.dim(ln))
-        ui.next_hint("verify %s   (after fixing hardened.py)" % fid)
+        ui.next_hint("verify %s   (after fixing %s)" % (fid, hname))
         return
     h, o, hp, g = res["hardened"], res["original"], res["happy"], res["gates"]
     budget = res["budget_s"]
@@ -172,14 +287,14 @@ def print_verify(res: dict, fid: str) -> None:
             _explain(cf["hardened"], cf["original"])
     print()
     if res["passed"]:
-        print("  " + ui.good(ui.bold(ui.OK + " PASS")) + "  enable is unlocked for this hardened.py " +
+        print("  " + ui.good(ui.bold(ui.OK + " PASS")) + "  enable is unlocked for this %s " % hname +
               ui.dim("(sha256 %s…) %s saved verify.json" % (res["hardened_sha256"][:12], ui.DOT)))
         ui.next_hint("enable %s" % fid)
     else:
         failed = [k for k, v in g.items() if not v]
         print("  " + ui.bad(ui.bold(ui.FAIL + " FAIL")) + "  gates failed: " + ", ".join(failed) +
               ui.dim("  %s saved verify.json" % ui.DOT))
-        ui.next_hint("verify %s   (after fixing .ras/hardens/%s/hardened.py)" % (fid, fid))
+        ui.next_hint("verify %s   (after fixing .ras/hardens/%s/%s)" % (fid, fid, hname))
 
 
 def _k(key: str) -> str:

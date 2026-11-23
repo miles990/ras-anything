@@ -1,5 +1,6 @@
 {
   "id": "billing.render_receipt",
+  "lang": "python",
   "module": "billing",
   "qualname": "render_receipt",
   "name": "render_receipt",
@@ -13,11 +14,8 @@
   ],
   "display_cmd": "python app.py",
   "cwd": ".",
-  "sys_path": [
-    "."
-  ],
   "env": {
-    "PAYMENTS_API_URL": "http://127.0.0.1:45377"
+    "PAYMENTS_API_URL": "http://127.0.0.1:35913"
   },
   "globals": {
     "RENDER": {
@@ -27,11 +25,14 @@
       ]
     }
   },
+  "sys_path": [
+    "."
+  ],
   "type_modules": [],
   "budget_s": 5.0,
   "recorded": 16,
   "seen": 16,
   "skipped": 0,
-  "recorded_at": "2026-11-23T12:16:34+0800",
-  "python": "3.13.5"
+  "recorded_at": "2026-11-23T12:28:22+0800",
+  "runtime": "Python 3.13.5"
 }

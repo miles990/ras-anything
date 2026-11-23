@@ -5,10 +5,9 @@ from __future__ import annotations
 import os
 import shutil
 import subprocess
-import sys
 import tempfile
 
-from . import ui
+from . import lang, ui
 from .paths import find_project, load_json, sha256_file
 
 
@@ -16,8 +15,8 @@ def doctor() -> int:
     project = find_project()
     ui.headline("doctor", str(project))
     checks = []
-    v = sys.version_info
-    checks.append((v >= (3, 10), "python %d.%d.%d" % v[:3], "" if v >= (3, 10) else "ras-anything needs Python 3.10+"))
+    for a in lang.ADAPTERS:
+        checks += a.doctor()
     for agent in ("claude", "codex"):
         p = shutil.which(agent)
         checks.append((bool(p) or None, "%s on PATH" % agent, p or "not found (only needed for --agent %s)" % agent))
@@ -37,12 +36,6 @@ def doctor() -> int:
         checks.append((True, ".ras writable", str(project / ".ras")))
     except OSError as e:
         checks.append((False, ".ras writable", str(e)))
-    try:
-        import requests
-
-        checks.append((True, "requests", "%s (intercepted too)" % requests.__version__))
-    except ImportError:
-        checks.append((None, "requests", "not installed (optional: urllib and subprocess are covered)"))
     bad = 0
     for ok, name, detail in checks:
         sym = ui.good(ui.OK) if ok else (ui.warn(ui.WARN) if ok is None else ui.bad(ui.FAIL))
@@ -70,7 +63,11 @@ def status() -> dict:
     nxt = None
     for d in sorted(base.iterdir()) if base.is_dir() else []:
         v = load_json(d / "verify.json")
-        cur = sha256_file(d / "hardened.py") if (d / "hardened.py").exists() else None
+        m = load_json(d / "meta.json")
+        if m is None:
+            continue
+        hp = d / lang.by_name(m.get("lang")).hardened_name
+        cur = sha256_file(hp) if hp.exists() else None
         if v is None or v.get("fatal"):
             st = ui.warn("not verified" if v is None else "verify error")
             nxt = nxt or "verify %s" % d.name

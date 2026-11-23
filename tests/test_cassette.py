@@ -20,7 +20,9 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from ras_anything import cassette
-from ras_anything.cassette import BadCassette, Codec, RemoteError, Unsupported, build_exc, dump_exc
+from ras_anything.agents.python import values
+from ras_anything.agents.python.values import Codec, RemoteError, Unsupported, build_exc, dump_exc
+from ras_anything.cassette import BadCassette
 
 REPO = Path(__file__).resolve().parent.parent
 PKG = REPO / "ras_anything"
@@ -132,7 +134,7 @@ class ExceptionsTest(unittest.TestCase):
             e = build_exc({"type": name, "module": module, "msg": "x"})
             self.assertIsInstance(e, RemoteError)
             self.assertEqual(e.type_name, "%s.%s" % (module, name))
-            self.assertTrue(cassette.matches(e, {"type": name, "module": module}))
+            self.assertTrue(values.matches(e, {"type": name, "module": module}))
 
     def test_optional_http_clients(self):
         for mod, name in (("requests.exceptions", "ReadTimeout"), ("httpx", "ConnectError")):

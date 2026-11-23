@@ -1,5 +1,6 @@
 {
   "id": "billing.render_receipt",
+  "lang": "python",
   "budget_s": 5.0,
   "recorded": 16,
   "happy": {
@@ -112,7 +113,7 @@
     "hang": 18,
     "miss": 0,
     "availability": 0.33125,
-    "p50": 0.02188,
+    "p50": 0.020981,
     "p99": 60.0,
     "max": 60.0,
     "dups": 0,
@@ -128,9 +129,9 @@
     "hang": 0,
     "miss": 0,
     "availability": 1.0,
-    "p50": 0.094108,
-    "p99": 1.168,
-    "max": 1.239945,
+    "p50": 0.093033,
+    "p99": 1.168782,
+    "max": 1.240291,
     "dups": 0,
     "logged_failures": 1.0,
     "structured_errors": null
@@ -146,10 +147,10 @@
   },
   "passed": true,
   "fallback": "callable",
-  "elapsed_s": 0.03,
+  "elapsed_s": 0.23,
   "hardened_sha256": "472bdf2e4a392293c094675d57951598236c5040efb726ea53fbd9aa09ee1c93",
-  "verified_at": "2026-11-23T12:16:34+0800",
-  "wall_s": 0.14,
+  "verified_at": "2026-11-23T12:28:22+0800",
+  "wall_s": 0.23,
   "fault_model": {
     "timeout": "no answer: caller's timeout fires; with no timeout it hangs (POST/PUT still reach the server)",
     "refused": "connection refused",

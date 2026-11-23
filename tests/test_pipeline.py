@@ -125,8 +125,8 @@ class WeatherTest(unittest.TestCase):
 
     def test_rejects_hardened_code_that_reaches_into_the_harness(self):
         hp = self.p.dir / ".ras" / "hardens" / self.fid / "hardened.py"
-        for line in ("from ras_anything import boundary", "import ras_anything._agent", "from ras_anything.faults import Plan",
-                     "import sys; B = sys.modules.get('ras_anything.boundary')"):
+        for line in ("from ras_anything.agents.python import boundary", "import ras_anything.agents.python.agent", "from ras_anything.faults import Plan",
+                     "import sys; B = sys.modules.get('ras_anything.agents.python.boundary')"):
             hp.write_text(line + "\n" + (FIX / "weather_good.py").read_text())
             v = verify(self.fid, quiet=True)
             self.assertFalse(v["passed"])
