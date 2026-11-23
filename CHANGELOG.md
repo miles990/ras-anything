@@ -4,6 +4,9 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follo
 
 ## Unreleased
 
+### Changed
+- MCP `call_tool` and `handle` route through dispatch tables so every shell function is complexity ≤ 10 (W8 E7).
+
 ## 0.2.0 — 2026-11-23
 
 First public release (GitHub tag `v0.2.0`). Not published to PyPI or npm.

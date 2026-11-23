@@ -4,6 +4,7 @@ controls) -> enable/disable byte for byte. Offline: the apps run their own local
 import contextlib
 import hashlib
 import io
+import json
 import os
 import shutil
 import subprocess
@@ -11,6 +12,7 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
 from ras_anything.enable import disable, enable
 from ras_anything.harden import harden
@@ -304,6 +306,43 @@ class McpTest(unittest.TestCase):
         self.assertEqual({t["name"] for t in tools}, {"ras_scan", "ras_harden", "ras_verify", "ras_enable",
                                                        "ras_disable", "ras_bench", "ras_report", "ras_status", "ras_replay", "ras_flag", "ras_export", "ras_events"})
         self.assertIsNone(mcp.handle({"jsonrpc": "2.0", "method": "notifications/initialized"}))
+
+    def test_handle_dispatch_table(self):
+        from ras_anything import mcp
+
+        self.assertEqual(mcp.handle({"jsonrpc": "2.0", "id": 3, "method": "ping"})["result"], {})
+        self.assertIsNone(mcp.handle({"jsonrpc": "2.0", "method": "ping"}))
+        err = mcp.handle({"jsonrpc": "2.0", "id": 4, "method": "nope"})
+        self.assertEqual(err["error"]["code"], -32601)
+        self.assertIn("nope", err["error"]["message"])
+        with mock.patch.object(mcp, "call_tool", return_value={"ok": True}) as c:
+            r = mcp.handle({"jsonrpc": "2.0", "id": 5, "method": "tools/call",
+                            "params": {"name": "ras_status", "arguments": {"cwd": "."}}})
+            self.assertEqual(r["result"], {"ok": True})
+            c.assert_called_once_with("ras_status", {"cwd": "."})
+
+    def test_call_tool_dispatch(self):
+        from ras_anything import mcp
+
+        bad = mcp.call_tool("ras_nope", {})
+        self.assertTrue(bad["isError"])
+        self.assertIn("unknown tool ras_nope", bad["content"][0]["text"])
+        with tempfile.TemporaryDirectory() as d:
+            ev = mcp.call_tool("ras_events", {"cwd": d})
+        self.assertFalse(ev["isError"])
+        body = json.loads(ev["content"][0]["text"])
+        self.assertEqual(body["events"], [])
+        with mock.patch.object(mcp.subprocess, "run") as run:
+            run.return_value = mock.Mock(stdout="hello", stderr="", returncode=0)
+            res = mcp.call_tool("ras_status", {"cwd": "/tmp"})
+        self.assertFalse(res["isError"])
+        self.assertEqual(res["content"][0]["text"], "hello")
+        argv = run.call_args[0][0]
+        self.assertEqual(argv[-1], "status")
+        with mock.patch.object(mcp.subprocess, "run", side_effect=OSError("gone")):
+            fail = mcp.call_tool("ras_status", {})
+        self.assertTrue(fail["isError"])
+        self.assertIn("failed", fail["content"][0]["text"])
 
 
 if __name__ == "__main__":

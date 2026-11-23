@@ -14,6 +14,7 @@ from . import __version__
 from .contracts import EXPORT_FORMATS
 
 PROTOCOL = "2024-11-05"
+_SUPPORTED_PROTOCOL = ("2024-11-05", "2025-03-26")
 
 _cwd = {"cwd": {"type": "string", "description": "project folder (where .ras/ lives or should be created)"}}
 _id = {"id": {"type": "string", "description": "function id from the scan, e.g. weather.fetch_forecast"}}
@@ -86,17 +87,23 @@ def _argv(name: str, a: dict) -> list[str]:
     return argv
 
 
-def call_tool(name: str, args: dict) -> dict:
-    if name not in TOOLS:
-        return {"content": [{"type": "text", "text": "unknown tool %s" % name}], "isError": True}
-    if name == "ras_events":
-        from pathlib import Path
-        from .export import read_events, sync_out
-        cwd = Path(args.get("cwd") or os.getcwd())
-        if (cwd / ".ras").is_dir():
-            sync_out(cwd)
-        res = read_events(cwd, since=int(args.get("since") or 0), limit=int(args.get("limit") or 200))
-        return {"content": [{"type": "text", "text": json.dumps(res, indent=2, sort_keys=True)}], "isError": False}
+def _text_result(text: str, err: bool) -> dict:
+    return {"content": [{"type": "text", "text": text or "(no output)"}], "isError": err}
+
+
+def _events_tool(args: dict) -> dict:
+    from pathlib import Path
+
+    from .export import read_events, sync_out
+
+    cwd = Path(args.get("cwd") or os.getcwd())
+    if (cwd / ".ras").is_dir():
+        sync_out(cwd)
+    res = read_events(cwd, since=int(args.get("since") or 0), limit=int(args.get("limit") or 200))
+    return _text_result(json.dumps(res, indent=2, sort_keys=True), False)
+
+
+def _run_cli(name: str, args: dict) -> dict:
     argv = _argv(name, args)
     env = dict(os.environ, NO_COLOR="1")
     env.pop("FORCE_COLOR", None)
@@ -105,35 +112,70 @@ def call_tool(name: str, args: dict) -> dict:
         p = subprocess.run([sys.executable, "-m", "ras_anything", *argv], cwd=cwd, env=env, capture_output=True,
                            text=True, timeout=3600, stdin=subprocess.DEVNULL)
         text = (p.stdout + ("\n" + p.stderr if p.stderr.strip() else "")).strip()
-        return {"content": [{"type": "text", "text": text or "(no output)"}], "isError": p.returncode != 0}
+        return _text_result(text, p.returncode != 0)
     except (OSError, subprocess.TimeoutExpired) as e:
-        return {"content": [{"type": "text", "text": "ras-anything %s failed: %s" % (" ".join(argv), e)}], "isError": True}
+        return _text_result("ras-anything %s failed: %s" % (" ".join(argv), e), True)
+
+
+# In-process tools (the rest are a thin CLI subprocess).
+_TOOL_IMPL = {
+    "ras_events": _events_tool,
+}
+
+
+def call_tool(name: str, args: dict) -> dict:
+    if name not in TOOLS:
+        return _text_result("unknown tool %s" % name, True)
+    special = _TOOL_IMPL.get(name)
+    if special is not None:
+        return special(args)
+    return _run_cli(name, args)
+
+
+def _initialize(params: dict) -> dict:
+    req_ver = params.get("protocolVersion")
+    ver = req_ver if req_ver in _SUPPORTED_PROTOCOL else PROTOCOL
+    return {"protocolVersion": ver,
+            "capabilities": {"tools": {"listChanged": False}},
+            "serverInfo": {"name": "ras-anything", "version": __version__},
+            "instructions": "ras-anything hardens the few functions that break under dependency faults. Loop: "
+                            "ras_scan -> ras_harden -> edit the hardened file per TASK.md -> ras_verify (until PASS) -> "
+                            "ras_enable -> ras_bench -> ras_report."}
+
+
+def _tools_list(_params: dict) -> dict:
+    return {"tools": [{"name": n, "description": d,
+                       "inputSchema": {"type": "object", "properties": props, "required": req}}
+                      for n, (d, props, req) in TOOLS.items()]}
+
+
+def _tools_call(params: dict) -> dict:
+    return call_tool(params.get("name", ""), params.get("arguments") or {})
+
+
+def _ping(_params: dict) -> dict:
+    return {}
+
+
+METHODS = {
+    "initialize": _initialize,
+    "tools/list": _tools_list,
+    "tools/call": _tools_call,
+    "ping": _ping,
+}
 
 
 def handle(msg: dict):
     mid, method, params = msg.get("id"), msg.get("method"), msg.get("params") or {}
-    if method == "initialize":
-        req_ver = params.get("protocolVersion")
-        ver = req_ver if req_ver in ("2024-11-05", "2025-03-26") else PROTOCOL
-        result = {"protocolVersion": ver,
-                  "capabilities": {"tools": {"listChanged": False}},
-                  "serverInfo": {"name": "ras-anything", "version": __version__},
-                  "instructions": "ras-anything hardens the few functions that break under dependency faults. Loop: "
-                                  "ras_scan -> ras_harden -> edit the hardened file per TASK.md -> ras_verify (until PASS) -> "
-                                  "ras_enable -> ras_bench -> ras_report."}
-    elif method == "tools/list":
-        result = {"tools": [{"name": n, "description": d,
-                             "inputSchema": {"type": "object", "properties": props, "required": req}}
-                            for n, (d, props, req) in TOOLS.items()]}
-    elif method == "tools/call":
-        result = call_tool(params.get("name", ""), params.get("arguments") or {})
-    elif method == "ping":
-        result = {}
-    elif mid is None:  # notification (e.g. notifications/initialized)
-        return None
-    else:
+    fn = METHODS.get(method)
+    if fn is None:
+        if mid is None:  # notification (e.g. notifications/initialized)
+            return None
         return {"jsonrpc": "2.0", "id": mid, "error": {"code": -32601, "message": "method not found: %s" % method}}
-    return None if mid is None else {"jsonrpc": "2.0", "id": mid, "result": result}
+    result = fn(params)
+    if mid is None:
+        return None
+    return {"jsonrpc": "2.0", "id": mid, "result": result}
 
 
 def serve(stdin=None, stdout=None) -> int:
