@@ -18,9 +18,30 @@ import importlib
 import itertools
 from dataclasses import dataclass, field
 
-# Outermost first. A new pattern is a new module and an entry here.
-NAMES = ("fallback", "deadline", "bulkhead", "idempotency", "retry_budget", "retry_after", "retry", "circuit_breaker",
-         "adaptive_throttle", "adaptive_concurrency", "hedge", "attempt_timeout")
+# NAMES (outermost first) is found, not listed: every module here that defines PATTERN, by PATTERN.order
+# (docs/adr/0003). A new pattern is a new module; nothing in this file changes.
+_names: tuple | None = None
+
+
+def _discover() -> tuple:
+    global _names
+    if _names is None:
+        import pkgutil
+        found = []
+        for info in pkgutil.iter_modules(__path__):
+            if info.name.startswith("_"):
+                continue
+            pat = getattr(importlib.import_module("%s.%s" % (__name__, info.name)), "PATTERN", None)
+            if isinstance(pat, Pattern):
+                found.append(pat)
+        _names = tuple(p.name for p in sorted(found, key=lambda p: (p.order, p.name)))
+    return _names
+
+
+def __getattr__(name):  # PEP 562: NAMES is computed on first use, so importing the package stays cheap
+    if name == "NAMES":
+        return _discover()
+    raise AttributeError("module %r has no attribute %r" % (__name__, name))
 
 ADOPTED, OPT_IN, REJECTED = "adopted", "opt-in", "rejected"
 
@@ -95,15 +116,15 @@ class Call:
 
 
 def get(name: str) -> Pattern:
-    if name not in NAMES:
-        raise KeyError("no pattern %r (known: %s)" % (name, ", ".join(NAMES)))
+    if name not in _discover():
+        raise KeyError("no pattern %r (known: %s)" % (name, ", ".join(_discover())))
     return importlib.import_module("ras_anything.patterns." + name).PATTERN
 
 
 def all_patterns() -> list[Pattern]:
     """Every pattern whose module is there, outermost first."""
     out = []
-    for n in NAMES:
+    for n in _discover():
         try:
             out.append(get(n))
         except ModuleNotFoundError as e:

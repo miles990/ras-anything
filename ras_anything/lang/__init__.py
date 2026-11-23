@@ -13,13 +13,28 @@ from importlib import metadata
 
 from ..contracts import LANGUAGE_ENTRY_POINT_GROUP
 from ..paths import UserError
-from .base import LangAdapter, program_stem
-from .golang import GoAdapter
-from .java import JavaAdapter
-from .node import NodeAdapter
-from .python import PythonAdapter
+import importlib
+import inspect
+import pkgutil
 
-BUILTIN: list[LangAdapter] = [PythonAdapter(), NodeAdapter(), GoAdapter(), JavaAdapter()]
+from .base import LangAdapter, program_stem
+
+def discover() -> list[LangAdapter]:
+    """The built-in adapters: every concrete LangAdapter subclass defined in a module of this package (docs/adr/0003).
+    Adding a language adds files (lang/<name>.py, lang/<name>_agent/); nothing here lists them. Order: `priority`,
+    then name; a command goes to the first adapter whose detect() says yes."""
+    found: dict[str, LangAdapter] = {}
+    for info in sorted(pkgutil.iter_modules(__path__), key=lambda i: i.name):
+        if info.name.startswith("_") or info.name == "base" or info.ispkg:
+            continue
+        mod = importlib.import_module("%s.%s" % (__name__, info.name))
+        for _, cls in inspect.getmembers(mod, inspect.isclass):
+            if cls.__module__ == mod.__name__ and issubclass(cls, LangAdapter) and not inspect.isabstract(cls) and cls.name:
+                found.setdefault(cls.name, cls())
+    return sorted(found.values(), key=lambda a: (a.priority, a.name))
+
+
+BUILTIN: list[LangAdapter] = discover()
 
 
 def plugins(group: str = LANGUAGE_ENTRY_POINT_GROUP) -> list[LangAdapter]:

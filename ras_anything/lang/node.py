@@ -91,6 +91,7 @@ def is_ts(path: str) -> bool:
 
 class NodeAdapter(LangAdapter):
     name = "node"
+    priority = 20
     label = "Node.js"
     launchers = "node app.js / .mjs / .cjs / .ts (with any node flags)"
     example = "node app.js"

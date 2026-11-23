@@ -56,6 +56,7 @@ def _go_version(exe: str) -> tuple[tuple[int, int] | None, str]:
 
 class GoAdapter(LangAdapter):
     name = "go"
+    priority = 30
     label = "Go"
     launchers = "go run . / ./cmd/app (with any flags and arguments)"
     example = "go run ."

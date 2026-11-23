@@ -94,6 +94,14 @@ class LanguagePluginContract(unittest.TestCase):
             self.assertIsInstance(a, LangAdapter)
 
 
+def _glob(g: str):
+    """setuptools package-data glob ('**' = any folders) as a regex."""
+    out = ""
+    for part in re.split(r"(\*\*/|\*)", g):
+        out += {"**/": "(?:.*/)?", "*": "[^/]*"}.get(part, re.escape(part))
+    return re.compile(out + "$")
+
+
 class PackagingContract(unittest.TestCase):
     """Every agent folder ships in the wheel and the sdist (adding a language used to need 2 manual edits here)."""
 
@@ -106,29 +114,27 @@ class PackagingContract(unittest.TestCase):
         globs = cfg["tool"]["setuptools"]["package-data"]["ras_anything.lang"]
         manifest = (REPO / "MANIFEST.in").read_text(encoding="utf-8")
         for agent in sorted(p for p in LANG.glob("*_agent") if p.is_dir()):
-            self.assertIn("graft ras_anything/lang/%s" % agent.name, manifest, agent.name)
+            self.assertTrue("graft ras_anything/lang\n" in manifest or "graft ras_anything/lang/%s" % agent.name in manifest, agent.name)
             for f in agent.rglob("*"):
                 if not f.is_file() or "node_modules" in f.parts or "__pycache__" in f.parts or f.suffix in (".class", ".md"):
                     continue
                 rel = f.relative_to(LANG).as_posix()
-                self.assertTrue(any(Path(rel).match(g) for g in globs), "not in package-data: " + rel)
+                self.assertTrue(any(_glob(g).match(rel) for g in globs), "not in package-data: " + rel)
 
 
 class FaultConformance(unittest.TestCase):
     """Each language's agent knows every fault kind of the shared matrix (faults.MATRIX), spelled the same."""
 
-    AGENTS = {
-        "python": REPO / "ras_anything" / "agents" / "python",
-        "node": LANG / "node_agent",
-        "go": LANG / "go_agent",
-        "java": LANG / "java_agent",
-    }
+    @staticmethod
+    def agents():
+        return {a.name: Path(a.agent_dir) if a.agent_dir else LANG / ("%s_agent" % a.name) for a in lang.BUILTIN}
 
-    def test_every_builtin_language_has_an_agent_folder_listed_here(self):
-        self.assertEqual(sorted(self.AGENTS), sorted(a.name for a in lang.BUILTIN))
+    def test_every_builtin_language_has_an_agent_folder(self):
+        for name, folder in self.agents().items():
+            self.assertTrue(folder.is_dir(), "%s: %s" % (name, folder))
 
     def test_every_agent_handles_every_fault_kind(self):
-        for name, folder in self.AGENTS.items():
+        for name, folder in self.agents().items():
             text = "\n".join(p.read_text(encoding="utf-8", errors="replace") for p in folder.rglob("*")
                              if p.is_file() and p.suffix in (".py", ".cjs", ".go", ".java") and "node_modules" not in p.parts)
             for kind in faults.MATRIX:

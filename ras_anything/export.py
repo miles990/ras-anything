@@ -229,7 +229,7 @@ def coverage_payload() -> dict:
     for name, status, boundary, ver, ax in ALL_LANGUAGES:
         adapters.append({
             "lang": name,
-            "status": "complete" if name in registered and status == "complete" else status,
+            "status": "complete" if name in registered else status,  # a registered adapter implements the whole contract
             "boundary": boundary,
             "verify": ver,
             "ax": ax,

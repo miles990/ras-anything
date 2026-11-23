@@ -29,14 +29,10 @@ packages = ["ras_anything", "ras_anything.lang", "ras_anything.patterns", "ras_a
 [tool.setuptools.package-data]
 "ras_anything.agents.python" = ["_inject/*.py"]
 "ras_anything.lang" = [
-    "node_agent/*.cjs",
-    "node_agent/patterns/*.cjs",
-    "go_agent/asttool/*.go",
-    "go_agent/rasagent/*.go",
-    "go_agent/rasruntime/*.go",
-    "java_agent/agent/*.java",
-    "java_agent/tool/*.java",
-    "java_agent/runtime/*.java",
+    # every language's in-app agent ships whole: a new lang/<name>_agent/ needs no edit here (docs/adr/0003)
+    "*_agent/**/*.cjs", "*_agent/**/*.mjs", "*_agent/**/*.js",
+    "*_agent/**/*.go", "*_agent/**/*.java", "*_agent/**/*.cs", "*_agent/**/*.php", "*_agent/**/*.rb", "*_agent/**/*.kt",
+    "*_agent/**/*.c", "*_agent/**/*.h", "*_agent/**/*.cpp", "*_agent/**/*.R", "*_agent/**/*.json", "*_agent/**/*.mod", "*_agent/**/*.sum",
 ]
 
 # Lint gate (CI + `make lint`): pyflakes errors are bugs here (an undefined name shipped in doctor.status).
@@ -44,7 +40,7 @@ packages = ["ras_anything", "ras_anything.lang", "ras_anything.patterns", "ras_a
 [tool.ruff]
 target-version = "py310"
 line-length = 140
-extend-exclude = ["examples", "build", "wow", "ras_anything/lang/node_agent", "ras_anything/lang/go_agent", "ras_anything/lang/java_agent"]
+extend-exclude = ["examples", "build", "wow", "ras_anything/lang/*_agent"]
 
 [tool.ruff.lint]
 select = ["F", "E9", "B006", "B008", "B012", "B015", "B018"]

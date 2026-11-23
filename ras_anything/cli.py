@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import json
 import sys
 
 from . import __version__, ui
@@ -42,6 +43,7 @@ def _split(argv):
 def parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(prog="ras-anything", description=USAGE, formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument("--version", action="version", version="ras-anything " + __version__)
+    p.add_argument("--json", action="store_true", help="errors as RFC 9457 problem+json on stderr (one line)")
     sub = p.add_subparsers(dest="command", metavar="<command>")
 
     s = sub.add_parser("scan", help="rank functions by risk × exposure × hardenability (-- <cmd>)")
@@ -110,11 +112,41 @@ def parser() -> argparse.ArgumentParser:
     return p
 
 
+PROBLEM_BASE = "urn:ras-anything:problem:"
+
+
+def problem(slug: str, title: str, detail: str = "", nxt: str = "", exit_code: int = 1) -> dict:
+    """An error as RFC 9457 Problem Details (wow spec/INTEROP.md §4); `--json` writes it to stderr as one line."""
+    doc = {"type": PROBLEM_BASE + slug, "title": title, "status": 400 if exit_code == 2 else 422, "exit_code": exit_code}
+    if detail:
+        doc["detail"] = detail
+    if nxt:
+        doc["next"] = "ras-anything " + nxt
+    return doc
+
+
+class _UsageError(Exception):
+    pass
+
+
 def main(argv=None) -> int:
     argv = list(sys.argv[1:] if argv is None else argv)
     head, cmd = _split(argv)
+    as_json = "--json" in head
     p = parser()
-    a = p.parse_args(head)
+    if as_json:
+        def _error(message):  # argparse would print usage and exit 2: say it as a problem instead
+            raise _UsageError(message)
+        p.error = _error
+        for action in p._actions:
+            if isinstance(action, argparse._SubParsersAction):
+                for sp in action.choices.values():
+                    sp.error = _error
+    try:
+        a = p.parse_args(head)
+    except _UsageError as e:
+        print(json.dumps(problem("usage", "invalid command line", str(e), "--help", 2)), file=sys.stderr)
+        return 2
     try:
         c = a.command
         if c in ("scan", "go") and not cmd:
@@ -195,7 +227,10 @@ def main(argv=None) -> int:
             p.print_help()
             return 2
     except UserError as e:
-        ui.error(e.what, e.impact, e.nxt)
+        if as_json:
+            print(json.dumps(problem("user-error", e.what, e.impact, e.nxt)), file=sys.stderr)
+        else:
+            ui.error(e.what, e.impact, e.nxt)
         return 1
     except KeyboardInterrupt:
         return 130

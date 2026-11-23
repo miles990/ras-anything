@@ -34,6 +34,8 @@ def pattern_list(show, spell=lambda name: name) -> str:
 
 class LangAdapter(ABC):
     name = ""            # stored in scan.json / meta.json / calls.json, e.g. "python"
+    priority = 100       # lower is asked first by lang.detect (built-ins: python 10, node 20, go 30)
+    agent_dir: Path | None = None  # the in-app agent's folder (default: lang/<name>_agent/); checked by tests/test_contracts.py
     label = ""           # for people, e.g. "Python"
     launchers = ""       # for people: the commands this adapter understands
     example = ""         # a command to show in hints, e.g. "python app.py"

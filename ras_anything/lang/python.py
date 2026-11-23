@@ -47,6 +47,8 @@ def _env_python(runner: str, sub: str, cwd: str) -> str:
 
 class PythonAdapter(LangAdapter):
     name = "python"
+    priority = 10
+    agent_dir = AGENT_DIR
     label = "Python"
     launchers = "python, python3, pypy, py, or uv / poetry / pipenv / pdm / hatch / rye run"
     example = "python app.py"
