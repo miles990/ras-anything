@@ -277,6 +277,9 @@ class InstallAndReleaseTests(unittest.TestCase):
             "root = Path(m.__file__).resolve().parent\n"
             "print(root / 'node_agent' / 'boundary.cjs')\n"
             "print(root / 'go_agent' / 'rasagent' / 'agent.go')\n"
+            "print(root / 'java_agent' / 'agent' / 'Agent.java')\n"
+            "print(root / 'java_agent' / 'tool' / 'RasTool.java')\n"
+            "print(root / 'java_agent' / 'runtime' / 'RasRt.java')\n"
         )
         # Find the python that belongs to the install (venv or pipx).
         probe = _run([str(shim), "--version"], env=env, timeout=30)
@@ -293,7 +296,7 @@ class InstallAndReleaseTests(unittest.TestCase):
         if venv_py.is_file():
             got = _run([str(venv_py), "-c", locate], env=env, timeout=30)
             paths = [Path(s) for s in got.stdout.splitlines() if s.strip()]
-            self.assertEqual(len(paths), 2, got.stdout)
+            self.assertEqual(len(paths), 5, got.stdout)
             for path in paths:
                 self.assertTrue(path.is_file(), f"packaged agent missing: {path}")
 

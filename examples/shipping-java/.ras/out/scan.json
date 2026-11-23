@@ -1,0 +1,118 @@
+{
+  "schema_version": "1.0.0",
+  "kind": "scan",
+  "generated_at": "2026-11-23T19:32:15+0800",
+  "project": "shipping-java",
+  "lang": "java",
+  "functions": [
+    {
+      "id": "shipping.Carrier.fetchRate",
+      "lang": "java",
+      "risk": 0.8176,
+      "exposure": 0.3333,
+      "score": 27.3,
+      "signals": {
+        "no_logging": "no logging on the failure path",
+        "no_retry": "no retry on transient errors",
+        "no_timeout": "HttpClient.send() without timeout"
+      }
+    },
+    {
+      "id": "shipping.Labels.labelCode",
+      "lang": "java",
+      "risk": 0.8176,
+      "exposure": 0.3333,
+      "score": 27.3,
+      "signals": {
+        "no_logging": "no logging on the failure path",
+        "no_retry": "no retry on transient errors",
+        "no_timeout": "ProcessBuilder.start() without timeout"
+      }
+    },
+    {
+      "id": "shipping.Carrier.bookShipment",
+      "lang": "java",
+      "risk": 0.6124,
+      "exposure": 0.3333,
+      "score": 20.4,
+      "signals": {
+        "no_logging": "no logging on the failure path",
+        "no_retry": "no retry on transient errors",
+        "no_timeout": "HttpClient.send() without timeout",
+        "write_no_key": "POST without Idempotency-Key"
+      }
+    },
+    {
+      "id": "shipping.FakeCarrier.answer",
+      "lang": "java",
+      "risk": 0.0,
+      "exposure": 0.0,
+      "score": 0.0,
+      "signals": []
+    },
+    {
+      "id": "shipping.FakeCarrier.close",
+      "lang": "java",
+      "risk": 0.0,
+      "exposure": 0.0,
+      "score": 0.0,
+      "signals": []
+    },
+    {
+      "id": "shipping.FakeCarrier.rates",
+      "lang": "java",
+      "risk": 0.0,
+      "exposure": 0.0,
+      "score": 0.0,
+      "signals": []
+    },
+    {
+      "id": "shipping.FakeCarrier.shipments",
+      "lang": "java",
+      "risk": 0.0,
+      "exposure": 0.0,
+      "score": 0.0,
+      "signals": []
+    },
+    {
+      "id": "shipping.FakeCarrier.url",
+      "lang": "java",
+      "risk": 0.0,
+      "exposure": 0.0,
+      "score": 0.0,
+      "signals": []
+    },
+    {
+      "id": "shipping.Json.expect",
+      "lang": "java",
+      "risk": 0.0,
+      "exposure": 0.0,
+      "score": 0.0,
+      "signals": []
+    },
+    {
+      "id": "shipping.Json.object",
+      "lang": "java",
+      "risk": 0.0,
+      "exposure": 0.0,
+      "score": 0.0,
+      "signals": []
+    },
+    {
+      "id": "shipping.Json.skip",
+      "lang": "java",
+      "risk": 0.0,
+      "exposure": 0.0,
+      "score": 0.0,
+      "signals": []
+    },
+    {
+      "id": "shipping.Main.main",
+      "lang": "java",
+      "risk": 0.0,
+      "exposure": 0.0,
+      "score": 0.0,
+      "signals": []
+    }
+  ]
+}

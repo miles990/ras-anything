@@ -1,0 +1,49 @@
+{
+  "id": "shipping.Carrier.bookShipment",
+  "lang": "java",
+  "module": "shipping.Carrier",
+  "qualname": "bookShipment",
+  "name": "bookShipment",
+  "kind": "static method",
+  "file": "src/shipping/Carrier.java",
+  "first_line": 26,
+  "in_main": false,
+  "cmd": [
+    "java",
+    "-cp",
+    "out",
+    "shipping.Main"
+  ],
+  "display_cmd": "java -cp out shipping.Main",
+  "cwd": ".",
+  "env": {},
+  "globals": {},
+  "owner": "shipping.Carrier",
+  "binary": "shipping.Carrier",
+  "params": [
+    {
+      "name": "base",
+      "type": "String"
+    },
+    {
+      "name": "p",
+      "type": "Parcel"
+    },
+    {
+      "name": "r",
+      "type": "Rate"
+    }
+  ],
+  "returns": "Booking",
+  "throws": [
+    "IOException",
+    "InterruptedException"
+  ],
+  "package": "shipping",
+  "budget_s": 5.0,
+  "recorded": 6,
+  "seen": 6,
+  "skipped": 0,
+  "recorded_at": "2026-11-23T19:25:52+0800",
+  "runtime": "Java 21.0.13.1"
+}

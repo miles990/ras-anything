@@ -1,0 +1,23 @@
+
+===== 2026-11-23 19:26:36  claude -p --permission-mode acceptEdits --allowedTools 'Read,Edit,Write,Glob,Grep,Bash(ras-anything verify:*),Bash(ras-anything status:*)' --add-dir . --model opus
+`labelCode` is hardened, and `ras-anything verify shipping.Labels.labelCode` prints **PASS**. I edited only `hardened.java` and enabled nothing.
+
+| | original | hardened |
+|---|---|---|
+| happy-path replay | n/a | 6/6 identical |
+| availability under faults | 35.0% | 98.3% |
+| silent wrong results | 7 | 0 |
+| hangs | 7 | 0 |
+| p99 latency (budget 5 s) | 60.00 s | 3.77 s |
+| attempts per call under faults | 1.00 | 1.92 |
+| attempts per call with the tool down | 1.00 | 0.60 |
+| failures logged with a trace id | 0% | 100% |
+
+- **Timeouts and retries:** A `label-tool` policy allows up to 4 attempts, 3.3 s each, inside a 4.5 s deadline. Computing a label has no side effects, so repeating it is safe. A slow 3 s run still fits in one attempt, and a hung one is killed with time left for a second.
+- **Cut-off output:** The original turned half a line into a wrong label code. Now the output must be the whole line, `<checksum> <bytes>` plus its final newline. Anything shorter is retried.
+- **Other exit codes:** These still throw `IOException("label tool exited N")` and are not retried.
+- **No fallback:** A made-up code could end up on a real parcel, so I declared no fallback. A give-up is logged by the policy and thrown as `RasRt.RasIOException` with its cause kept. It is an `IOException`, which the method already declares.
+
+One of the 18 `mixed` trials still ended in an error rather than an answer, which is the missing 1.7%. The root-cause diagnosis score from logs was 0% for both versions; it is informational and not a gate.
+
+===== exit 0 after 41s

@@ -34,4 +34,7 @@ packages = ["ras_anything", "ras_anything.lang", "ras_anything.patterns", "ras_a
     "go_agent/asttool/*.go",
     "go_agent/rasagent/*.go",
     "go_agent/rasruntime/*.go",
+    "java_agent/agent/*.java",
+    "java_agent/tool/*.java",
+    "java_agent/runtime/*.java",
 ]

@@ -4,6 +4,7 @@ include skills/ras-anything/SKILL.md
 include .mcp.json
 graft ras_anything/lang/node_agent
 graft ras_anything/lang/go_agent
+graft ras_anything/lang/java_agent
 graft skills
 graft .claude-plugin
 graft commands

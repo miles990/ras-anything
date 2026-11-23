@@ -9,10 +9,11 @@ from __future__ import annotations
 from ..paths import UserError
 from .base import LangAdapter, program_stem
 from .golang import GoAdapter
+from .java import JavaAdapter
 from .node import NodeAdapter
 from .python import PythonAdapter
 
-ADAPTERS: list[LangAdapter] = [PythonAdapter(), NodeAdapter(), GoAdapter()]
+ADAPTERS: list[LangAdapter] = [PythonAdapter(), NodeAdapter(), GoAdapter(), JavaAdapter()]
 
 # Recognized, but no adapter here yet.
 PLANNED = {"bun": "Bun", "deno": "Deno"}
@@ -32,6 +33,9 @@ _HINTS = {
     "make": "start the app itself instead of make: ras-anything scan -- python app.py",
     "env": "set variables in your shell, then start the app itself: ras-anything scan -- python app.py",
     "go": "start your Go app with go run: ras-anything scan -- go run .",
+    "java": "name what it runs: ras-anything scan -- java App.java (or java -cp DIR Main, java -jar app.jar)",
+    **{w: "build it, then start the main class itself: ras-anything scan -- java -cp %s Main" % d
+       for w, d in (("mvn", "target/classes"), ("mvnw", "target/classes"), ("gradle", "build/classes/java/main"), ("gradlew", "build/classes/java/main"))},
 }
 
 

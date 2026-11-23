@@ -1,0 +1,1 @@
+{"status": "ok", "updated": "2026-11-23T11:32:14Z", "breakers": {}, "functions": {"shipping.Carrier.bookShipment": {"calls": 6, "raised": 0, "gave_up": 0}, "shipping.Carrier.fetchRate": {"calls": 6, "raised": 0, "gave_up": 0}, "shipping.Labels.labelCode": {"calls": 6, "raised": 0, "gave_up": 0}}}

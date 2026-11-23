@@ -1,0 +1,53 @@
+{
+  "schema_version": "1.0.0",
+  "kind": "slo",
+  "generated_at": "2026-11-23T19:32:15+0800",
+  "project": "shipping-java",
+  "slo": {
+    "source": "bench",
+    "targets": {
+      "availability": 0.95,
+      "p99_s": 3.0,
+      "error_rate": 0.05
+    },
+    "original": {
+      "availability": 0.0,
+      "error_rate": 1.0,
+      "p50_s": 0.7685,
+      "p99_s": 2.6581,
+      "error_budget": 0.05,
+      "error_budget_burn_ratio": 20.0,
+      "error_budget_burn_pct": 2000.0,
+      "checks": {
+        "availability": false,
+        "p99_s": true,
+        "error_rate": false
+      },
+      "status": "missed"
+    },
+    "hardened": {
+      "availability": 1.0,
+      "error_rate": 0.0,
+      "p50_s": 1.633,
+      "p99_s": 3.2526,
+      "error_budget": 0.05,
+      "error_budget_burn_ratio": 0.0,
+      "error_budget_burn_pct": 0.0,
+      "checks": {
+        "availability": true,
+        "p99_s": false,
+        "error_rate": true
+      },
+      "status": "missed"
+    },
+    "series": [
+      {
+        "ts": "2026-11-23T19:32:15+0800",
+        "availability": 1.0,
+        "p99_s": 3.2526,
+        "error_rate": 0.0,
+        "burn_pct": 0.0
+      }
+    ]
+  }
+}

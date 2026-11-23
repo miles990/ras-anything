@@ -1,0 +1,22 @@
+
+===== 2026-11-23 19:24:51  claude -p --permission-mode acceptEdits --allowedTools 'Read,Edit,Write,Glob,Grep,Bash(ras-anything verify:*),Bash(ras-anything status:*)' --add-dir . --model opus
+I hardened `fetchRate`, and `ras-anything verify shipping.Carrier.fetchRate` prints **PASS** on the first run. I only edited `hardened.java`, and nothing is enabled.
+
+| gate | original | hardened |
+|---|---|---|
+| happy-path replay | – | 6/6 identical |
+| availability under faults | 31.7% | 100% |
+| silent wrong results | 0 | 0 |
+| hangs | 8 | 0 |
+| p99 latency (budget 5 s) | 60.00 s | 3.55 s |
+| duplicate side effects | 0 | 0 |
+| attempts per call with the dependency down | 1.00 | 0.60 |
+
+- **Retries:** one shared policy allows up to 4 attempts in 4.5 s, with 3.3 s per attempt. A slow 3 s answer fits in one attempt, and a hung one leaves about 1.2 s for a second. Other 4xx answers are never retried.
+- **Stalled bodies:** on Java 21, `HttpRequest.timeout` stops counting once the headers arrive, so a body that stalls could still hang. I used `sendAsync` with a bounded `get`, and it cancels the request when it gives up. Verify's fault matrix doesn't include a mid-body stall, so this part isn't tested.
+- **Cut-off or bad answers:** a truncated body is retried. A complete answer without a usable `service` and `cents` now throws an error instead of returning a partial rate, and is not retried.
+- **No fallback or cache:** callers book and bill at this rate, so a made-up or stale price would be worse than an error. Give-ups are logged by the policy and thrown as `RasIOException`, so code catching `IOException` still works and the cause is kept.
+
+The log-coverage row shows "—" for the hardened version: every fault trial recovered, so verify had no failure to check that logging on.
+
+===== exit 0 after 59s

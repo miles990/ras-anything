@@ -1,0 +1,35 @@
+{
+  "schema_version": "1.0.0",
+  "kind": "bench",
+  "generated_at": "2026-11-23T19:32:15+0800",
+  "project": "shipping-java",
+  "lang": "java",
+  "bench": {
+    "seeds": 20,
+    "rate": 0.1,
+    "original": {
+      "availability": 0.0,
+      "identical_rate": 0.0,
+      "crash_rate": 0.95,
+      "hang_rate": 0.05,
+      "wrong": 0,
+      "hang": 1,
+      "dups": 0,
+      "p50_s": 0.7685,
+      "p99_s": 2.6581,
+      "amplification": 1.0
+    },
+    "hardened": {
+      "availability": 1.0,
+      "identical_rate": 1.0,
+      "crash_rate": 0.0,
+      "hang_rate": 0.0,
+      "wrong": 0,
+      "hang": 0,
+      "dups": 0,
+      "p50_s": 1.633,
+      "p99_s": 3.2526,
+      "amplification": 1.2027777777777777
+    }
+  }
+}

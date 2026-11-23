@@ -85,7 +85,7 @@ def enable(fid: str | None = None, quiet: bool = False, canary: str | None = Non
     state["enabled"][fid] = entry
     folder.mkdir(exist_ok=True)
     write_file(copy_abs, hp.read_bytes())
-    write_file(rt_abs, adapter.runtime_file()[0].read_bytes())
+    write_file(rt_abs, adapter.runtime_bytes(meta))
     modules = adapter.runtime_modules()
     if modules:
         (folder / PATTERNS_DIR).mkdir(exist_ok=True)

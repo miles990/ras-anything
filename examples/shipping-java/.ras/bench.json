@@ -1,0 +1,784 @@
+{
+  "lang": "java",
+  "cmd": [
+    "java",
+    "-cp",
+    "out",
+    "shipping.Main"
+  ],
+  "display_cmd": "java -cp out shipping.Main",
+  "ids": [
+    "shipping.Carrier.fetchRate",
+    "shipping.Carrier.bookShipment",
+    "shipping.Labels.labelCode"
+  ],
+  "seeds": 20,
+  "rate": 0.1,
+  "outage_rate": 0.05,
+  "time_scale": 0.05,
+  "hang_cap_s": 2.0,
+  "degraded_markers": [],
+  "clean_outputs_equal": true,
+  "summary": {
+    "original": {
+      "runs": 20,
+      "correct": 0,
+      "degraded": 0,
+      "wrong": 0,
+      "crash": 19,
+      "hang": 1,
+      "availability": 0.0,
+      "crash_rate": 0.95,
+      "hang_rate": 0.05,
+      "wrong_rate": 0.0,
+      "p50_wall": 0.7685,
+      "p99_wall": 2.6581,
+      "identical_rate": 0.0,
+      "dups": 0,
+      "faults": 23,
+      "failures_by_place": {
+        "IOException in shipping.Labels.labelCode": 5,
+        "IOException in shipping.Carrier.fetchRate": 4,
+        "ConnectException in shipping.Carrier.fetchRate": 3,
+        "IOException in shipping.Json.object": 3,
+        "hang in shipping.Carrier.bookShipment": 1,
+        "IOException in shipping.Carrier.bookShipment": 2,
+        "ConnectException in shipping.Carrier.bookShipment": 2
+      },
+      "amplification": 1.0,
+      "outage_amplification": 1.0,
+      "outage_calls": 6,
+      "clean_per_call": 1.0,
+      "clean_wall": 1.2472
+    },
+    "hardened": {
+      "runs": 20,
+      "correct": 20,
+      "degraded": 0,
+      "wrong": 0,
+      "crash": 0,
+      "hang": 0,
+      "availability": 1.0,
+      "crash_rate": 0.0,
+      "hang_rate": 0.0,
+      "wrong_rate": 0.0,
+      "p50_wall": 1.633,
+      "p99_wall": 3.2526,
+      "identical_rate": 1.0,
+      "dups": 0,
+      "faults": 84,
+      "failures_by_place": {},
+      "amplification": 1.2027777777777777,
+      "outage_amplification": 3.0,
+      "outage_calls": 12,
+      "clean_per_call": 1.0,
+      "clean_wall": 1.22
+    }
+  },
+  "runs": {
+    "original": [
+      {
+        "seed": 1,
+        "outcome": "crash",
+        "exit": 1,
+        "wall_s": 1.1971,
+        "fallbacks": 0,
+        "faults": 1,
+        "attempts": 18,
+        "dups": 0,
+        "uncaught": {
+          "type": "IOException",
+          "msg": "label tool exited 75",
+          "hang": false,
+          "where": "shipping.Labels.labelCode"
+        }
+      },
+      {
+        "seed": 2,
+        "outcome": "crash",
+        "exit": 1,
+        "wall_s": 0.5648,
+        "fallbacks": 0,
+        "faults": 1,
+        "attempts": 1,
+        "dups": 0,
+        "uncaught": {
+          "type": "IOException",
+          "msg": "rates answered 429",
+          "hang": false,
+          "where": "shipping.Carrier.fetchRate"
+        }
+      },
+      {
+        "seed": 3,
+        "outcome": "crash",
+        "exit": 1,
+        "wall_s": 0.7685,
+        "fallbacks": 0,
+        "faults": 1,
+        "attempts": 7,
+        "dups": 0,
+        "uncaught": {
+          "type": "ConnectException",
+          "msg": "Connection refused",
+          "hang": false,
+          "where": "shipping.Carrier.fetchRate"
+        }
+      },
+      {
+        "seed": 4,
+        "outcome": "crash",
+        "exit": 1,
+        "wall_s": 0.562,
+        "fallbacks": 0,
+        "faults": 1,
+        "attempts": 1,
+        "dups": 0,
+        "uncaught": {
+          "type": "ConnectException",
+          "msg": "Connection refused",
+          "hang": false,
+          "where": "shipping.Carrier.fetchRate"
+        }
+      },
+      {
+        "seed": 5,
+        "outcome": "crash",
+        "exit": 1,
+        "wall_s": 0.645,
+        "fallbacks": 0,
+        "faults": 1,
+        "attempts": 1,
+        "dups": 0,
+        "uncaught": {
+          "type": "IOException",
+          "msg": "bad JSON: unterminated string",
+          "hang": false,
+          "where": "shipping.Json.object"
+        }
+      },
+      {
+        "seed": 6,
+        "outcome": "crash",
+        "exit": 1,
+        "wall_s": 0.5546,
+        "fallbacks": 0,
+        "faults": 1,
+        "attempts": 1,
+        "dups": 0,
+        "uncaught": {
+          "type": "IOException",
+          "msg": "rates answered 503",
+          "hang": false,
+          "where": "shipping.Carrier.fetchRate"
+        }
+      },
+      {
+        "seed": 7,
+        "outcome": "hang",
+        "exit": 70,
+        "wall_s": 2.6581,
+        "fallbacks": 0,
+        "faults": 1,
+        "attempts": 2,
+        "dups": 0,
+        "uncaught": {
+          "type": "ChaosHang",
+          "msg": "boundary call with no timeout hung (chaos)",
+          "hang": true,
+          "where": "shipping.Carrier.bookShipment"
+        }
+      },
+      {
+        "seed": 8,
+        "outcome": "crash",
+        "exit": 1,
+        "wall_s": 1.0499,
+        "fallbacks": 0,
+        "faults": 1,
+        "attempts": 14,
+        "dups": 0,
+        "uncaught": {
+          "type": "IOException",
+          "msg": "shipments answered 503",
+          "hang": false,
+          "where": "shipping.Carrier.bookShipment"
+        }
+      },
+      {
+        "seed": 9,
+        "outcome": "crash",
+        "exit": 1,
+        "wall_s": 1.0548,
+        "fallbacks": 0,
+        "faults": 1,
+        "attempts": 14,
+        "dups": 0,
+        "uncaught": {
+          "type": "ConnectException",
+          "msg": "Connection refused",
+          "hang": false,
+          "where": "shipping.Carrier.bookShipment"
+        }
+      },
+      {
+        "seed": 10,
+        "outcome": "crash",
+        "exit": 1,
+        "wall_s": 0.6209,
+        "fallbacks": 0,
+        "faults": 1,
+        "attempts": 1,
+        "dups": 0,
+        "uncaught": {
+          "type": "IOException",
+          "msg": "rates answered 429",
+          "hang": false,
+          "where": "shipping.Carrier.fetchRate"
+        }
+      },
+      {
+        "seed": 11,
+        "outcome": "crash",
+        "exit": 1,
+        "wall_s": 1.13,
+        "fallbacks": 0,
+        "faults": 2,
+        "attempts": 12,
+        "dups": 0,
+        "uncaught": {
+          "type": "IOException",
+          "msg": "Cannot run program \"sh\": error=11, Resource temporarily unavailable",
+          "hang": false,
+          "where": "shipping.Labels.labelCode"
+        }
+      },
+      {
+        "seed": 12,
+        "outcome": "crash",
+        "exit": 1,
+        "wall_s": 0.8009,
+        "fallbacks": 0,
+        "faults": 1,
+        "attempts": 6,
+        "dups": 0,
+        "uncaught": {
+          "type": "IOException",
+          "msg": "label tool exited 75",
+          "hang": false,
+          "where": "shipping.Labels.labelCode"
+        }
+      },
+      {
+        "seed": 13,
+        "outcome": "crash",
+        "exit": 1,
+        "wall_s": 0.6563,
+        "fallbacks": 0,
+        "faults": 1,
+        "attempts": 1,
+        "dups": 0,
+        "uncaught": {
+          "type": "IOException",
+          "msg": "bad JSON: unterminated string",
+          "hang": false,
+          "where": "shipping.Json.object"
+        }
+      },
+      {
+        "seed": 14,
+        "outcome": "crash",
+        "exit": 1,
+        "wall_s": 1.0167,
+        "fallbacks": 0,
+        "faults": 1,
+        "attempts": 13,
+        "dups": 0,
+        "uncaught": {
+          "type": "IOException",
+          "msg": "rates answered 503",
+          "hang": false,
+          "where": "shipping.Carrier.fetchRate"
+        }
+      },
+      {
+        "seed": 15,
+        "outcome": "crash",
+        "exit": 1,
+        "wall_s": 1.0931,
+        "fallbacks": 0,
+        "faults": 2,
+        "attempts": 12,
+        "dups": 0,
+        "uncaught": {
+          "type": "IOException",
+          "msg": "label tool exited 75",
+          "hang": false,
+          "where": "shipping.Labels.labelCode"
+        }
+      },
+      {
+        "seed": 16,
+        "outcome": "crash",
+        "exit": 1,
+        "wall_s": 1.1428,
+        "fallbacks": 0,
+        "faults": 2,
+        "attempts": 14,
+        "dups": 0,
+        "uncaught": {
+          "type": "IOException",
+          "msg": "shipments answered 429",
+          "hang": false,
+          "where": "shipping.Carrier.bookShipment"
+        }
+      },
+      {
+        "seed": 17,
+        "outcome": "crash",
+        "exit": 1,
+        "wall_s": 0.6199,
+        "fallbacks": 0,
+        "faults": 1,
+        "attempts": 1,
+        "dups": 0,
+        "uncaught": {
+          "type": "IOException",
+          "msg": "bad JSON: unterminated string",
+          "hang": false,
+          "where": "shipping.Json.object"
+        }
+      },
+      {
+        "seed": 18,
+        "outcome": "crash",
+        "exit": 1,
+        "wall_s": 0.6263,
+        "fallbacks": 0,
+        "faults": 1,
+        "attempts": 2,
+        "dups": 0,
+        "uncaught": {
+          "type": "ConnectException",
+          "msg": "Connection refused",
+          "hang": false,
+          "where": "shipping.Carrier.bookShipment"
+        }
+      },
+      {
+        "seed": 19,
+        "outcome": "crash",
+        "exit": 1,
+        "wall_s": 0.7646,
+        "fallbacks": 0,
+        "faults": 1,
+        "attempts": 6,
+        "dups": 0,
+        "uncaught": {
+          "type": "IOException",
+          "msg": "Cannot run program \"sh\": error=11, Resource temporarily unavailable",
+          "hang": false,
+          "where": "shipping.Labels.labelCode"
+        }
+      },
+      {
+        "seed": 20,
+        "outcome": "crash",
+        "exit": 1,
+        "wall_s": 0.5543,
+        "fallbacks": 0,
+        "faults": 1,
+        "attempts": 1,
+        "dups": 0,
+        "uncaught": {
+          "type": "ConnectException",
+          "msg": "Connection refused",
+          "hang": false,
+          "where": "shipping.Carrier.fetchRate"
+        }
+      }
+    ],
+    "hardened": [
+      {
+        "seed": 1,
+        "outcome": "correct",
+        "exit": 0,
+        "wall_s": 1.293,
+        "fallbacks": 0,
+        "faults": 1,
+        "attempts": 19,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 2,
+        "outcome": "correct",
+        "exit": 0,
+        "wall_s": 2.7387,
+        "fallbacks": 0,
+        "faults": 9,
+        "attempts": 27,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 3,
+        "outcome": "correct",
+        "exit": 0,
+        "wall_s": 1.6261,
+        "fallbacks": 0,
+        "faults": 4,
+        "attempts": 22,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 4,
+        "outcome": "correct",
+        "exit": 0,
+        "wall_s": 1.3892,
+        "fallbacks": 0,
+        "faults": 3,
+        "attempts": 20,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 5,
+        "outcome": "correct",
+        "exit": 0,
+        "wall_s": 1.3708,
+        "fallbacks": 0,
+        "faults": 2,
+        "attempts": 19,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 6,
+        "outcome": "correct",
+        "exit": 0,
+        "wall_s": 2.8359,
+        "fallbacks": 0,
+        "faults": 8,
+        "attempts": 25,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 7,
+        "outcome": "correct",
+        "exit": 0,
+        "wall_s": 1.4936,
+        "fallbacks": 0,
+        "faults": 2,
+        "attempts": 20,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 8,
+        "outcome": "correct",
+        "exit": 0,
+        "wall_s": 1.2048,
+        "fallbacks": 0,
+        "faults": 1,
+        "attempts": 19,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 9,
+        "outcome": "correct",
+        "exit": 0,
+        "wall_s": 1.7982,
+        "fallbacks": 0,
+        "faults": 5,
+        "attempts": 22,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 10,
+        "outcome": "correct",
+        "exit": 0,
+        "wall_s": 3.2526,
+        "fallbacks": 0,
+        "faults": 4,
+        "attempts": 22,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 11,
+        "outcome": "correct",
+        "exit": 0,
+        "wall_s": 1.8775,
+        "fallbacks": 0,
+        "faults": 7,
+        "attempts": 24,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 12,
+        "outcome": "correct",
+        "exit": 0,
+        "wall_s": 1.4679,
+        "fallbacks": 0,
+        "faults": 3,
+        "attempts": 21,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 13,
+        "outcome": "correct",
+        "exit": 0,
+        "wall_s": 1.633,
+        "fallbacks": 0,
+        "faults": 7,
+        "attempts": 25,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 14,
+        "outcome": "correct",
+        "exit": 0,
+        "wall_s": 1.2673,
+        "fallbacks": 0,
+        "faults": 2,
+        "attempts": 20,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 15,
+        "outcome": "correct",
+        "exit": 0,
+        "wall_s": 1.4479,
+        "fallbacks": 0,
+        "faults": 3,
+        "attempts": 19,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 16,
+        "outcome": "correct",
+        "exit": 0,
+        "wall_s": 3.2407,
+        "fallbacks": 0,
+        "faults": 3,
+        "attempts": 20,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 17,
+        "outcome": "correct",
+        "exit": 0,
+        "wall_s": 1.7615,
+        "fallbacks": 0,
+        "faults": 6,
+        "attempts": 22,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 18,
+        "outcome": "correct",
+        "exit": 0,
+        "wall_s": 2.8098,
+        "fallbacks": 0,
+        "faults": 7,
+        "attempts": 24,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 19,
+        "outcome": "correct",
+        "exit": 0,
+        "wall_s": 1.7194,
+        "fallbacks": 0,
+        "faults": 4,
+        "attempts": 22,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 20,
+        "outcome": "correct",
+        "exit": 0,
+        "wall_s": 1.5794,
+        "fallbacks": 0,
+        "faults": 3,
+        "attempts": 21,
+        "dups": 0,
+        "uncaught": null
+      }
+    ]
+  },
+  "functions": {
+    "original": {
+      "shipping.Carrier.bookShipment": {
+        "calls": 40,
+        "ok": 36,
+        "fallback": 0,
+        "raised": 4,
+        "attempts": 40,
+        "outage_calls": 2,
+        "outage_attempts": 2,
+        "p99": 0.155864201
+      },
+      "shipping.Carrier.fetchRate": {
+        "calls": 51,
+        "ok": 41,
+        "fallback": 0,
+        "raised": 10,
+        "attempts": 51,
+        "outage_calls": 2,
+        "outage_attempts": 2,
+        "p99": 0.094020383
+      },
+      "shipping.Labels.labelCode": {
+        "calls": 36,
+        "ok": 31,
+        "fallback": 0,
+        "raised": 5,
+        "attempts": 36,
+        "outage_calls": 2,
+        "outage_attempts": 2,
+        "p99": 0.158746186
+      }
+    },
+    "hardened": {
+      "shipping.Carrier.bookShipment": {
+        "calls": 120,
+        "ok": 120,
+        "fallback": 0,
+        "raised": 0,
+        "attempts": 140,
+        "outage_calls": 4,
+        "outage_attempts": 12,
+        "p99": 1.010130755
+      },
+      "shipping.Carrier.fetchRate": {
+        "calls": 120,
+        "ok": 120,
+        "fallback": 0,
+        "raised": 0,
+        "attempts": 144,
+        "outage_calls": 3,
+        "outage_attempts": 9,
+        "p99": 1.135532709
+      },
+      "shipping.Labels.labelCode": {
+        "calls": 120,
+        "ok": 120,
+        "fallback": 0,
+        "raised": 0,
+        "attempts": 149,
+        "outage_calls": 5,
+        "outage_attempts": 15,
+        "p99": 0.436451028
+      }
+    }
+  },
+  "first_wrong": null,
+  "serviceability": {
+    "original": {
+      "cases": 20,
+      "detected": 19,
+      "detection_rate": 0.95,
+      "lines_to_diagnosis_p50": 1,
+      "ttd_ms_p50": null
+    },
+    "hardened": {
+      "cases": 20,
+      "detected": 20,
+      "detection_rate": 1.0,
+      "lines_to_diagnosis_p50": 1,
+      "ttd_ms_p50": null
+    }
+  },
+  "leaks": [],
+  "host": {
+    "machine": "x86_64",
+    "system": "Linux",
+    "release": "6.12.113+",
+    "python": "3.13.5",
+    "runtime": "Java 21.0.13.1",
+    "cpus": 8,
+    "node": null
+  },
+  "fault_model": {
+    "timeout": "no answer: caller's timeout fires; with no timeout it hangs (POST/PUT still reach the server)",
+    "refused": "connection refused",
+    "http5xx": "HTTP 503 (subprocess: exit 75 EX_TEMPFAIL)",
+    "http429": "HTTP 429 with Retry-After: 1",
+    "slow": "+3 s latency, then the correct answer",
+    "truncated": "body (or stdout) cut in half"
+  },
+  "created": "2026-11-23T19:32:15+0800",
+  "slo": {
+    "schema_version": "1.0.0",
+    "kind": "slo",
+    "source": "bench",
+    "targets": {
+      "availability": 0.95,
+      "p99_s": 3.0,
+      "error_rate": 0.05
+    },
+    "original": {
+      "availability": 0.0,
+      "error_rate": 1.0,
+      "p50_s": 0.7685,
+      "p99_s": 2.6581,
+      "error_budget": 0.05,
+      "error_budget_burn_ratio": 20.0,
+      "error_budget_burn_pct": 2000.0,
+      "checks": {
+        "availability": false,
+        "p99_s": true,
+        "error_rate": false
+      },
+      "status": "missed"
+    },
+    "hardened": {
+      "availability": 1.0,
+      "error_rate": 0.0,
+      "p50_s": 1.633,
+      "p99_s": 3.2526,
+      "error_budget": 0.05,
+      "error_budget_burn_ratio": 0.0,
+      "error_budget_burn_pct": 0.0,
+      "checks": {
+        "availability": true,
+        "p99_s": false,
+        "error_rate": true
+      },
+      "status": "missed"
+    },
+    "serviceability": {
+      "original": {
+        "cases": 20,
+        "detected": 19,
+        "detection_rate": 0.95,
+        "lines_to_diagnosis_p50": 1,
+        "ttd_ms_p50": null
+      },
+      "hardened": {
+        "cases": 20,
+        "detected": 20,
+        "detection_rate": 1.0,
+        "lines_to_diagnosis_p50": 1,
+        "ttd_ms_p50": null
+      }
+    },
+    "ax": null,
+    "created": "2026-11-23T19:32:15+0800"
+  }
+}

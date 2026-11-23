@@ -1,0 +1,41 @@
+{
+  "id": "shipping.Labels.labelCode",
+  "lang": "java",
+  "module": "shipping.Labels",
+  "qualname": "labelCode",
+  "name": "labelCode",
+  "kind": "static method",
+  "file": "src/shipping/Labels.java",
+  "first_line": 10,
+  "in_main": false,
+  "cmd": [
+    "java",
+    "-cp",
+    "out",
+    "shipping.Main"
+  ],
+  "display_cmd": "java -cp out shipping.Main",
+  "cwd": ".",
+  "env": {},
+  "globals": {},
+  "owner": "shipping.Labels",
+  "binary": "shipping.Labels",
+  "params": [
+    {
+      "name": "tracking",
+      "type": "String"
+    }
+  ],
+  "returns": "String",
+  "throws": [
+    "IOException",
+    "InterruptedException"
+  ],
+  "package": "shipping",
+  "budget_s": 5.0,
+  "recorded": 6,
+  "seen": 6,
+  "skipped": 0,
+  "recorded_at": "2026-11-23T19:26:36+0800",
+  "runtime": "Java 21.0.13.1"
+}

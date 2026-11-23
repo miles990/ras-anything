@@ -30,6 +30,7 @@ file is the contract: a new language implements the adapter interface and the ag
 | `lang/__init__.py` | adapter registry: `detect(cmd)`, `by_name(name)` |
 | `lang/base.py` | the `LangAdapter` interface |
 | `lang/python.py`, `lang/python_static.py` | the Python adapter; its AST signals |
+| `lang/java.py`, `lang/java_static.py`, `lang/java_verify.py`, `lang/java_agent/` | the Java adapter; its command lines and builds; its replay worker; agent, source tool and `RasRt` runtime in Java (see [Java](#java)) |
 | `agents/python/` | the Python agent: `_inject/sitecustomize.py` (loads it), `agent.py` (modes), `boundary.py` (interception), `values.py` (JSON ⇄ Python values), `worker.py` (replay) |
 | `runtime.py` | the core of what hardened Python code may import (errors, log, clock, deadlines); vendored next to it by `enable` |
 | `patterns/` | the resilience patterns as plugins: registry and contract (`__init__.py`), composition (`policy.py`), one module per pattern; vendored with the runtime. Reached through `runtime` (lazy names) |
@@ -60,7 +61,7 @@ Attributes: `name` (stored in scan/meta/cassette), `label`, `launchers`, `exampl
 | `refuse_hardened` (path) | reason not to run this hardened file (it imports the harness), or `None` |
 | `worker_cmd` (exe, job) | argv + env of the replay worker |
 | `markers` / `block` / `insertion` | the marked block and where it goes in the module |
-| `copy_name` / `runtime_file` / `runtime_modules` | names of the hardened copy, the vendored runtime and its pattern modules (`_ras_hardened/patterns/`) |
+| `copy_name` / `runtime_file` / `runtime_modules` | names of the hardened copy, the vendored runtime and its pattern modules (`_ras_hardened/patterns/`); `runtime_bytes(meta)` (optional) is the vendored runtime's contents for one module |
 | `doctor` / `runtime_label` | optional: checks; "Python 3.13.5" for reports |
 
 To add a language: `lang/<name>.py` + agent files, an entry in `lang.ADAPTERS`, package data in
@@ -293,3 +294,36 @@ and in bench per call of the enabled functions (and per call that met an outage 
 symlink: the module (one marked block), `_ras_hardened/<copy>`, `_ras_hardened/<runtime>` and
 `_ras_hardened/patterns/`. `disable`
 validates every entry of `state.json` before it changes anything.
+
+## Java
+
+Strategy (a), in process, by a source overlay like Go's. `lang/java_agent/tool/RasTool.java` runs the JDK's own compiler
+(`com.sun.source`): it attributes the program that the entry file reaches, so calls are found **by type, not by name**, rewrites a
+*copy*, and compiles it (once per content, in a private cache in the temp folder, before a run is timed). The app then runs from those
+classes, ahead of its own class path. User files are only touched by `enable`.
+
+| in the copy | becomes |
+|---|---|
+| `HttpClient.newHttpClient()`, `HttpClient.Builder.build()` | the client wrapped by `WatchedHttpClient` (so libraries that get it are watched too) |
+| `URL.openConnection/openStream`, `ProcessBuilder.start`, `Runtime.exec` | `WatchedConnection`, `WatchedProcess` |
+| `Thread.sleep`, `TimeUnit.sleep`, `System.nanoTime/currentTimeMillis`, `Instant.now`, `Future.get`, `CompletableFuture.get/join/orTimeout/completeOnTimeout`, `Math.random`, `ThreadLocalRandom.current().x()`, `new Random()`, `System.exit` | the agent's: virtual time and seeded randomness in verify, the real thing elsewhere |
+| every project method | first counts the call; the recorded or benched one also gets a wrapper of the same signature |
+
+Attribution: `StackWalker`, innermost frame whose file and line lie in a project method; lambdas and anonymous classes count as the method
+around them. `Codec` decodes by declared type (the method's signature, a record's components): nothing a file names is loaded.
+Java's own cassette tag: `$long` (an integer beyond 32 bits). `meta.globals` holds the non-final static fields of the function's file.
+
+Verify: `java_verify.py` builds the module exactly as `enable` would leave it, so what is verified is what is swapped in. Each trial runs in a
+thread of its own. A wait of the trial thread moves the virtual clock at once. When helper threads are involved (executors, readers), time
+moves once every thread of the app waits; if nothing is left to happen, the call hangs.
+
+`enable`: the original becomes `_ras_orig_<name>`; the block at the end of its class holds the body of `class Hardened` as the nested class
+`_Ras_<name>` (private members stay reachable; names from imports the module lacks are spelled out, so no import is added) and a method
+with the old name and signature. `RasRt.java` is vendored in `<package>._ras_hardened`; for `java App.java` it is embedded in the block,
+since Java compiles that one file only.
+
+Limits: a static method per swap (no instance, overloaded or generic methods); plain-data arguments and results; sources that compile without
+annotation processors; code in jars or reached only by reflection isn't watched; bodies are read whole; `HttpClient` subclasses, WebSockets,
+raw sockets and `ProcessBuilder.startPipeline` aren't intercepted; a method reference such as `pb::start` isn't rewritten; `Object.wait`,
+locks and `BlockingQueue.poll` with a timeout run on real time; standard input isn't part of a process's key. When `main` ends in an uncaught
+exception the watched run ends (exit 1), even if non-daemon threads would have kept the JVM alive: such a run counts as a crash.

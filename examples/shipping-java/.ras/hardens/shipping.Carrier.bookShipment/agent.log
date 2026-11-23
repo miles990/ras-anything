@@ -1,0 +1,27 @@
+
+===== 2026-11-23 19:25:52  claude -p --permission-mode acceptEdits --allowedTools 'Read,Edit,Write,Glob,Grep,Bash(ras-anything verify:*),Bash(ras-anything status:*)' --add-dir . --model opus
+`ras-anything verify shipping.Carrier.bookShipment` prints **PASS**. I edited only `hardened.java` and enabled nothing.
+
+| gate | original | hardened |
+|---|---|---|
+| happy-path replay | – | 6/6 identical |
+| availability under faults | 38.3% | 100% |
+| silent wrong results | 0 | 0 |
+| hangs | 6 | 0 |
+| p99 latency (budget 5 s) | 60 s | 3.43 s |
+| duplicate side effects | 0 | 0 |
+| attempts per call, under faults | 1.00 | 1.82 |
+| attempts per call, dependency down | 1.00 | 0.60 (breaker fails fast) |
+
+What changed:
+- **Timeouts and retries:** A `carrier-shipments` policy allows 4.5 s overall, 3.3 s per attempt and up to 4 attempts, retrying transient errors only. The response body wait is bounded too, because `HttpRequest.timeout` stops at the headers.
+- **Idempotency:** Every attempt sends the same key, derived from order, zip and service, so a timed-out booking is safe to resend. A later rerun with the same inputs reuses the key.
+- **Cut-off bodies:** Strict JSON parsing catches truncated answers, and they are retried.
+- **Missing tracking number:** A complete answer with no tracking number is now an error. The original passed `null` on to the label step.
+- **Giving up:** There is no fallback, because a booking without a real tracking number would be false. The failure is logged and thrown as `RasIOException` with its cause, so callers that catch `IOException` still work.
+
+Two limits on the idempotency:
+- **Carrier support:** Duplicate protection depends on the real carrier honouring `Idempotency-Key`. The local `FakeCarrier` does, but confirm it for production.
+- **Changed inputs:** If a rerun picks a different zip or service for the same order, it counts as a new booking and may be charged again. I preferred that to silently getting back an older shipment with the wrong details.
+
+===== exit 0 after 41s

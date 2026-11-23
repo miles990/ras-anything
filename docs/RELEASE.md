@@ -9,7 +9,7 @@ Current in-tree version: `0.1.0` (see `pyproject.toml` and `ras_anything/__versi
 The first public tag contemplated by this runbook is **v0.2.0**.
 
 The Node agent ships **inside the Python wheel** as package data (`ras_anything/lang/node_agent/`,
-plus the Go agent under `ras_anything/lang/go_agent/`). A separate npm package is **not required**
+plus the Go agent under `ras_anything/lang/go_agent/` and the Java agent under `ras_anything/lang/java_agent/`). A separate npm package is **not required**
 and must not be published unless a later, explicit decision says otherwise.
 
 ## 0. Preconditions (run these; they do not publish anything)
@@ -39,8 +39,8 @@ python3 -m venv /tmp/ras-rel-venv
 ```
 
 `twine check` must report `PASSED` for every artifact. Confirm the wheel contains
-`ras_anything/lang/node_agent/*.cjs` and `ras_anything/lang/go_agent/*/*.go`
-(`unzip -l dist/ras_anything-*.whl | grep -E 'node_agent|go_agent'`).
+`ras_anything/lang/node_agent/*.cjs`, `ras_anything/lang/go_agent/*/*.go` and `ras_anything/lang/java_agent/*/*.java`
+(`unzip -l dist/ras_anything-*.whl | grep -E 'node_agent|go_agent|java_agent'`).
 
 You may delete `dist/` and `build/` afterwards. **Stop here** unless Alex has approved
 the next section.

@@ -16,7 +16,7 @@ ALL_LANGUAGES = (
     ("python", "complete", "urllib / requests / httpx / aiohttp / socket / subprocess", True, True),
     ("node", "complete", "fetch / http / https / child_process (CJS + ESM + TS)", True, True),
     ("go", "complete", "net/http / os/exec: AST + rasagent + rasruntime", True, True),
-    ("java", "planned", "HttpClient / HttpURLConnection / ProcessBuilder", False, False),
+    ("java", "complete", "HttpClient / HttpURLConnection / ProcessBuilder: javac + java_agent + RasRt", True, True),
     ("csharp", "planned", "HttpClient / Process", False, False),
     ("php", "planned", "curl / file_get_contents / proc_open", False, False),
     ("ruby", "planned", "Net::HTTP / Open3", False, False),

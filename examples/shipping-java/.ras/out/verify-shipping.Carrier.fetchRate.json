@@ -1,0 +1,57 @@
+{
+  "schema_version": "1.0.0",
+  "kind": "verify",
+  "generated_at": "2026-11-23T19:32:15+0800",
+  "project": "shipping-java",
+  "lang": "java",
+  "functions": [
+    {
+      "id": "shipping.Carrier.fetchRate",
+      "lang": "java",
+      "passed": true,
+      "budget_s": 5.0,
+      "happy": {
+        "equal": 6,
+        "total": 6
+      },
+      "original": {
+        "availability": 0.31666666666666665,
+        "identical_rate": null,
+        "crash_rate": null,
+        "hang_rate": null,
+        "wrong": 0,
+        "hang": 8,
+        "dups": 0,
+        "p50_s": 0.0437,
+        "p99_s": 60.0,
+        "amplification": 1.0
+      },
+      "hardened": {
+        "availability": 1.0,
+        "identical_rate": null,
+        "crash_rate": null,
+        "hang_rate": null,
+        "wrong": 0,
+        "hang": 0,
+        "dups": 0,
+        "p50_s": 0.1714,
+        "p99_s": 3.5542,
+        "amplification": 1.95
+      },
+      "gates": {
+        "happy": true,
+        "no_wrong": true,
+        "no_hang": true,
+        "no_new_crashes": true,
+        "p99": true,
+        "dups": true,
+        "availability": true
+      }
+    }
+  ],
+  "serviceability": {
+    "orig_detection_rate": 0.0,
+    "hard_detection_rate": 0.8723404255319149,
+    "hard_diagnosis_accuracy": 0.5957446808510638
+  }
+}

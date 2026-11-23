@@ -151,6 +151,10 @@ class LangAdapter(ABC):
     def runtime_file(self) -> tuple[Path, str]:
         """(runtime helpers to vendor next to the copy, file name there)."""
 
+    def runtime_bytes(self, meta: dict) -> bytes:
+        """The contents of the vendored runtime for one function's module."""
+        return self.runtime_file()[0].read_bytes()
+
     def runtime_modules(self) -> list[tuple[Path, str]]:
         """(file, name in the folder `patterns` next to the vendored runtime): the pattern modules it loads."""
         return []

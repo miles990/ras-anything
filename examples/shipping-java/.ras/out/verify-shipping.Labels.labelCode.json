@@ -1,0 +1,57 @@
+{
+  "schema_version": "1.0.0",
+  "kind": "verify",
+  "generated_at": "2026-11-23T19:32:15+0800",
+  "project": "shipping-java",
+  "lang": "java",
+  "functions": [
+    {
+      "id": "shipping.Labels.labelCode",
+      "lang": "java",
+      "passed": true,
+      "budget_s": 5.0,
+      "happy": {
+        "equal": 6,
+        "total": 6
+      },
+      "original": {
+        "availability": 0.35,
+        "identical_rate": null,
+        "crash_rate": null,
+        "hang_rate": null,
+        "wrong": 7,
+        "hang": 7,
+        "dups": 0,
+        "p50_s": 0.0035,
+        "p99_s": 60.0,
+        "amplification": 1.0
+      },
+      "hardened": {
+        "availability": 0.9833333333333333,
+        "identical_rate": null,
+        "crash_rate": null,
+        "hang_rate": null,
+        "wrong": 0,
+        "hang": 0,
+        "dups": 0,
+        "p50_s": 0.0626,
+        "p99_s": 3.7745,
+        "amplification": 1.9166666666666667
+      },
+      "gates": {
+        "happy": true,
+        "no_wrong": true,
+        "no_hang": true,
+        "no_new_crashes": true,
+        "p99": true,
+        "dups": true,
+        "availability": true
+      }
+    }
+  ],
+  "serviceability": {
+    "orig_detection_rate": 0.0,
+    "hard_detection_rate": 0.8666666666666667,
+    "hard_diagnosis_accuracy": 0.5777777777777777
+  }
+}

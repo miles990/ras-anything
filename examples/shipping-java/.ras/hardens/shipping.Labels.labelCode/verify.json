@@ -1,0 +1,288 @@
+{
+  "id": "shipping.Labels.labelCode",
+  "lang": "java",
+  "budget_s": 5.0,
+  "recorded": 6,
+  "happy": {
+    "total": 6,
+    "equal": 6,
+    "original_nondeterministic": 0,
+    "first_failure": null
+  },
+  "chaos": {
+    "calls": 6,
+    "scenarios": [
+      "timeout",
+      "refused",
+      "http5xx",
+      "http429",
+      "slow",
+      "truncated",
+      "outage",
+      "mixed:1",
+      "mixed:2",
+      "mixed:3"
+    ],
+    "by_scenario": {
+      "timeout": {
+        "original": {
+          "hang": 6
+        },
+        "hardened": {
+          "ok": 6
+        },
+        "n": 6
+      },
+      "refused": {
+        "original": {
+          "error": 6
+        },
+        "hardened": {
+          "ok": 6
+        },
+        "n": 6
+      },
+      "http5xx": {
+        "original": {
+          "error": 6
+        },
+        "hardened": {
+          "ok": 6
+        },
+        "n": 6
+      },
+      "http429": {
+        "original": {
+          "error": 6
+        },
+        "hardened": {
+          "ok": 6
+        },
+        "n": 6
+      },
+      "slow": {
+        "original": {
+          "ok": 6
+        },
+        "hardened": {
+          "ok": 6
+        },
+        "n": 6
+      },
+      "truncated": {
+        "original": {
+          "wrong": 6
+        },
+        "hardened": {
+          "ok": 6
+        },
+        "n": 6
+      },
+      "outage": {
+        "original": {
+          "error": 6
+        },
+        "hardened": {
+          "ok": 6
+        },
+        "n": 6
+      },
+      "mixed": {
+        "original": {
+          "ok": 15,
+          "hang": 1,
+          "wrong": 1,
+          "error": 1
+        },
+        "hardened": {
+          "ok": 17,
+          "error": 1
+        },
+        "n": 18
+      }
+    },
+    "first_failure": null,
+    "first_original_dup": null,
+    "new_crashes": []
+  },
+  "original": {
+    "trials": 60,
+    "ok": 21,
+    "degraded": 0,
+    "wrong": 7,
+    "error": 25,
+    "hang": 7,
+    "miss": 0,
+    "attempts": 60,
+    "amplification": 1.0,
+    "availability": 0.35,
+    "p50": 0.0035,
+    "p99": 60.0,
+    "max": 60.0,
+    "dups": 0,
+    "logged_failures": 0.0,
+    "structured_errors": 0.0
+  },
+  "hardened": {
+    "trials": 60,
+    "ok": 59,
+    "degraded": 0,
+    "wrong": 0,
+    "error": 1,
+    "hang": 0,
+    "miss": 0,
+    "attempts": 115,
+    "amplification": 1.9166666666666667,
+    "availability": 0.9833333333333333,
+    "p50": 0.0626,
+    "p99": 3.7745,
+    "max": 3.7745,
+    "dups": 0,
+    "logged_failures": 1.0,
+    "structured_errors": 1.0
+  },
+  "outage": {
+    "healthy": {
+      "calls": 10,
+      "gap_s": 0.5
+    },
+    "down": {
+      "calls": 40,
+      "gap_s": 0.5
+    },
+    "recovered": {
+      "calls": 90,
+      "gap_s": 1.0
+    },
+    "original": {
+      "calls": 40,
+      "attempts": 40,
+      "ok": 0,
+      "degraded": 0,
+      "wrong": 0,
+      "error": 40,
+      "hang": 0,
+      "miss": 0,
+      "amplification": 1.0,
+      "healthy_per_call": 1.0,
+      "max_latency": 0.0,
+      "recovered_after_s": 0.0,
+      "dups": 0
+    },
+    "hardened": {
+      "calls": 40,
+      "attempts": 24,
+      "ok": 0,
+      "degraded": 0,
+      "wrong": 0,
+      "error": 40,
+      "hang": 0,
+      "miss": 0,
+      "amplification": 0.6,
+      "healthy_per_call": 1.0,
+      "max_latency": 0.125,
+      "recovered_after_s": 0.0,
+      "dups": 0
+    }
+  },
+  "serviceability": {
+    "original": {
+      "runs": 45,
+      "detection_rate": 0.0,
+      "diagnosis_accuracy": 0.0,
+      "ttd_ms_p50": null,
+      "lines_to_diagnosis_p50": null,
+      "restore_s": null
+    },
+    "hardened": {
+      "runs": 45,
+      "detection_rate": 0.8666666666666667,
+      "diagnosis_accuracy": 0.5777777777777777,
+      "ttd_ms_p50": null,
+      "lines_to_diagnosis_p50": 1,
+      "restore_s": null
+    }
+  },
+  "ax": {
+    "observed": {
+      "original": {
+        "cases": 32,
+        "original": {
+          "cases": 32,
+          "accuracy": 0.0,
+          "mean_tokens": 1.0,
+          "mean_steps": 3.0,
+          "leaks": 0
+        },
+        "hardened": {
+          "cases": 32,
+          "accuracy": 0.0,
+          "mean_tokens": 1.0,
+          "mean_steps": 3.0,
+          "leaks": 0
+        }
+      },
+      "hardened": {
+        "cases": 1,
+        "original": {
+          "cases": 1,
+          "accuracy": 0.0,
+          "mean_tokens": 1.0,
+          "mean_steps": 3.0,
+          "leaks": 0
+        },
+        "hardened": {
+          "cases": 1,
+          "accuracy": 0.0,
+          "mean_tokens": 1.0,
+          "mean_steps": 3.0,
+          "leaks": 0
+        }
+      }
+    },
+    "catalog": {
+      "cases": 10,
+      "original": {
+        "cases": 10,
+        "accuracy": 0.3,
+        "mean_tokens": 42.2,
+        "mean_steps": 2.9,
+        "leaks": 40
+      },
+      "hardened": {
+        "cases": 10,
+        "accuracy": 1.0,
+        "mean_tokens": 105.8,
+        "mean_steps": 1.0,
+        "leaks": 0
+      }
+    },
+    "leaks": []
+  },
+  "ai": null,
+  "gates": {
+    "happy": true,
+    "no_wrong": true,
+    "no_hang": true,
+    "no_new_crashes": true,
+    "p99": true,
+    "dups": true,
+    "availability": true
+  },
+  "passed": true,
+  "fallback": null,
+  "elapsed_s": 2.59,
+  "hardened_sha256": "6df5eae18951c4dcbe190cf223b7e984ceb661231c6fedd1cedd7429f540d02b",
+  "verified_at": "2026-11-23T19:29:36+0800",
+  "wall_s": 2.8,
+  "fault_model": {
+    "timeout": "no answer: caller's timeout fires; with no timeout it hangs (POST/PUT still reach the server)",
+    "refused": "connection refused",
+    "http5xx": "HTTP 503 (subprocess: exit 75 EX_TEMPFAIL)",
+    "http429": "HTTP 429 with Retry-After: 1",
+    "slow": "+3 s latency, then the correct answer",
+    "truncated": "body (or stdout) cut in half",
+    "outage": "dependency down (refused) for 3 consecutive attempts, then recovers",
+    "mixed": "seeded mix: each attempt faults with p=0.3, kind drawn uniformly"
+  }
+}
