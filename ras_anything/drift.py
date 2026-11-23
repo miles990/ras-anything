@@ -160,8 +160,8 @@ def drift(model: str, eval_ref: str | None = None, provider_url: str | None = No
         b_ok = bool(c.get("baseline_ok", True))
         in_tok = int(c.get("input_tokens") or 40)
         out_tok = int(c.get("output_tokens") or 20)
-        b_cost = float(c.get("baseline_cost_usd") if c.get("baseline_cost_usd") is not None
-                       else ai.estimate_cost(str(c.get("model") or base_model), in_tok, out_tok, config))
+        raw_cost = c.get("baseline_cost_usd")
+        b_cost = float(raw_cost) if raw_cost is not None else float(ai.estimate_cost(str(c.get("model") or base_model), in_tok, out_tok, config))
         base_ok += int(b_ok)
         base_cost += b_cost
 

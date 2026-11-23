@@ -379,7 +379,7 @@ def sync_out(project: Path) -> dict[str, Path]:
             written["patterns"] = emit_run(project, "patterns", {"patterns": pat_rows})
 
     # Aggregated report & status
-    ax_summary = None
+    ax_summary: dict | None = None
     if ax_records:
         cat = ax_records[-1].get("catalog") or {}
         ax_summary = {

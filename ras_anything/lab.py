@@ -256,7 +256,9 @@ def simulate(adapter, specs: list[tuple[str, str, int]], vs: dict) -> list[dict]
 
 def lab_scenario(adapter, name: str) -> dict:
     sc = SCENARIOS[name]
-    return {**sc, "params": {d: adapter.lab_params(p) for d, p in sc.get("params", {}).items()}}
+    raw = sc.get("params")
+    params: dict = raw if isinstance(raw, dict) else {}
+    return {**sc, "params": {d: adapter.lab_params(p) for d, p in params.items()}}
 
 
 
@@ -276,7 +278,7 @@ def judge_patterns(runs: dict) -> dict:
 # ------------------------------------------------------------------------------------------ example apps
 
 EXAMPLES = (("weather", "weather.fetch_forecast"), ("payments", "billing.charge"), ("orders-node", "orders.getItem"), ("orders-node", "orders.charge"))
-EXAMPLE_STACK = {**{k: bool(v) for k, v in STACK.items()}, "fallback": True}
+EXAMPLE_STACK: dict = {**{k: bool(v) for k, v in STACK.items()}, "fallback": True}
 EXAMPLE_METRICS = ("availability", "p99", "dups", "amplification", "outage_amplification", "outage_answered", "recovered_after_s", "wrong", "hang")
 
 
@@ -357,7 +359,7 @@ def run(seeds: int = 20, out: Path | None = None, examples_root: Path | None = N
                                                                               for b in ("bare", "stack")} for s in SCENARIOS}}
         if not quiet:
             print("  %s %s runtime measured %s" % (ui.good(ui.OK), adapter.label, ui.dim("%.0fs" % (time.perf_counter() - t0))), flush=True)
-    verdicts = {n: max((x["patterns"][n]["verdict"] for x in langs.values()), key=RANK.get) for n in ROWS}
+    verdicts = {n: max((x["patterns"][n]["verdict"] for x in langs.values()), key=lambda v: RANK[v]) for n in ROWS}
     root = examples_root or Path(__file__).resolve().parent.parent / "examples"
     ex = examples(root) if (root / "patterns-lab" / "hardened").is_dir() else None
     res = {"seeds": [SEED0 + 1, SEED0 + seeds], "verdicts": verdicts, "languages": _round(langs), "examples": _round(ex),

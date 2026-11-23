@@ -5,6 +5,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follo
 ## Unreleased
 
 ### Added
+- mypy now checks the pipeline modules (scan, harden, verify, export, and the rest of that layer) as well as the original five files.
 - The Node pattern list (`lang/node_agent/patterns/names.json`) is generated from `ras_anything.patterns.NAMES`.
 - `--json` on every result-producing command writes a `cli-result` object to stdout (progress and logs go to stderr; `export --format json` stays a bundle). Errors remain RFC 9457 on stderr.
 - `schema_version` lives in `contracts.SCHEMA_VERSION` and is **1.1.0** (additive `coverage.adapters[].enabled`; see `docs/schema/README.md`).

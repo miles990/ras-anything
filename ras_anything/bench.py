@@ -82,8 +82,8 @@ def bench(cmd: list[str] | None = None, seeds: int = 20, rate: float = 0.1, mark
     if not quiet:
         print("  %s clean runs %s" % (ui.good(ui.OK) if same_clean else ui.bad(ui.FAIL),
                                       "print identical output" if same_clean else "DIFFER: hardened changed the app's output"))
-    runs = {v: [] for v in variants}
-    stats = {v: {} for v in variants}
+    runs: dict[str, list] = {v: [] for v in variants}
+    stats: dict[str, dict] = {v: {} for v in variants}
     degraded_stdouts: set[str] = set()
     raw_runs = []
     first_wrong_diff = None

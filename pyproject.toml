@@ -52,6 +52,6 @@ select = ["F", "E9", "B006", "B008", "B012", "B015", "B018"]
 
 [tool.mypy]
 python_version = "3.10"
-files = ["ras_anything/contracts.py", "ras_anything/lang/base.py", "ras_anything/lang/__init__.py", "ras_anything/patterns/__init__.py", "ras_anything/hardens.py"]
+files = ["ras_anything/contracts.py", "ras_anything/lang/base.py", "ras_anything/lang/__init__.py", "ras_anything/patterns/__init__.py", "ras_anything/hardens.py", "ras_anything/go.py", "ras_anything/scan.py", "ras_anything/harden.py", "ras_anything/verify.py", "ras_anything/enable.py", "ras_anything/bench.py", "ras_anything/report.py", "ras_anything/replay.py", "ras_anything/drift.py", "ras_anything/diagnose.py", "ras_anything/doctor.py", "ras_anything/export.py", "ras_anything/exporters", "ras_anything/lab.py", "ras_anything/slo.py", "ras_anything/ax.py", "ras_anything/judge.py", "ras_anything/runner.py"]
 ignore_missing_imports = true
 follow_imports = "silent"

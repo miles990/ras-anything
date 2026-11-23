@@ -122,7 +122,8 @@ def classify_sequence(raw: list[dict], calls: list[dict], keys: list[list[str]],
     """classify_trial for calls made one after the other with the code's own state kept (an outage). Here a
     fallback may also be earned without a request: an open circuit is the point. The evidence is the agent's, from
     the calls before: the last thing it saw of every dependency of this call was a failure, recently."""
-    out, seen, now = [], {}, 0.0  # seen: dependency -> (when, failed)
+    out, now = [], 0.0
+    seen: dict[str, tuple] = {}  # dependency -> (when, failed)
     for r, call, ks, gap in zip(raw, calls, keys, gaps):
         now += gap
         t = classify_trial(r, call, ks, budget, fallback_allowed)

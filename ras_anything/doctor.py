@@ -51,7 +51,7 @@ def status() -> dict:
     ui.headline("status", str(project))
     scan = load_json(project / ".ras" / "scan.json")
     state = load_json(project / ".ras" / "state.json", {"enabled": {}})
-    out = {"project": str(project), "scan": None, "hardens": [], "enabled": list(state["enabled"]), "bench": None}
+    out: dict = {"project": str(project), "scan": None, "hardens": [], "enabled": list(state["enabled"]), "bench": None}
     if not scan:
         print("  no scan yet")
         ui.next_hint("scan -- python app.py / node app.mjs")

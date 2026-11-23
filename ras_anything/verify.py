@@ -98,7 +98,8 @@ def outage_trials(usable: list[int], side: str) -> tuple[list[str], list[dict]]:
 def measure_outage(adapter, project, d, meta, calls, keys, usable, deadline) -> dict | None:
     if not usable:
         return None
-    budget, out = float(meta["budget_s"]), {p: {"calls": n, "gap_s": gap} for p, (n, gap) in OUTAGE.items()}
+    budget = float(meta["budget_s"])
+    out: dict = {p: {"calls": n, "gap_s": gap} for p, (n, gap) in OUTAGE.items()}
     for side in ("original", "hardened"):  # each in a process of its own
         phases, trials = outage_trials(usable, side)
         raw = replay(adapter, project, d, meta, trials, deadline)["results"]
@@ -135,7 +136,7 @@ def measure(adapter, project: Path, d: Path, meta: dict, max_chaos: int) -> dict
         return raw, list(zip(out[::2], out[1::2]))
 
     # (a) happy path ------------------------------------------------------------------------------
-    happy = {"total": 0, "equal": 0, "original_nondeterministic": 0, "first_failure": None}
+    happy: dict = {"total": 0, "equal": 0, "original_nondeterministic": 0, "first_failure": None}
     usable = []
     raw, results = pairs([{"call": i, "plan": NONE, "seed": i} for i in range(len(calls))])
     for i, (o, h) in enumerate(results):

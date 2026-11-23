@@ -130,7 +130,8 @@ def diagnose(stderr_text: str, stdout_text: str = "", start_ns: int | None = Non
         if rec is not None:
             ev = rec.get("EventName") or rec.get("event") or ""
             sev = str(rec.get("SeverityText") or "").upper()
-            attrs = rec.get("Attributes") if isinstance(rec.get("Attributes"), dict) else rec
+            raw_attrs = rec.get("Attributes")
+            attrs: dict = raw_attrs if isinstance(raw_attrs, dict) else rec
             is_diag = ev in DIAG_EVENTS or sev in ("WARN", "ERROR") or "error" in attrs or "ras.fault" in attrs
             if not is_diag:
                 continue

@@ -52,7 +52,7 @@ def task_md(adapter, fn: dict, meta: dict, calls: list, scan: dict, root: Path, 
     fid = fn["id"]
     tx, hname = adapter.task_texts(fn), adapter.hardened_file(fn)
     budget = meta["budget_s"]
-    reqs = {}
+    reqs: dict[str, int] = {}
     for c in calls:
         for io in c["io"]:
             r = io["req"]
@@ -191,7 +191,7 @@ def harden(fid: str | None = None, agent: str | None = None, model: str | None =
         "file": rel_to_project(resolve_in_project(fn["file"], project), project), "first_line": fn["first_line"], "in_main": fn["in_main"],
         "cmd": portable_cmd(scan["cmd"], project), "display_cmd": scan.get("display_cmd", shlex.join(scan["cmd"])),
         "cwd": rel_to_project(scan_cwd, project),
-        "env": env_diff(snap.get("env"), project, adapter.private_env),
+        "env": env_diff(snap.get("env") or {}, project, adapter.private_env),
         "globals": snap.get("globals") or {},
         **adapter.record_meta(fn, r.data, project),
         "budget_s": budget or old.get("budget_s") or DEFAULT_BUDGET_S,
