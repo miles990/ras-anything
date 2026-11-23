@@ -104,7 +104,7 @@ class ContractTest(unittest.TestCase):
         self.assertEqual([p.name for p in ps], list(patterns.NAMES))
         self.assertEqual(len({p.order for p in ps}), len(ps))
         files = {f.stem for f in PKG.glob("*.py")} - {"__init__", "policy"}
-        self.assertEqual(files - {"problem", "recorder"}, set(patterns.NAMES))  # (support modules: errors for agents, flight recorder)
+        self.assertEqual(files - {"problem", "recorder", "ai"}, set(patterns.NAMES))  # (support modules: errors for agents, flight recorder)
         self.assertRaises(KeyError, patterns.get, "nope")
 
     def test_every_module_keeps_the_contract(self):

@@ -253,7 +253,7 @@ class NodeContractTest(unittest.TestCase):
         """Each requires ./core.cjs and built-ins only; retry looks for Retry-After support, hedge for the drivers, both lazily."""
         allowed = {"retry.cjs": {"./core.cjs", "./retry_after.cjs"}, "hedge.cjs": {"./core.cjs", "./policy.cjs"}, "core.cjs": set(), "index.cjs": {"./flags.cjs"}, "flags.cjs": set(),
                    "policy.cjs": {"./core.cjs", "./index.cjs"}, "problem.cjs": {"./core.cjs", "./retry_after.cjs"}, "recorder.cjs": {"./core.cjs", "./problem.cjs"}}
-        self.assertEqual({f.stem for f in PDIR.glob("*.cjs")} - {"core", "index", "policy", "flags", "problem", "recorder"}, set(patterns.NAMES))
+        self.assertEqual({f.stem for f in PDIR.glob("*.cjs")} - {"core", "index", "policy", "flags", "problem", "recorder", "ai"}, set(patterns.NAMES))
         for f in PDIR.glob("*.cjs"):
             for spec in re.findall(r"""require\(["'](.+?)["']\)""", f.read_text()):
                 self.assertTrue(spec.startswith("node:") or spec in allowed.get(f.name, {"./core.cjs"}), "%s requires %s" % (f.name, spec))
