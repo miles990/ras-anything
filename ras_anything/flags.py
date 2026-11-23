@@ -298,33 +298,36 @@ def _print_list(snap: dict) -> None:
     print(ui.table(["flag", "state", "value", "variant"], rows, "llll"))
 
 
-def run(argv: list[str]) -> int:
+def run(argv: list[str]) -> dict:
     """`ras-anything flag list|get|set|delete`."""
 
     if not argv or argv[0] in ("list", "ls"):
-        _print_list(store().snapshot())
-        return 0
+        snap = store().snapshot()
+        _print_list(snap)
+        return {"action": "list", "source": snap["source"], "version": snap["version"], "flags": snap["flags"]}
     cmd = argv[0]
     if cmd == "get":
         if len(argv) < 2:
             raise UserError("flag get needs a name", "", "flag list")
         s = store()
         key = argv[1]
-        print(json.dumps({"key": key, "value": s.evaluate(key, None), "flag": s.flag(key),
-                          "source": s.source, "version": s.version}, indent=2, default=str))
-        return 0
+        doc = {"action": "get", "key": key, "value": s.evaluate(key, None), "flag": s.flag(key),
+               "source": s.source, "version": s.version}
+        print(json.dumps({k: doc[k] for k in ("key", "value", "flag", "source", "version")}, indent=2, default=str))
+        return doc
     if cmd == "delete":
         if len(argv) < 2:
             raise UserError("flag delete needs a name", "", "flag list")
         store().delete(argv[1])
-        _print_list(store().snapshot())
-        return 0
+        snap = store().snapshot()
+        _print_list(snap)
+        return {"action": "delete", "key": argv[1], "source": snap["source"], "version": snap["version"], "flags": snap["flags"]}
     if cmd == "set":
         return _set(argv[1:])
     raise UserError("unknown flag command %s" % cmd, "use list, get, set or delete", "flag list")
 
 
-def _set(argv: list[str]) -> int:
+def _set(argv: list[str]) -> dict:
     if not argv:
         raise UserError("flag set needs a name", "examples: flag set ras.pattern.retry off · flag set weather.fetch_forecast --canary 5",
                         "flag list")
@@ -363,8 +366,10 @@ def _set(argv: list[str]) -> int:
                 value = a
         i += 1
     store().set_flag(key, value, state=state)
-    _print_list(store().snapshot())
-    return 0
+    snap = store().snapshot()
+    _print_list(snap)
+    return {"action": "set", "key": key, "value": value, "state": state,
+            "source": snap["source"], "version": snap["version"], "flags": snap["flags"]}
 
 
 # bind the process-wide hook the first time this module is imported from is_on — done in patterns/__init__.py

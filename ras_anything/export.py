@@ -136,8 +136,13 @@ def emit_run(project: Path, kind: str, payload: dict, suffix: str | None = None)
     doc = scrub(doc, project)
     fname = f"{kind}-{_safe_name(suffix)}.json" if suffix else f"{kind}.json"
     p = plain_path(out_dir(project) / fname, project, "export file", kind="file", must_exist=False)
-    existing = load_json(p)
-    if existing and {k: v for k, v in existing.items() if k != "generated_at"} == {k: v for k, v in doc.items() if k != "generated_at"}:
+    existing = None
+    if p.is_file():
+        try:
+            existing = json.loads(p.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError, UnicodeError):
+            existing = None  # unreadable snapshot: rebuild rather than fail the export
+    if isinstance(existing, dict) and {k: v for k, v in existing.items() if k != "generated_at"} == {k: v for k, v in doc.items() if k != "generated_at"}:
         return p
     save_json(p, doc)
     return p

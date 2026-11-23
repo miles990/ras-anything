@@ -227,6 +227,20 @@ class SchemaExportTests(unittest.TestCase):
             second = {p.name: p.read_bytes() for p in (proj / ".ras" / "out").glob("*.json")}
             self.assertEqual(first, second)
 
+    def test_sync_out_rebuilds_a_corrupt_snapshot(self):
+        with tempfile.TemporaryDirectory() as td:
+            proj = Path(td)
+            shutil.copytree(ROOT / "examples" / "support-ai" / ".ras", proj / ".ras")
+            export.sync_out(proj)
+            target = proj / ".ras" / "out" / "report.json"
+            self.assertTrue(target.is_file())
+            target.write_text("{", encoding="utf-8")
+            export.sync_out(proj)
+            doc = json.loads(target.read_text(encoding="utf-8"))
+            self.assertEqual(doc["kind"], "report")
+            self.assertEqual(doc["schema_version"], export.SCHEMA_VERSION)
+
+
     def test_no_private_workspace_or_home_paths_in_examples_or_cards(self):
         for base in (ROOT / "examples", ROOT / "docs" / "cards"):
             for p in sorted(base.rglob("*")):

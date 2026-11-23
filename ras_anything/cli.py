@@ -286,9 +286,6 @@ def _cli_result(command: str, result, exit_code: int) -> dict:
     return doc
 
 
-_JSON_EXPORT = {"json", "ndjson", "otlp-json", "cloudevents"}
-
-
 def _present(command: str, result, as_json: bool) -> int:
     """Write the command's result: JSON on stdout when --json, otherwise any payload the shell still holds."""
     code = _exit_of(result)
@@ -296,7 +293,7 @@ def _present(command: str, result, as_json: bool) -> int:
         return code
     if isinstance(result, dict) and "text" in result and command == "export":
         text, fmt = result.get("text") or "", result.get("format")
-        if as_json and fmt not in _JSON_EXPORT:
+        if as_json:
             print(json.dumps(_cli_result(command, {"format": fmt, "body": text}, code), sort_keys=True))
             return code
         sys.stdout.write(text)
@@ -315,10 +312,14 @@ def _wants_json(a, as_json: bool) -> bool:
 
 def _execute(p, a, cmd, as_json: bool) -> int:
     import contextlib
+    import io
 
     if as_json and a.command != "mcp":
-        with contextlib.redirect_stdout(sys.stderr):
+        buf = io.StringIO()
+        with contextlib.redirect_stdout(buf):
             result = _run(p, a, cmd)
+        # progress stays buffered until success, so a later UserError leaves stderr as one RFC 9457 object
+        sys.stderr.write(buf.getvalue())
         return _present(a.command, result, True)
     return _present(a.command, _run(p, a, cmd), False)
 

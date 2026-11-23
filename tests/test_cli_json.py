@@ -60,18 +60,36 @@ class CliJsonTest(unittest.TestCase):
         self.assertIn("checks", doc["result"])
         self.assertGreater(len(doc["result"]["checks"]), 0)
 
-    def test_export_json_is_the_bundle_not_a_wrapper(self):
-        r = _run(["--json", "export", "--format", "json"], self.proj)
-        self.assertEqual(r.returncode, 0, r.stderr)
-        doc = json.loads(r.stdout)
-        self.assertEqual(doc["kind"], "bundle")
-        self.assertIn("snapshots", doc)
+    def test_export_formats_are_wrapped_in_one_cli_result(self):
+        for fmt in ("json", "ndjson", "prom", "otlp-json", "cloudevents"):
+            doc, _ = self._doc(["--json", "export", "--format", fmt])
+            self.assertEqual(doc["kind"], "cli-result", fmt)
+            self.assertEqual(doc["command"], "export")
+            self.assertEqual(doc["result"]["format"], fmt)
+            self.assertIsInstance(doc["result"]["body"], str)
+            if fmt == "json":
+                bundle = json.loads(doc["result"]["body"])
+                self.assertEqual(bundle["kind"], "bundle")
+                self.assertIn("snapshots", bundle)
+            elif fmt == "prom":
+                self.assertIn("ras_availability_ratio", doc["result"]["body"])
+            elif fmt == "otlp-json":
+                self.assertIn("resourceLogs", json.loads(doc["result"]["body"]))
+            else:
+                # ndjson and cloudevents are one JSON object per line
+                for ln in doc["result"]["body"].splitlines():
+                    if ln.strip():
+                        json.loads(ln)
 
-    def test_export_prom_with_json_is_wrapped(self):
-        doc, _ = self._doc(["export", "--format", "prom", "--json"])
-        self.assertEqual(doc["command"], "export")
-        self.assertEqual(doc["result"]["format"], "prom")
-        self.assertIn("ras_availability_ratio", doc["result"]["body"])
+    def test_export_ndjson_empty_stream_is_one_cli_result(self):
+        with tempfile.TemporaryDirectory() as td:
+            proj = Path(td)
+            (proj / ".ras").mkdir()
+            # no events.ndjson: body is an empty stream, still one cli-result
+            doc, _ = self._doc(["--json", "export", "--format", "ndjson"], cwd=proj)
+            self.assertEqual(doc["kind"], "cli-result")
+            self.assertEqual(doc["result"]["format"], "ndjson")
+            self.assertEqual(doc["result"]["body"].strip(), "")
 
     def test_user_error_is_problem_json_on_stderr(self):
         r = _run(["--json", "scan"], self.proj)  # no app command
@@ -86,3 +104,25 @@ class CliJsonTest(unittest.TestCase):
         doc, _ = self._doc(["flag", "list", "--json"])
         self.assertEqual(doc["command"], "flag")
         self.assertEqual(doc["exit_code"], 0)
+        self.assertEqual(doc["result"]["action"], "list")
+        self.assertIn("flags", doc["result"])
+
+    def test_flag_set_and_get_json_include_the_value(self):
+        set_doc, _ = self._doc(["--json", "flag", "set", "ras.pattern.retry", "off"])
+        self.assertEqual(set_doc["result"]["action"], "set")
+        self.assertEqual(set_doc["result"]["key"], "ras.pattern.retry")
+        self.assertFalse(set_doc["result"]["value"])
+        get_doc, _ = self._doc(["flag", "get", "ras.pattern.retry", "--json"])
+        self.assertEqual(get_doc["result"]["action"], "get")
+        self.assertEqual(get_doc["result"]["key"], "ras.pattern.retry")
+        self.assertFalse(get_doc["result"]["value"])
+        self.assertIn("flags", set_doc["result"])
+
+    def test_json_error_after_progress_is_only_the_problem_on_stderr(self):
+        # scan prints a headline, then raises when the clean run fails
+        r = _run(["--json", "scan", "--", sys.executable, "-c", "raise SystemExit(1)"], self.proj)
+        self.assertEqual(r.returncode, 1)
+        self.assertFalse(r.stdout.strip())
+        problem = json.loads(r.stderr.strip())  # the whole stream, not just the last line
+        self.assertIn("urn:ras-anything:problem:", problem["type"])
+        self.assertTrue(problem["title"])
