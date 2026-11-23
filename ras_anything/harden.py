@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import ast
 import os
-import pickle
 import re
 import shlex
 import shutil
@@ -14,7 +13,7 @@ import textwrap
 import time
 from pathlib import Path
 
-from . import faults, static, ui
+from . import cassette, faults, static, ui
 from .paths import UserError, find_project, harden_dir, load_json, ras_dir, rel_to_project, resolve_in_project, save_json
 from .runner import python_cmd, run
 
@@ -124,9 +123,9 @@ def callers(fn: dict, root: Path, limit: int = 4) -> list[str]:
     return out
 
 
-def _short(v, n=240) -> str:
-    r = repr(v)
-    return r if len(r) <= n else r[: n - 1] + "…"
+def _argv(req: dict) -> str:
+    argv = req.get("argv") or []
+    return argv if isinstance(argv, str) else " ".join(a if isinstance(a, str) else cassette.show(a).strip("'") for a in argv)
 
 
 def task_md(fn: dict, meta: dict, calls: list, scan: dict, root: Path, project: Path | None = None) -> str:
@@ -136,17 +135,18 @@ def task_md(fn: dict, meta: dict, calls: list, scan: dict, root: Path, project: 
     for c in calls:
         for io in c["io"]:
             r = io["req"]
-            k = "%s %s" % (r["method"] or r["kind"], re.sub(r"\?.*", "?…", r["url"]) if r["url"] else " ".join(r["argv"] or [])[:80])
+            k = "%s %s" % (r["method"] or r["kind"], re.sub(r"\?.*", "?…", r["url"]) if r["url"] else _argv(r)[:80])
             reqs[k] = reqs.get(k, 0) + 1
     samples = []
     for c in calls[:3]:
-        args, kwargs = pickle.loads(c["args"])
-        res = ("raises %s: %s" % (c["exc"]["type"], c["exc"]["msg"])) if "exc" in c else _short(pickle.loads(c["result"]))
-        io = "; ".join("%s %s -> %s" % (x["req"]["method"] or "run", (x["req"]["url"] or " ".join(x["req"]["argv"] or []))[:90],
+        res = ("raises %s.%s: %s" % (c["exc"]["module"], c["exc"]["type"], c["exc"]["msg"])) if "exc" in c \
+            else cassette.show(c["result"])
+        io = "; ".join("%s %s -> %s" % (x["req"]["method"] or "run", (x["req"]["url"] or _argv(x["req"]))[:90],
                                          x["out"].get("status", x["out"].get("returncode", "exception")))
                        for x in c["io"])
         samples.append("- `%s(%s)` → %s\n  dependency I/O: %s" % (
-            fn["name"], ", ".join([_short(a, 80) for a in args] + ["%s=%s" % (k, _short(v, 60)) for k, v in kwargs.items()]),
+            fn["name"], ", ".join([cassette.show(a, 80) for a in c["args"]] +
+                                 ["%s=%s" % (k, cassette.show(v, 60)) for k, v in c["kwargs"].items()]),
             res, io or "none"))
     sigs = "\n".join("- " + s for s in fn["signals"].values()) or "- (none)"
     dyn = fn.get("chaos")
@@ -160,7 +160,7 @@ You are hardening one Python function for **reliability, availability and servic
 Edit **only `hardened.py` in this folder**. Keep the function name `{fn['name']}` and its signature.
 When you are done, `ras-anything verify {fid}` must print PASS. Run it yourself (it works from this
 folder) and iterate until it passes. Do not enable anything; do not edit the original source,
-`calls.pkl` or `meta.json`.
+`calls.json` or `meta.json`.
 
 ## The function
 
@@ -237,10 +237,11 @@ Write it like production code: small, readable, commented where it matters. Then
 """
 
 
-def env_diff(child_env: dict) -> dict:
+def env_diff(child_env: dict, project: Path) -> dict:
+    """What the app itself put in its environment before the first recorded call (values encoded)."""
     skip = ("RAS_ANYTHING", "PYTHONPATH", "PYTHONHASHSEED")
-    return {k: v for k, v in (child_env or {}).items()
-            if not k.startswith(skip) and os.environ.get(k) != v}
+    mine = cassette.Codec(project).enc(dict(os.environ))
+    return {k: v for k, v in (child_env or {}).items() if not k.startswith(skip) and mine.get(k) != v}
 
 
 def harden(fid: str | None = None, agent: str | None = None, model: str | None = None, budget: float | None = None,
@@ -253,16 +254,16 @@ def harden(fid: str | None = None, agent: str | None = None, model: str | None =
     d.mkdir(parents=True, exist_ok=True)
     if not quiet:
         ui.headline("harden", "%s %s recording up to %d calls" % (fid, ui.DOT, max_calls))
-    calls_path = d / "calls.pkl"
+    calls_path = d / "calls.json"
     scan_cwd = resolve_in_project(scan.get("cwd") or ".", project)
     scan_root = resolve_in_project(scan.get("root") or ".", project)
     fn_abs = str(resolve_in_project(fn["file"], project))
-    r = run(python_cmd(scan["cmd"]), {"mode": "record", "max_calls": max_calls, "calls_path": str(calls_path),
+    r = run(python_cmd(scan["cmd"]), {"mode": "record", "max_calls": max_calls, "calls_path": str(calls_path), "project": str(project),
                           "target": {"file": fn_abs, "line": fn["first_line"], "name": fn["name"]}},
             scan_cwd, root=scan_root)
     if r.data is None or not calls_path.exists():
         raise UserError("recording failed (exit %s)" % r.code, (r.stderr or "").strip()[-300:], "doctor")
-    calls = pickle.loads(calls_path.read_bytes())
+    calls = cassette.load(calls_path)
     if not calls:
         raise UserError("%s wasn't called while the workload ran" % fid, "is the command the same as for scan?",
                         "scan -- " + scan.get("display_cmd", ""))
@@ -275,8 +276,9 @@ def harden(fid: str | None = None, agent: str | None = None, model: str | None =
         "cwd": rel_to_project(scan_cwd, project),
         "sys_path": [rel_to_project(p, project) if Path(p).resolve().is_relative_to(project.resolve()) else p for p in (r.data.get("sys_path") or [])],
         "executable": r.data.get("executable"),
-        "env": env_diff(snap.get("env")),
-        "globals": {k: v for k, v in (snap.get("globals") or {}).items() if not isinstance(v, bytes)},
+        "env": env_diff(snap.get("env"), project),
+        "globals": snap.get("globals") or {},
+        "type_modules": r.data.get("type_modules") or [],
         "budget_s": budget or old.get("budget_s") or DEFAULT_BUDGET_S,
         "recorded": len(calls), "seen": r.data.get("seen"), "skipped": r.data.get("skipped"),
         "recorded_at": time.strftime("%Y-%m-%dT%H:%M:%S%z"),
@@ -292,7 +294,7 @@ def harden(fid: str | None = None, agent: str | None = None, model: str | None =
     if not quiet:
         print("  %s recorded %d calls (of %d seen) with %d dependency exchanges %s %s" % (
             ui.good(ui.OK), len(calls), meta["seen"] or len(calls), nio, ui.DOT,
-            ui.dim("calls.pkl %.0f KB" % (calls_path.stat().st_size / 1024))))
+            ui.dim("calls.json %.0f KB" % (calls_path.stat().st_size / 1024))))
         print("  %s wrote %s" % (ui.good(ui.OK), os.path.relpath(d / "TASK.md")))
         print("  %s %s %s" % (ui.good(ui.OK), "kept your" if kept else "wrote stub", os.path.relpath(hp)))
     result = {"id": fid, "dir": str(d), "recorded": len(calls), "agent": None}

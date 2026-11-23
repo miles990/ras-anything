@@ -1,6 +1,6 @@
 # weather: app availability under faults 40.0% → 100.0%
 
-`/workspace/ras-anything/.venv/bin/python app.py`, 20 whole-app runs per variant (seeds 1–20, original and hardened interleaved, same fault seed per pair), faults injected live at the dependency boundary with p=0.1 per attempt.
+`python app.py`, 20 whole-app runs per variant (seeds 1–20, original and hardened interleaved, same fault seed per pair), faults injected live at the dependency boundary with p=0.1 per attempt.
 
 ![ras-anything card](../../docs/cards/weather.svg)
 
@@ -12,7 +12,7 @@
 | hangs | 15.0% | 0.0% |
 | wrong output | 0.0% | 0.0% |
 | duplicate non-idempotent side effects | 0 | 0 |
-| p50 / p99 run time | 91ms / 2.10s | 316ms / 889ms |
+| p50 / p99 run time | 125ms / 2.14s | 352ms / 905ms |
 | faults injected (total) | 14 | 49 |
 
 A run counts as *degraded* when its output differs only where a hardened function returned its declared `RAS_FALLBACK` in that run (and symmetrically for the original if its output matches a declared-degraded output) or on lines containing `unavailable`.
@@ -42,7 +42,7 @@ Each hardened function was replayed on its recorded real calls (dependency answe
 
 Whole-app bench: each dependency attempt draws its fault from a hash of (seed, request, attempt number), so original and hardened see the same fault on the same attempt. Outages hit 5% of requests. Injected waits are scaled ×0.05 in real time and a call with no timeout is declared hung after 2s; the real local upstream answers everything else.
 
-Host: Linux 6.12.113+ x86_64, 8 CPUs, Python 3.13.5 · 2026-11-23T05:02:01+0800
+Host: Linux 6.12.113+ x86_64, 8 CPUs, Python 3.13.5 · 2026-11-23T12:12:40+0800
 
 Undo: `ras-anything disable <id>` removes the swap byte for byte; `RAS_ANYTHING_DISABLE=1` runs the originals.
 

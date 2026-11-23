@@ -152,7 +152,7 @@ class AgentHardenedExamplesTest(unittest.TestCase):
             try:
                 shutil.copytree(REPO / "examples" / ex / ".ras", p.dir / ".ras")
                 for d in sorted(base.iterdir()):
-                    if not (d / "calls.pkl").exists():
+                    if not (d / "calls.json").exists():
                         continue
                     found += 1
                     with quiet():

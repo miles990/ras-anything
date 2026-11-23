@@ -1,15 +1,15 @@
 {
   "version": 1,
   "cmd": [
-    "/workspace/ras-anything/.venv/bin/python",
+    "python",
     "app.py"
   ],
-  "display_cmd": "/workspace/ras-anything/.venv/bin/python app.py",
+  "display_cmd": "python app.py",
   "cwd": ".",
   "root": ".",
-  "created": "2026-11-23T05:02:10+0800",
+  "created": "2026-11-23T12:12:21+0800",
   "clean": {
-    "wall_s": 0.47,
+    "wall_s": 0.5,
     "stdout_sha256": "ebe99fcc08dee5da092ce71548ff6d1f9773ee4d71c7a0d780a37930cc857fe6",
     "boundary_calls": 33
   },
@@ -22,7 +22,7 @@
         "seed": 1,
         "outcome": "hang",
         "exit": 1,
-        "wall_s": 2.081,
+        "wall_s": 2.115,
         "faults": 1,
         "uncaught": {
           "type": "ChaosHang",
@@ -35,7 +35,7 @@
         "seed": 2,
         "outcome": "hang",
         "exit": 1,
-        "wall_s": 2.112,
+        "wall_s": 2.148,
         "faults": 1,
         "uncaught": {
           "type": "ChaosHang",
@@ -48,7 +48,7 @@
         "seed": 3,
         "outcome": "crash",
         "exit": 1,
-        "wall_s": 0.143,
+        "wall_s": 0.161,
         "faults": 1,
         "uncaught": {
           "type": "JSONDecodeError",
@@ -61,7 +61,7 @@
         "seed": 4,
         "outcome": "crash",
         "exit": 1,
-        "wall_s": 0.289,
+        "wall_s": 0.324,
         "faults": 2,
         "uncaught": {
           "type": "JSONDecodeError",
@@ -74,7 +74,7 @@
         "seed": 5,
         "outcome": "crash",
         "exit": 1,
-        "wall_s": 3.55,
+        "wall_s": 3.575,
         "faults": 7,
         "uncaught": {
           "type": "JSONDecodeError",
@@ -397,5 +397,5 @@
       "why": ""
     }
   ],
-  "elapsed_s": 8.65
+  "elapsed_s": 8.83
 }

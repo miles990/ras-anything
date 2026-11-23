@@ -10,31 +10,23 @@ import importlib.util
 import io
 import json
 import os
-import pickle
 import random
 import sys
 import time
 import traceback
 
-from . import boundary, faults, runtime
+from . import boundary, cassette, faults, runtime
 from .boundary import ReplayMiss
 from .faults import ChaosHang
 
 _perf = time.perf_counter  # real time, saved before the virtual clock is installed
 
 
-def _req_key(raw_req: dict, meta_cwd: str | None = None) -> str:
-    if raw_req.get("kind") == "subprocess" and raw_req.get("argv"):
-        return boundary.norm_subproc_key(raw_req["argv"], meta_cwd)
-    return raw_req["key"]
-
-
 class Replay(boundary.FaultingHandler):
     """Serves dependency calls from one recorded call's cassette, with faults from a plan."""
 
-    def __init__(self, clock, meta_cwd: str | None = None):
+    def __init__(self, clock):
         super().__init__(faults.Plan(), clock)
-        self.meta_cwd = meta_cwd
         self.io, self.used, self.misses = [], [], []
         self.active = False
 
@@ -49,8 +41,7 @@ class Replay(boundary.FaultingHandler):
     def match(self, req):
         last = None
         for i, x in enumerate(self.io):
-            k = _req_key(x["req"], self.meta_cwd)
-            if k == req.key or x["req"]["key"] == req.key:
+            if x["req"]["key"] == req.key:
                 if not self.used[i]:
                     return i
                 last = i
@@ -79,8 +70,23 @@ class Replay(boundary.FaultingHandler):
         return sum(len(g) - 1 for g in groups.values())
 
 
-def type_matches(exc: BaseException, recorded: str) -> bool:
-    return any("%s.%s" % (c.__module__, c.__qualname__) == recorded for c in type(exc).__mro__)
+def class_finder(meta):
+    """Classes of the project's own modules that recording saw values of. Only modules this process
+    has already imported are looked at: the cassette can't make anything run."""
+    names = {"__main__": meta["module"]}
+
+    def find(module, qualname):
+        module = names.get(module, module)
+        if module not in set(meta.get("type_modules") or []) | {meta["module"]}:
+            raise LookupError("not one of the recorded project modules")
+        obj = sys.modules.get(module)
+        for part in qualname.split("."):
+            obj = getattr(obj, part, None)
+        if obj is None:
+            raise LookupError("not defined there")
+        return obj
+
+    return find
 
 
 def load_original(meta):
@@ -99,7 +105,7 @@ def load_original(meta):
 
 def apply_globals(mod, snap):
     for k, v in (snap or {}).items():
-        if k in vars(mod) and isinstance(vars(mod)[k], (str, int, float, bool, type(None))):
+        if k in vars(mod) and type(vars(mod)[k]) in (str, int, float, bool, type(None)):
             setattr(mod, k, v)
 
 
@@ -107,11 +113,12 @@ def main(argv):
     hdir, out_path = argv[0], argv[1]
     max_chaos = int(argv[2]) if len(argv) > 2 else 60
     meta = json.load(open(os.path.join(hdir, "meta.json")))
-    calls = pickle.load(open(os.path.join(hdir, "calls.pkl"), "rb"))
     hpath = os.path.join(hdir, "hardened.py")
-    result = {"id": meta["id"], "budget_s": meta["budget_s"], "recorded": len(calls)}
-
     project_dir = os.path.abspath(os.path.join(hdir, "..", "..", ".."))
+    codec = cassette.Codec(project_dir, find=class_finder(meta))
+    aliases = {"__main__": meta["module"]}
+    result = {"id": meta["id"], "budget_s": meta["budget_s"]}
+
     def _proj_path(p):
         if not p:
             return project_dir
@@ -119,7 +126,7 @@ def main(argv):
     orig_cwd = meta.get("cwd") or "."
     work_cwd = _proj_path(orig_cwd)
     meta = dict(meta, file=_proj_path(meta["file"]), cwd=work_cwd)
-    os.environ.update(meta.get("env") or {})
+    os.environ.update(codec.dec(meta.get("env") or {}))
     os.environ["RAS_ANYTHING_DISABLE"] = "1"
     try:
         os.chdir(work_cwd)
@@ -129,7 +136,7 @@ def main(argv):
     sys.path[:0] = [p for p in resolved_sp if p not in sys.path]
 
     clock = faults.VirtualClock()
-    handler = Replay(clock, meta_cwd=orig_cwd if os.path.isabs(orig_cwd) else work_cwd)
+    handler = Replay(clock)
     boundary.install(handler)
 
     def fail(stage, msg):
@@ -137,17 +144,29 @@ def main(argv):
         json.dump(result, open(out_path, "w"), default=str)
         return 0
 
+    glob = codec.dec(meta.get("globals") or {})
     try:
         omod, original = load_original(meta)
-        apply_globals(omod, meta.get("globals"))
+        apply_globals(omod, glob)
+        for m in meta.get("type_modules") or []:
+            if m != "__main__":
+                importlib.import_module(m)
     except BaseException:
         return fail("import original", traceback.format_exc(limit=6))
+    try:
+        calls = cassette.load(os.path.join(hdir, "calls.json"))
+        for call in calls:
+            call["io"] = codec.dec(call["io"])
+            codec.dec([call["args"], call["kwargs"], call.get("result")])
+    except (cassette.BadCassette, OSError, KeyError, TypeError) as e:
+        return fail("read calls.json", "%s: %s" % (type(e).__name__, e))
+    result["recorded"] = len(calls)
     try:
         spec = importlib.util.spec_from_file_location("_ras_hardened_" + meta["id"].replace(".", "__"), hpath)
         hmod = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(hmod)
         hardened = getattr(hmod, meta["name"])
-        apply_globals(hmod, meta.get("globals"))
+        apply_globals(hmod, glob)
     except BaseException:
         return fail("import hardened.py", traceback.format_exc(limit=6))
     fallback = getattr(hmod, "RAS_FALLBACK", None)
@@ -158,7 +177,7 @@ def main(argv):
     real_stderr = sys.stderr
 
     def trial(fn, call, plan, seedval, fb):
-        args, kwargs = pickle.loads(call["args"])
+        args, kwargs = codec.dec(call["args"]), codec.dec(call["kwargs"])
         handler.begin(call["io"], plan)
         random.seed(seedval)
         runtime.seed(seedval)
@@ -186,13 +205,13 @@ def main(argv):
         if handler.misses and not miss:
             miss = "request the original never made: %s" % handler.misses[0]
         exp_exc = call.get("exc")
-        expected = None if exp_exc else pickle.loads(call["result"])
+        expected = None if exp_exc else codec.dec(call["result"])
         if hang or lat > budget + 1e-9:
             cls = "hang"
         elif miss:
             cls = "miss"
         elif exc is not None:
-            cls = "ok" if exp_exc and type_matches(exc, exp_exc["type"]) else "error"
+            cls = "ok" if exp_exc and cassette.matches(exc, exp_exc, aliases) else "error"
         elif exp_exc:
             cls = "degraded" if fb is not None and _eq(res, _fb(fb, args, kwargs)) else "wrong"
         elif _eq(res, expected):
@@ -210,7 +229,7 @@ def main(argv):
         return {
             "class": cls, "latency": round(lat, 6), "dups": handler.duplicates(), "miss": miss or None,
             "result": None if exc is not None or hang else _short(res),
-            "expected": _short(expected) if not exp_exc else "raises " + exp_exc["type"],
+            "expected": _short(expected) if not exp_exc else "raises " + _exc_name(exp_exc),
             "exc": None if exc is None else "%s: %s" % (exc_type, str(exc)[:200]),
             "exc_type": exc_type, "cause_type": cause_type,
             "logs": logs, "structured": structured,
@@ -267,7 +286,7 @@ def main(argv):
     # For calls that make >=2 distinct requests (e.g., GET then POST), also isolate faults per key
     for i in chaos_idx:
         call = calls[i]
-        call_keys = list(dict.fromkeys(_req_key(x["req"], handler.meta_cwd) for x in call["io"]))
+        call_keys = list(dict.fromkeys(x["req"]["key"] for x in call["io"]))
         if len(call_keys) <= 1:
             continue
         has_per_key = True
@@ -353,11 +372,21 @@ def _fb(fb, args, kwargs):
     return fb
 
 
+_structure = cassette.Codec(owns=lambda cls: True)
+
+
 def _eq(a, b) -> bool:
+    """Equal and of the same type; or, for classes without __eq__, equal attribute by attribute."""
     try:
-        return bool(a == b) and type(a) is type(b)
+        if type(a) is not type(b):
+            return False
+        return bool(a == b) or _structure.enc(a) == _structure.enc(b)
     except Exception:
         return False
+
+
+def _exc_name(d: dict) -> str:
+    return "%s.%s" % (d.get("module"), d.get("type"))
 
 
 def _short(v, n=300):
@@ -366,8 +395,8 @@ def _short(v, n=300):
 
 
 def _args(call):
-    a, k = pickle.loads(call["args"])
-    return _short(a, 200) + (" " + _short(k, 100) if k else "")
+    a, k = call["args"], call["kwargs"]
+    return cassette.show({"$tuple": a}, 200) + (" " + cassette.show(k, 100) if k else "")
 
 
 if __name__ == "__main__":

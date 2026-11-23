@@ -41,9 +41,9 @@ def hardenability(fn: dict, fi) -> str | None:
     if fn["in_main"] and not (fi and fi.has_main_guard):
         return "in the entry script with no `if __name__ == \"__main__\"` guard"
     if fn.get("arg_ok") is False:
-        return "arguments aren't picklable, so calls can't be recorded"
+        return "arguments can't be stored as JSON, so calls can't be recorded"
     if fn.get("ret_ok") is False:
-        return "return value isn't picklable, so results can't be compared"
+        return "return value can't be stored as JSON, so results can't be compared"
     if not fn["boundary"]:
         return "makes no dependency calls"
     return None

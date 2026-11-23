@@ -1,0 +1,855 @@
+{
+ "format": "ras-anything-cassette",
+ "version": 1,
+ "lang": "python",
+ "calls": [
+  {
+   "args": [
+    {
+     "id": "INV-1001",
+     "customer": "Acme Co",
+     "amount_cents": 1500,
+     "currency": "usd"
+    },
+    {
+     "id": "ch_0001",
+     "invoice": "INV-1001",
+     "amount_cents": 1500,
+     "currency": "usd",
+     "status": "succeeded"
+    }
+   ],
+   "kwargs": {},
+   "io": [
+    {
+     "req": {
+      "kind": "subprocess",
+      "method": "RUN",
+      "url": "",
+      "body_sha": "",
+      "idempotency_key": null,
+      "timeout": null,
+      "argv": [
+       "python",
+       {
+        "$proj": [
+         "${PROJECT}",
+         "${PROJECT}/render.py"
+        ]
+       },
+       "{\"invoice\": \"INV-1001\", \"customer\": \"Acme Co\", \"amount_cents\": 1500, \"currency\": \"usd\", \"charge_id\": \"ch_0001\"}"
+      ],
+      "key": "run python render.py {\"invoice\": \"INV-1001\", \"customer\": \"Acme Co\", \"amount_cents\": 1500, \"currency\": \"usd\", \"charge_id\": \"ch_0001\"}"
+     },
+     "out": {
+      "returncode": 0,
+      "stdout": "{\"pages\": 1, \"bytes\": 78, \"sha256\": \"74258fbbffaf4526116acd9f7074c1a18af438811746dd1453709c2d83ce445f\"}\n",
+      "stderr": ""
+     },
+     "dur": 0.025206
+    }
+   ],
+   "dur": 0.025952,
+   "result": {
+    "pages": 1,
+    "bytes": 78,
+    "sha256": "74258fbbffaf4526116acd9f7074c1a18af438811746dd1453709c2d83ce445f"
+   }
+  },
+  {
+   "args": [
+    {
+     "id": "INV-1002",
+     "customer": "Globex",
+     "amount_cents": 2237,
+     "currency": "usd"
+    },
+    {
+     "id": "ch_0002",
+     "invoice": "INV-1002",
+     "amount_cents": 2237,
+     "currency": "usd",
+     "status": "succeeded"
+    }
+   ],
+   "kwargs": {},
+   "io": [
+    {
+     "req": {
+      "kind": "subprocess",
+      "method": "RUN",
+      "url": "",
+      "body_sha": "",
+      "idempotency_key": null,
+      "timeout": null,
+      "argv": [
+       "python",
+       {
+        "$proj": [
+         "${PROJECT}",
+         "${PROJECT}/render.py"
+        ]
+       },
+       "{\"invoice\": \"INV-1002\", \"customer\": \"Globex\", \"amount_cents\": 2237, \"currency\": \"usd\", \"charge_id\": \"ch_0002\"}"
+      ],
+      "key": "run python render.py {\"invoice\": \"INV-1002\", \"customer\": \"Globex\", \"amount_cents\": 2237, \"currency\": \"usd\", \"charge_id\": \"ch_0002\"}"
+     },
+     "out": {
+      "returncode": 0,
+      "stdout": "{\"pages\": 1, \"bytes\": 77, \"sha256\": \"60e075574fa1b31bc51cd1492a6afde0287dd7c585fa36afa698554b0cfeeff1\"}\n",
+      "stderr": ""
+     },
+     "dur": 0.022704
+    }
+   ],
+   "dur": 0.023374,
+   "result": {
+    "pages": 1,
+    "bytes": 77,
+    "sha256": "60e075574fa1b31bc51cd1492a6afde0287dd7c585fa36afa698554b0cfeeff1"
+   }
+  },
+  {
+   "args": [
+    {
+     "id": "INV-1003",
+     "customer": "Initech",
+     "amount_cents": 2974,
+     "currency": "usd"
+    },
+    {
+     "id": "ch_0003",
+     "invoice": "INV-1003",
+     "amount_cents": 2974,
+     "currency": "usd",
+     "status": "succeeded"
+    }
+   ],
+   "kwargs": {},
+   "io": [
+    {
+     "req": {
+      "kind": "subprocess",
+      "method": "RUN",
+      "url": "",
+      "body_sha": "",
+      "idempotency_key": null,
+      "timeout": null,
+      "argv": [
+       "python",
+       {
+        "$proj": [
+         "${PROJECT}",
+         "${PROJECT}/render.py"
+        ]
+       },
+       "{\"invoice\": \"INV-1003\", \"customer\": \"Initech\", \"amount_cents\": 2974, \"currency\": \"usd\", \"charge_id\": \"ch_0003\"}"
+      ],
+      "key": "run python render.py {\"invoice\": \"INV-1003\", \"customer\": \"Initech\", \"amount_cents\": 2974, \"currency\": \"usd\", \"charge_id\": \"ch_0003\"}"
+     },
+     "out": {
+      "returncode": 0,
+      "stdout": "{\"pages\": 1, \"bytes\": 78, \"sha256\": \"ab3ca12d347d5d76754209dca91d1268ceb64be89f3905688820cf99a27f9bbd\"}\n",
+      "stderr": ""
+     },
+     "dur": 0.021695
+    }
+   ],
+   "dur": 0.02238,
+   "result": {
+    "pages": 1,
+    "bytes": 78,
+    "sha256": "ab3ca12d347d5d76754209dca91d1268ceb64be89f3905688820cf99a27f9bbd"
+   }
+  },
+  {
+   "args": [
+    {
+     "id": "INV-1004",
+     "customer": "Umbrella",
+     "amount_cents": 3711,
+     "currency": "usd"
+    },
+    {
+     "id": "ch_0004",
+     "invoice": "INV-1004",
+     "amount_cents": 3711,
+     "currency": "usd",
+     "status": "succeeded"
+    }
+   ],
+   "kwargs": {},
+   "io": [
+    {
+     "req": {
+      "kind": "subprocess",
+      "method": "RUN",
+      "url": "",
+      "body_sha": "",
+      "idempotency_key": null,
+      "timeout": null,
+      "argv": [
+       "python",
+       {
+        "$proj": [
+         "${PROJECT}",
+         "${PROJECT}/render.py"
+        ]
+       },
+       "{\"invoice\": \"INV-1004\", \"customer\": \"Umbrella\", \"amount_cents\": 3711, \"currency\": \"usd\", \"charge_id\": \"ch_0004\"}"
+      ],
+      "key": "run python render.py {\"invoice\": \"INV-1004\", \"customer\": \"Umbrella\", \"amount_cents\": 3711, \"currency\": \"usd\", \"charge_id\": \"ch_0004\"}"
+     },
+     "out": {
+      "returncode": 0,
+      "stdout": "{\"pages\": 1, \"bytes\": 79, \"sha256\": \"16a8f5a04dcb849f1cf4141da78b1f558401517f96998f56190562dd1bb67997\"}\n",
+      "stderr": ""
+     },
+     "dur": 0.021957
+    }
+   ],
+   "dur": 0.022564,
+   "result": {
+    "pages": 1,
+    "bytes": 79,
+    "sha256": "16a8f5a04dcb849f1cf4141da78b1f558401517f96998f56190562dd1bb67997"
+   }
+  },
+  {
+   "args": [
+    {
+     "id": "INV-1005",
+     "customer": "Hooli",
+     "amount_cents": 4448,
+     "currency": "usd"
+    },
+    {
+     "id": "ch_0005",
+     "invoice": "INV-1005",
+     "amount_cents": 4448,
+     "currency": "usd",
+     "status": "succeeded"
+    }
+   ],
+   "kwargs": {},
+   "io": [
+    {
+     "req": {
+      "kind": "subprocess",
+      "method": "RUN",
+      "url": "",
+      "body_sha": "",
+      "idempotency_key": null,
+      "timeout": null,
+      "argv": [
+       "python",
+       {
+        "$proj": [
+         "${PROJECT}",
+         "${PROJECT}/render.py"
+        ]
+       },
+       "{\"invoice\": \"INV-1005\", \"customer\": \"Hooli\", \"amount_cents\": 4448, \"currency\": \"usd\", \"charge_id\": \"ch_0005\"}"
+      ],
+      "key": "run python render.py {\"invoice\": \"INV-1005\", \"customer\": \"Hooli\", \"amount_cents\": 4448, \"currency\": \"usd\", \"charge_id\": \"ch_0005\"}"
+     },
+     "out": {
+      "returncode": 0,
+      "stdout": "{\"pages\": 1, \"bytes\": 76, \"sha256\": \"780602cfd7c094afc0d671f78836210e78374a37c509c8a8508029e63275efe7\"}\n",
+      "stderr": ""
+     },
+     "dur": 0.020595
+    }
+   ],
+   "dur": 0.021226,
+   "result": {
+    "pages": 1,
+    "bytes": 76,
+    "sha256": "780602cfd7c094afc0d671f78836210e78374a37c509c8a8508029e63275efe7"
+   }
+  },
+  {
+   "args": [
+    {
+     "id": "INV-1006",
+     "customer": "Stark Ind",
+     "amount_cents": 5185,
+     "currency": "usd"
+    },
+    {
+     "id": "ch_0006",
+     "invoice": "INV-1006",
+     "amount_cents": 5185,
+     "currency": "usd",
+     "status": "succeeded"
+    }
+   ],
+   "kwargs": {},
+   "io": [
+    {
+     "req": {
+      "kind": "subprocess",
+      "method": "RUN",
+      "url": "",
+      "body_sha": "",
+      "idempotency_key": null,
+      "timeout": null,
+      "argv": [
+       "python",
+       {
+        "$proj": [
+         "${PROJECT}",
+         "${PROJECT}/render.py"
+        ]
+       },
+       "{\"invoice\": \"INV-1006\", \"customer\": \"Stark Ind\", \"amount_cents\": 5185, \"currency\": \"usd\", \"charge_id\": \"ch_0006\"}"
+      ],
+      "key": "run python render.py {\"invoice\": \"INV-1006\", \"customer\": \"Stark Ind\", \"amount_cents\": 5185, \"currency\": \"usd\", \"charge_id\": \"ch_0006\"}"
+     },
+     "out": {
+      "returncode": 0,
+      "stdout": "{\"pages\": 1, \"bytes\": 80, \"sha256\": \"982e8ad183e4050e0b6e998aefaba633ce68fd5825f5d366ce8fbcf1562b8eaa\"}\n",
+      "stderr": ""
+     },
+     "dur": 0.020864
+    }
+   ],
+   "dur": 0.02151,
+   "result": {
+    "pages": 1,
+    "bytes": 80,
+    "sha256": "982e8ad183e4050e0b6e998aefaba633ce68fd5825f5d366ce8fbcf1562b8eaa"
+   }
+  },
+  {
+   "args": [
+    {
+     "id": "INV-1007",
+     "customer": "Wayne Ent",
+     "amount_cents": 5922,
+     "currency": "usd"
+    },
+    {
+     "id": "ch_0007",
+     "invoice": "INV-1007",
+     "amount_cents": 5922,
+     "currency": "usd",
+     "status": "succeeded"
+    }
+   ],
+   "kwargs": {},
+   "io": [
+    {
+     "req": {
+      "kind": "subprocess",
+      "method": "RUN",
+      "url": "",
+      "body_sha": "",
+      "idempotency_key": null,
+      "timeout": null,
+      "argv": [
+       "python",
+       {
+        "$proj": [
+         "${PROJECT}",
+         "${PROJECT}/render.py"
+        ]
+       },
+       "{\"invoice\": \"INV-1007\", \"customer\": \"Wayne Ent\", \"amount_cents\": 5922, \"currency\": \"usd\", \"charge_id\": \"ch_0007\"}"
+      ],
+      "key": "run python render.py {\"invoice\": \"INV-1007\", \"customer\": \"Wayne Ent\", \"amount_cents\": 5922, \"currency\": \"usd\", \"charge_id\": \"ch_0007\"}"
+     },
+     "out": {
+      "returncode": 0,
+      "stdout": "{\"pages\": 1, \"bytes\": 80, \"sha256\": \"903223a4623698f687aa055f34a2ce109ff0e06326fb14b2b5bcb35332327259\"}\n",
+      "stderr": ""
+     },
+     "dur": 0.020665
+    }
+   ],
+   "dur": 0.021305,
+   "result": {
+    "pages": 1,
+    "bytes": 80,
+    "sha256": "903223a4623698f687aa055f34a2ce109ff0e06326fb14b2b5bcb35332327259"
+   }
+  },
+  {
+   "args": [
+    {
+     "id": "INV-1008",
+     "customer": "Wonka",
+     "amount_cents": 6659,
+     "currency": "usd"
+    },
+    {
+     "id": "ch_0008",
+     "invoice": "INV-1008",
+     "amount_cents": 6659,
+     "currency": "usd",
+     "status": "succeeded"
+    }
+   ],
+   "kwargs": {},
+   "io": [
+    {
+     "req": {
+      "kind": "subprocess",
+      "method": "RUN",
+      "url": "",
+      "body_sha": "",
+      "idempotency_key": null,
+      "timeout": null,
+      "argv": [
+       "python",
+       {
+        "$proj": [
+         "${PROJECT}",
+         "${PROJECT}/render.py"
+        ]
+       },
+       "{\"invoice\": \"INV-1008\", \"customer\": \"Wonka\", \"amount_cents\": 6659, \"currency\": \"usd\", \"charge_id\": \"ch_0008\"}"
+      ],
+      "key": "run python render.py {\"invoice\": \"INV-1008\", \"customer\": \"Wonka\", \"amount_cents\": 6659, \"currency\": \"usd\", \"charge_id\": \"ch_0008\"}"
+     },
+     "out": {
+      "returncode": 0,
+      "stdout": "{\"pages\": 1, \"bytes\": 76, \"sha256\": \"5c1419ea5b8b30803e6e84d9e76bb8bd1f85fefb298ed878d10aca742e61b56d\"}\n",
+      "stderr": ""
+     },
+     "dur": 0.021543
+    }
+   ],
+   "dur": 0.022206,
+   "result": {
+    "pages": 1,
+    "bytes": 76,
+    "sha256": "5c1419ea5b8b30803e6e84d9e76bb8bd1f85fefb298ed878d10aca742e61b56d"
+   }
+  },
+  {
+   "args": [
+    {
+     "id": "INV-1009",
+     "customer": "Acme Co",
+     "amount_cents": 7396,
+     "currency": "usd"
+    },
+    {
+     "id": "ch_0009",
+     "invoice": "INV-1009",
+     "amount_cents": 7396,
+     "currency": "usd",
+     "status": "succeeded"
+    }
+   ],
+   "kwargs": {},
+   "io": [
+    {
+     "req": {
+      "kind": "subprocess",
+      "method": "RUN",
+      "url": "",
+      "body_sha": "",
+      "idempotency_key": null,
+      "timeout": null,
+      "argv": [
+       "python",
+       {
+        "$proj": [
+         "${PROJECT}",
+         "${PROJECT}/render.py"
+        ]
+       },
+       "{\"invoice\": \"INV-1009\", \"customer\": \"Acme Co\", \"amount_cents\": 7396, \"currency\": \"usd\", \"charge_id\": \"ch_0009\"}"
+      ],
+      "key": "run python render.py {\"invoice\": \"INV-1009\", \"customer\": \"Acme Co\", \"amount_cents\": 7396, \"currency\": \"usd\", \"charge_id\": \"ch_0009\"}"
+     },
+     "out": {
+      "returncode": 0,
+      "stdout": "{\"pages\": 1, \"bytes\": 78, \"sha256\": \"3ba42803440ebdbc83d71a48142d13afb063599879c7d0dc4cc7cc7b57dd583a\"}\n",
+      "stderr": ""
+     },
+     "dur": 0.020854
+    }
+   ],
+   "dur": 0.02147,
+   "result": {
+    "pages": 1,
+    "bytes": 78,
+    "sha256": "3ba42803440ebdbc83d71a48142d13afb063599879c7d0dc4cc7cc7b57dd583a"
+   }
+  },
+  {
+   "args": [
+    {
+     "id": "INV-1010",
+     "customer": "Globex",
+     "amount_cents": 8133,
+     "currency": "usd"
+    },
+    {
+     "id": "ch_0010",
+     "invoice": "INV-1010",
+     "amount_cents": 8133,
+     "currency": "usd",
+     "status": "succeeded"
+    }
+   ],
+   "kwargs": {},
+   "io": [
+    {
+     "req": {
+      "kind": "subprocess",
+      "method": "RUN",
+      "url": "",
+      "body_sha": "",
+      "idempotency_key": null,
+      "timeout": null,
+      "argv": [
+       "python",
+       {
+        "$proj": [
+         "${PROJECT}",
+         "${PROJECT}/render.py"
+        ]
+       },
+       "{\"invoice\": \"INV-1010\", \"customer\": \"Globex\", \"amount_cents\": 8133, \"currency\": \"usd\", \"charge_id\": \"ch_0010\"}"
+      ],
+      "key": "run python render.py {\"invoice\": \"INV-1010\", \"customer\": \"Globex\", \"amount_cents\": 8133, \"currency\": \"usd\", \"charge_id\": \"ch_0010\"}"
+     },
+     "out": {
+      "returncode": 0,
+      "stdout": "{\"pages\": 1, \"bytes\": 77, \"sha256\": \"ed2e12aea20ac7eefb50ff423a45b5c4ce39c4073bafc224c4a4823dac1cdd3b\"}\n",
+      "stderr": ""
+     },
+     "dur": 0.02247
+    }
+   ],
+   "dur": 0.023094,
+   "result": {
+    "pages": 1,
+    "bytes": 77,
+    "sha256": "ed2e12aea20ac7eefb50ff423a45b5c4ce39c4073bafc224c4a4823dac1cdd3b"
+   }
+  },
+  {
+   "args": [
+    {
+     "id": "INV-1011",
+     "customer": "Initech",
+     "amount_cents": 8870,
+     "currency": "usd"
+    },
+    {
+     "id": "ch_0011",
+     "invoice": "INV-1011",
+     "amount_cents": 8870,
+     "currency": "usd",
+     "status": "succeeded"
+    }
+   ],
+   "kwargs": {},
+   "io": [
+    {
+     "req": {
+      "kind": "subprocess",
+      "method": "RUN",
+      "url": "",
+      "body_sha": "",
+      "idempotency_key": null,
+      "timeout": null,
+      "argv": [
+       "python",
+       {
+        "$proj": [
+         "${PROJECT}",
+         "${PROJECT}/render.py"
+        ]
+       },
+       "{\"invoice\": \"INV-1011\", \"customer\": \"Initech\", \"amount_cents\": 8870, \"currency\": \"usd\", \"charge_id\": \"ch_0011\"}"
+      ],
+      "key": "run python render.py {\"invoice\": \"INV-1011\", \"customer\": \"Initech\", \"amount_cents\": 8870, \"currency\": \"usd\", \"charge_id\": \"ch_0011\"}"
+     },
+     "out": {
+      "returncode": 0,
+      "stdout": "{\"pages\": 1, \"bytes\": 78, \"sha256\": \"bc5f3c331622d49c914dcea0a4e45dfab4e1fcc686056d942a303930bede1177\"}\n",
+      "stderr": ""
+     },
+     "dur": 0.020287
+    }
+   ],
+   "dur": 0.020903,
+   "result": {
+    "pages": 1,
+    "bytes": 78,
+    "sha256": "bc5f3c331622d49c914dcea0a4e45dfab4e1fcc686056d942a303930bede1177"
+   }
+  },
+  {
+   "args": [
+    {
+     "id": "INV-1012",
+     "customer": "Umbrella",
+     "amount_cents": 9607,
+     "currency": "usd"
+    },
+    {
+     "id": "ch_0012",
+     "invoice": "INV-1012",
+     "amount_cents": 9607,
+     "currency": "usd",
+     "status": "succeeded"
+    }
+   ],
+   "kwargs": {},
+   "io": [
+    {
+     "req": {
+      "kind": "subprocess",
+      "method": "RUN",
+      "url": "",
+      "body_sha": "",
+      "idempotency_key": null,
+      "timeout": null,
+      "argv": [
+       "python",
+       {
+        "$proj": [
+         "${PROJECT}",
+         "${PROJECT}/render.py"
+        ]
+       },
+       "{\"invoice\": \"INV-1012\", \"customer\": \"Umbrella\", \"amount_cents\": 9607, \"currency\": \"usd\", \"charge_id\": \"ch_0012\"}"
+      ],
+      "key": "run python render.py {\"invoice\": \"INV-1012\", \"customer\": \"Umbrella\", \"amount_cents\": 9607, \"currency\": \"usd\", \"charge_id\": \"ch_0012\"}"
+     },
+     "out": {
+      "returncode": 0,
+      "stdout": "{\"pages\": 1, \"bytes\": 79, \"sha256\": \"ab5bc010d88b5cc053ebccea5a43657682f7269ee6c244d832d28b850315ef74\"}\n",
+      "stderr": ""
+     },
+     "dur": 0.020297
+    }
+   ],
+   "dur": 0.020948,
+   "result": {
+    "pages": 1,
+    "bytes": 79,
+    "sha256": "ab5bc010d88b5cc053ebccea5a43657682f7269ee6c244d832d28b850315ef74"
+   }
+  },
+  {
+   "args": [
+    {
+     "id": "INV-1013",
+     "customer": "Hooli",
+     "amount_cents": 10344,
+     "currency": "usd"
+    },
+    {
+     "id": "ch_0013",
+     "invoice": "INV-1013",
+     "amount_cents": 10344,
+     "currency": "usd",
+     "status": "succeeded"
+    }
+   ],
+   "kwargs": {},
+   "io": [
+    {
+     "req": {
+      "kind": "subprocess",
+      "method": "RUN",
+      "url": "",
+      "body_sha": "",
+      "idempotency_key": null,
+      "timeout": null,
+      "argv": [
+       "python",
+       {
+        "$proj": [
+         "${PROJECT}",
+         "${PROJECT}/render.py"
+        ]
+       },
+       "{\"invoice\": \"INV-1013\", \"customer\": \"Hooli\", \"amount_cents\": 10344, \"currency\": \"usd\", \"charge_id\": \"ch_0013\"}"
+      ],
+      "key": "run python render.py {\"invoice\": \"INV-1013\", \"customer\": \"Hooli\", \"amount_cents\": 10344, \"currency\": \"usd\", \"charge_id\": \"ch_0013\"}"
+     },
+     "out": {
+      "returncode": 0,
+      "stdout": "{\"pages\": 1, \"bytes\": 77, \"sha256\": \"4881c99705cccae33afb3186ff2e73b1a6e401fbdc07b5528b6c6f0b55d2acfa\"}\n",
+      "stderr": ""
+     },
+     "dur": 0.020815
+    }
+   ],
+   "dur": 0.021493,
+   "result": {
+    "pages": 1,
+    "bytes": 77,
+    "sha256": "4881c99705cccae33afb3186ff2e73b1a6e401fbdc07b5528b6c6f0b55d2acfa"
+   }
+  },
+  {
+   "args": [
+    {
+     "id": "INV-1014",
+     "customer": "Stark Ind",
+     "amount_cents": 2081,
+     "currency": "usd"
+    },
+    {
+     "id": "ch_0014",
+     "invoice": "INV-1014",
+     "amount_cents": 2081,
+     "currency": "usd",
+     "status": "succeeded"
+    }
+   ],
+   "kwargs": {},
+   "io": [
+    {
+     "req": {
+      "kind": "subprocess",
+      "method": "RUN",
+      "url": "",
+      "body_sha": "",
+      "idempotency_key": null,
+      "timeout": null,
+      "argv": [
+       "python",
+       {
+        "$proj": [
+         "${PROJECT}",
+         "${PROJECT}/render.py"
+        ]
+       },
+       "{\"invoice\": \"INV-1014\", \"customer\": \"Stark Ind\", \"amount_cents\": 2081, \"currency\": \"usd\", \"charge_id\": \"ch_0014\"}"
+      ],
+      "key": "run python render.py {\"invoice\": \"INV-1014\", \"customer\": \"Stark Ind\", \"amount_cents\": 2081, \"currency\": \"usd\", \"charge_id\": \"ch_0014\"}"
+     },
+     "out": {
+      "returncode": 0,
+      "stdout": "{\"pages\": 1, \"bytes\": 80, \"sha256\": \"94342f400126558b3e19ef7e1bd847a1c20b6e8c1512e916cf143b185c9fa0a2\"}\n",
+      "stderr": ""
+     },
+     "dur": 0.020804
+    }
+   ],
+   "dur": 0.021468,
+   "result": {
+    "pages": 1,
+    "bytes": 80,
+    "sha256": "94342f400126558b3e19ef7e1bd847a1c20b6e8c1512e916cf143b185c9fa0a2"
+   }
+  },
+  {
+   "args": [
+    {
+     "id": "INV-1015",
+     "customer": "Wayne Ent",
+     "amount_cents": 2818,
+     "currency": "usd"
+    },
+    {
+     "id": "ch_0015",
+     "invoice": "INV-1015",
+     "amount_cents": 2818,
+     "currency": "usd",
+     "status": "succeeded"
+    }
+   ],
+   "kwargs": {},
+   "io": [
+    {
+     "req": {
+      "kind": "subprocess",
+      "method": "RUN",
+      "url": "",
+      "body_sha": "",
+      "idempotency_key": null,
+      "timeout": null,
+      "argv": [
+       "python",
+       {
+        "$proj": [
+         "${PROJECT}",
+         "${PROJECT}/render.py"
+        ]
+       },
+       "{\"invoice\": \"INV-1015\", \"customer\": \"Wayne Ent\", \"amount_cents\": 2818, \"currency\": \"usd\", \"charge_id\": \"ch_0015\"}"
+      ],
+      "key": "run python render.py {\"invoice\": \"INV-1015\", \"customer\": \"Wayne Ent\", \"amount_cents\": 2818, \"currency\": \"usd\", \"charge_id\": \"ch_0015\"}"
+     },
+     "out": {
+      "returncode": 0,
+      "stdout": "{\"pages\": 1, \"bytes\": 80, \"sha256\": \"12ccecbe7deb18ed4b284152ab023123ee318a581b624ed2a1e1e656c1c6d029\"}\n",
+      "stderr": ""
+     },
+     "dur": 0.038496
+    }
+   ],
+   "dur": 0.039185,
+   "result": {
+    "pages": 1,
+    "bytes": 80,
+    "sha256": "12ccecbe7deb18ed4b284152ab023123ee318a581b624ed2a1e1e656c1c6d029"
+   }
+  },
+  {
+   "args": [
+    {
+     "id": "INV-1016",
+     "customer": "Wonka",
+     "amount_cents": 3555,
+     "currency": "usd"
+    },
+    {
+     "id": "ch_0016",
+     "invoice": "INV-1016",
+     "amount_cents": 3555,
+     "currency": "usd",
+     "status": "succeeded"
+    }
+   ],
+   "kwargs": {},
+   "io": [
+    {
+     "req": {
+      "kind": "subprocess",
+      "method": "RUN",
+      "url": "",
+      "body_sha": "",
+      "idempotency_key": null,
+      "timeout": null,
+      "argv": [
+       "python",
+       {
+        "$proj": [
+         "${PROJECT}",
+         "${PROJECT}/render.py"
+        ]
+       },
+       "{\"invoice\": \"INV-1016\", \"customer\": \"Wonka\", \"amount_cents\": 3555, \"currency\": \"usd\", \"charge_id\": \"ch_0016\"}"
+      ],
+      "key": "run python render.py {\"invoice\": \"INV-1016\", \"customer\": \"Wonka\", \"amount_cents\": 3555, \"currency\": \"usd\", \"charge_id\": \"ch_0016\"}"
+     },
+     "out": {
+      "returncode": 0,
+      "stdout": "{\"pages\": 1, \"bytes\": 76, \"sha256\": \"0f50b115e356e6231211d429bf57eb437af3532033f13563d0909c5eef471489\"}\n",
+      "stderr": ""
+     },
+     "dur": 0.020369
+    }
+   ],
+   "dur": 0.021007,
+   "result": {
+    "pages": 1,
+    "bytes": 76,
+    "sha256": "0f50b115e356e6231211d429bf57eb437af3532033f13563d0909c5eef471489"
+   }
+  }
+ ]
+}

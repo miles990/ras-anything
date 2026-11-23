@@ -7,19 +7,18 @@ recorded into a cassette and replayed):
 
     http:       {"status", "reason", "headers": [[k, v]...], "body": bytes, "url"}
     subprocess: {"returncode", "stdout", "stderr"}
-    any:        {"exc": {"type", "msg", "pickle"}}
+    any:        {"exc": {"type", "module", "msg", ...}}   (see cassette.dump_exc)
 
-The adapter then turns the outcome back into exactly what the API returns or raises.
+A live exception also travels as out["_live"] so running code gets the original object; it is never
+recorded. The adapter then turns the outcome back into exactly what the API returns or raises.
 """
 
 from __future__ import annotations
 
 import errno
 import hashlib
-import importlib
 import io
 import os
-import pickle
 import socket
 import subprocess
 import threading
@@ -29,7 +28,7 @@ import urllib.parse
 import urllib.request
 from email.message import Message
 
-from . import faults, runtime
+from . import cassette, faults, runtime
 
 NONIDEMPOTENT = frozenset({"POST", "PUT", "PATCH", "DELETE"})
 
@@ -45,7 +44,6 @@ class ReplayMiss(BaseException):
 
 
 # --------------------------------------------------------------------------- requests and outcomes
-
 
 
 def norm_subproc_key(argv, cwd: str | None = None) -> str:
@@ -96,7 +94,15 @@ class Req:
 
     def to_dict(self) -> dict:
         return {"kind": self.kind, "method": self.method, "url": self.url, "body_sha": self.body_sha,
-                "idempotency_key": self.idem_key, "timeout": self.timeout, "argv": self.argv, "key": self.key}
+                "idempotency_key": self.idem_key, "timeout": self.timeout, "argv": _portable_argv(self.argv),
+                "key": self.key}
+
+
+def _portable_argv(argv):
+    """argv for the record: which python runs a script is this machine's business."""
+    if isinstance(argv, list) and argv and os.path.basename(argv[0]).startswith("python"):
+        return ["python"] + argv[1:]
+    return argv
 
 
 def _logical_url(url: str) -> str:
@@ -120,33 +126,17 @@ def _sha(body) -> str:
     return hashlib.sha256(bytes(body)).hexdigest() if body else ""
 
 
-def ser_exc(e: BaseException) -> dict:
-    d = {"type": "%s.%s" % (type(e).__module__, type(e).__qualname__), "msg": str(e), "pickle": None}
-    try:
-        blob = pickle.dumps(e)
-        pickle.loads(blob)
-        d["pickle"] = blob
-    except Exception:
-        pass
-    return d
-
-
-def rebuild_exc(d: dict) -> BaseException:
-    if d.get("pickle"):
-        try:
-            return pickle.loads(d["pickle"])
-        except Exception:
-            pass
-    mod, _, name = d["type"].rpartition(".")
-    try:
-        cls = getattr(importlib.import_module(mod), name)
-        return cls(d.get("msg", ""))
-    except Exception:
-        return RuntimeError("%s: %s" % (d["type"], d.get("msg", "")))
-
-
 def exc_outcome(e: BaseException) -> dict:
-    return {"exc": ser_exc(e)}
+    return {"exc": cassette.dump_exc(e), "_live": e}
+
+
+def recorded(out: dict) -> dict:
+    """The outcome as it goes into a cassette."""
+    return {k: v for k, v in out.items() if k != "_live"}
+
+
+def raise_outcome(out: dict):
+    raise out.get("_live") or cassette.build_exc(out["exc"])
 
 
 # --------------------------------------------------------------------------- handlers
@@ -406,7 +396,7 @@ def _urlopen(url, data=None, timeout=socket._GLOBAL_DEFAULT_TIMEOUT, *args, **kw
 
     out = _dispatch(req, real)
     if "exc" in out:
-        raise rebuild_exc(out["exc"])
+        raise_outcome(out)
     if out["status"] >= 400:
         raise urllib.error.HTTPError(out.get("url") or full, out["status"], out.get("reason", ""),
                                      _headers(out.get("headers")), io.BytesIO(out.get("body") or b""))
@@ -433,7 +423,7 @@ def _run(*popenargs, **kwargs):
 
     out = _dispatch(req, real)
     if "exc" in out:
-        raise rebuild_exc(out["exc"])
+        raise_outcome(out)
     cp = subprocess.CompletedProcess(args, out["returncode"], out.get("stdout"), out.get("stderr"))
     if check and cp.returncode:
         raise subprocess.CalledProcessError(cp.returncode, args, cp.stdout, cp.stderr)
@@ -469,7 +459,7 @@ def _requests_request(self, method, url, *args, **kwargs):
 
     out = _dispatch(req, real)
     if "exc" in out:
-        raise rebuild_exc(out["exc"])
+        raise_outcome(out)
     r = requests.Response()
     r.status_code = out["status"]
     r.reason = out.get("reason", "")

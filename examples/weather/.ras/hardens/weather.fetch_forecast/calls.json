@@ -1,0 +1,851 @@
+{
+ "format": "ras-anything-cassette",
+ "version": 1,
+ "lang": "python",
+ "calls": [
+  {
+   "args": [
+    "Taipei"
+   ],
+   "kwargs": {},
+   "io": [
+    {
+     "req": {
+      "kind": "http",
+      "method": "GET",
+      "url": "http://127.0.0.1:45301/v1/forecast?city=Taipei",
+      "body_sha": "",
+      "idempotency_key": null,
+      "timeout": null,
+      "argv": null,
+      "key": "GET http://127.0.0.1/v1/forecast?city=Taipei"
+     },
+     "out": {
+      "status": 200,
+      "reason": "OK",
+      "headers": [
+       [
+        "Server",
+        "BaseHTTP/0.6 Python/3.13.5"
+       ],
+       [
+        "Date",
+        "Mon, 23 Nov 2026 04:12:12 GMT"
+       ],
+       [
+        "Content-Type",
+        "application/json"
+       ],
+       [
+        "Content-Length",
+        "223"
+       ]
+      ],
+      "body": {
+       "$bytes": "eyJjaXR5IjogIlRhaXBlaSIsICJkYWlseSI6IFt7ImRheSI6ICJNb24iLCAiaGlfYyI6IDgsICJsb19jIjogLTEsICJyYWluX21tIjogMy4zfSwgeyJkYXkiOiAiVHVlIiwgImhpX2MiOiAxMywgImxvX2MiOiAzLCAicmFpbl9tbSI6IDEuOX0sIHsiZGF5IjogIldlZCIsICJoaV9jIjogMjAsICJsb19jIjogMTQsICJyYWluX21tIjogNC44fV0sICJzb3VyY2UiOiAibG9jYWwtdXBzdHJlYW0ifQ=="
+      },
+      "url": "http://127.0.0.1:45301/v1/forecast?city=Taipei"
+     },
+     "dur": 0.01602
+    }
+   ],
+   "dur": 0.017478,
+   "result": {
+    "city": "Taipei",
+    "daily": [
+     {
+      "day": "Mon",
+      "hi_c": 8,
+      "lo_c": -1,
+      "rain_mm": 3.3
+     },
+     {
+      "day": "Tue",
+      "hi_c": 13,
+      "lo_c": 3,
+      "rain_mm": 1.9
+     },
+     {
+      "day": "Wed",
+      "hi_c": 20,
+      "lo_c": 14,
+      "rain_mm": 4.8
+     }
+    ],
+    "source": "local-upstream"
+   }
+  },
+  {
+   "args": [
+    "Tokyo"
+   ],
+   "kwargs": {},
+   "io": [
+    {
+     "req": {
+      "kind": "http",
+      "method": "GET",
+      "url": "http://127.0.0.1:45301/v1/forecast?city=Tokyo",
+      "body_sha": "",
+      "idempotency_key": null,
+      "timeout": null,
+      "argv": null,
+      "key": "GET http://127.0.0.1/v1/forecast?city=Tokyo"
+     },
+     "out": {
+      "status": 200,
+      "reason": "OK",
+      "headers": [
+       [
+        "Server",
+        "BaseHTTP/0.6 Python/3.13.5"
+       ],
+       [
+        "Date",
+        "Mon, 23 Nov 2026 04:12:12 GMT"
+       ],
+       [
+        "Content-Type",
+        "application/json"
+       ],
+       [
+        "Content-Length",
+        "222"
+       ]
+      ],
+      "body": {
+       "$bytes": "eyJjaXR5IjogIlRva3lvIiwgImRhaWx5IjogW3siZGF5IjogIk1vbiIsICJoaV9jIjogMTksICJsb19jIjogMTQsICJyYWluX21tIjogMi44fSwgeyJkYXkiOiAiVHVlIiwgImhpX2MiOiAyOCwgImxvX2MiOiAyMiwgInJhaW5fbW0iOiA3Ljl9LCB7ImRheSI6ICJXZWQiLCAiaGlfYyI6IDgsICJsb19jIjogMiwgInJhaW5fbW0iOiAwLjZ9XSwgInNvdXJjZSI6ICJsb2NhbC11cHN0cmVhbSJ9"
+      },
+      "url": "http://127.0.0.1:45301/v1/forecast?city=Tokyo"
+     },
+     "dur": 0.004213
+    }
+   ],
+   "dur": 0.00535,
+   "result": {
+    "city": "Tokyo",
+    "daily": [
+     {
+      "day": "Mon",
+      "hi_c": 19,
+      "lo_c": 14,
+      "rain_mm": 2.8
+     },
+     {
+      "day": "Tue",
+      "hi_c": 28,
+      "lo_c": 22,
+      "rain_mm": 7.9
+     },
+     {
+      "day": "Wed",
+      "hi_c": 8,
+      "lo_c": 2,
+      "rain_mm": 0.6
+     }
+    ],
+    "source": "local-upstream"
+   }
+  },
+  {
+   "args": [
+    "Seoul"
+   ],
+   "kwargs": {},
+   "io": [
+    {
+     "req": {
+      "kind": "http",
+      "method": "GET",
+      "url": "http://127.0.0.1:45301/v1/forecast?city=Seoul",
+      "body_sha": "",
+      "idempotency_key": null,
+      "timeout": null,
+      "argv": null,
+      "key": "GET http://127.0.0.1/v1/forecast?city=Seoul"
+     },
+     "out": {
+      "status": 200,
+      "reason": "OK",
+      "headers": [
+       [
+        "Server",
+        "BaseHTTP/0.6 Python/3.13.5"
+       ],
+       [
+        "Date",
+        "Mon, 23 Nov 2026 04:12:12 GMT"
+       ],
+       [
+        "Content-Type",
+        "application/json"
+       ],
+       [
+        "Content-Length",
+        "220"
+       ]
+      ],
+      "body": {
+       "$bytes": "eyJjaXR5IjogIlNlb3VsIiwgImRhaWx5IjogW3siZGF5IjogIk1vbiIsICJoaV9jIjogOCwgImxvX2MiOiAyLCAicmFpbl9tbSI6IDAuN30sIHsiZGF5IjogIlR1ZSIsICJoaV9jIjogMTUsICJsb19jIjogNywgInJhaW5fbW0iOiA1Ljl9LCB7ImRheSI6ICJXZWQiLCAiaGlfYyI6IDEwLCAibG9fYyI6IDYsICJyYWluX21tIjogMS4wfV0sICJzb3VyY2UiOiAibG9jYWwtdXBzdHJlYW0ifQ=="
+      },
+      "url": "http://127.0.0.1:45301/v1/forecast?city=Seoul"
+     },
+     "dur": 0.004013
+    }
+   ],
+   "dur": 0.004985,
+   "result": {
+    "city": "Seoul",
+    "daily": [
+     {
+      "day": "Mon",
+      "hi_c": 8,
+      "lo_c": 2,
+      "rain_mm": 0.7
+     },
+     {
+      "day": "Tue",
+      "hi_c": 15,
+      "lo_c": 7,
+      "rain_mm": 5.9
+     },
+     {
+      "day": "Wed",
+      "hi_c": 10,
+      "lo_c": 6,
+      "rain_mm": 1.0
+     }
+    ],
+    "source": "local-upstream"
+   }
+  },
+  {
+   "args": [
+    "Singapore"
+   ],
+   "kwargs": {},
+   "io": [
+    {
+     "req": {
+      "kind": "http",
+      "method": "GET",
+      "url": "http://127.0.0.1:45301/v1/forecast?city=Singapore",
+      "body_sha": "",
+      "idempotency_key": null,
+      "timeout": null,
+      "argv": null,
+      "key": "GET http://127.0.0.1/v1/forecast?city=Singapore"
+     },
+     "out": {
+      "status": 200,
+      "reason": "OK",
+      "headers": [
+       [
+        "Server",
+        "BaseHTTP/0.6 Python/3.13.5"
+       ],
+       [
+        "Date",
+        "Mon, 23 Nov 2026 04:12:12 GMT"
+       ],
+       [
+        "Content-Type",
+        "application/json"
+       ],
+       [
+        "Content-Length",
+        "226"
+       ]
+      ],
+      "body": {
+       "$bytes": "eyJjaXR5IjogIlNpbmdhcG9yZSIsICJkYWlseSI6IFt7ImRheSI6ICJNb24iLCAiaGlfYyI6IDksICJsb19jIjogNCwgInJhaW5fbW0iOiAyLjR9LCB7ImRheSI6ICJUdWUiLCAiaGlfYyI6IDE3LCAibG9fYyI6IDExLCAicmFpbl9tbSI6IDcuNX0sIHsiZGF5IjogIldlZCIsICJoaV9jIjogMjQsICJsb19jIjogMTcsICJyYWluX21tIjogNi41fV0sICJzb3VyY2UiOiAibG9jYWwtdXBzdHJlYW0ifQ=="
+      },
+      "url": "http://127.0.0.1:45301/v1/forecast?city=Singapore"
+     },
+     "dur": 0.003653
+    }
+   ],
+   "dur": 0.004773,
+   "result": {
+    "city": "Singapore",
+    "daily": [
+     {
+      "day": "Mon",
+      "hi_c": 9,
+      "lo_c": 4,
+      "rain_mm": 2.4
+     },
+     {
+      "day": "Tue",
+      "hi_c": 17,
+      "lo_c": 11,
+      "rain_mm": 7.5
+     },
+     {
+      "day": "Wed",
+      "hi_c": 24,
+      "lo_c": 17,
+      "rain_mm": 6.5
+     }
+    ],
+    "source": "local-upstream"
+   }
+  },
+  {
+   "args": [
+    "Sydney"
+   ],
+   "kwargs": {},
+   "io": [
+    {
+     "req": {
+      "kind": "http",
+      "method": "GET",
+      "url": "http://127.0.0.1:45301/v1/forecast?city=Sydney",
+      "body_sha": "",
+      "idempotency_key": null,
+      "timeout": null,
+      "argv": null,
+      "key": "GET http://127.0.0.1/v1/forecast?city=Sydney"
+     },
+     "out": {
+      "status": 200,
+      "reason": "OK",
+      "headers": [
+       [
+        "Server",
+        "BaseHTTP/0.6 Python/3.13.5"
+       ],
+       [
+        "Date",
+        "Mon, 23 Nov 2026 04:12:12 GMT"
+       ],
+       [
+        "Content-Type",
+        "application/json"
+       ],
+       [
+        "Content-Length",
+        "225"
+       ]
+      ],
+      "body": {
+       "$bytes": "eyJjaXR5IjogIlN5ZG5leSIsICJkYWlseSI6IFt7ImRheSI6ICJNb24iLCAiaGlfYyI6IDE3LCAibG9fYyI6IDEwLCAicmFpbl9tbSI6IDEuNn0sIHsiZGF5IjogIlR1ZSIsICJoaV9jIjogMjEsICJsb19jIjogMTYsICJyYWluX21tIjogMi42fSwgeyJkYXkiOiAiV2VkIiwgImhpX2MiOiAxNywgImxvX2MiOiAxMSwgInJhaW5fbW0iOiAyLjV9XSwgInNvdXJjZSI6ICJsb2NhbC11cHN0cmVhbSJ9"
+      },
+      "url": "http://127.0.0.1:45301/v1/forecast?city=Sydney"
+     },
+     "dur": 0.003876
+    }
+   ],
+   "dur": 0.004906,
+   "result": {
+    "city": "Sydney",
+    "daily": [
+     {
+      "day": "Mon",
+      "hi_c": 17,
+      "lo_c": 10,
+      "rain_mm": 1.6
+     },
+     {
+      "day": "Tue",
+      "hi_c": 21,
+      "lo_c": 16,
+      "rain_mm": 2.6
+     },
+     {
+      "day": "Wed",
+      "hi_c": 17,
+      "lo_c": 11,
+      "rain_mm": 2.5
+     }
+    ],
+    "source": "local-upstream"
+   }
+  },
+  {
+   "args": [
+    "Mumbai"
+   ],
+   "kwargs": {},
+   "io": [
+    {
+     "req": {
+      "kind": "http",
+      "method": "GET",
+      "url": "http://127.0.0.1:45301/v1/forecast?city=Mumbai",
+      "body_sha": "",
+      "idempotency_key": null,
+      "timeout": null,
+      "argv": null,
+      "key": "GET http://127.0.0.1/v1/forecast?city=Mumbai"
+     },
+     "out": {
+      "status": 200,
+      "reason": "OK",
+      "headers": [
+       [
+        "Server",
+        "BaseHTTP/0.6 Python/3.13.5"
+       ],
+       [
+        "Date",
+        "Mon, 23 Nov 2026 04:12:12 GMT"
+       ],
+       [
+        "Content-Type",
+        "application/json"
+       ],
+       [
+        "Content-Length",
+        "224"
+       ]
+      ],
+      "body": {
+       "$bytes": "eyJjaXR5IjogIk11bWJhaSIsICJkYWlseSI6IFt7ImRheSI6ICJNb24iLCAiaGlfYyI6IDE3LCAibG9fYyI6IDgsICJyYWluX21tIjogNS40fSwgeyJkYXkiOiAiVHVlIiwgImhpX2MiOiAyNiwgImxvX2MiOiAyMCwgInJhaW5fbW0iOiAxLjV9LCB7ImRheSI6ICJXZWQiLCAiaGlfYyI6IDI0LCAibG9fYyI6IDE1LCAicmFpbl9tbSI6IDIuMn1dLCAic291cmNlIjogImxvY2FsLXVwc3RyZWFtIn0="
+      },
+      "url": "http://127.0.0.1:45301/v1/forecast?city=Mumbai"
+     },
+     "dur": 0.003913
+    }
+   ],
+   "dur": 0.00496,
+   "result": {
+    "city": "Mumbai",
+    "daily": [
+     {
+      "day": "Mon",
+      "hi_c": 17,
+      "lo_c": 8,
+      "rain_mm": 5.4
+     },
+     {
+      "day": "Tue",
+      "hi_c": 26,
+      "lo_c": 20,
+      "rain_mm": 1.5
+     },
+     {
+      "day": "Wed",
+      "hi_c": 24,
+      "lo_c": 15,
+      "rain_mm": 2.2
+     }
+    ],
+    "source": "local-upstream"
+   }
+  },
+  {
+   "args": [
+    "Berlin"
+   ],
+   "kwargs": {},
+   "io": [
+    {
+     "req": {
+      "kind": "http",
+      "method": "GET",
+      "url": "http://127.0.0.1:45301/v1/forecast?city=Berlin",
+      "body_sha": "",
+      "idempotency_key": null,
+      "timeout": null,
+      "argv": null,
+      "key": "GET http://127.0.0.1/v1/forecast?city=Berlin"
+     },
+     "out": {
+      "status": 200,
+      "reason": "OK",
+      "headers": [
+       [
+        "Server",
+        "BaseHTTP/0.6 Python/3.13.5"
+       ],
+       [
+        "Date",
+        "Mon, 23 Nov 2026 04:12:12 GMT"
+       ],
+       [
+        "Content-Type",
+        "application/json"
+       ],
+       [
+        "Content-Length",
+        "224"
+       ]
+      ],
+      "body": {
+       "$bytes": "eyJjaXR5IjogIkJlcmxpbiIsICJkYWlseSI6IFt7ImRheSI6ICJNb24iLCAiaGlfYyI6IDI2LCAibG9fYyI6IDIyLCAicmFpbl9tbSI6IDYuNn0sIHsiZGF5IjogIlR1ZSIsICJoaV9jIjogMTcsICJsb19jIjogNywgInJhaW5fbW0iOiAwLjZ9LCB7ImRheSI6ICJXZWQiLCAiaGlfYyI6IDI4LCAibG9fYyI6IDIxLCAicmFpbl9tbSI6IDEuOH1dLCAic291cmNlIjogImxvY2FsLXVwc3RyZWFtIn0="
+      },
+      "url": "http://127.0.0.1:45301/v1/forecast?city=Berlin"
+     },
+     "dur": 0.003995
+    }
+   ],
+   "dur": 0.005217,
+   "result": {
+    "city": "Berlin",
+    "daily": [
+     {
+      "day": "Mon",
+      "hi_c": 26,
+      "lo_c": 22,
+      "rain_mm": 6.6
+     },
+     {
+      "day": "Tue",
+      "hi_c": 17,
+      "lo_c": 7,
+      "rain_mm": 0.6
+     },
+     {
+      "day": "Wed",
+      "hi_c": 28,
+      "lo_c": 21,
+      "rain_mm": 1.8
+     }
+    ],
+    "source": "local-upstream"
+   }
+  },
+  {
+   "args": [
+    "London"
+   ],
+   "kwargs": {},
+   "io": [
+    {
+     "req": {
+      "kind": "http",
+      "method": "GET",
+      "url": "http://127.0.0.1:45301/v1/forecast?city=London",
+      "body_sha": "",
+      "idempotency_key": null,
+      "timeout": null,
+      "argv": null,
+      "key": "GET http://127.0.0.1/v1/forecast?city=London"
+     },
+     "out": {
+      "status": 200,
+      "reason": "OK",
+      "headers": [
+       [
+        "Server",
+        "BaseHTTP/0.6 Python/3.13.5"
+       ],
+       [
+        "Date",
+        "Mon, 23 Nov 2026 04:12:12 GMT"
+       ],
+       [
+        "Content-Type",
+        "application/json"
+       ],
+       [
+        "Content-Length",
+        "224"
+       ]
+      ],
+      "body": {
+       "$bytes": "eyJjaXR5IjogIkxvbmRvbiIsICJkYWlseSI6IFt7ImRheSI6ICJNb24iLCAiaGlfYyI6IDE5LCAibG9fYyI6IDEyLCAicmFpbl9tbSI6IDIuMH0sIHsiZGF5IjogIlR1ZSIsICJoaV9jIjogMjUsICJsb19jIjogMjAsICJyYWluX21tIjogMi43fSwgeyJkYXkiOiAiV2VkIiwgImhpX2MiOiAxNCwgImxvX2MiOiA4LCAicmFpbl9tbSI6IDQuMX1dLCAic291cmNlIjogImxvY2FsLXVwc3RyZWFtIn0="
+      },
+      "url": "http://127.0.0.1:45301/v1/forecast?city=London"
+     },
+     "dur": 0.004516
+    }
+   ],
+   "dur": 0.005488,
+   "result": {
+    "city": "London",
+    "daily": [
+     {
+      "day": "Mon",
+      "hi_c": 19,
+      "lo_c": 12,
+      "rain_mm": 2.0
+     },
+     {
+      "day": "Tue",
+      "hi_c": 25,
+      "lo_c": 20,
+      "rain_mm": 2.7
+     },
+     {
+      "day": "Wed",
+      "hi_c": 14,
+      "lo_c": 8,
+      "rain_mm": 4.1
+     }
+    ],
+    "source": "local-upstream"
+   }
+  },
+  {
+   "args": [
+    "Reykjavik"
+   ],
+   "kwargs": {},
+   "io": [
+    {
+     "req": {
+      "kind": "http",
+      "method": "GET",
+      "url": "http://127.0.0.1:45301/v1/forecast?city=Reykjavik",
+      "body_sha": "",
+      "idempotency_key": null,
+      "timeout": null,
+      "argv": null,
+      "key": "GET http://127.0.0.1/v1/forecast?city=Reykjavik"
+     },
+     "out": {
+      "status": 200,
+      "reason": "OK",
+      "headers": [
+       [
+        "Server",
+        "BaseHTTP/0.6 Python/3.13.5"
+       ],
+       [
+        "Date",
+        "Mon, 23 Nov 2026 04:12:12 GMT"
+       ],
+       [
+        "Content-Type",
+        "application/json"
+       ],
+       [
+        "Content-Length",
+        "46"
+       ]
+      ],
+      "body": {
+       "$bytes": "eyJjaXR5IjogIlJleWtqYXZpayIsICJzdGF0dXMiOiAidW5hdmFpbGFibGUifQ=="
+      },
+      "url": "http://127.0.0.1:45301/v1/forecast?city=Reykjavik"
+     },
+     "dur": 0.00371
+    }
+   ],
+   "dur": 0.004669,
+   "result": {
+    "city": "Reykjavik",
+    "status": "unavailable"
+   }
+  },
+  {
+   "args": [
+    "New York"
+   ],
+   "kwargs": {},
+   "io": [
+    {
+     "req": {
+      "kind": "http",
+      "method": "GET",
+      "url": "http://127.0.0.1:45301/v1/forecast?city=New%20York",
+      "body_sha": "",
+      "idempotency_key": null,
+      "timeout": null,
+      "argv": null,
+      "key": "GET http://127.0.0.1/v1/forecast?city=New%20York"
+     },
+     "out": {
+      "status": 200,
+      "reason": "OK",
+      "headers": [
+       [
+        "Server",
+        "BaseHTTP/0.6 Python/3.13.5"
+       ],
+       [
+        "Date",
+        "Mon, 23 Nov 2026 04:12:12 GMT"
+       ],
+       [
+        "Content-Type",
+        "application/json"
+       ],
+       [
+        "Content-Length",
+        "225"
+       ]
+      ],
+      "body": {
+       "$bytes": "eyJjaXR5IjogIk5ldyBZb3JrIiwgImRhaWx5IjogW3siZGF5IjogIk1vbiIsICJoaV9jIjogMTIsICJsb19jIjogNCwgInJhaW5fbW0iOiAyLjd9LCB7ImRheSI6ICJUdWUiLCAiaGlfYyI6IDI3LCAibG9fYyI6IDE4LCAicmFpbl9tbSI6IDYuN30sIHsiZGF5IjogIldlZCIsICJoaV9jIjogMTAsICJsb19jIjogMCwgInJhaW5fbW0iOiA0LjN9XSwgInNvdXJjZSI6ICJsb2NhbC11cHN0cmVhbSJ9"
+      },
+      "url": "http://127.0.0.1:45301/v1/forecast?city=New%20York"
+     },
+     "dur": 0.004166
+    }
+   ],
+   "dur": 0.005216,
+   "result": {
+    "city": "New York",
+    "daily": [
+     {
+      "day": "Mon",
+      "hi_c": 12,
+      "lo_c": 4,
+      "rain_mm": 2.7
+     },
+     {
+      "day": "Tue",
+      "hi_c": 27,
+      "lo_c": 18,
+      "rain_mm": 6.7
+     },
+     {
+      "day": "Wed",
+      "hi_c": 10,
+      "lo_c": 0,
+      "rain_mm": 4.3
+     }
+    ],
+    "source": "local-upstream"
+   }
+  },
+  {
+   "args": [
+    "Lima"
+   ],
+   "kwargs": {},
+   "io": [
+    {
+     "req": {
+      "kind": "http",
+      "method": "GET",
+      "url": "http://127.0.0.1:45301/v1/forecast?city=Lima",
+      "body_sha": "",
+      "idempotency_key": null,
+      "timeout": null,
+      "argv": null,
+      "key": "GET http://127.0.0.1/v1/forecast?city=Lima"
+     },
+     "out": {
+      "status": 200,
+      "reason": "OK",
+      "headers": [
+       [
+        "Server",
+        "BaseHTTP/0.6 Python/3.13.5"
+       ],
+       [
+        "Date",
+        "Mon, 23 Nov 2026 04:12:12 GMT"
+       ],
+       [
+        "Content-Type",
+        "application/json"
+       ],
+       [
+        "Content-Length",
+        "223"
+       ]
+      ],
+      "body": {
+       "$bytes": "eyJjaXR5IjogIkxpbWEiLCAiZGFpbHkiOiBbeyJkYXkiOiAiTW9uIiwgImhpX2MiOiAyOCwgImxvX2MiOiAyNCwgInJhaW5fbW0iOiA4LjB9LCB7ImRheSI6ICJUdWUiLCAiaGlfYyI6IDI1LCAibG9fYyI6IDE4LCAicmFpbl9tbSI6IDIuM30sIHsiZGF5IjogIldlZCIsICJoaV9jIjogMTYsICJsb19jIjogMTAsICJyYWluX21tIjogNi4yfV0sICJzb3VyY2UiOiAibG9jYWwtdXBzdHJlYW0ifQ=="
+      },
+      "url": "http://127.0.0.1:45301/v1/forecast?city=Lima"
+     },
+     "dur": 0.00392
+    }
+   ],
+   "dur": 0.004878,
+   "result": {
+    "city": "Lima",
+    "daily": [
+     {
+      "day": "Mon",
+      "hi_c": 28,
+      "lo_c": 24,
+      "rain_mm": 8.0
+     },
+     {
+      "day": "Tue",
+      "hi_c": 25,
+      "lo_c": 18,
+      "rain_mm": 2.3
+     },
+     {
+      "day": "Wed",
+      "hi_c": 16,
+      "lo_c": 10,
+      "rain_mm": 6.2
+     }
+    ],
+    "source": "local-upstream"
+   }
+  },
+  {
+   "args": [
+    "Nairobi"
+   ],
+   "kwargs": {},
+   "io": [
+    {
+     "req": {
+      "kind": "http",
+      "method": "GET",
+      "url": "http://127.0.0.1:45301/v1/forecast?city=Nairobi",
+      "body_sha": "",
+      "idempotency_key": null,
+      "timeout": null,
+      "argv": null,
+      "key": "GET http://127.0.0.1/v1/forecast?city=Nairobi"
+     },
+     "out": {
+      "status": 200,
+      "reason": "OK",
+      "headers": [
+       [
+        "Server",
+        "BaseHTTP/0.6 Python/3.13.5"
+       ],
+       [
+        "Date",
+        "Mon, 23 Nov 2026 04:12:12 GMT"
+       ],
+       [
+        "Content-Type",
+        "application/json"
+       ],
+       [
+        "Content-Length",
+        "225"
+       ]
+      ],
+      "body": {
+       "$bytes": "eyJjaXR5IjogIk5haXJvYmkiLCAiZGFpbHkiOiBbeyJkYXkiOiAiTW9uIiwgImhpX2MiOiAyNCwgImxvX2MiOiAxOSwgInJhaW5fbW0iOiA0LjV9LCB7ImRheSI6ICJUdWUiLCAiaGlfYyI6IDEwLCAibG9fYyI6IDEsICJyYWluX21tIjogMC4zfSwgeyJkYXkiOiAiV2VkIiwgImhpX2MiOiAyOSwgImxvX2MiOiAyMiwgInJhaW5fbW0iOiAzLjZ9XSwgInNvdXJjZSI6ICJsb2NhbC11cHN0cmVhbSJ9"
+      },
+      "url": "http://127.0.0.1:45301/v1/forecast?city=Nairobi"
+     },
+     "dur": 0.003555
+    }
+   ],
+   "dur": 0.004707,
+   "result": {
+    "city": "Nairobi",
+    "daily": [
+     {
+      "day": "Mon",
+      "hi_c": 24,
+      "lo_c": 19,
+      "rain_mm": 4.5
+     },
+     {
+      "day": "Tue",
+      "hi_c": 10,
+      "lo_c": 1,
+      "rain_mm": 0.3
+     },
+     {
+      "day": "Wed",
+      "hi_c": 29,
+      "lo_c": 22,
+      "rain_mm": 3.6
+     }
+    ],
+    "source": "local-upstream"
+   }
+  }
+ ]
+}

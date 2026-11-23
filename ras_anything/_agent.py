@@ -15,12 +15,11 @@ import functools
 import importlib.abc
 import json
 import os
-import pickle
 import sys
 import threading
 import time
 
-from . import boundary, faults
+from . import boundary, cassette, faults
 
 CO_GEN = 0x20 | 0x80 | 0x100 | 0x200  # generator, coroutine, iterable coroutine, async generator
 
@@ -31,7 +30,9 @@ class Agent:
         self.mode = cfg["mode"]
         self.root = os.path.realpath(cfg["root"])
         self.exclude = [os.path.realpath(p) for p in cfg.get("exclude", [])]
-        self.main_file = None
+        self.codec = cassette.Codec(cfg.get("project") or self.root, owns=self.owns_class)
+        self._owned: dict = {}
+        self.type_modules: set = set()
         self._user: dict = {}
         self.funcs: dict = {}
         self.boundary_by_fn: dict = {}
@@ -53,12 +54,26 @@ class Agent:
         k = None
         if fn and not fn.startswith("<"):
             real = os.path.realpath(fn)
-            if (real == self.root or real.startswith(self.root + os.sep)) and \
-                    not any(real.startswith(x + os.sep) or real == x for x in self.exclude) and \
-                    "site-packages" not in real and "_ras_hardened" not in real and os.sep + ".ras" + os.sep not in real:
+            if self.in_project(real):
                 k = (real, code.co_firstlineno, code.co_name)
         self._user[code] = k
         return k
+
+    def owns_class(self, cls):
+        """Is this a class of the project's own code (so its instances may be recorded)?"""
+        ok = self._owned.get(cls)
+        if ok is None:
+            mod = sys.modules.get(cls.__module__)
+            path = getattr(mod, "__file__", None)
+            ok = self._owned[cls] = bool(path) and self.in_project(os.path.realpath(path))
+        if ok:
+            self.type_modules.add(cls.__module__)
+        return ok
+
+    def in_project(self, real):
+        return (real == self.root or real.startswith(self.root + os.sep)) and \
+            not any(real.startswith(x + os.sep) or real == x for x in self.exclude) and \
+            "site-packages" not in real and "_ras_hardened" not in real and os.sep + ".ras" + os.sep not in real
 
     def innermost(self):
         f = sys._getframe(2)
@@ -94,11 +109,8 @@ class Agent:
             if st["calls"] <= 3:
                 code = frame.f_code
                 n = code.co_argcount + code.co_kwonlyargcount + bool(code.co_flags & 0x04) + bool(code.co_flags & 0x08)
-                try:
-                    pickle.dumps(tuple(frame.f_locals.get(v) for v in code.co_varnames[:n]))
-                    ok = True
-                except Exception:
-                    ok = False
+                loc = frame.f_locals
+                ok = self.codec.can([loc.get(v) for v in code.co_varnames[:n]])
                 st["arg_ok"] = ok if st["arg_ok"] is None else (st["arg_ok"] and ok)
         elif event == "return":
             k = self._user.get(frame.f_code)
@@ -106,11 +118,7 @@ class Agent:
                 return
             st = self.funcs.get(k)
             if st is not None and st["calls"] <= 3:
-                try:
-                    pickle.dumps(arg)
-                    ok = True
-                except Exception:
-                    ok = False
+                ok = self.codec.can(arg)
                 st["ret_ok"] = ok if st["ret_ok"] is None else (st["ret_ok"] and ok)
 
     # ---------------------------------------------------------------- record (settrace on one code object)
@@ -133,10 +141,8 @@ class Agent:
                 out, dur = serve()
                 cur = getattr(agent.tls, "current", None)
                 if cur is not None:
-                    o = out
-                    if "exc" in o:
-                        o = {"exc": o["exc"]}
-                    cur["io"].append({"req": req.to_dict(), "out": o, "dur": round(dur, 6)})
+                    cur["io"].append({"req": agent.codec.enc(req.to_dict()),
+                                      "out": agent.codec.enc(boundary.recorded(out)), "dur": round(dur, 6)})
                 return out
 
         self.handler = Recorder()
@@ -163,10 +169,10 @@ class Agent:
         self.target_seen += 1
         if self.snapshot is None:
             g = frame.f_globals
-            simple = (str, int, float, bool, type(None), bytes)
-            self.snapshot = {"env": dict(os.environ),
-                             "globals": {n: g[n] for n in frame.f_code.co_names
-                                         if n in g and isinstance(g[n], simple)}}
+            simple = (str, int, float, bool, type(None))
+            self.snapshot = {"env": self.codec.enc(dict(os.environ)),
+                             "globals": {n: self.codec.enc(g[n]) for n in frame.f_code.co_names
+                                         if n in g and type(g[n]) in simple}}
         rec = None
         if len(self.records) < self.max_calls:
             code = frame.f_code
@@ -183,7 +189,8 @@ class Agent:
             if code.co_flags & 0x08:
                 kwargs.update(loc[code.co_varnames[i]])
             try:
-                rec = {"args": pickle.dumps((tuple(args), kwargs)), "io": [], "t0": time.perf_counter()}
+                rec = {"args": self.codec.enc(args), "kwargs": self.codec.enc(kwargs), "io": [],
+                       "t0": time.perf_counter()}
             except Exception:
                 self.skipped += 1
                 rec = None
@@ -211,9 +218,9 @@ class Agent:
                 exc = tls.pending_exc
                 try:
                     if exc is not None:
-                        rec["exc"] = boundary.ser_exc(exc)
+                        rec["exc"] = cassette.dump_exc(exc)
                     else:
-                        rec["result"] = pickle.dumps(arg)
+                        rec["result"] = self.codec.enc(arg)
                     with self.lock:
                         if len(self.records) < self.max_calls:
                             self.records.append(rec)
@@ -389,12 +396,12 @@ class Agent:
             out["attempts"] = h.attempts
             out["hangs"] = h.hangs
         if self.mode == "record":
-            with open(self.calls_path, "wb") as f:
-                pickle.dump(self.records, f, protocol=4)
+            cassette.save(self.calls_path, self.records, "python")
             out["recorded"] = len(self.records)
             out["seen"] = self.target_seen
             out["skipped"] = self.skipped
             out["snapshot"] = self.snapshot
+            out["type_modules"] = sorted(self.type_modules)
         if self.stats:
             for st in self.stats.values():
                 lat = sorted(st.pop("lat"))

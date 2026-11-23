@@ -4,13 +4,28 @@ You are hardening one Python function for **reliability, availability and servic
 Edit **only `hardened.py` in this folder**. Keep the function name `render_receipt` and its signature.
 When you are done, `ras-anything verify billing.render_receipt` must print PASS. Run it yourself (it works from this
 folder) and iterate until it passes. Do not enable anything; do not edit the original source,
-`calls.pkl` or `meta.json`.
+`calls.json` or `meta.json`.
 
 ## The function
 
 `billing.render_receipt` in `billing.py` line 29. Recorded **16 real calls** from
-`/workspace/ras-anything/.venv/bin/python app.py`. Dependency requests it made:
-- 16× `RUN /workspace/ras-anything/.venv/bin/python /workspace/ras-anything/examples/paymen`
+`python app.py`. Dependency requests it made:
+- 1× `RUN python ${PROJECT}/render.py {"invoice": "INV-1001", "customer": "Acme Co", "amou`
+- 1× `RUN python ${PROJECT}/render.py {"invoice": "INV-1002", "customer": "Globex", "amoun`
+- 1× `RUN python ${PROJECT}/render.py {"invoice": "INV-1003", "customer": "Initech", "amou`
+- 1× `RUN python ${PROJECT}/render.py {"invoice": "INV-1004", "customer": "Umbrella", "amo`
+- 1× `RUN python ${PROJECT}/render.py {"invoice": "INV-1005", "customer": "Hooli", "amount`
+- 1× `RUN python ${PROJECT}/render.py {"invoice": "INV-1006", "customer": "Stark Ind", "am`
+- 1× `RUN python ${PROJECT}/render.py {"invoice": "INV-1007", "customer": "Wayne Ent", "am`
+- 1× `RUN python ${PROJECT}/render.py {"invoice": "INV-1008", "customer": "Wonka", "amount`
+- 1× `RUN python ${PROJECT}/render.py {"invoice": "INV-1009", "customer": "Acme Co", "amou`
+- 1× `RUN python ${PROJECT}/render.py {"invoice": "INV-1010", "customer": "Globex", "amoun`
+- 1× `RUN python ${PROJECT}/render.py {"invoice": "INV-1011", "customer": "Initech", "amou`
+- 1× `RUN python ${PROJECT}/render.py {"invoice": "INV-1012", "customer": "Umbrella", "amo`
+- 1× `RUN python ${PROJECT}/render.py {"invoice": "INV-1013", "customer": "Hooli", "amount`
+- 1× `RUN python ${PROJECT}/render.py {"invoice": "INV-1014", "customer": "Stark Ind", "am`
+- 1× `RUN python ${PROJECT}/render.py {"invoice": "INV-1015", "customer": "Wayne Ent", "am`
+- 1× `RUN python ${PROJECT}/render.py {"invoice": "INV-1016", "customer": "Wonka", "amount`
 
 What the scan found:
 - subprocess.run() without timeout
@@ -42,11 +57,11 @@ How callers use the result (a fallback must be something they already handle):
 
 Recorded examples:
 - `render_receipt({'id': 'INV-1001', 'customer': 'Acme Co', 'amount_cents': 1500, 'currency': 'us…, {'id': 'ch_0001', 'invoice': 'INV-1001', 'amount_cents': 1500, 'currency': 'usd…)` → {'pages': 1, 'bytes': 78, 'sha256': '74258fbbffaf4526116acd9f7074c1a18af438811746dd1453709c2d83ce445f'}
-  dependency I/O: RUN /workspace/ras-anything/.venv/bin/python /workspace/ras-anything/examples/payments/render. -> 0
+  dependency I/O: RUN python ${PROJECT}/render.py {"invoice": "INV-1001", "customer": "Acme Co", "amount_cents": -> 0
 - `render_receipt({'id': 'INV-1002', 'customer': 'Globex', 'amount_cents': 2237, 'currency': 'usd…, {'id': 'ch_0002', 'invoice': 'INV-1002', 'amount_cents': 2237, 'currency': 'usd…)` → {'pages': 1, 'bytes': 77, 'sha256': '60e075574fa1b31bc51cd1492a6afde0287dd7c585fa36afa698554b0cfeeff1'}
-  dependency I/O: RUN /workspace/ras-anything/.venv/bin/python /workspace/ras-anything/examples/payments/render. -> 0
+  dependency I/O: RUN python ${PROJECT}/render.py {"invoice": "INV-1002", "customer": "Globex", "amount_cents":  -> 0
 - `render_receipt({'id': 'INV-1003', 'customer': 'Initech', 'amount_cents': 2974, 'currency': 'us…, {'id': 'ch_0003', 'invoice': 'INV-1003', 'amount_cents': 2974, 'currency': 'usd…)` → {'pages': 1, 'bytes': 78, 'sha256': 'ab3ca12d347d5d76754209dca91d1268ceb64be89f3905688820cf99a27f9bbd'}
-  dependency I/O: RUN /workspace/ras-anything/.venv/bin/python /workspace/ras-anything/examples/payments/render. -> 0
+  dependency I/O: RUN python ${PROJECT}/render.py {"invoice": "INV-1003", "customer": "Initech", "amount_cents": -> 0
 
 ## The contract (what `verify` enforces)
 
