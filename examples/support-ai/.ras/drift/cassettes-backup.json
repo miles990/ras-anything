@@ -1,0 +1,53 @@
+{
+  "suite": "cassettes",
+  "cases": 6,
+  "baseline_model": "small",
+  "candidate_model": "backup",
+  "baseline_semantic_success": 1.0,
+  "candidate_semantic_success": 1.0,
+  "semantic_delta": 0.0,
+  "baseline_cost_usd": 9e-05,
+  "candidate_cost_usd": 0.000324,
+  "cost_delta_usd": 0.000234,
+  "threshold": 0.05,
+  "passed": true,
+  "promptfoo_exported": ".ras/evals/support-promptfoo.yaml",
+  "details": [
+    {
+      "id": "support.triage_ticket#c0.io0",
+      "baseline_ok": true,
+      "candidate_ok": true,
+      "error": null
+    },
+    {
+      "id": "support.triage_ticket#c0.io1",
+      "baseline_ok": true,
+      "candidate_ok": true,
+      "error": null
+    },
+    {
+      "id": "support.triage_ticket#c1.io0",
+      "baseline_ok": true,
+      "candidate_ok": true,
+      "error": null
+    },
+    {
+      "id": "support.triage_ticket#c1.io1",
+      "baseline_ok": true,
+      "candidate_ok": true,
+      "error": null
+    },
+    {
+      "id": "support.triage_ticket#c2.io0",
+      "baseline_ok": true,
+      "candidate_ok": true,
+      "error": null
+    },
+    {
+      "id": "support.triage_ticket#c2.io1",
+      "baseline_ok": true,
+      "candidate_ok": true,
+      "error": null
+    }
+  ]
+}

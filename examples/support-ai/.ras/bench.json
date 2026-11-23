@@ -1,0 +1,687 @@
+{
+  "lang": "python",
+  "cmd": [
+    "python3",
+    "app.py"
+  ],
+  "display_cmd": "python3 app.py",
+  "ids": [
+    "support.triage_ticket"
+  ],
+  "seeds": 20,
+  "rate": 0.1,
+  "outage_rate": 0.05,
+  "time_scale": 0.05,
+  "hang_cap_s": 2.0,
+  "degraded_markers": [],
+  "clean_outputs_equal": true,
+  "summary": {
+    "original": {
+      "runs": 20,
+      "correct": 10,
+      "degraded": 0,
+      "wrong": 0,
+      "crash": 8,
+      "hang": 2,
+      "availability": 0.5,
+      "crash_rate": 0.4,
+      "hang_rate": 0.1,
+      "wrong_rate": 0.0,
+      "p50_wall": 0.6043,
+      "p99_wall": 2.1041,
+      "identical_rate": 0.5,
+      "dups": 0,
+      "faults": 12,
+      "failures_by_place": {
+        "JSONDecodeError in support.triage_ticket": 2,
+        "URLError in support.triage_ticket": 5,
+        "HTTPError in support.triage_ticket": 1,
+        "hang in support.triage_ticket": 2
+      },
+      "amplification": 1.8297872340425532,
+      "outage_amplification": 1.0,
+      "outage_calls": 3,
+      "clean_per_call": 2.0,
+      "clean_wall": 0.6172
+    },
+    "hardened": {
+      "runs": 20,
+      "correct": 19,
+      "degraded": 1,
+      "wrong": 0,
+      "crash": 0,
+      "hang": 0,
+      "availability": 1.0,
+      "crash_rate": 0.0,
+      "hang_rate": 0.0,
+      "wrong_rate": 0.0,
+      "p50_wall": 0.7569,
+      "p99_wall": 2.6095,
+      "identical_rate": 0.95,
+      "dups": 0,
+      "faults": 30,
+      "failures_by_place": {},
+      "amplification": 2.4833333333333334,
+      "outage_amplification": 4.25,
+      "outage_calls": 8,
+      "clean_per_call": 2.0,
+      "clean_wall": 0.6108
+    }
+  },
+  "runs": {
+    "original": [
+      {
+        "seed": 1,
+        "outcome": "correct",
+        "exit": 0,
+        "wall_s": 0.6022,
+        "fallbacks": 0,
+        "faults": 0,
+        "attempts": 6,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 2,
+        "outcome": "crash",
+        "exit": 1,
+        "wall_s": 0.5991,
+        "fallbacks": 0,
+        "faults": 1,
+        "attempts": 3,
+        "dups": 0,
+        "uncaught": {
+          "type": "JSONDecodeError",
+          "msg": "Unterminated string starting at: line 1 column 193 (char 192)",
+          "hang": false,
+          "where": "support.triage_ticket"
+        }
+      },
+      {
+        "seed": 3,
+        "outcome": "correct",
+        "exit": 0,
+        "wall_s": 0.6022,
+        "fallbacks": 0,
+        "faults": 0,
+        "attempts": 6,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 4,
+        "outcome": "correct",
+        "exit": 0,
+        "wall_s": 0.6012,
+        "fallbacks": 0,
+        "faults": 0,
+        "attempts": 6,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 5,
+        "outcome": "crash",
+        "exit": 1,
+        "wall_s": 0.5992,
+        "fallbacks": 0,
+        "faults": 1,
+        "attempts": 5,
+        "dups": 0,
+        "uncaught": {
+          "type": "URLError",
+          "msg": "<urlopen error [Errno 111] Connection refused>",
+          "hang": false,
+          "where": "support.triage_ticket"
+        }
+      },
+      {
+        "seed": 6,
+        "outcome": "correct",
+        "exit": 0,
+        "wall_s": 0.6062,
+        "fallbacks": 0,
+        "faults": 0,
+        "attempts": 6,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 7,
+        "outcome": "crash",
+        "exit": 1,
+        "wall_s": 0.5968,
+        "fallbacks": 0,
+        "faults": 1,
+        "attempts": 2,
+        "dups": 0,
+        "uncaught": {
+          "type": "HTTPError",
+          "msg": "HTTP Error 429: Too Many Requests",
+          "hang": false,
+          "where": "support.triage_ticket"
+        }
+      },
+      {
+        "seed": 8,
+        "outcome": "correct",
+        "exit": 0,
+        "wall_s": 0.603,
+        "fallbacks": 0,
+        "faults": 0,
+        "attempts": 6,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 9,
+        "outcome": "crash",
+        "exit": 1,
+        "wall_s": 0.6164,
+        "fallbacks": 0,
+        "faults": 1,
+        "attempts": 1,
+        "dups": 0,
+        "uncaught": {
+          "type": "JSONDecodeError",
+          "msg": "Unterminated string starting at: line 1 column 193 (char 192)",
+          "hang": false,
+          "where": "support.triage_ticket"
+        }
+      },
+      {
+        "seed": 10,
+        "outcome": "hang",
+        "exit": 1,
+        "wall_s": 2.1041,
+        "fallbacks": 0,
+        "faults": 1,
+        "attempts": 3,
+        "dups": 0,
+        "uncaught": {
+          "type": "ChaosHang",
+          "msg": "boundary call with no timeout hung (chaos)",
+          "hang": true,
+          "where": "support.triage_ticket"
+        }
+      },
+      {
+        "seed": 11,
+        "outcome": "correct",
+        "exit": 0,
+        "wall_s": 0.6135,
+        "fallbacks": 0,
+        "faults": 0,
+        "attempts": 6,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 12,
+        "outcome": "crash",
+        "exit": 1,
+        "wall_s": 0.6088,
+        "fallbacks": 0,
+        "faults": 1,
+        "attempts": 3,
+        "dups": 0,
+        "uncaught": {
+          "type": "URLError",
+          "msg": "<urlopen error [Errno 111] Connection refused>",
+          "hang": false,
+          "where": "support.triage_ticket"
+        }
+      },
+      {
+        "seed": 13,
+        "outcome": "crash",
+        "exit": 1,
+        "wall_s": 0.7528,
+        "fallbacks": 0,
+        "faults": 2,
+        "attempts": 4,
+        "dups": 0,
+        "uncaught": {
+          "type": "URLError",
+          "msg": "<urlopen error [Errno 111] Connection refused>",
+          "hang": false,
+          "where": "support.triage_ticket"
+        }
+      },
+      {
+        "seed": 14,
+        "outcome": "crash",
+        "exit": 1,
+        "wall_s": 0.5861,
+        "fallbacks": 0,
+        "faults": 1,
+        "attempts": 1,
+        "dups": 0,
+        "uncaught": {
+          "type": "URLError",
+          "msg": "<urlopen error [Errno 111] Connection refused>",
+          "hang": false,
+          "where": "support.triage_ticket"
+        }
+      },
+      {
+        "seed": 15,
+        "outcome": "correct",
+        "exit": 0,
+        "wall_s": 0.753,
+        "fallbacks": 0,
+        "faults": 1,
+        "attempts": 6,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 16,
+        "outcome": "hang",
+        "exit": 1,
+        "wall_s": 2.1002,
+        "fallbacks": 0,
+        "faults": 1,
+        "attempts": 3,
+        "dups": 0,
+        "uncaught": {
+          "type": "ChaosHang",
+          "msg": "boundary call with no timeout hung (chaos)",
+          "hang": true,
+          "where": "support.triage_ticket"
+        }
+      },
+      {
+        "seed": 17,
+        "outcome": "correct",
+        "exit": 0,
+        "wall_s": 0.6031,
+        "fallbacks": 0,
+        "faults": 0,
+        "attempts": 6,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 18,
+        "outcome": "correct",
+        "exit": 0,
+        "wall_s": 0.6049,
+        "fallbacks": 0,
+        "faults": 0,
+        "attempts": 6,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 19,
+        "outcome": "crash",
+        "exit": 1,
+        "wall_s": 0.5928,
+        "fallbacks": 0,
+        "faults": 1,
+        "attempts": 1,
+        "dups": 0,
+        "uncaught": {
+          "type": "URLError",
+          "msg": "<urlopen error [Errno 111] Connection refused>",
+          "hang": false,
+          "where": "support.triage_ticket"
+        }
+      },
+      {
+        "seed": 20,
+        "outcome": "correct",
+        "exit": 0,
+        "wall_s": 0.6043,
+        "fallbacks": 0,
+        "faults": 0,
+        "attempts": 6,
+        "dups": 0,
+        "uncaught": null
+      }
+    ],
+    "hardened": [
+      {
+        "seed": 1,
+        "outcome": "correct",
+        "exit": 0,
+        "wall_s": 0.9522,
+        "fallbacks": 0,
+        "faults": 4,
+        "attempts": 10,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 2,
+        "outcome": "correct",
+        "exit": 0,
+        "wall_s": 0.7631,
+        "fallbacks": 0,
+        "faults": 2,
+        "attempts": 8,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 3,
+        "outcome": "correct",
+        "exit": 0,
+        "wall_s": 0.6047,
+        "fallbacks": 0,
+        "faults": 0,
+        "attempts": 6,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 4,
+        "outcome": "correct",
+        "exit": 0,
+        "wall_s": 0.6028,
+        "fallbacks": 0,
+        "faults": 0,
+        "attempts": 6,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 5,
+        "outcome": "degraded",
+        "exit": 0,
+        "wall_s": 0.9073,
+        "fallbacks": 1,
+        "faults": 4,
+        "attempts": 9,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 6,
+        "outcome": "correct",
+        "exit": 0,
+        "wall_s": 0.7477,
+        "fallbacks": 0,
+        "faults": 1,
+        "attempts": 7,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 7,
+        "outcome": "correct",
+        "exit": 0,
+        "wall_s": 0.7569,
+        "fallbacks": 0,
+        "faults": 2,
+        "attempts": 8,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 8,
+        "outcome": "correct",
+        "exit": 0,
+        "wall_s": 0.7591,
+        "fallbacks": 0,
+        "faults": 3,
+        "attempts": 9,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 9,
+        "outcome": "correct",
+        "exit": 0,
+        "wall_s": 0.8176,
+        "fallbacks": 0,
+        "faults": 3,
+        "attempts": 9,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 10,
+        "outcome": "correct",
+        "exit": 0,
+        "wall_s": 0.6135,
+        "fallbacks": 0,
+        "faults": 0,
+        "attempts": 6,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 11,
+        "outcome": "correct",
+        "exit": 0,
+        "wall_s": 0.6147,
+        "fallbacks": 0,
+        "faults": 1,
+        "attempts": 7,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 12,
+        "outcome": "correct",
+        "exit": 0,
+        "wall_s": 0.6127,
+        "fallbacks": 0,
+        "faults": 0,
+        "attempts": 6,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 13,
+        "outcome": "correct",
+        "exit": 0,
+        "wall_s": 0.8132,
+        "fallbacks": 0,
+        "faults": 3,
+        "attempts": 9,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 14,
+        "outcome": "correct",
+        "exit": 0,
+        "wall_s": 0.764,
+        "fallbacks": 0,
+        "faults": 2,
+        "attempts": 8,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 15,
+        "outcome": "correct",
+        "exit": 0,
+        "wall_s": 0.6055,
+        "fallbacks": 0,
+        "faults": 0,
+        "attempts": 6,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 16,
+        "outcome": "correct",
+        "exit": 0,
+        "wall_s": 0.6071,
+        "fallbacks": 0,
+        "faults": 0,
+        "attempts": 6,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 17,
+        "outcome": "correct",
+        "exit": 0,
+        "wall_s": 1.6071,
+        "fallbacks": 0,
+        "faults": 1,
+        "attempts": 7,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 18,
+        "outcome": "correct",
+        "exit": 0,
+        "wall_s": 2.6095,
+        "fallbacks": 0,
+        "faults": 2,
+        "attempts": 8,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 19,
+        "outcome": "correct",
+        "exit": 0,
+        "wall_s": 0.6127,
+        "fallbacks": 0,
+        "faults": 1,
+        "attempts": 7,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 20,
+        "outcome": "correct",
+        "exit": 0,
+        "wall_s": 0.6584,
+        "fallbacks": 0,
+        "faults": 1,
+        "attempts": 7,
+        "dups": 0,
+        "uncaught": null
+      }
+    ]
+  },
+  "functions": {
+    "original": {
+      "support.triage_ticket": {
+        "calls": 47,
+        "ok": 37,
+        "fallback": 0,
+        "raised": 10,
+        "attempts": 86,
+        "outage_calls": 3,
+        "outage_attempts": 3,
+        "p99": 2.0003641260009317
+      }
+    },
+    "hardened": {
+      "support.triage_ticket": {
+        "calls": 60,
+        "ok": 59,
+        "fallback": 1,
+        "raised": 0,
+        "attempts": 149,
+        "outage_calls": 8,
+        "outage_attempts": 34,
+        "p99": 1.0125773910003772
+      }
+    }
+  },
+  "first_wrong": null,
+  "serviceability": {
+    "original": {
+      "cases": 11,
+      "detected": 10,
+      "detection_rate": 0.9090909090909091,
+      "lines_to_diagnosis_p50": 19,
+      "ttd_ms_p50": null
+    },
+    "hardened": {
+      "cases": 14,
+      "detected": 14,
+      "detection_rate": 1.0,
+      "lines_to_diagnosis_p50": 1,
+      "ttd_ms_p50": null
+    }
+  },
+  "leaks": [],
+  "host": {
+    "machine": "x86_64",
+    "system": "Linux",
+    "release": "6.12.113+",
+    "python": "3.13.5",
+    "runtime": "Python 3.13.5",
+    "cpus": 8,
+    "node": null
+  },
+  "fault_model": {
+    "timeout": "no answer: caller's timeout fires; with no timeout it hangs (POST/PUT still reach the server)",
+    "refused": "connection refused",
+    "http5xx": "HTTP 503 (subprocess: exit 75 EX_TEMPFAIL)",
+    "http429": "HTTP 429 with Retry-After: 1",
+    "slow": "+3 s latency, then the correct answer",
+    "truncated": "body (or stdout) cut in half"
+  },
+  "created": "2026-11-23T17:40:02+0800",
+  "slo": {
+    "schema_version": "1.0.0",
+    "kind": "slo",
+    "source": "bench",
+    "targets": {
+      "availability": 0.99,
+      "p99_s": 5.0,
+      "error_rate": 0.01
+    },
+    "original": {
+      "availability": 0.5,
+      "error_rate": 0.5,
+      "p50_s": 0.6043,
+      "p99_s": 2.1041,
+      "error_budget": 0.01,
+      "error_budget_burn_ratio": 50.0,
+      "error_budget_burn_pct": 5000.0,
+      "checks": {
+        "availability": false,
+        "p99_s": true,
+        "error_rate": false
+      },
+      "status": "missed"
+    },
+    "hardened": {
+      "availability": 1.0,
+      "error_rate": 0.0,
+      "p50_s": 0.7569,
+      "p99_s": 2.6095,
+      "error_budget": 0.01,
+      "error_budget_burn_ratio": 0.0,
+      "error_budget_burn_pct": 0.0,
+      "checks": {
+        "availability": true,
+        "p99_s": true,
+        "error_rate": true
+      },
+      "status": "met"
+    },
+    "serviceability": {
+      "original": {
+        "cases": 11,
+        "detected": 10,
+        "detection_rate": 0.9090909090909091,
+        "lines_to_diagnosis_p50": 19,
+        "ttd_ms_p50": null
+      },
+      "hardened": {
+        "cases": 14,
+        "detected": 14,
+        "detection_rate": 1.0,
+        "lines_to_diagnosis_p50": 1,
+        "ttd_ms_p50": null
+      }
+    },
+    "ax": null,
+    "created": "2026-11-23T17:40:02+0800"
+  }
+}

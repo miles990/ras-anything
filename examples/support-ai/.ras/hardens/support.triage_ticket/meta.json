@@ -1,0 +1,29 @@
+{
+  "id": "support.triage_ticket",
+  "lang": "python",
+  "module": "support",
+  "qualname": "triage_ticket",
+  "name": "triage_ticket",
+  "kind": "function",
+  "file": "support.py",
+  "first_line": 25,
+  "in_main": false,
+  "cmd": [
+    "python3",
+    "app.py"
+  ],
+  "display_cmd": "python3 app.py",
+  "cwd": ".",
+  "env": {},
+  "globals": {},
+  "sys_path": [
+    "."
+  ],
+  "type_modules": [],
+  "budget_s": 5.0,
+  "recorded": 3,
+  "seen": 3,
+  "skipped": 0,
+  "recorded_at": "2026-11-23T17:38:33+0800",
+  "runtime": "Python 3.13.5"
+}

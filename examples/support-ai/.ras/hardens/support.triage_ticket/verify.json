@@ -1,0 +1,501 @@
+{
+  "id": "support.triage_ticket",
+  "lang": "python",
+  "budget_s": 5.0,
+  "recorded": 3,
+  "happy": {
+    "total": 3,
+    "equal": 3,
+    "original_nondeterministic": 0,
+    "first_failure": null
+  },
+  "chaos": {
+    "calls": 3,
+    "scenarios": [
+      "timeout",
+      "refused",
+      "http5xx",
+      "http429",
+      "slow",
+      "truncated",
+      "outage",
+      "ai_rate_limit",
+      "ai_quota",
+      "ai_context_limit",
+      "ai_overloaded",
+      "ai_sse_truncated",
+      "ai_finish_length",
+      "ai_malformed_json",
+      "ai_refusal",
+      "ai_plausible_wrong",
+      "ai_tool_error",
+      "ai_tool_loop",
+      "ai_model_deprecated",
+      "ai_prompt_injection",
+      "mixed:1",
+      "mixed:2",
+      "mixed:3",
+      "per-key"
+    ],
+    "by_scenario": {
+      "timeout": {
+        "original": {
+          "hang": 3
+        },
+        "hardened": {
+          "ok": 3
+        },
+        "n": 3
+      },
+      "refused": {
+        "original": {
+          "error": 3
+        },
+        "hardened": {
+          "ok": 3
+        },
+        "n": 3
+      },
+      "http5xx": {
+        "original": {
+          "error": 3
+        },
+        "hardened": {
+          "ok": 3
+        },
+        "n": 3
+      },
+      "http429": {
+        "original": {
+          "error": 3
+        },
+        "hardened": {
+          "ok": 3
+        },
+        "n": 3
+      },
+      "slow": {
+        "original": {
+          "hang": 3
+        },
+        "hardened": {
+          "ok": 3
+        },
+        "n": 3
+      },
+      "truncated": {
+        "original": {
+          "error": 3
+        },
+        "hardened": {
+          "ok": 3
+        },
+        "n": 3
+      },
+      "outage": {
+        "original": {
+          "error": 3
+        },
+        "hardened": {
+          "degraded": 3
+        },
+        "n": 3
+      },
+      "ai_rate_limit": {
+        "original": {
+          "error": 3
+        },
+        "hardened": {
+          "ok": 3
+        },
+        "n": 3
+      },
+      "ai_quota": {
+        "original": {
+          "error": 3
+        },
+        "hardened": {
+          "degraded": 3
+        },
+        "n": 3
+      },
+      "ai_context_limit": {
+        "original": {
+          "error": 3
+        },
+        "hardened": {
+          "degraded": 3
+        },
+        "n": 3
+      },
+      "ai_overloaded": {
+        "original": {
+          "error": 3
+        },
+        "hardened": {
+          "ok": 3
+        },
+        "n": 3
+      },
+      "ai_sse_truncated": {
+        "original": {
+          "error": 3
+        },
+        "hardened": {
+          "ok": 3
+        },
+        "n": 3
+      },
+      "ai_finish_length": {
+        "original": {
+          "error": 3
+        },
+        "hardened": {
+          "ok": 3
+        },
+        "n": 3
+      },
+      "ai_malformed_json": {
+        "original": {
+          "error": 3
+        },
+        "hardened": {
+          "ok": 3
+        },
+        "n": 3
+      },
+      "ai_refusal": {
+        "original": {
+          "error": 3
+        },
+        "hardened": {
+          "degraded": 3
+        },
+        "n": 3
+      },
+      "ai_plausible_wrong": {
+        "original": {
+          "error": 3
+        },
+        "hardened": {
+          "ok": 3
+        },
+        "n": 3
+      },
+      "ai_tool_error": {
+        "original": {
+          "error": 3
+        },
+        "hardened": {
+          "degraded": 3
+        },
+        "n": 3
+      },
+      "ai_tool_loop": {
+        "original": {
+          "error": 3
+        },
+        "hardened": {
+          "degraded": 3
+        },
+        "n": 3
+      },
+      "ai_model_deprecated": {
+        "original": {
+          "error": 3
+        },
+        "hardened": {
+          "degraded": 3
+        },
+        "n": 3
+      },
+      "ai_prompt_injection": {
+        "original": {
+          "error": 3
+        },
+        "hardened": {
+          "degraded": 3
+        },
+        "n": 3
+      },
+      "mixed": {
+        "original": {
+          "error": 4,
+          "ok": 5
+        },
+        "hardened": {
+          "ok": 8,
+          "degraded": 1
+        },
+        "n": 9
+      },
+      "timeout (per-key)": {
+        "original": {
+          "hang": 6
+        },
+        "hardened": {
+          "ok": 6
+        },
+        "n": 6
+      },
+      "refused (per-key)": {
+        "original": {
+          "error": 6
+        },
+        "hardened": {
+          "ok": 6
+        },
+        "n": 6
+      },
+      "http5xx (per-key)": {
+        "original": {
+          "error": 6
+        },
+        "hardened": {
+          "ok": 6
+        },
+        "n": 6
+      },
+      "http429 (per-key)": {
+        "original": {
+          "error": 6
+        },
+        "hardened": {
+          "ok": 6
+        },
+        "n": 6
+      },
+      "slow (per-key)": {
+        "original": {
+          "ok": 6
+        },
+        "hardened": {
+          "ok": 6
+        },
+        "n": 6
+      },
+      "truncated (per-key)": {
+        "original": {
+          "error": 6
+        },
+        "hardened": {
+          "ok": 6
+        },
+        "n": 6
+      },
+      "outage (per-key)": {
+        "original": {
+          "error": 6
+        },
+        "hardened": {
+          "ok": 6
+        },
+        "n": 6
+      }
+    },
+    "first_failure": null,
+    "first_original_dup": null,
+    "new_crashes": []
+  },
+  "original": {
+    "trials": 111,
+    "ok": 11,
+    "degraded": 0,
+    "wrong": 0,
+    "error": 88,
+    "hang": 12,
+    "miss": 0,
+    "attempts": 143,
+    "amplification": 1.2882882882882882,
+    "availability": 0.0990990990990991,
+    "p50": 0.0,
+    "p99": 60.004472,
+    "max": 60.015144,
+    "dups": 0,
+    "logged_failures": 0.0,
+    "structured_errors": 0.0
+  },
+  "hardened": {
+    "trials": 111,
+    "ok": 86,
+    "degraded": 25,
+    "wrong": 0,
+    "error": 0,
+    "hang": 0,
+    "miss": 0,
+    "attempts": 303,
+    "amplification": 2.72972972972973,
+    "availability": 1.0,
+    "p50": 0.008827,
+    "p99": 3.719763,
+    "max": 3.719763,
+    "dups": 0,
+    "logged_failures": 1.0,
+    "structured_errors": null
+  },
+  "outage": {
+    "healthy": {
+      "calls": 10,
+      "gap_s": 0.5
+    },
+    "down": {
+      "calls": 40,
+      "gap_s": 0.5
+    },
+    "recovered": {
+      "calls": 90,
+      "gap_s": 1.0
+    },
+    "original": {
+      "calls": 40,
+      "attempts": 40,
+      "ok": 0,
+      "degraded": 0,
+      "wrong": 0,
+      "error": 40,
+      "hang": 0,
+      "miss": 0,
+      "amplification": 1.0,
+      "healthy_per_call": 2.0,
+      "max_latency": 0.0,
+      "recovered_after_s": 0.0,
+      "dups": 0
+    },
+    "hardened": {
+      "calls": 40,
+      "attempts": 160,
+      "ok": 0,
+      "degraded": 40,
+      "wrong": 0,
+      "error": 0,
+      "hang": 0,
+      "miss": 0,
+      "amplification": 4.0,
+      "healthy_per_call": 2.0,
+      "max_latency": 0.3,
+      "recovered_after_s": 0.0,
+      "dups": 0
+    }
+  },
+  "serviceability": {
+    "original": {
+      "runs": 107,
+      "detection_rate": 0.0,
+      "diagnosis_accuracy": 0.0,
+      "ttd_ms_p50": null,
+      "lines_to_diagnosis_p50": null,
+      "restore_s": null
+    },
+    "hardened": {
+      "runs": 107,
+      "detection_rate": 1.0,
+      "diagnosis_accuracy": 0.0,
+      "ttd_ms_p50": null,
+      "lines_to_diagnosis_p50": 1,
+      "restore_s": null
+    }
+  },
+  "ax": {
+    "observed": {
+      "original": {
+        "cases": 97,
+        "original": {
+          "cases": 97,
+          "accuracy": 0.0,
+          "mean_tokens": 1.0,
+          "mean_steps": 3.0,
+          "leaks": 0
+        },
+        "hardened": {
+          "cases": 97,
+          "accuracy": 0.0,
+          "mean_tokens": 1.0,
+          "mean_steps": 3.0,
+          "leaks": 0
+        }
+      },
+      "hardened": null
+    },
+    "catalog": {
+      "cases": 10,
+      "original": {
+        "cases": 10,
+        "accuracy": 0.3,
+        "mean_tokens": 42.2,
+        "mean_steps": 2.9,
+        "leaks": 40
+      },
+      "hardened": {
+        "cases": 10,
+        "accuracy": 1.0,
+        "mean_tokens": 105.8,
+        "mean_steps": 1.0,
+        "leaks": 0
+      }
+    },
+    "leaks": []
+  },
+  "ai": {
+    "original": {
+      "calls": 111,
+      "semantic_success_rate": 0.0991,
+      "total_tokens": 9997,
+      "total_cost_usd": 0.002063,
+      "cost_per_success_usd": 0.000188,
+      "retry_cost_amplification": 0.682,
+      "injection_resistance": 1.0,
+      "loop_guard_trips": 0
+    },
+    "hardened": {
+      "calls": 111,
+      "semantic_success_rate": 1.0,
+      "total_tokens": 25374,
+      "total_cost_usd": 0.006074,
+      "cost_per_success_usd": 5.5e-05,
+      "retry_cost_amplification": 1.732,
+      "injection_resistance": 1.0,
+      "loop_guard_trips": 0
+    },
+    "max_attempts_per_trial": 4
+  },
+  "gates": {
+    "happy": true,
+    "no_wrong": true,
+    "no_hang": true,
+    "no_new_crashes": true,
+    "p99": true,
+    "dups": true,
+    "availability": true,
+    "ai_budget": true,
+    "ai_injection": true
+  },
+  "passed": true,
+  "fallback": "callable",
+  "elapsed_s": 0.65,
+  "hardened_sha256": "244135167ed5a4b70ac0006885b1ab28f6bec4c0ae15aeeeb832847d290fb915",
+  "verified_at": "2026-11-23T17:39:22+0800",
+  "wall_s": 0.65,
+  "fault_model": {
+    "timeout": "no answer: caller's timeout fires; with no timeout it hangs (POST/PUT still reach the server)",
+    "refused": "connection refused",
+    "http5xx": "HTTP 503 (subprocess: exit 75 EX_TEMPFAIL)",
+    "http429": "HTTP 429 with Retry-After: 1",
+    "slow": "+3 s latency, then the correct answer",
+    "truncated": "body (or stdout) cut in half",
+    "outage": "dependency down (refused) for 3 consecutive attempts, then recovers",
+    "mixed": "seeded mix: each attempt faults with p=0.3, kind drawn uniformly",
+    "ai_rate_limit": "HTTP 429 rate_limit_exceeded with Retry-After: 1",
+    "ai_quota": "HTTP 429 insufficient_quota (non-retryable billing/quota stop)",
+    "ai_context_limit": "HTTP 400 context_length_exceeded (needs context-window fallback or trim)",
+    "ai_overloaded": "HTTP 529 overloaded_error (provider capacity overload)",
+    "ai_sse_truncated": "streaming SSE / JSON response cut off mid-payload",
+    "ai_finish_length": "HTTP 200 with finish_reason=length (incomplete truncated completion)",
+    "ai_malformed_json": "HTTP 200 with malformed JSON / schema violation",
+    "ai_refusal": "HTTP 200 with finish_reason=content_filter / safety refusal",
+    "ai_plausible_wrong": "HTTP 200 valid schema but empty/placeholder answer (fails semantic check)",
+    "ai_tool_error": "HTTP 200 requesting unknown/forbidden tool call (refund_all)",
+    "ai_tool_loop": "HTTP 200 repeating the same tool call indefinitely",
+    "ai_model_deprecated": "HTTP 404 model_not_found (deprecated model id)",
+    "ai_prompt_injection": "prompt-injection payload trying to trigger forbidden tool or canary leak"
+  }
+}

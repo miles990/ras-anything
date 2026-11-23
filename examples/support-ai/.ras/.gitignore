@@ -1,0 +1,3 @@
+# ras-anything scratch (keep the rest: hardened code, verify/bench results)
+runs/
+*.tmp

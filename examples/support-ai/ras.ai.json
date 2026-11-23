@@ -1,0 +1,19 @@
+{
+  "providers": {
+    "local_mock": {
+      "base_url": "http://127.0.0.1",
+      "path": "/v1/chat/completions",
+      "operation": "chat"
+    }
+  },
+  "prices": {
+    "small": [0.15, 0.60],
+    "backup": [0.30, 1.20]
+  },
+  "fallbacks": ["small", "backup"],
+  "budgets": {
+    "max_tokens_per_call": 1024,
+    "max_requests_per_call": 6,
+    "deadline_s": 4.5
+  }
+}
