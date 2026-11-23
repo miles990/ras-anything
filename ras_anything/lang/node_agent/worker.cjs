@@ -147,10 +147,12 @@ async function runJob(job) {
   // hardened code is resolved as if it were where enable puts it: _ras_hardened/ next to the module
   const home = path.join(path.dirname(file), "_ras_hardened", path.basename(hardenedFile));
   const runtimeFile = path.join(__dirname, "runtime.cjs");
-  hooks.install(job.node_files, (specifier, parent) => {
-    if (parent !== hardenedFile) return null;
-    if (specifier === "./_runtime.cjs") return { specifier: pathToFileURL(runtimeFile).href };
-    return { specifier, parent: home };
+  hooks.install(job.node_files, (specifier, parent, required) => {
+    if (parent !== hardenedFile || /^node:/.test(specifier)) return null;
+    if (specifier === "./_runtime.cjs") return { specifier: required ? runtimeFile : pathToFileURL(runtimeFile).href };
+    if (!required) return { specifier, parent: home };
+    if (/^\.\.?(\/|$)/.test(specifier)) return { specifier: path.resolve(path.dirname(home), specifier) };
+    return module_.isBuiltin(specifier) ? null : { specifier: module_.createRequire(home).resolve(specifier) };
   });
 
   let original = null;

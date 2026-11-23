@@ -554,7 +554,7 @@ class FileInfo:
             req = self._require(init)
             for nm in names:
                 if req is not None:
-                    self.vars[nm] = Var("require", init, text, req, "*" if self.tk(a).kind == "id" else self._pattern_source(a, nm))
+                    self.vars[nm] = Var("require", init, text, req[0], req[1] if self.tk(a).kind == "id" else self._pattern_source(a, nm))
                 else:
                     self.vars[nm] = Var(kind, init, text)
                 if exported:
@@ -583,10 +583,17 @@ class FileInfo:
             k = self._skip(k)
         return None
 
-    def _require(self, init) -> str | None:
-        if init and self.t(init[0]) == "require" and self.t(init[0] + 1) == "(" and self.tk(init[0] + 2).kind == "str" \
-                and self.pairs.get(init[0] + 1) == init[0] + 3 and "require" not in self.vars:
-            return self.toks[init[0] + 2].text[1:-1]
+    def _require(self, init) -> tuple[str, str] | None:
+        """(specifier, member) when an initializer is require("x") or require("x").member."""
+        if not init or "require" in self.vars:
+            return None
+        a, b = init
+        if self.t(a) != "require" or self.t(a + 1) != "(" or self.tk(a + 2).kind != "str" or self.pairs.get(a + 1) != a + 3:
+            return None
+        if b == a + 4:
+            return self.toks[a + 2].text[1:-1], "*"
+        if b == a + 6 and self.t(a + 4) == ".":
+            return self.toks[a + 2].text[1:-1], self.t(a + 5)
         return None
 
     def _pattern_names(self, i: int) -> list[str]:

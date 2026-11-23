@@ -5,13 +5,13 @@ const module_ = require("node:module");
 const { createHash } = require("node:crypto");
 const { fileURLToPath, pathToFileURL } = require("node:url");
 
-/** files: {"/abs/file": {sha, source}}; resolve(specifier, parentPath, next) may redirect a specifier. */
+/** files: {"/abs/file": {sha, source}}; resolve(specifier, parentPath, isRequire) may redirect: {specifier, parent?}. */
 function install(files, resolve) {
   const byUrl = new Map(Object.entries(files).map(([f, x]) => [pathToFileURL(f).href, { file: f, ...x }]));
   module_.registerHooks({
     resolve(specifier, context, next) {
       if (!resolve || !context.parentURL?.startsWith("file:")) return next(specifier, context);
-      const r = resolve(specifier, fileURLToPath(context.parentURL));
+      const r = resolve(specifier, fileURLToPath(context.parentURL), context.conditions?.includes("require") ?? false);
       return r ? next(r.specifier, r.parent ? { ...context, parentURL: pathToFileURL(r.parent).href } : context) : next(specifier, context);
     },
     load(url, context, next) {

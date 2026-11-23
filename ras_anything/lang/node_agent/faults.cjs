@@ -1,5 +1,6 @@
 // The fault plans and clocks of ras_anything/faults.py, for the Node agent: same plans, same draws.
 "use strict";
+const { AsyncResource } = require("node:async_hooks");
 const { createHash } = require("node:crypto");
 const real = {
   setTimeout, clearTimeout, setInterval, clearInterval, setImmediate, Date, AbortSignalTimeout: AbortSignal.timeout,
@@ -125,7 +126,7 @@ function delay(ms, ctl) {
 
 class VTimeout {
   constructor(clock, fn, ms, args, repeat) {
-    Object.assign(this, { clock, fn, args, repeat });
+    Object.assign(this, { clock, fn: AsyncResource.bind(fn), args, repeat }); // (a callback runs in the context that set it)
     this.ms = !(ms >= 1 && ms <= 2 ** 31 - 1) ? 1 : Math.trunc(ms);
     this.refresh();
   }

@@ -290,7 +290,10 @@ function start(cfg) {
   hooks.install(spec.files);
 
   process.on("uncaughtExceptionMonitor", (err) => {
-    out.uncaught = { type: err?.name ?? typeof err, msg: String(err?.message ?? err).slice(0, 300), hang: false, where: place(err) };
+    out.uncaught = { type: err?.name ?? typeof err, msg: String(err?.message ?? err).slice(0, 300), hang: false, where: null };
+    try {
+      out.uncaught.where = place(err);
+    } catch {}
   });
   process.on("exit", finish);
 
@@ -308,8 +311,8 @@ function start(cfg) {
       const rel = path.relative(cfg.root, file);
       if (rel.startsWith("..") || /(^|\/)(node_modules|_ras_hardened|\.ras)\//.test(rel)) continue;
       const table = spec.files[file]?.functions ?? [];
-      const line = Number(m[3]);
-      const inside = table.find((f) => f.line <= line && line <= f.end);
+      const at = Number(m[3]);
+      const inside = table.find((f) => f.line <= at && at <= f.end);
       const mod = table[0]?.module ?? rel.replace(/\.\w+$/, "").replaceAll("/", ".");
       return inside ? `${mod}.${inside.qualname}` : m[1] ? `${mod}.${m[1].replace(/^.*\./, "")}` : `${mod}.<module>`;
     }

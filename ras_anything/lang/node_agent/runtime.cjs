@@ -296,7 +296,12 @@ const scopes = new Map();
 function scope(id) {
   const s = scopes.get(id);
   if (!s) throw new RasError(`no scope for ${id}: hardened code is loaded by the block ras-anything enable adds`);
-  return s;
+  return new Proxy(s, {
+    get(o, k) {
+      if (typeof k === "string" && !(k in o)) throw new RasError(`scope("${id}") has no ${k}: only the module-level names the original uses`);
+      return o[k];
+    },
+  });
 }
 
 /** Used by the marked block: the function that runs hardened code, loaded on the first call; if it can't be
