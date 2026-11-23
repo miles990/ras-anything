@@ -21,8 +21,10 @@ Read [AGENTS.md](AGENTS.md) first (setup, tests, structure, boundaries). Decisio
 2. A test in `tests/`. It is switchable with the flag `ras.pattern.<name>`.
 3. Still manual (known gap, docs/REVIEW-PRACTICES.md): the runtime's `_PATTERN_NAMES` if it exports helpers, and the Node `patterns/index.cjs`.
 
-## Add an export format
-Today: add the name to `contracts.EXPORT_FORMATS` and a renderer to `export.RENDERERS`; README and a test. Two core files; making formats discovered modules is phase 2 in docs/REVIEW-PRACTICES.md.
+## Add an export format (a component: new files only)
+1. `ras_anything/exporters/<name>.py` with module-level `FORMAT` (the `--format` name), optional `ORDER` (lower first; json is 10), and `render(project, od, bundle, snapshots, events) -> str`. `exporters.FORMATS` picks it up; the CLI and MCP enum follow.
+2. A test in `tests/` (the contract test already checks CLI, MCP and renderers agree).
+3. Nothing in `contracts.py`, `export.py`, `cli.py` or `mcp.py` changes. Check with `wow-eng change`: core edits must be 0.
 
 ## Versions
 SemVer. Public library API: `docs/api/runtime-api.json`. Snapshot schemas: `docs/schema/README.md`. Interop: wow INTEROP 1.0 via `wow.manifest.json`.

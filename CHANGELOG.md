@@ -5,6 +5,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follo
 ## Unreleased
 
 ### Added
+- Export formats are auto-discovered modules in `ras_anything/exporters/` (new format = new file, 0 core changes).
 - `wow.manifest.json` (wow INTEROP 1.0, wow-common 1.0): skills with CLI, MCP tool, output schema and JSON-Pointer evidence.
 - Library contract: `docs/LIBRARY.md`, `py.typed`, API snapshot `docs/api/runtime-api.json` checked by `tests/test_library_api.py`.
 - `RAS_ANYTHING_LANGUAGES_OFF` switches languages off by name.

@@ -52,10 +52,11 @@
    "ras_anything.patterns"
   ],
   [
-   "ras_anything.paths",
-   "ras_anything.ui",
+   "ras_anything",
    "ras_anything.contracts",
-   "ras_anything"
+   "ras_anything.exporters",
+   "ras_anything.paths",
+   "ras_anything.ui"
   ]
  ],
  "independent": [
@@ -121,6 +122,13 @@
    "discovery": "auto",
    "tests": "tests",
    "toggle": "ras-anything flag set ras.pattern.<name> off"
+  },
+  {
+   "kind": "export format",
+   "dir": "ras_anything/exporters",
+   "match": "^(?!_).+\\.py$",
+   "discovery": "auto",
+   "tests": "tests"
   }
  ],
  "change": {

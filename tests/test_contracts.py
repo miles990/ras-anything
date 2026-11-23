@@ -33,6 +33,16 @@ class ExportFormatContract(unittest.TestCase):
         self.assertEqual(tuple(fmt.choices), contracts.EXPORT_FORMATS)
         self.assertEqual(tuple(mcp.TOOLS["ras_export"][1]["format"]["enum"]), contracts.EXPORT_FORMATS)
 
+    def test_formats_are_discovered_from_exporter_modules(self):
+        from ras_anything import exporters
+        self.assertEqual(exporters.FORMATS, contracts.EXPORT_FORMATS)
+        self.assertGreaterEqual(len(exporters.FORMATS), 5)
+        self.assertEqual(exporters.FORMATS[0], "json")
+        root = REPO / "ras_anything" / "exporters"
+        names = {getattr(__import__("ras_anything.exporters." + p.stem, fromlist=["FORMAT"]), "FORMAT")
+                 for p in root.glob("*.py") if p.name != "__init__.py" and not p.name.startswith("_")}
+        self.assertEqual(names, set(exporters.FORMATS))
+
 
 class CloudEventsExport(unittest.TestCase):
     def test_every_event_is_a_cloudevent(self):
