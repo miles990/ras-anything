@@ -8,10 +8,11 @@ from __future__ import annotations
 
 from ..paths import UserError
 from .base import LangAdapter, program_stem
+from .golang import GoAdapter
 from .node import NodeAdapter
 from .python import PythonAdapter
 
-ADAPTERS: list[LangAdapter] = [PythonAdapter(), NodeAdapter()]
+ADAPTERS: list[LangAdapter] = [PythonAdapter(), NodeAdapter(), GoAdapter()]
 
 # Recognized, but no adapter here yet.
 PLANNED = {"bun": "Bun", "deno": "Deno"}
@@ -30,6 +31,7 @@ _HINTS = {
     "sh": "start the app itself instead of a shell: ras-anything scan -- python app.py",
     "make": "start the app itself instead of make: ras-anything scan -- python app.py",
     "env": "set variables in your shell, then start the app itself: ras-anything scan -- python app.py",
+    "go": "start your Go app with go run: ras-anything scan -- go run .",
 }
 
 
