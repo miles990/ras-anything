@@ -20,6 +20,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follo
 - `wow/eng.json` and `wow/eng-baseline.json`: W8 engineering measurements and the frozen baseline.
 
 ### Fixed
+- W8: moved exporter complexity keys in `wow/eng-baseline.json` after the format split; export formats declared toggle-N/A; `cli.main` kept at CC ≤ 10 after `--json`.
 - `export` / `sync_out` leave versioned `.ras/out` snapshots (including SLO series timestamps) unchanged when the payload has not changed.
 - Holdout pipeline tests (`test_ai_pipeline`, `test_go_pipeline`, `test_java_pipeline`) skip with a clear reason when `wow/work/holdout/` is missing (fresh clone or CI).
 - Proposed CI workflow pins Actions to full commit SHAs and sets job-level `permissions: contents: read`.

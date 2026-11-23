@@ -128,13 +128,15 @@
    "dir": "ras_anything/exporters",
    "match": "^(?!_).+\\.py$",
    "discovery": "auto",
-   "tests": "tests"
+   "tests": "tests",
+   "toggleNa": true,
+   "why": "a format is chosen per call with --format, not switched off for the process"
   }
  ],
  "change": {
   "scenarios": [
    {
-    "name": "add export format cloudevents (fc0f734)",
+    "name": "add export format cloudevents (fc0f734, historical, before auto-discovery)",
     "range": "fc0f734^..fc0f734",
     "extensionDirs": [
      "ras_anything/export.py",
@@ -142,7 +144,8 @@
      "README.md",
      "docs/**",
      "tests/**"
-    ]
+    ],
+    "maxCoreEdits": 2
    }
   ]
  },

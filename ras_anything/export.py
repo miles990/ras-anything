@@ -249,6 +249,33 @@ def coverage_payload() -> dict:
     return {"adapters": adapters}
 
 
+
+def _slo_payload(project: Path, slo_doc: dict) -> dict:
+    """SLO snapshot body. Reuses a previous series timestamp when the metrics have not changed."""
+    sh = slo_doc.get("hardened") or {}
+    body = {
+        "source": slo_doc.get("source", "bench"),
+        "targets": slo_doc.get("targets") or {},
+        "original": slo_doc.get("original") or {},
+        "hardened": sh,
+    }
+    prev = (load_json(out_dir(project) / "slo.json") or {}).get("slo") or {}
+    prev_head = {k: prev.get(k) for k in ("source", "targets", "original", "hardened")}
+    if sh and prev_head == body and prev.get("series"):
+        series = prev["series"]
+    elif sh:
+        series = [{
+            "ts": _iso_now(),
+            "availability": float(sh.get("availability") or 0.0),
+            "p99_s": float(sh.get("p99_s") or 0.0),
+            "error_rate": float(sh.get("error_rate") or 0.0),
+            "burn_pct": float(sh.get("error_budget_burn_pct") or 0.0),
+        }]
+    else:
+        series = []
+    return {"slo": {**body, "series": series}}
+
+
 def sync_out(project: Path) -> dict[str, Path]:
     """Build or refresh .ras/out/*.json and seed events.ndjson from project .ras/ state."""
     written: dict[str, Path] = {}
@@ -315,28 +342,7 @@ def sync_out(project: Path) -> dict[str, Path]:
         })
 
     if slo_doc:
-        sh = slo_doc.get("hardened") or {}
-        slo_body = {
-            "source": slo_doc.get("source", "bench"),
-            "targets": slo_doc.get("targets") or {},
-            "original": slo_doc.get("original") or {},
-            "hardened": sh,
-        }
-        prev_slo = (load_json(out_dir(project) / "slo.json") or {}).get("slo") or {}
-        prev_head = {k: prev_slo.get(k) for k in ("source", "targets", "original", "hardened")}
-        if sh and prev_head == slo_body and prev_slo.get("series"):
-            series = prev_slo["series"]  # keep the stamped point so a re-export does not rewrite ts
-        elif sh:
-            series = [{
-                "ts": _iso_now(),
-                "availability": float(sh.get("availability") or 0.0),
-                "p99_s": float(sh.get("p99_s") or 0.0),
-                "error_rate": float(sh.get("error_rate") or 0.0),
-                "burn_pct": float(sh.get("error_budget_burn_pct") or 0.0),
-            }]
-        else:
-            series = []
-        written["slo"] = emit_run(project, "slo", {"slo": {**slo_body, "series": series}})
+        written["slo"] = emit_run(project, "slo", _slo_payload(project, slo_doc))
 
     # Incidents -> replay-<id>.json
     inc_dir = project / ".ras" / "incidents"

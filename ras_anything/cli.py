@@ -306,9 +306,32 @@ def _present(command: str, result, as_json: bool) -> int:
     return code
 
 
-def main(argv=None) -> int:
+def _wants_json(a, as_json: bool) -> bool:
+    if a.command == "flag" and "--json" in (a.rest or []):
+        a.rest = [x for x in a.rest if x != "--json"]
+        return True
+    return as_json
+
+
+def _execute(p, a, cmd, as_json: bool) -> int:
     import contextlib
 
+    if as_json and a.command != "mcp":
+        with contextlib.redirect_stdout(sys.stderr):
+            result = _run(p, a, cmd)
+        return _present(a.command, result, True)
+    return _present(a.command, _run(p, a, cmd), False)
+
+
+def _fail(e: UserError, as_json: bool) -> int:
+    if as_json:
+        print(json.dumps(problem("user-error", e.what, e.impact, e.nxt)), file=sys.stderr)
+    else:
+        ui.error(e.what, e.impact, e.nxt)
+    return 1
+
+
+def main(argv=None) -> int:
     argv = list(sys.argv[1:] if argv is None else argv)
     head, cmd = _split(argv)
     as_json = "--json" in head
@@ -318,20 +341,9 @@ def main(argv=None) -> int:
     except _UsageError as e:
         print(json.dumps(problem("usage", "invalid command line", str(e), "--help", 2)), file=sys.stderr)
         return 2
-    if a.command == "flag" and "--json" in (a.rest or []):
-        as_json = True
-        a.rest = [x for x in a.rest if x != "--json"]
     try:
-        if as_json and a.command != "mcp":
-            with contextlib.redirect_stdout(sys.stderr):
-                result = _run(p, a, cmd)
-            return _present(a.command, result, True)
-        return _present(a.command, _run(p, a, cmd), False)
+        return _execute(p, a, cmd, _wants_json(a, as_json))
     except UserError as e:
-        if as_json:
-            print(json.dumps(problem("user-error", e.what, e.impact, e.nxt)), file=sys.stderr)
-        else:
-            ui.error(e.what, e.impact, e.nxt)
-        return 1
+        return _fail(e, as_json)
     except KeyboardInterrupt:
         return 130

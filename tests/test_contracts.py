@@ -38,6 +38,7 @@ class ExportFormatContract(unittest.TestCase):
         self.assertEqual(exporters.FORMATS, contracts.EXPORT_FORMATS)
         self.assertGreaterEqual(len(exporters.FORMATS), 5)
         self.assertEqual(exporters.FORMATS[0], "json")
+        self.assertTrue(any(p.stem == "otlp_json" for p in (REPO / "ras_anything" / "exporters").glob("*.py")))
         root = REPO / "ras_anything" / "exporters"
         names = {getattr(__import__("ras_anything.exporters." + p.stem, fromlist=["FORMAT"]), "FORMAT")
                  for p in root.glob("*.py") if p.name != "__init__.py" and not p.name.startswith("_")}

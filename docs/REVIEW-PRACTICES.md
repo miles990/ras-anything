@@ -171,13 +171,13 @@ D 階段其餘語言**暫停**，直到上表的 adapter 介面寫成文件化�
 | 階段 | 內容 | 價值／成本 |
 |---|---|---|
 | 1（本次，完成） | contracts、語言／模式自動發現與停用、RFC 9457、CloudEvents、manifest、CI、ADR、AGENTS／CONTRIBUTING／CHANGELOG、函式庫 API 快照、W8 量測 | 高／低 |
-| 2 | 匯出格式改成 `exporters/<fmt>.py` 自動發現（E4 核心 0）；`schema_version` 集中；Node 模式清單由 Python 產生；mypy 擴到 pipeline；actions 以 SHA 釘選；`export` 不改寫追蹤快照的時間戳 | 高／中 |
+| 2（完成，2026-11-23） | 匯出格式改成 `exporters/<fmt>.py` 自動發現（新格式核心 **0**）；`schema_version` 集中為 1.1.0；Node 模式清單由 Python 產生；mypy 擴到 pipeline（28 檔）；actions 以 SHA 釘選；`export` 不改寫追蹤快照的時間戳；每個出結果的指令有 `--json` | 高／中 |
 | 3 | 拆 `sync_out`、`bench`、`verify.measure`、`diagnose`、`doctor.status`（每次一個函式，baseline 逐步歸零）；mcp `call_tool`／`handle` 壓到 CC ≤ 10 | 中／中 |
 | 4 | runtime 獨立發行形狀；旗標的視覺編輯頁（token 化）；LSP 診斷 | 中／高 |
 
 ## 11. 給其他工作線
 
-- 測試依賴未追蹤的 `wow/work/holdout/`：CI 上 test_ai_pipeline、test_go_pipeline 與 Java 測試會失敗，除非在缺少時 skip。請 Java／D 線處理。
+- 測試依賴未追蹤的 `wow/work/holdout/`：已改成缺少時 skip，並附原因。新鮮 clone（無 holdout）426 個測試、0 失敗、11 skip。
 - D 階段其餘語言暫停（見 §8）。
 
 ## 12. 獨立審查（Codex）與處理
@@ -198,4 +198,24 @@ D 階段其餘語言**暫停**，直到上表的 adapter 介面寫成文件化�
 | 10 | 共同規範只比主版本，未來的次版本會被當成支援 | 比 checker 新的次版本標未驗證 |
 | 11 | 暫存副本保留 symlink，可能寫回原檔 | 複製時解開 symlink |
 
-`schema_version` 這次沒有升（`enabled` 是選填的新增欄位）；照 `docs/schema/README.md` 應升次版本，等 phase 2 把寫死在 4 處的版本字串集中後一起升。
+`schema_version` 已集中到 `contracts.SCHEMA_VERSION` 並升為 **1.1.0**（additive `coverage.adapters[].enabled`；見 `docs/schema/README.md`）。
+
+## 13. Phase 2 量測（2026-11-23，台北時間）
+
+`wow-eng all --run --cwd examples/weather`。前：phase 1 結束（表 §1，約 62a222c）。後：本階段結束。
+
+| W8 子項 | 前（phase 1） | 後（phase 2） | 狀態 |
+|---|---|---|---|
+| E1＋E2 | 可用率 100.0%、SLO met、verify 通過 | 同左 | 通過 |
+| E3 可維護 | maxCC 122、最長函式 209、baseline 107 筆 | maxCC **114**、最長函式 **194**（`sync_out` 的 SLO 時間戳邏輯抽成 `_slo_payload`）；搬家的 `_prom_lines`／`_otlp_json` baseline 鍵改指向 `exporters/` | 通過（含 baseline） |
+| E4 可擴充 | 新語言核心 0；匯出格式核心 2 | 新增匯出格式（暫存 toy commit，不推）：核心 **0**、只新增 `exporters/toy.py`。歷史 cloudevents 仍記 core 2（`maxCoreEdits: 2`） | 通過（新格式）；歷史紀錄保留 |
+| E5 模組化 | 循環 1、分層 0 | 同左 | 通過 |
+| E6 組件化 | 語言 4、模式 13 | 再加上匯出格式 5：自動發現、各有測試；停用標不適用（`--format` 每次選） | 通過 |
+| E7 lib 化 | L2 外殼最大 CC 11（mcp） | 同左（`--json` 曾讓 `cli.main` 升到 13，已拆回 ≤10；mcp `call_tool`／`handle` 仍 11 → phase 3） | 部分 |
+| E8 共同編輯 | C1–C3、C5 ✓ | 同左 | 通過 |
+| E9 互通 | X1–X8 過，但 `--json` 只讓錯誤機讀 | X1–X8 全過（含 `--run`）；每個出結果的指令 stdout 可為 JSON（`cli-result` 或 export 本體） | 通過 |
+| E10 安全與可移植 | S3／S4 未過（workflow 還在 `docs/ci/`） | 擬議 workflow 已用 SHA 釘選、`permissions: contents: read`；仍等 Alex 複製到 `.github/workflows/`（本 token 沒有 workflow 權限） | 未通過 |
+| E11 共同規範 | 通過 | 同左 | 通過 |
+
+新鮮 clone（commit 7299031，模擬 Linux CI、無 `wow/work/holdout/`）：**426 tests, 0 failures, 11 skipped**；ruff、mypy 通過。分支覆蓋率約 69%（缺 holdout 資料，低於本機有 holdout 的 71%）。
+
