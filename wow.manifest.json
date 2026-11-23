@@ -2,7 +2,7 @@
   "$schema": "urn:wow:schema:manifest:1",
   "manifestVersion": "1",
   "name": "ras-anything",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Find the functions that break when dependencies misbehave, harden only those, prove it on recorded calls, and swap them in reversibly.",
   "license": "MIT",
   "homepage": "https://github.com/miles990/ras-anything",

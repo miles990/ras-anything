@@ -2,7 +2,9 @@
 
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follow [SemVer](https://semver.org/). Not published to any registry.
 
-## Unreleased
+## 0.2.1 — 2026-11-23
+
+GitHub tag `v0.2.1`. Not published to PyPI or npm. CI green on Python 3.10 and 3.13; wow W8 E1–E11 all pass.
 
 ### Fixed
 - The pattern lab worker no longer crashes on Python 3.10 when an attempt times out (`asyncio.TimeoutError` is not `OSError` until 3.11).
