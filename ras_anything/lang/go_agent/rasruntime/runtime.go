@@ -24,6 +24,9 @@ import (
 	"time"
 )
 
+// Generated from ras_anything.contracts.SCHEMA_VERSION by write_schema_version(). Do not edit by hand.
+const SchemaVersion = "1.1.0"
+
 // --------------------------------------------------------------------------- masking & plain
 
 var (
@@ -930,7 +933,7 @@ func dumpIncident(ctx *CallContext, err error) {
 	}, ctx.FID)
 	id := fmt.Sprintf("inc-%s-%s-%s", stamp, safeFID, ctx.SpanID[:8])
 	doc := map[string]any{
-		"schema_version": "1.0.0",
+		"schema_version": SchemaVersion,
 		"kind":           "incident",
 		"id":             id,
 		"created":        time.Now().UTC().Format(time.RFC3339),

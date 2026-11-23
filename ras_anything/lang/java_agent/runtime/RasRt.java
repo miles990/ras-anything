@@ -8,6 +8,9 @@ package _ras_hardened;
 public final class RasRt {
     private RasRt() {}
 
+    // Generated from ras_anything.contracts.SCHEMA_VERSION by write_schema_version(). Do not edit by hand.
+    public static final String SCHEMA_VERSION = "1.1.0";
+
     // ---------------------------------------------------------------- masking
 
     private static java.util.regex.Pattern rx(String s) {
@@ -1019,7 +1022,7 @@ public final class RasRt {
         String id = "inc-" + stamp().replaceAll("[-:Z]", "") + "-" + c.fid.replaceAll("[^\\w.-]", "_") + "-" + c.span.substring(0, 8);
         java.util.List<Object> deps = new java.util.ArrayList<>();
         for (String[] d : c.deps) deps.add(map("name", d[0], "kind", d[1]));
-        java.util.Map<String, Object> doc = map("schema_version", "1.0.0", "kind", "incident", "id", id, "created", stamp(), "lang", "java", "service", service(),
+        java.util.Map<String, Object> doc = map("schema_version", SCHEMA_VERSION, "kind", "incident", "id", id, "created", stamp(), "lang", "java", "service", service(),
                 "pid", ProcessHandle.current().pid(), "function", c.fid, "trigger", c.gaveUp != null ? "gave_up" : "raise", "trace_id", c.trace, "span_id", c.span,
                 "duration_s", Math.round((System.nanoTime() - c.started) / 1e6) / 1e3, "dependencies", deps, "dependency", c.dependency, "fault", fault, "events", c.events);
         if (e != null)

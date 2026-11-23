@@ -20,7 +20,7 @@ Every emitted document carries `schema_version` (`MAJOR.MINOR.PATCH`, currently 
 
 ### 1.1.0 (2026-11-23)
 - Additive optional field `coverage.adapters[].enabled` (`false` when the language is switched off with `RAS_ANYTHING_LANGUAGES_OFF`). Collectors that ignore unknown properties stay compatible with 1.0.0 documents.
-- `schema_version` is defined once in `ras_anything.contracts.SCHEMA_VERSION`; every emitter (export, replay, SLO, incidents, OTLP) reads it from there.
+- `schema_version` is defined once in `ras_anything.contracts.SCHEMA_VERSION`; every emitter (export, replay, SLO, incidents, OTLP) reads it from there. Node/Go/Java incident runtimes are vendored and cannot import that module: `contracts.write_schema_version()` copies the value into `lang/node_agent/patterns/schema_version.cjs` and the marked constants in the Go and Java runtimes.
 
 ### 1.0.0
 - Initial snapshot (`ras-run`) and event (`ras-event`) contracts.

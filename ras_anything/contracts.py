@@ -23,3 +23,52 @@ def __getattr__(name: str):
 #   [project.entry-points."ras_anything.languages"]
 #   ruby = "ras_ruby:RubyAdapter"
 LANGUAGE_ENTRY_POINT_GROUP = "ras_anything.languages"
+
+
+# Incident runtimes (Node / Go / Java) cannot import this module: they are vendored into the user's
+# app. write_schema_version() copies SCHEMA_VERSION into those trees (a generated Node module; a marked
+# constant in the single-file Go and Java runtimes). tests/test_contracts.py fails if they drift.
+
+
+def write_schema_version():
+    """Rewrite Node/Go/Java incident schema_version from SCHEMA_VERSION. Run after bumping it."""
+    import json
+    import re
+    from pathlib import Path
+
+    root = Path(__file__).resolve().parent
+    written = []
+
+    node = root / "lang" / "node_agent" / "patterns" / "schema_version.cjs"
+    node.write_text(
+        "// Generated from ras_anything.contracts.SCHEMA_VERSION by write_schema_version(). Do not edit by hand.\n"
+        "module.exports = " + json.dumps(SCHEMA_VERSION) + ";\n",
+        encoding="utf-8",
+    )
+    written.append(node)
+
+    go = root / "lang" / "go_agent" / "rasruntime" / "runtime.go"
+    go_pat = re.compile(
+        r"(// Generated from ras_anything\.contracts\.SCHEMA_VERSION by write_schema_version\(\)\. Do not edit by hand\.\nconst SchemaVersion = \")[^\"]+(\")"
+    )
+    go_text = go.read_text(encoding="utf-8")
+    new_go, n = go_pat.subn(r"\g<1>" + SCHEMA_VERSION + r"\2", go_text, count=1)
+    if n != 1:
+        raise ValueError("schema_version marker missing or not unique in %s" % go)
+    if new_go != go_text:
+        go.write_text(new_go, encoding="utf-8")
+    written.append(go)
+
+    java = root / "lang" / "java_agent" / "runtime" / "RasRt.java"
+    java_pat = re.compile(
+        r"(// Generated from ras_anything\.contracts\.SCHEMA_VERSION by write_schema_version\(\)\. Do not edit by hand\.\n"
+        r'\s*public static final String SCHEMA_VERSION = ")[^"]+(";)'
+    )
+    java_text = java.read_text(encoding="utf-8")
+    new_java, n = java_pat.subn(r"\g<1>" + SCHEMA_VERSION + r"\2", java_text, count=1)
+    if n != 1:
+        raise ValueError("schema_version marker missing or not unique in %s" % java)
+    if new_java != java_text:
+        java.write_text(new_java, encoding="utf-8")
+    written.append(java)
+    return written

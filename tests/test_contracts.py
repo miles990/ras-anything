@@ -230,3 +230,35 @@ class SchemaVersionContract(unittest.TestCase):
     def test_vendored_recorder_carries_the_same_schema_version(self):
         from ras_anything.patterns import recorder
         self.assertEqual(recorder.SCHEMA_VERSION, contracts.SCHEMA_VERSION)
+
+    def test_node_go_java_incidents_use_contracts_schema_version(self):
+        """Fail when a language runtime's incident schema_version drifts from contracts.SCHEMA_VERSION."""
+        import re
+        root = REPO / "ras_anything"
+        want = contracts.SCHEMA_VERSION
+        node = (root / "lang" / "node_agent" / "patterns" / "schema_version.cjs").read_text(encoding="utf-8")
+        self.assertIn('module.exports = "%s";' % want, node, "schema_version.cjs is stale; run contracts.write_schema_version()")
+        go = (root / "lang" / "go_agent" / "rasruntime" / "runtime.go").read_text(encoding="utf-8")
+        gm = re.search(r'const SchemaVersion = "([^"]+)"', go)
+        self.assertIsNotNone(gm, "Go SchemaVersion constant missing; run contracts.write_schema_version()")
+        self.assertEqual(gm.group(1), want, "Go SchemaVersion is stale; run contracts.write_schema_version()")
+        self.assertIn('"schema_version": SchemaVersion,', go)
+        self.assertNotIn('"schema_version": "1.0.0"', go)
+        java = (root / "lang" / "java_agent" / "runtime" / "RasRt.java").read_text(encoding="utf-8")
+        jm = re.search(r'public static final String SCHEMA_VERSION = "([^"]+)";', java)
+        self.assertIsNotNone(jm, "Java SCHEMA_VERSION constant missing; run contracts.write_schema_version()")
+        self.assertEqual(jm.group(1), want, "Java SCHEMA_VERSION is stale; run contracts.write_schema_version()")
+        self.assertIn('map("schema_version", SCHEMA_VERSION,', java)
+        self.assertNotIn('map("schema_version", "1.0.0"', java)
+
+    def test_write_schema_version_is_current(self):
+        """The generated/marked files already match what the writer would emit."""
+        paths = [
+            REPO / "ras_anything" / "lang" / "node_agent" / "patterns" / "schema_version.cjs",
+            REPO / "ras_anything" / "lang" / "go_agent" / "rasruntime" / "runtime.go",
+            REPO / "ras_anything" / "lang" / "java_agent" / "runtime" / "RasRt.java",
+        ]
+        before = {p: p.read_bytes() for p in paths}
+        contracts.write_schema_version()
+        after = {p: p.read_bytes() for p in paths}
+        self.assertEqual(before, after, "generated schema_version files are stale; run contracts.write_schema_version()")

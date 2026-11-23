@@ -7,6 +7,7 @@ const fs = require("node:fs");
 const path = require("node:path");
 const { createHash } = require("node:crypto");
 const core = require("./core.cjs");
+const SCHEMA_VERSION = require("./schema_version.cjs");
 
 const RING = 64;
 const BEFORE = 20;
@@ -145,7 +146,7 @@ function dump(ctx, trigger, outcome, error) {
   const stamp = wall.toISOString().replace(/[-:]/g, "").slice(0, 15);
   const id = `inc-${stamp}-${ctx.fid.replace(/[^A-Za-z0-9_.-]/g, "_").slice(0, 60)}-${ctx.spanId.slice(0, 8)}`;
   const doc = {
-    schema_version: "1.0.0", kind: "incident", id, created: wall.toISOString().slice(0, 19) + "Z", lang: "node", service: core.SERVICE, pid: process.pid,
+    schema_version: SCHEMA_VERSION, kind: "incident", id, created: wall.toISOString().slice(0, 19) + "Z", lang: "node", service: core.SERVICE, pid: process.pid,
     function: ctx.fid, trigger, trace_id: ctx.traceId, span_id: ctx.spanId, parent_span_id: ctx.parent, seed: ctx.seed, started: ctx.ts / 1000,
     duration_s: round((now - ctx.t0) / 1000), inputs: redact([...ctx.args]), input_hash: inputHash(ctx.args), dependencies: ctx.deps,
     dependency: ctx.lastDependency, fault,
