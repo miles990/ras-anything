@@ -103,6 +103,35 @@ class WeatherTest(unittest.TestCase):
         self.assertEqual(hashlib.sha256(src.read_bytes()).hexdigest(), before)
         self.assertFalse((self.p.dir / "_ras_hardened").exists())
 
+    def test_rejects_fake_fallback_line_without_a_boundary_failure(self):
+        v = self.p.use(self.fid, "weather_fake_fallback.py")
+        self.assertTrue(v["gates"]["happy"])
+        self.assertFalse(v["passed"])
+        self.assertFalse(v["gates"]["no_wrong"])
+        bad = v["chaos"]["first_failure"]["hardened"]
+        self.assertEqual((bad["class"], bad["attempts"], bad["logs"]), ("wrong", [], 1))
+        self.assertIn("no dependency request failed", bad["note"])
+
+    def test_rejects_fallback_when_the_retry_had_the_answer(self):
+        v = self.p.use(self.fid, "weather_discard_answer.py")
+        self.assertFalse(v["gates"]["no_wrong"])
+        self.assertIn("answered in the end", v["chaos"]["first_failure"]["hardened"]["note"])
+
+    def test_rejects_fallback_on_the_happy_path(self):
+        v = self.p.use(self.fid, "weather_fallback_always.py")
+        self.assertFalse(v["passed"])
+        self.assertFalse(v["gates"]["happy"])
+        self.assertFalse(v["gates"]["no_wrong"])
+
+    def test_rejects_hardened_code_that_reaches_into_the_harness(self):
+        hp = self.p.dir / ".ras" / "hardens" / self.fid / "hardened.py"
+        for line in ("from ras_anything import boundary", "import ras_anything._agent", "from ras_anything.faults import Plan",
+                     "import sys; B = sys.modules.get('ras_anything.boundary')"):
+            hp.write_text(line + "\n" + (FIX / "weather_good.py").read_text())
+            v = verify(self.fid, quiet=True)
+            self.assertFalse(v["passed"])
+            self.assertIn("ras_anything.runtime only", v["fatal"]["message"])
+
     def test_enable_refuses_unverified_change(self):
         from ras_anything.paths import UserError
 

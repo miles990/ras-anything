@@ -261,6 +261,28 @@ def _is_main_guard(test) -> bool:
             and len(test.comparators) == 1 and _const_str(test.comparators[0]) == "__main__")
 
 
+def forbidden_imports(path) -> list[str]:
+    """ras_anything modules (other than runtime) that hardened code imports: the harness itself."""
+    try:
+        with open(path, encoding="utf-8") as f:
+            tree = ast.parse(f.read())
+    except (SyntaxError, OSError, UnicodeDecodeError, ValueError):
+        return []  # the worker reports it
+    found = set()
+    for n in ast.walk(tree):
+        names = []
+        if isinstance(n, ast.Import):
+            names = [a.name for a in n.names]
+        elif isinstance(n, ast.ImportFrom) and n.module and not n.level:
+            names = [n.module + "." + a.name for a in n.names] if n.module == "ras_anything" else [n.module]
+        elif isinstance(n, ast.Constant) and isinstance(n.value, str) and n.value.startswith("ras_anything."):
+            names = [n.value]  # importlib.import_module("ras_anything...."), sys.modules["ras_anything...."]
+        for name in names:
+            if name.split(".")[0] == "ras_anything" and name.split(".")[:2] != ["ras_anything", "runtime"]:
+                found.add(name)
+    return sorted(found)
+
+
 @lru_cache(maxsize=256)
 def load(path: str) -> FileInfo | None:
     try:

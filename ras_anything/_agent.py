@@ -280,8 +280,8 @@ class Agent:
 
         @functools.wraps(fn)
         def wrapper(*a, **kw):
-            h = self.handler
-            before = len(h.attempts) if isinstance(h, boundary.FaultingHandler) else 0
+            attempts: list = []  # what this call (and threads it hands its context to) asked of dependencies
+            token = boundary._scopes.set(boundary._scopes.get() + (attempts,))
             t0 = time.perf_counter()
             st["calls"] += 1
             try:
@@ -291,14 +291,16 @@ class Agent:
                 st["raised"][name] = st["raised"].get(name, 0) + 1
                 st["lat"].append(time.perf_counter() - t0)
                 raise
+            finally:
+                boundary._scopes.reset(token)
             st["lat"].append(time.perf_counter() - t0)
             fb = None
             try:
                 fb = fallback(*a, **kw) if callable(fallback) else fallback
             except Exception:
                 pass
-            faulted = isinstance(h, boundary.FaultingHandler) and any(x["fault"] for x in h.attempts[before:])
-            if fallback is not None and faulted and res == fb:
+            # a fallback only counts when this very call saw a dependency fail
+            if fallback is not None and res == fb and any(x["failed"] for x in attempts):
                 st["fallback"] += 1
             else:
                 st["ok"] += 1

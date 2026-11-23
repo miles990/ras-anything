@@ -10,7 +10,7 @@ import tempfile
 import time
 from pathlib import Path
 
-from . import faults, ui
+from . import faults, static, ui
 from .paths import PKG_DIR, UserError, find_project, harden_dir, load_json, save_json, sha256_file
 
 CLASSES = ("ok", "degraded", "error", "wrong", "hang")
@@ -45,6 +45,12 @@ def verify(fid: str | None = None, max_chaos: int = 60, quiet: bool = False) -> 
         ui.headline("verify", "%s %s %d recorded calls %s %d faults + 3 seeded mixes %s virtual clock" % (
             fid, ui.DOT, meta["recorded"], ui.DOT, len(faults.MATRIX), ui.DOT))
     t0 = time.perf_counter()
+    peek = static.forbidden_imports(d / "hardened.py")
+    if peek:
+        res = {"passed": False, "id": fid, "fatal": {"stage": "accept hardened.py", "message":
+               "hardened.py imports %s. Hardened code may use ras_anything.runtime only: the rest of ras-anything is "
+               "the harness that judges it." % ", ".join(peek)}}
+        return _save(res, d, fid, t0, quiet)
     try:
         exe = meta.get("executable") if meta.get("executable") and os.path.exists(meta["executable"]) else sys.executable
         p = subprocess.run([exe, "-m", "ras_anything._verify_worker", str(d), out, str(max_chaos)],
@@ -60,6 +66,10 @@ def verify(fid: str | None = None, max_chaos: int = 60, quiet: bool = False) -> 
             os.unlink(out)
         except OSError:
             pass
+    return _save(res, d, fid, t0, quiet)
+
+
+def _save(res: dict, d: Path, fid: str, t0: float, quiet: bool) -> dict:
     res["hardened_sha256"] = sha256_file(d / "hardened.py")
     res["verified_at"] = time.strftime("%Y-%m-%dT%H:%M:%S%z")
     res["wall_s"] = round(time.perf_counter() - t0, 2)
@@ -167,6 +177,8 @@ def _k(key: str) -> str:
 
 def _explain(h: dict, o: dict | None = None) -> None:
     print("    hardened: %s %s" % (h["class"], ui.dim("(%s, %s)" % (h["exc"] or h["result"], ui.secs(h["latency"])))))
+    if h.get("note"):
+        print("    " + ui.warn(h["note"]))
     if h.get("miss"):
         print("    " + ui.dim(h["miss"]))
     print("    expected: %s" % ui.dim(str(h["expected"])))

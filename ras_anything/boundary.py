@@ -16,6 +16,7 @@ recorded. The adapter then turns the outcome back into exactly what the API retu
 from __future__ import annotations
 
 import errno
+import contextvars
 import hashlib
 import io
 import os
@@ -139,6 +140,16 @@ def raise_outcome(out: dict):
     raise out.get("_live") or cassette.build_exc(out["exc"])
 
 
+def is_failure(out: dict) -> bool:
+    """Did the dependency fail in this outcome? (exception or timeout, 5xx/429, a temp-failed or killed process)"""
+    if "exc" in out:
+        return True
+    if "status" in out:
+        return out["status"] >= 500 or out["status"] == 429
+    rc = out.get("returncode")
+    return rc is not None and (rc == 75 or rc < 0)
+
+
 # --------------------------------------------------------------------------- handlers
 
 
@@ -156,6 +167,10 @@ def _live_serve(fn):
         out = fn()
         return out, time.perf_counter() - t0
     return serve
+
+
+# One list per wrapped call in progress in this context; every attempt is added to all of them.
+_scopes: contextvars.ContextVar[tuple] = contextvars.ContextVar("ras_scopes", default=())
 
 
 class FaultingHandler(Handler):
@@ -178,15 +193,24 @@ class FaultingHandler(Handler):
     def on_attempt(self, req: Req, rec: dict) -> None:  # hook for attribution / counting
         pass
 
+    def unanswered(self, keys) -> bool:
+        """Is there a request among `keys` that never got a good answer?"""
+        good = {a["key"] for a in self.attempts if not a["failed"]}
+        return any(k not in good for k in keys)
+
     def perform(self, req, serve):
         n = self.counts.get(req.key, 0)
         self.counts[req.key] = n + 1
         fault = self.plan.fault(req.key, n, req.nonidempotent)
         rec = {"key": req.key, "n": n, "fault": fault, "reached": False, "nonidempotent": req.nonidempotent,
-               "idem": req.idem_key, "method": req.method}
+               "idem": req.idem_key, "method": req.method, "failed": True}
         self.attempts.append(rec)
+        for calls in _scopes.get():
+            calls.append(rec)
         self.on_attempt(req, rec)
-        return self.execute(fault, req, serve, rec)
+        out = self.execute(fault, req, serve, rec)  # a hang raises: failed stays True
+        rec["failed"] = is_failure(out) or bool(rec.get("truncated"))
+        return out
 
     def _timeout(self, req):
         t = req.timeout
@@ -224,8 +248,10 @@ class FaultingHandler(Handler):
         if fault == "slow":
             return self._serve(serve, rec, faults.SLOW_S, t, by_deadline, req)
         if fault == "truncated":
-            out = self._serve(serve, rec, 0.0, t, by_deadline, req)
-            return truncate(out)
+            whole = self._serve(serve, rec, 0.0, t, by_deadline, req)
+            out = truncate(whole)
+            rec["truncated"] = out != whole
+            return out
         if fault == "timeout":
             if req.nonidempotent:  # the request went out; only the answer is lost
                 serve()

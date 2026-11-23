@@ -205,6 +205,9 @@ Recorded examples:
    to declare `None` as the fallback use `RAS_FALLBACK = lambda *args, **kwargs: None`).
    Any other value that differs from the happy result counts as **silent wrong data** and fails.
    Swallowing errors (`except Exception: return None`) is the defect you are fixing.
+   A fallback counts only in a call where a dependency request really failed and never got a good
+   answer (the recorder watches the boundary; a log line alone proves nothing). An open
+   `CircuitBreaker` makes no request, so raise then.
 6. **Serviceable errors.** Log each give-up with `log_event("...", **context)` (JSON line on stderr,
    with a trace id) and chain causes (`raise ... from e`).
 

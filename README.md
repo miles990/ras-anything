@@ -69,21 +69,24 @@ A scan looks like this (examples/payments):
 the hardened function. Dependency answers come from the recording, so nothing touches the network.
 Time is virtual: timeouts, backoff and `Retry-After` cost no wall time and are measured exactly. Each
 call is classified as **ok** (equal to the recorded result), **degraded** (equal to the fallback the
-hardened module declares in `RAS_FALLBACK`), **wrong** (any other value: silent bad data), **error**
+hardened module declares in `RAS_FALLBACK`, in a call where a dependency request was *seen* to fail and
+never got a good answer), **wrong** (any other value: silent bad data), **error**
 (an exception within budget) or **hang** (blocked with no timeout, or over the latency budget).
 Nothing can be enabled until every gate passes:
 
 - happy-path replay: 100% identical (where the original raised, the same exception type)
-- no `wrong` results (degraded fallbacks must log with a `trace_id`), no new crash types, and no requests the original never made
+- no `wrong` results (a fallback returned with no observed boundary failure is wrong, whatever it logs; an earned one must log with a `trace_id`), no new crash types, and no requests the original never made
 - no hangs, and p99 latency within the budget (default 5 s per call)
 - duplicate non-idempotent side effects ≤ the original's (POST/PUT/PATCH/DELETE that reached the server under different or missing `Idempotency-Key`s)
 - availability (ok + degraded) strictly higher than the original's
 
 Hangs raise `ChaosHang`, a `BaseException`, so `except Exception` can't hide one. The test suite
 checks that verify **rejects** a version that swallows everything and returns `None` (even with an
-unlogged `RAS_FALLBACK`), one that retries a POST without an idempotency key (including after a GET),
-and one that changes the happy-path result. Enable also
-refuses any `hardened.py` whose hash differs from the verified one.
+unlogged `RAS_FALLBACK`), one that prints a fake `RAS_FALLBACK`/`trace_id` line without a failure, one
+that throws a good answer away for the fallback, one that retries a POST without an idempotency key
+(including after a GET), and one that changes the happy-path result. Hardened code may import
+`ras_anything.runtime` but nothing else of ras-anything. Enable also refuses any `hardened.py` whose
+hash differs from the verified one.
 
 When the original double-sends, verify shows you the exact recorded call:
 
@@ -137,10 +140,12 @@ after 2 s.
 ## What it can't do yet
 
 - Python only. No Node, Go or other runtimes yet.
-- Top-level functions and `@staticmethod`s only: no methods, nested functions, async functions or generators. Arguments and results must be picklable.
+- Top-level functions and `@staticmethod`s only: no methods, nested functions, async functions or generators. Arguments and results must be storable as JSON (plain data, bytes, dates, decimals, and instances of your project's own classes).
 - Boundaries: `urlopen`, `subprocess.run` (and `check_output`, which goes through it) and `requests`. Not raw sockets, `http.client` used directly, database drivers, `asyncio`, `Popen` used directly, or file I/O faults.
 - Fault decisions ignore the port, so two dependencies on the same host and path share a schedule.
-- Verify checks that a fallback is *declared*. It can't tell whether returning it for a permanent error (a 4xx) is wise.
+- Verify checks that a fallback is *declared* and *earned* (a request failed with an exception, timeout, 5xx/429, a cut-off body, or a temp-failed process, and never got a good answer). An open circuit breaker makes no request, so return-the-fallback-while-open counts as wrong: raise instead.
+- The checks catch mistakes and shortcuts, not sabotage: hardened code runs in the same process as the recorder.
+- Recordings hold real arguments and responses in `.ras/hardens/*/calls.json`: review before committing. Session auth/cookie headers are left out.
 - Whole-app availability is judged by output: byte-identical to a clean run, a declared fallback in that run, or lines with `--degraded-marker`. Apps with nondeterministic output need a marker or a deterministic mode.
 - Wall-clock numbers in `bench` are real time on a shared host and can be noisy. `verify` latencies are virtual and exact.
 

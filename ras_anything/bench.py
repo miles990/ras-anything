@@ -21,15 +21,18 @@ def duplicates(attempts: list) -> int:
     return sum(len(g) - 1 for g in groups.values())
 
 
-def classify(r, baseline: str, markers: list[str], fallbacks: int = 0) -> str:
+def classify(r, baseline: str, markers: list[str], fallbacks: int = 0, failures: int = 1) -> str:
     """correct: identical output · degraded: output differs only where the app said so (a marker) or
-    after a hardened function returned its *declared* fallback in this run · wrong: anything else."""
+    after a hardened function returned its *declared* fallback in this run, and a dependency was
+    seen to fail in it · wrong: anything else."""
     if r.hang:
         return "hang"
     if r.code != 0:
         return "crash"
     if r.stdout == baseline:
         return "correct"
+    if not failures:
+        return "wrong"
     a, b = r.stdout.splitlines(), baseline.splitlines()
     if markers and len(a) == len(b):
         diff = [x for x, y in zip(a, b) if x != y]
@@ -105,7 +108,7 @@ def bench(cmd: list[str] | None = None, seeds: int = 20, rate: float = 0.1, mark
             d = r.data or {}
             att = d.get("attempts") or []
             fbs = sum(st.get("fallback", 0) for st in (d.get("stats") or {}).values())
-            outc = classify(r, baseline, markers, fbs)
+            outc = classify(r, baseline, markers, fbs, sum(1 for a in att if a.get("failed")))
             if v == "hardened" and outc == "degraded" and r.code == 0:
                 degraded_stdouts.add(r.stdout)
             if v == "hardened" and outc == "wrong" and first_wrong_diff is None:

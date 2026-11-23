@@ -221,19 +221,25 @@ def main(argv):
         else:
             cls = "wrong"
         logs = sum(1 for ln in err.getvalue().splitlines() if '"trace_id"' in ln)
-        if cls == "degraded" and fb is not None and logs == 0:
-            cls = "wrong"
+        note = None
+        if cls == "degraded":
+            if not any(a["failed"] for a in handler.attempts):
+                cls, note = "wrong", "returned RAS_FALLBACK although no dependency request failed in this call"
+            elif not handler.unanswered([x["req"]["key"] for x in call["io"]]):
+                cls, note = "wrong", "returned RAS_FALLBACK although every request was answered in the end"
+            elif logs == 0:
+                cls, note = "wrong", "returned RAS_FALLBACK without logging it (log_event)"
         structured = exc is not None and (isinstance(exc, runtime.RasError) or exc.__cause__ is not None)
         exc_type = None if exc is None else type(exc).__name__
         cause_type = type(exc.__cause__).__name__ if (exc is not None and exc.__cause__ is not None) else None
         return {
-            "class": cls, "latency": round(lat, 6), "dups": handler.duplicates(), "miss": miss or None,
+            "class": cls, "note": note, "latency": round(lat, 6), "dups": handler.duplicates(), "miss": miss or None,
             "result": None if exc is not None or hang else _short(res),
             "expected": _short(expected) if not exp_exc else "raises " + _exc_name(exp_exc),
             "exc": None if exc is None else "%s: %s" % (exc_type, str(exc)[:200]),
             "exc_type": exc_type, "cause_type": cause_type,
             "logs": logs, "structured": structured,
-            "attempts": [{"key": a["key"], "n": a["n"], "fault": a["fault"], "reached": a["reached"],
+            "attempts": [{"key": a["key"], "n": a["n"], "fault": a["fault"], "reached": a["reached"], "failed": a["failed"],
                           "idem": a["idem"], "method": a["method"]} for a in handler.attempts],
         }
 
