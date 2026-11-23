@@ -124,6 +124,9 @@ def detect(cmd: list[str]) -> LangAdapter:
         hint = "start it with its interpreter: ras-anything scan -- python %s" % cmd[0]
     if hint is None and stem.endswith((".js", ".mjs", ".cjs", ".ts", ".mts", ".cts")):
         hint = "start it with its interpreter: ras-anything scan -- node %s" % cmd[0]
+    if not ADAPTERS:
+        raise UserError("every language is switched off", "RAS_ANYTHING_LANGUAGES_OFF=%s" % ",".join(sorted(switched_off())),
+                        "unset RAS_ANYTHING_LANGUAGES_OFF, or leave the app's language out of it")
     raise UserError("don't know how to watch %r" % (cmd[0] if cmd else ""), supported + (("\n  " + hint) if hint else ""),
                     "scan -- " + ADAPTERS[0].example)
 
@@ -133,5 +136,9 @@ def by_name(name: str | None) -> LangAdapter:
     for a in ADAPTERS:
         if a.name == (name or "python"):
             return a
+    if name in switched_off():
+        raise UserError("this project was scanned as %r, which is switched off" % name,
+                        "RAS_ANYTHING_LANGUAGES_OFF=%s" % ",".join(sorted(switched_off())), "unset RAS_ANYTHING_LANGUAGES_OFF")
     raise UserError("this project was scanned as %r, which this version can't handle" % name,
-                    "supported: " + ", ".join(a.name for a in ADAPTERS), "scan -- " + ADAPTERS[0].example)
+                    "supported: " + ", ".join(a.name for a in ADAPTERS),
+                    "scan -- " + (ADAPTERS[0].example if ADAPTERS else "python app.py"))

@@ -109,6 +109,9 @@ def parser() -> argparse.ArgumentParser:
     g.add_argument("--seeds", type=int, default=20)
     g.add_argument("--budget", type=float)
     g.add_argument("--degraded-marker", action="append", dest="markers")
+    for name, sp in sub.choices.items():  # --json before or after the subcommand (wow INTEROP §1)
+        if name != "flag":  # flag passes everything after it through
+            sp.add_argument("--json", action="store_true", default=argparse.SUPPRESS, help=argparse.SUPPRESS)
     return p
 
 

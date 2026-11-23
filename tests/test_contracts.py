@@ -192,3 +192,24 @@ class EveryLanguageModuleIsDiscovered(unittest.TestCase):
 
         modules = {type(a).__module__.rsplit(".", 1)[-1] for a in lang.BUILTIN}
         self.assertTrue({"python", "node", "golang"} <= modules, modules)
+
+
+class LanguageSwitchEdges(unittest.TestCase):
+    def test_all_off_is_a_user_error(self):
+        from ras_anything import lang
+        from ras_anything.paths import UserError
+
+        with mock.patch.object(lang, "ADAPTERS", []), mock.patch.dict(os.environ, {"RAS_ANYTHING_LANGUAGES_OFF": "python,node,go,java"}):
+            with self.assertRaises(UserError) as e:
+                lang.detect(["python", "app.py"])
+            self.assertIn("switched off", e.exception.what)
+
+    def test_coverage_says_disabled(self):
+        from ras_anything import export as ex
+        from ras_anything import lang
+
+        with mock.patch.object(lang, "ADAPTERS", lang.enabled(lang.ALL_ADAPTERS, {"python"})):
+            rows = {r["lang"]: r for r in ex.coverage_payload()["adapters"]}
+        self.assertFalse(rows["python"]["enabled"])
+        self.assertFalse(rows["python"]["verify"])
+        self.assertTrue(rows["node"]["enabled"])

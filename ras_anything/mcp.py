@@ -17,11 +17,12 @@ PROTOCOL = "2024-11-05"
 
 _cwd = {"cwd": {"type": "string", "description": "project folder (where .ras/ lives or should be created)"}}
 _id = {"id": {"type": "string", "description": "function id from the scan, e.g. weather.fetch_forecast"}}
+_seeds = {"seeds": {"type": "integer", "description": "number of seeded chaos runs (default from the CLI)"}}
 _cmd = {"cmd": {"type": "array", "items": {"type": "string"}, "description": "command that runs the app, e.g. [\"python\", \"app.py\"]"}}
 
 TOOLS = {
     "ras_scan": ("Run the app clean and under seeded dependency chaos; rank functions by risk × exposure × hardenability.",
-                 {**_cwd, **_cmd, "seeds": {"type": "integer"}}, ["cmd"]),
+                 {**_cwd, **_cmd, **_seeds}, ["cmd"]),
     "ras_harden": ("Record real calls of one function with their dependency I/O and write TASK.md + a stub "
                    "(optionally run an agent). Then edit the hardened file following TASK.md.",
                    {**_cwd, **_id, "agent": {"type": "string", "description": "claude | codex | shell command (optional)"}}, []),
@@ -30,7 +31,7 @@ TOOLS = {
     "ras_enable": ("Swap the verified hardened function in (one marked block in its module).", {**_cwd, **_id}, []),
     "ras_disable": ("Remove the swap, restoring the module byte for byte.", {**_cwd, **_id}, []),
     "ras_bench": ("Whole-app runs under live seeded chaos, original vs hardened, interleaved.",
-                  {**_cwd, **_cmd, "seeds": {"type": "integer"},
+                  {**_cwd, **_cmd, **_seeds,
                    "degraded_marker": {"type": "string", "description": "text marking a deliberately degraded output line"}}, []),
     "ras_report": ("Write RAS-REPORT.md and ras-card.svg from measured results.", {**_cwd}, []),
     "ras_status": ("Show scan, hardened functions, verify state, what is enabled, flags and the next step.", {**_cwd}, []),
@@ -41,7 +42,7 @@ TOOLS = {
                  {**_cwd, "argv": {"type": "array", "items": {"type": "string"},
                                    "description": "flag args, e.g. set ras.pattern.retry off, or list"}}, []),
     "ras_export": ("Export .ras/out snapshots and telemetry as %s." % ", ".join(EXPORT_FORMATS),
-                   {**_cwd, "format": {"type": "string", "enum": list(EXPORT_FORMATS)}}, []),
+                   {**_cwd, "format": {"type": "string", "enum": list(EXPORT_FORMATS), "description": "output format"}}, []),
     "ras_events": ("Read .ras/out/events.ndjson incrementally using a sequence cursor.",
                    {**_cwd, "since": {"type": "integer", "description": "sequence cursor (default 0)"},
                     "limit": {"type": "integer", "description": "max events to return (default 200)"}}, []),

@@ -166,6 +166,7 @@
             "properties": {
               "lang": { "type": "string" },
               "status": { "type": "string", "enum": ["complete", "partial", "planned"] },
+              "enabled": { "type": "boolean", "description": "false when switched off with RAS_ANYTHING_LANGUAGES_OFF (optional, additive)" },
               "boundary": { "type": "string" },
               "verify": { "type": "boolean" },
               "ax": { "type": "boolean" }

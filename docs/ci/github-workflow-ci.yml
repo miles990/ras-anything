@@ -1,3 +1,5 @@
+# Proposed GitHub Actions workflow. Copy to .github/workflows/ci.yml (pushing workflow files needs a token with the
+# `workflow` scope, or add it in the GitHub web UI). Kept here because the agent token cannot push workflows.
 # CI for ras-anything (docs/REVIEW-PRACTICES.md §CI). Private repo: Linux runs on every push; macOS and
 # Windows bill at 10x / 2x the minutes, so they run only when started by hand (Actions → ci → Run workflow).
 name: ci

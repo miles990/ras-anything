@@ -225,19 +225,23 @@ def _fn_entry(fid: str, v: dict, m: dict) -> dict:
 
 def coverage_payload() -> dict:
     registered = {a.name for a in lang_mod.ADAPTERS}
+    built = {a.name for a in lang_mod.ALL_ADAPTERS}
     adapters = []
     for name, status, boundary, ver, ax in ALL_LANGUAGES:
+        on = name in registered
         adapters.append({
             "lang": name,
-            "status": "complete" if name in registered else status,  # a registered adapter implements the whole contract
+            # status is implementation maturity; enabled says whether this run can use it (RAS_ANYTHING_LANGUAGES_OFF)
+            "status": "complete" if name in built else status,  # a registered adapter implements the whole contract
+            "enabled": on,
             "boundary": boundary,
-            "verify": ver,
-            "ax": ax,
+            "verify": ver and on,
+            "ax": ax and on,
         })
     listed = {name for name, *_ in ALL_LANGUAGES}
     for a in lang_mod.ADAPTERS:  # languages added by a plugin package (entry points)
         if a.name not in listed:
-            adapters.append({"lang": a.name, "status": "complete", "boundary": a.boundaries, "verify": True, "ax": True})
+            adapters.append({"lang": a.name, "status": "complete", "enabled": True, "boundary": a.boundaries, "verify": True, "ax": True})
     return {"adapters": adapters}
 
 
