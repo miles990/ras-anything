@@ -1,7 +1,6 @@
 """The same patterns in Node (lang/node_agent/patterns/): same names, order, verdicts and parameters as Python's
 registry, and the same behaviour, told as stories both runtimes live through on the virtual clock."""
 
-import ast
 import asyncio
 import contextlib
 import io

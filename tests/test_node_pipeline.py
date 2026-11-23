@@ -1,7 +1,6 @@
 """The whole loop on small Node apps: scan -> record -> verify (negative and positive controls) -> enable/disable
 byte for byte, kill switch. Offline: the apps run their own local upstream."""
 
-import hashlib
 import json
 import os
 import shutil

@@ -8,6 +8,7 @@ import time
 from pathlib import Path
 
 from . import lang as lang_mod
+from .contracts import EXPORT_FORMATS
 from .paths import UserError, find_project, load_json, plain_path, save_json, scrub
 
 SCHEMA_VERSION = "1.0.0"
@@ -232,6 +233,10 @@ def coverage_payload() -> dict:
             "verify": ver,
             "ax": ax,
         })
+    listed = {name for name, *_ in ALL_LANGUAGES}
+    for a in lang_mod.ADAPTERS:  # languages added by a plugin package (entry points)
+        if a.name not in listed:
+            adapters.append({"lang": a.name, "status": "complete", "boundary": a.boundaries, "verify": True, "ax": True})
     return {"adapters": adapters}
 
 
@@ -617,10 +622,32 @@ def _otlp_json(project: Path, bundle: dict, events: list[dict]) -> dict:
     }
 
 
+def _render_json(project, od, bundle, snapshots, events):
+    return json.dumps(scrub(bundle, project), indent=2, sort_keys=True) + "\n"
+
+
+def _render_ndjson(project, od, bundle, snapshots, events):
+    ev_p = od / "events.ndjson"
+    return ev_p.read_text(encoding="utf-8") if ev_p.is_file() else ""
+
+
+def _render_prom(project, od, bundle, snapshots, events):
+    return _prom_lines(project, {"report": snapshots.get("report")})
+
+
+def _render_otlp(project, od, bundle, snapshots, events):
+    return json.dumps(scrub(_otlp_json(project, {"report": snapshots.get("report")}, events), project),
+                      indent=2, sort_keys=True) + "\n"
+
+
+# One renderer per name in contracts.EXPORT_FORMATS: a new format is a function here plus its name there.
+RENDERERS = {"json": _render_json, "ndjson": _render_ndjson, "prom": _render_prom, "otlp-json": _render_otlp}
+
+
 def export_data(project: Path | None = None, fmt: str = "json", out_path: Path | str | None = None) -> str:
     project = project or find_project()
-    if fmt not in ("json", "ndjson", "prom", "otlp-json"):
-        raise UserError(f"unsupported export format {fmt!r}", "choose json | ndjson | prom | otlp-json", "export --format json")
+    if fmt not in RENDERERS:
+        raise UserError(f"unsupported export format {fmt!r}", "choose " + " | ".join(EXPORT_FORMATS), "export --format json")
 
     sync_out(project)
     od = out_dir(project)
@@ -636,16 +663,7 @@ def export_data(project: Path | None = None, fmt: str = "json", out_path: Path |
         "snapshots": snapshots,
         "events": ev_list,
     }
-    if fmt == "json":
-        text = json.dumps(scrub(bundle, project), indent=2, sort_keys=True) + "\n"
-    elif fmt == "ndjson":
-        ev_p = od / "events.ndjson"
-        text = ev_p.read_text(encoding="utf-8") if ev_p.is_file() else ""
-    elif fmt == "prom":
-        text = _prom_lines(project, {"report": snapshots.get("report")})
-    else:
-        text = json.dumps(scrub(_otlp_json(project, {"report": snapshots.get("report")}, ev_list), project),
-                          indent=2, sort_keys=True) + "\n"
+    text = RENDERERS[fmt](project, od, bundle, snapshots, ev_list)
 
     if out_path:
         dest = Path(out_path)

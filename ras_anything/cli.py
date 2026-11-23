@@ -6,6 +6,7 @@ import argparse
 import sys
 
 from . import __version__, ui
+from .contracts import EXPORT_FORMATS
 from .paths import UserError
 
 USAGE = """\
@@ -95,8 +96,8 @@ def parser() -> argparse.ArgumentParser:
     dr.add_argument("--export-promptfoo", help="write promptfoo YAML config to path")
     dr.add_argument("--threshold", type=float, default=0.05, help="allowed semantic drop (default 0.05)")
 
-    ex = sub.add_parser("export", help="export .ras/out telemetry (json | ndjson | prom | otlp-json)")
-    ex.add_argument("--format", default="json", choices=["json", "ndjson", "prom", "otlp-json"])
+    ex = sub.add_parser("export", help="export .ras/out telemetry (%s)" % " | ".join(EXPORT_FORMATS))
+    ex.add_argument("--format", default="json", choices=list(EXPORT_FORMATS))
     ex.add_argument("--out", help="optional output file path")
 
     g = sub.add_parser("go", help="scan → harden → verify → enable → bench → report (-- <cmd>)")

@@ -38,3 +38,23 @@ packages = ["ras_anything", "ras_anything.lang", "ras_anything.patterns", "ras_a
     "java_agent/tool/*.java",
     "java_agent/runtime/*.java",
 ]
+
+# Lint gate (CI + `make lint`): pyflakes errors are bugs here (an undefined name shipped in doctor.status).
+# Style rules (line length, %-formatting) are not enforced: the code base predates them (docs/REVIEW-PRACTICES.md).
+[tool.ruff]
+target-version = "py310"
+line-length = 140
+extend-exclude = ["examples", "build", "wow", "ras_anything/lang/node_agent", "ras_anything/lang/go_agent", "ras_anything/lang/java_agent"]
+
+[tool.ruff.lint]
+select = ["F", "E9", "B006", "B008", "B012", "B015", "B018"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/fixtures/*" = ["F401"]
+"tests/test_install.py" = ["F841"]
+
+[tool.mypy]
+python_version = "3.10"
+files = ["ras_anything/contracts.py", "ras_anything/lang/base.py", "ras_anything/lang/__init__.py", "ras_anything/patterns/__init__.py", "ras_anything/arch.py"]
+ignore_missing_imports = true
+follow_imports = "silent"

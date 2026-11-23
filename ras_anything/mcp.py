@@ -11,6 +11,7 @@ import subprocess
 import sys
 
 from . import __version__
+from .contracts import EXPORT_FORMATS
 
 PROTOCOL = "2024-11-05"
 
@@ -39,8 +40,8 @@ TOOLS = {
     "ras_flag": ("List, get, set or delete flags in .ras/flags.json (hot-reloaded in running processes).",
                  {**_cwd, "argv": {"type": "array", "items": {"type": "string"},
                                    "description": "flag args, e.g. set ras.pattern.retry off, or list"}}, []),
-    "ras_export": ("Export .ras/out snapshots and telemetry as json, ndjson, prom, or otlp-json.",
-                   {**_cwd, "format": {"type": "string", "enum": ["json", "ndjson", "prom", "otlp-json"]}}, []),
+    "ras_export": ("Export .ras/out snapshots and telemetry as %s." % ", ".join(EXPORT_FORMATS),
+                   {**_cwd, "format": {"type": "string", "enum": list(EXPORT_FORMATS)}}, []),
     "ras_events": ("Read .ras/out/events.ndjson incrementally using a sequence cursor.",
                    {**_cwd, "since": {"type": "integer", "description": "sequence cursor (default 0)"},
                     "limit": {"type": "integer", "description": "max events to return (default 200)"}}, []),

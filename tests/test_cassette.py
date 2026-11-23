@@ -6,7 +6,6 @@ import decimal
 import enum
 import http.client
 import json
-import os
 import re
 import socket
 import subprocess

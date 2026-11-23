@@ -6,6 +6,7 @@ import os
 import shutil
 import subprocess
 import tempfile
+from pathlib import Path
 
 from . import lang, ui
 from .paths import find_project, load_json, sha256_file

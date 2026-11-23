@@ -18,7 +18,6 @@ import hashlib
 import json
 import os
 import threading
-import time
 from pathlib import Path
 
 from .paths import UserError, find_project, save_json
@@ -301,7 +300,6 @@ def _print_list(snap: dict) -> None:
 
 def run(argv: list[str]) -> int:
     """`ras-anything flag list|get|set|delete`."""
-    from . import ui
 
     if not argv or argv[0] in ("list", "ls"):
         _print_list(store().snapshot())

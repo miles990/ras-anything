@@ -13,8 +13,6 @@ Isolation: `Policy.shard(key)` (see patterns/policy.py) gives a key its own brea
 
 from __future__ import annotations
 
-from typing import Callable
-
 from . import flags, runtime
 
 
@@ -27,72 +25,7 @@ def fail_safe(fn, fallback, *args, **kwargs):
         return fallback(*args, **kwargs) if callable(fallback) else fallback
 
 
-def route(fid: str, key: str | None = None) -> str:
-    """'original' | 'hardened' | 'shadow'. Never raises."""
-    def _route():
-        if flags.disabled() or flags.enable_percent(fid) <= 0:
-            return "original"
-        if flags.shadow_on(fid):
-            return "shadow"
-        return "hardened" if flags.in_canary(fid, key) else "original"
-    return fail_safe(_route, "original")
-
-
-# Optional hook: tests (or an in-process agent) can run the shadowed function with writes suppressed.
-_suppress: Callable | None = None
-
-
-def set_shadow_suppressor(fn: Callable | None) -> Callable | None:
-    """`fn(hardened, args, kwargs)` runs the shadow call; return the previous hook."""
-    global _suppress
-    prev, _suppress = _suppress, fn
-    return prev
-
-
-def swap(fid: str, original, hardened):
-    """A wrapper that looks like `original` and routes each call. Bugs in the wrapper use `original`."""
-
-    def _key(args, kwargs):
-        return fail_safe(lambda: flags.targeting_key(*args, **kwargs), fid)
-
-    def _pick(args, kwargs):
-        return route(fid, _key(args, kwargs))
-
-    def _call(fn, args, kwargs):
-        return fn(*args, **kwargs)
-
-    def wrapped(*args, **kwargs):
-        choice = fail_safe(_pick, "original", args, kwargs)
-        if choice == "original":
-            return original(*args, **kwargs)
-        if choice == "shadow":
-            out = original(*args, **kwargs)
-            try:
-                if _suppress is not None:
-                    other = _suppress(hardened, args, kwargs)
-                else:
-                    other = None  # production: don't double-call a write
-                    runtime.log_event("ras.shadow.skip", id=fid, reason="no suppressor")
-                if other is not None and other != out:
-                    runtime.log_event("ras.shadow.mismatch", id=fid, correlation_id=runtime.trace_id())
-            except Exception as e:
-                runtime.log_event("ras.shadow.error", id=fid, error=type(e).__name__)
-            return out
-        try:
-            return hardened(*args, **kwargs)
-        except Exception:
-            # Hardened business errors propagate; only a failure to *call* is fail-safe, and that's above.
-            raise
-
-    try:
-        wrapped.__name__ = getattr(original, "__name__", "swapped")
-        wrapped.__doc__ = getattr(original, "__doc__", None)
-        wrapped.__wrapped__ = original
-        wrapped.__ras_id__ = fid
-        wrapped.__ras_hardened__ = hardened
-    except Exception:
-        pass
-    return wrapped
+# route / swap / set_shadow_suppressor: the runtime's (bottom of this file) are the only implementation.
 
 
 # --------------------------------------------------------------------------- canary analysis (promote / rollback)
@@ -145,7 +78,7 @@ def blast_radius(affected: int, total: int, contained_s: float | None = None) ->
 
 
 # The human gate is part of the runtime (patterns/problem.py); these names stay importable from here.
-from .patterns.problem import ApprovalRequired as NeedsApproval  # noqa: E402
+from .patterns.problem import ApprovalRequired as NeedsApproval  # noqa: E402,F401
 from .patterns.problem import require_approval, set_approver  # noqa: E402,F401
 
 # The runtime (vendored with enabled apps) is the implementation.

@@ -102,7 +102,6 @@ def dependencies(calls: list, project=None) -> list[dict]:
     for c in calls or ():
         for x in c.get("io") or ():
             req = x.get("req") or {}
-            kind = req.get("kind") or ("http" if req.get("url") else "subprocess")
             if req.get("url"):
                 url = text(req["url"], project) if project is not None else str(req["url"])
                 u = urlsplit(url)

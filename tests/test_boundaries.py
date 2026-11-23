@@ -16,7 +16,7 @@ from ras_anything.enable import disable, enable
 from ras_anything.harden import harden
 from ras_anything.scan import scan
 from ras_anything.verify import verify
-from tests.test_pipeline import FIX, Project, quiet
+from tests.test_pipeline import Project, quiet
 
 UPSTREAM = '''
 import json, threading

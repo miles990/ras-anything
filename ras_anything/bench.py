@@ -6,7 +6,6 @@ import os
 import platform
 import shlex
 import time
-from pathlib import Path
 
 from . import ax, diagnose, faults, lang, slo, ui
 from .judge import classify_run, duplicates

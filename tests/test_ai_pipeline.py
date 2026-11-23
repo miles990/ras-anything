@@ -13,8 +13,8 @@ import unittest
 import urllib.error
 from pathlib import Path
 
-from ras_anything import ai, faults, runtime
-from ras_anything.drift import drift, export_promptfoo
+from ras_anything import ai, runtime
+from ras_anything.drift import drift
 from ras_anything.enable import disable, enable
 from ras_anything.harden import harden
 from tests.node_support import NODE, needs_node

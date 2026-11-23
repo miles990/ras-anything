@@ -85,7 +85,7 @@ class FlagStoreTest(unittest.TestCase):
     def test_hot_update_is_visible_on_the_next_call_and_drops_nothing(self):
         """Write the file under a tight loop; first call after the write must see the new value."""
         with flagfile({"flags": {flags.pattern_key("retry"): flags._flag_body(True)}}) as path:
-            store = flags.store()
+            flags.store()
             self.assertTrue(flags.is_pattern_on("shop", "retry", True))
             delays, misses = [], 0
             for i in range(40):

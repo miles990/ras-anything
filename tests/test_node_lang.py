@@ -10,7 +10,7 @@ from ras_anything import faults, lang
 from ras_anything.lang import node, node_static
 from ras_anything.lang.base import LangAdapter
 from ras_anything.paths import UserError
-from tests.node_support import AGENT, NodeCase, js, needs_node, run_json
+from tests.node_support import AGENT, js, needs_node, run_json
 
 A = lang.by_name("node")
 

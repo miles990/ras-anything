@@ -130,7 +130,7 @@ def load_original(meta):
         mod = importlib.import_module(meta["module"])
     obj = mod
     for part in meta["qualname"].split("."):
-        owner, obj = obj, inspect.getattr_static(obj, part)
+        obj = inspect.getattr_static(obj, part)
     if isinstance(obj, (staticmethod, classmethod)):  # recorded arguments include self / cls
         obj = obj.__func__
     return mod, obj

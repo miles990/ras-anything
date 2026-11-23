@@ -1,11 +1,17 @@
 """Language adapters and which one a command belongs to.
 
 To add a language: write lang/<name>.py with a LangAdapter subclass and an agent that follows
-docs/ARCHITECTURE.md, and list it in ADAPTERS.
+docs/ARCHITECTURE.md, and list it in ADAPTERS (CONTRIBUTING.md has the checklist). A language can also live in a
+package of its own: it registers its adapter class under the entry-point group
+contracts.LANGUAGE_ENTRY_POINT_GROUP and ras-anything finds it without any change here (docs/adr/0002).
 """
 
 from __future__ import annotations
 
+import sys
+from importlib import metadata
+
+from ..contracts import LANGUAGE_ENTRY_POINT_GROUP
 from ..paths import UserError
 from .base import LangAdapter, program_stem
 from .golang import GoAdapter
@@ -13,7 +19,36 @@ from .java import JavaAdapter
 from .node import NodeAdapter
 from .python import PythonAdapter
 
-ADAPTERS: list[LangAdapter] = [PythonAdapter(), NodeAdapter(), GoAdapter(), JavaAdapter()]
+BUILTIN: list[LangAdapter] = [PythonAdapter(), NodeAdapter(), GoAdapter(), JavaAdapter()]
+
+
+def plugins(group: str = LANGUAGE_ENTRY_POINT_GROUP) -> list[LangAdapter]:
+    """Adapters other installed packages register (entry points). A broken plugin is reported and skipped,
+    never fatal; a plugin can't replace a built-in language (same name: the built-in wins)."""
+    taken = {a.name for a in BUILTIN}
+    found: list[LangAdapter] = []
+    try:
+        eps = metadata.entry_points(group=group)
+    except Exception:  # pragma: no cover - broken metadata of some other distribution
+        return found
+    for ep in sorted(eps, key=lambda e: e.name):
+        try:
+            cls = ep.load()
+            adapter = cls() if isinstance(cls, type) else cls
+            if not isinstance(adapter, LangAdapter):
+                raise TypeError("%s is not a LangAdapter" % ep.value)
+        except Exception as e:
+            print("ras-anything: skipped language plugin %r: %s" % (ep.name, e), file=sys.stderr)
+            continue
+        if adapter.name in taken:
+            print("ras-anything: skipped language plugin %r: %r is built in" % (ep.name, adapter.name), file=sys.stderr)
+            continue
+        taken.add(adapter.name)
+        found.append(adapter)
+    return found
+
+
+ADAPTERS: list[LangAdapter] = BUILTIN + plugins()
 
 # Recognized, but no adapter here yet.
 PLANNED = {"bun": "Bun", "deno": "Deno"}

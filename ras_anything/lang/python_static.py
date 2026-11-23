@@ -106,7 +106,6 @@ class FileInfo:
         found: dict[str, str] = {}
         boundary_calls = []
         has_retry = bool({"retry", "retrying", "backoff", "on_exception"} & set(info["decorators"])) or "retry(" in seg
-        loops: list = []
         requests_made: dict = {}
         with_items = set()
         logs = False

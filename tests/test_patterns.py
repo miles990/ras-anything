@@ -20,7 +20,7 @@ from ras_anything import faults, patterns, runtime
 from ras_anything.patterns import Call, Layer
 from ras_anything.runtime import (AdaptiveConcurrency, AdaptiveThrottle, Bulkhead, BulkheadFullError, CircuitBreaker, CircuitOpenError,
                                   ConcurrencyLimitError, DeadlineExceeded, Policy, RejectedError, RetryBudget, StaleCache,
-                                  ThrottledError, ahedge, aretry, attempt_timeout, deadline, hedge, idempotency_key, remaining_s, retry)
+                                  ThrottledError, ahedge, attempt_timeout, deadline, hedge, idempotency_key, remaining_s, retry)
 
 PKG = Path(patterns.__file__).parent
 OFF = {n: False for n in patterns.NAMES}

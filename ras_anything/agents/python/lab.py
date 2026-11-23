@@ -205,7 +205,7 @@ class Sim:
     async def main(self):
         import itertools
 
-        tasks, ids = [], itertools.count()
+        tasks = []
 
         async def feed(s, stream):
             t, i = stream.get("from", 0.0), 0

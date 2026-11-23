@@ -15,7 +15,7 @@ from ras_anything import lang
 from ras_anything.cli import main
 from ras_anything.lang.base import LangAdapter
 from ras_anything.paths import UserError
-from tests.test_pipeline import FIX, REPO, Project, harden, quiet, scan, verify
+from tests.test_pipeline import FIX, REPO, Project, harden, quiet, scan
 
 PKG = REPO / "ras_anything"
 
