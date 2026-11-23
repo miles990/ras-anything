@@ -1,0 +1,352 @@
+{
+  "version": 1,
+  "lang": "node",
+  "cmd": [
+    "node",
+    "app.mjs"
+  ],
+  "display_cmd": "node app.mjs",
+  "cwd": ".",
+  "root": ".",
+  "created": "2026-11-23T13:27:07+0800",
+  "clean": {
+    "wall_s": 0.503,
+    "stdout_sha256": "395433878cf34c4e9a9988c84534481b205a54454a58cc9dc7db78ff191c72af",
+    "boundary_calls": 49
+  },
+  "chaos": {
+    "seeds": 5,
+    "rate": 0.25,
+    "outage_rate": 0.05,
+    "runs": [
+      {
+        "seed": 1,
+        "outcome": "crash",
+        "exit": 1,
+        "wall_s": 0.077,
+        "faults": 1,
+        "uncaught": {
+          "type": "Error",
+          "msg": "connect ECONNREFUSED 127.0.0.1:35799",
+          "hang": false,
+          "where": "orders.shippingQuote"
+        }
+      },
+      {
+        "seed": 2,
+        "outcome": "crash",
+        "exit": 1,
+        "wall_s": 0.121,
+        "faults": 1,
+        "uncaught": {
+          "type": "SyntaxError",
+          "msg": "Unterminated string in JSON at position 44 (line 1 column 45)",
+          "hang": false,
+          "where": "orders.printLabel"
+        }
+      },
+      {
+        "seed": 3,
+        "outcome": "crash",
+        "exit": 1,
+        "wall_s": 0.155,
+        "faults": 2,
+        "uncaught": {
+          "type": "TypeError",
+          "msg": "fetch failed",
+          "hang": false,
+          "where": "orders.getItem"
+        }
+      },
+      {
+        "seed": 4,
+        "outcome": "hang",
+        "exit": 70,
+        "wall_s": 2.988,
+        "faults": 5,
+        "uncaught": {
+          "type": "ChaosHang",
+          "msg": "boundary call with no timeout hung (chaos)",
+          "hang": true,
+          "where": "orders.printLabel"
+        }
+      },
+      {
+        "seed": 5,
+        "outcome": "crash",
+        "exit": 1,
+        "wall_s": 0.082,
+        "faults": 1,
+        "uncaught": {
+          "type": "SyntaxError",
+          "msg": "Unterminated string in JSON at position 33 (line 1 column 34)",
+          "hang": false,
+          "where": null
+        }
+      }
+    ]
+  },
+  "functions": [
+    {
+      "id": "orders.charge",
+      "module": "orders",
+      "qualname": "charge",
+      "name": "charge",
+      "kind": "function",
+      "async": true,
+      "line": 30,
+      "in_main": false,
+      "signals": {
+        "swallow": "`catch {}` swallows errors",
+        "unsafe_retry": "retries a POST with no Idempotency-Key",
+        "no_logging": "no logging on the failure path"
+      },
+      "static_risk": 0.601,
+      "refused": null,
+      "hardened_ext": ".mjs",
+      "file": "orders.mjs",
+      "first_line": 30,
+      "calls": 12,
+      "boundary": 12,
+      "boundary_kinds": {
+        "fetch": 12
+      },
+      "gen": false,
+      "arg_ok": true,
+      "ret_ok": true,
+      "chaos": {
+        "runs": 1,
+        "failed": 1,
+        "outcomes": {
+          "hang": 1
+        }
+      },
+      "dynamic_risk": 1.0,
+      "risk": 0.8404,
+      "exposure": 0.2449,
+      "hardenable": true,
+      "verdict": "harden it",
+      "score": 20.6,
+      "why": "app failed in 1/1 chaos runs that hit it (hang 1) \u00b7 retries a POST with no Idempotency-Key \u00b7 `catch {}` swallows errors \u00b7 no logging on the failure path"
+    },
+    {
+      "id": "orders.getItem",
+      "module": "orders",
+      "qualname": "getItem",
+      "name": "getItem",
+      "kind": "function",
+      "async": true,
+      "line": 12,
+      "in_main": false,
+      "signals": {
+        "no_timeout": "fetch() without a timeout (signal)",
+        "no_retry": "no retry on transient errors",
+        "no_logging": "no logging on the failure path"
+      },
+      "static_risk": 0.544,
+      "refused": null,
+      "hardened_ext": ".mjs",
+      "file": "orders.mjs",
+      "first_line": 12,
+      "calls": 12,
+      "boundary": 12,
+      "boundary_kinds": {
+        "fetch": 12
+      },
+      "gen": false,
+      "arg_ok": true,
+      "ret_ok": true,
+      "chaos": {
+        "runs": 2,
+        "failed": 2,
+        "outcomes": {
+          "crash": 2
+        }
+      },
+      "dynamic_risk": 1.0,
+      "risk": 0.8176,
+      "exposure": 0.2449,
+      "hardenable": true,
+      "verdict": "harden it",
+      "score": 20.0,
+      "why": "app failed in 2/2 chaos runs that hit it (crash 2) \u00b7 fetch() without a timeout (signal) \u00b7 no retry on transient errors \u00b7 no logging on the failure path"
+    },
+    {
+      "id": "orders.printLabel",
+      "module": "orders",
+      "qualname": "printLabel",
+      "name": "printLabel",
+      "kind": "function",
+      "async": true,
+      "line": 47,
+      "in_main": false,
+      "signals": {
+        "no_timeout": "execFile() without timeout",
+        "no_retry": "no retry on transient errors",
+        "no_logging": "no logging on the failure path"
+      },
+      "static_risk": 0.544,
+      "refused": null,
+      "hardened_ext": ".mjs",
+      "file": "orders.mjs",
+      "first_line": 47,
+      "calls": 12,
+      "boundary": 12,
+      "boundary_kinds": {
+        "subprocess": 12
+      },
+      "gen": false,
+      "arg_ok": true,
+      "ret_ok": true,
+      "chaos": {
+        "runs": 2,
+        "failed": 2,
+        "outcomes": {
+          "crash": 1,
+          "hang": 1
+        }
+      },
+      "dynamic_risk": 1.0,
+      "risk": 0.8176,
+      "exposure": 0.2449,
+      "hardenable": true,
+      "verdict": "harden it",
+      "score": 20.0,
+      "why": "app failed in 2/2 chaos runs that hit it (crash 1, hang 1) \u00b7 execFile() without timeout \u00b7 no retry on transient errors \u00b7 no logging on the failure path"
+    },
+    {
+      "id": "orders.shippingQuote",
+      "module": "orders",
+      "qualname": "shippingQuote",
+      "name": "shippingQuote",
+      "kind": "function",
+      "async": true,
+      "line": 18,
+      "in_main": false,
+      "signals": {
+        "no_timeout": "http.get() without timeout",
+        "no_retry": "no retry on transient errors",
+        "no_logging": "no logging on the failure path"
+      },
+      "static_risk": 0.544,
+      "refused": null,
+      "hardened_ext": ".mjs",
+      "file": "orders.mjs",
+      "first_line": 18,
+      "calls": 12,
+      "boundary": 12,
+      "boundary_kinds": {
+        "http": 12
+      },
+      "gen": false,
+      "arg_ok": true,
+      "ret_ok": true,
+      "chaos": {
+        "runs": 3,
+        "failed": 3,
+        "outcomes": {
+          "crash": 2,
+          "hang": 1
+        }
+      },
+      "dynamic_risk": 1.0,
+      "risk": 0.8176,
+      "exposure": 0.2449,
+      "hardenable": true,
+      "verdict": "harden it",
+      "score": 20.0,
+      "why": "app failed in 3/3 chaos runs that hit it (crash 2, hang 1) \u00b7 http.get() without timeout \u00b7 no retry on transient errors \u00b7 no logging on the failure path"
+    },
+    {
+      "id": "app.eur",
+      "module": "app",
+      "qualname": "eur",
+      "name": "eur",
+      "kind": "function",
+      "async": false,
+      "line": 12,
+      "in_main": false,
+      "signals": {},
+      "static_risk": 0.0,
+      "refused": "not exported (exported top-level functions only)",
+      "hardened_ext": ".mjs",
+      "file": "app.mjs",
+      "first_line": 12,
+      "calls": 23,
+      "boundary": 0,
+      "boundary_kinds": {},
+      "gen": false,
+      "arg_ok": true,
+      "ret_ok": true,
+      "chaos": null,
+      "dynamic_risk": null,
+      "risk": 0.0,
+      "exposure": 0.0,
+      "hardenable": false,
+      "verdict": "not exported (exported top-level functions only)",
+      "score": 0.0,
+      "why": ""
+    },
+    {
+      "id": "orders.api",
+      "module": "orders",
+      "qualname": "api",
+      "name": "api",
+      "kind": "function",
+      "async": false,
+      "line": 8,
+      "in_main": false,
+      "signals": {},
+      "static_risk": 0.0,
+      "refused": "not exported (exported top-level functions only)",
+      "hardened_ext": ".mjs",
+      "file": "orders.mjs",
+      "first_line": 8,
+      "calls": 36,
+      "boundary": 0,
+      "boundary_kinds": {},
+      "gen": false,
+      "arg_ok": true,
+      "ret_ok": true,
+      "chaos": null,
+      "dynamic_risk": null,
+      "risk": 0.0,
+      "exposure": 0.0,
+      "hardenable": false,
+      "verdict": "not exported (exported top-level functions only)",
+      "score": 0.0,
+      "why": ""
+    },
+    {
+      "id": "upstream.start",
+      "module": "upstream",
+      "qualname": "start",
+      "name": "start",
+      "kind": "function",
+      "async": true,
+      "line": 15,
+      "in_main": false,
+      "signals": {},
+      "static_risk": 0.0,
+      "refused": null,
+      "hardened_ext": ".mjs",
+      "file": "upstream.mjs",
+      "first_line": 15,
+      "calls": 1,
+      "boundary": 0,
+      "boundary_kinds": {},
+      "gen": false,
+      "arg_ok": true,
+      "ret_ok": false,
+      "chaos": null,
+      "dynamic_risk": null,
+      "risk": 0.0,
+      "exposure": 0.0,
+      "hardenable": false,
+      "verdict": "return value can't be stored as JSON, so results can't be compared",
+      "score": 0.0,
+      "why": ""
+    }
+  ],
+  "elapsed_s": 3.94
+}

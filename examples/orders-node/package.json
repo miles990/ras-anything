@@ -1,0 +1,6 @@
+{
+  "name": "orders-node",
+  "private": true,
+  "type": "module",
+  "description": "Example app for ras-anything: an order run against a local shop API"
+}

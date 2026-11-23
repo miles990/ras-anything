@@ -1,0 +1,246 @@
+{
+  "id": "orders.charge",
+  "lang": "node",
+  "budget_s": 5.0,
+  "recorded": 12,
+  "happy": {
+    "total": 12,
+    "equal": 12,
+    "original_nondeterministic": 0,
+    "first_failure": null
+  },
+  "chaos": {
+    "calls": 12,
+    "scenarios": [
+      "timeout",
+      "refused",
+      "http5xx",
+      "http429",
+      "slow",
+      "truncated",
+      "outage",
+      "mixed:1",
+      "mixed:2",
+      "mixed:3"
+    ],
+    "by_scenario": {
+      "timeout": {
+        "original": {
+          "hang": 12
+        },
+        "hardened": {
+          "ok": 12
+        },
+        "n": 12
+      },
+      "refused": {
+        "original": {
+          "ok": 12
+        },
+        "hardened": {
+          "ok": 12
+        },
+        "n": 12
+      },
+      "http5xx": {
+        "original": {
+          "ok": 12
+        },
+        "hardened": {
+          "ok": 12
+        },
+        "n": 12
+      },
+      "http429": {
+        "original": {
+          "ok": 12
+        },
+        "hardened": {
+          "ok": 12
+        },
+        "n": 12
+      },
+      "slow": {
+        "original": {
+          "ok": 12
+        },
+        "hardened": {
+          "ok": 12
+        },
+        "n": 12
+      },
+      "truncated": {
+        "original": {
+          "ok": 12
+        },
+        "hardened": {
+          "ok": 12
+        },
+        "n": 12
+      },
+      "outage": {
+        "original": {
+          "wrong": 12
+        },
+        "hardened": {
+          "ok": 12
+        },
+        "n": 12
+      },
+      "mixed": {
+        "original": {
+          "ok": 34,
+          "hang": 2
+        },
+        "hardened": {
+          "ok": 36
+        },
+        "n": 36
+      }
+    },
+    "first_failure": null,
+    "first_original_dup": {
+      "call": 0,
+      "args": "({'id': 'ORD-2001', 'name': 'A. Kaya', 'country': 'DE', 'sku': 'TEE-M', 'qty': 1}, 2390)",
+      "scenario": "timeout",
+      "original": {
+        "outcome": "return",
+        "latency": 10.30254,
+        "matches": true,
+        "is_fallback": false,
+        "miss": null,
+        "logs": 0,
+        "result": "{ id: 'ch_0001', order: 'ORD-2001', amount_cents: 2390, status: 'succeeded' }",
+        "expected": "{ id: 'ch_0001', order: 'ORD-2001', amount_cents: 2390, status: 'succeeded' }",
+        "exc": null,
+        "exc_type": null,
+        "cause_type": null,
+        "structured": false,
+        "state": null,
+        "attempts": [
+          {
+            "key": "POST http://127.0.0.1/v1/charges #0a9ac13abd3a",
+            "n": 0,
+            "fault": "timeout",
+            "reached": true,
+            "failed": true,
+            "idem": null,
+            "method": "POST",
+            "nonidempotent": true
+          },
+          {
+            "key": "POST http://127.0.0.1/v1/charges #0a9ac13abd3a",
+            "n": 1,
+            "fault": null,
+            "reached": true,
+            "failed": false,
+            "idem": null,
+            "method": "POST",
+            "nonidempotent": true
+          }
+        ],
+        "class": "hang",
+        "note": null,
+        "dups": 1
+      },
+      "hardened": {
+        "outcome": "return",
+        "latency": 3.51254,
+        "matches": true,
+        "is_fallback": false,
+        "miss": null,
+        "logs": 0,
+        "result": "{ id: 'ch_0001', order: 'ORD-2001', amount_cents: 2390, status: 'succeeded' }",
+        "expected": "{ id: 'ch_0001', order: 'ORD-2001', amount_cents: 2390, status: 'succeeded' }",
+        "exc": null,
+        "exc_type": null,
+        "cause_type": null,
+        "structured": false,
+        "state": null,
+        "attempts": [
+          {
+            "key": "POST http://127.0.0.1/v1/charges #0a9ac13abd3a",
+            "n": 0,
+            "fault": "timeout",
+            "reached": true,
+            "failed": true,
+            "idem": "charge-ORD-2001",
+            "method": "POST",
+            "nonidempotent": true
+          },
+          {
+            "key": "POST http://127.0.0.1/v1/charges #0a9ac13abd3a",
+            "n": 1,
+            "fault": null,
+            "reached": true,
+            "failed": false,
+            "idem": "charge-ORD-2001",
+            "method": "POST",
+            "nonidempotent": true
+          }
+        ],
+        "class": "ok",
+        "note": null,
+        "dups": 0
+      }
+    },
+    "new_crashes": []
+  },
+  "original": {
+    "trials": 120,
+    "ok": 94,
+    "degraded": 0,
+    "wrong": 12,
+    "error": 0,
+    "hang": 14,
+    "miss": 0,
+    "availability": 0.7833333333333333,
+    "p50": 0.3011,
+    "p99": 10.30254,
+    "max": 10.60146,
+    "dups": 28,
+    "logged_failures": null,
+    "structured_errors": null
+  },
+  "hardened": {
+    "trials": 120,
+    "ok": 120,
+    "degraded": 0,
+    "wrong": 0,
+    "error": 0,
+    "hang": 0,
+    "miss": 0,
+    "availability": 1.0,
+    "p50": 0.094662,
+    "p99": 3.5951,
+    "max": 3.60846,
+    "dups": 0,
+    "logged_failures": null,
+    "structured_errors": null
+  },
+  "gates": {
+    "happy": true,
+    "no_wrong": true,
+    "no_hang": true,
+    "no_new_crashes": true,
+    "p99": true,
+    "dups": true,
+    "availability": true
+  },
+  "passed": true,
+  "fallback": "callable",
+  "elapsed_s": 0.22,
+  "hardened_sha256": "005f32d54363a271037e148dc0c96bc370e1bf4d099e9d1845d8c04c41a65cad",
+  "verified_at": "2026-11-23T13:41:16+0800",
+  "wall_s": 0.22,
+  "fault_model": {
+    "timeout": "no answer: caller's timeout fires; with no timeout it hangs (POST/PUT still reach the server)",
+    "refused": "connection refused",
+    "http5xx": "HTTP 503 (subprocess: exit 75 EX_TEMPFAIL)",
+    "http429": "HTTP 429 with Retry-After: 1",
+    "slow": "+3 s latency, then the correct answer",
+    "truncated": "body (or stdout) cut in half",
+    "outage": "dependency down (refused) for 3 consecutive attempts, then recovers",
+    "mixed": "seeded mix: each attempt faults with p=0.3, kind drawn uniformly"
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "id": "orders.shippingQuote",
+  "lang": "node",
+  "module": "orders",
+  "qualname": "shippingQuote",
+  "name": "shippingQuote",
+  "kind": "function",
+  "file": "orders.mjs",
+  "first_line": 18,
+  "in_main": false,
+  "cmd": [
+    "node",
+    "app.mjs"
+  ],
+  "display_cmd": "node app.mjs",
+  "cwd": ".",
+  "env": {
+    "NODE_USE_SYSTEM_CA": "1",
+    "SHOP_API_URL": "http://127.0.0.1:32967"
+  },
+  "globals": {},
+  "hardened_ext": ".mjs",
+  "format": "module",
+  "accessor": "shippingQuote",
+  "binding": "function",
+  "scope": [],
+  "budget_s": 5.0,
+  "recorded": 12,
+  "seen": 12,
+  "skipped": 0,
+  "recorded_at": "2026-11-23T13:39:04+0800",
+  "runtime": "Node.js 24.22.1"
+}

@@ -59,7 +59,7 @@ Attributes: `name` (stored in scan/meta/cassette), `label`, `launchers`, `exampl
 
 To add a language: `lang/<name>.py` + agent files, an entry in `lang.ADAPTERS`, package data in
 `pyproject.toml`. For Node that means `lang/node.py` and `agents/node/` (a `--require` preload `.cjs`
-and a worker, no npm dependencies); `lang.PLANNED` holds the placeholder to remove.
+and a worker, no npm dependencies).
 
 ## Wire format 1: run configuration (core → agent)
 

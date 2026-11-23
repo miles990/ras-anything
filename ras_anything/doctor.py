@@ -41,7 +41,7 @@ def doctor() -> int:
         sym = ui.good(ui.OK) if ok else (ui.warn(ui.WARN) if ok is None else ui.bad(ui.FAIL))
         bad += ok is False
         print("  %s %-24s %s" % (sym, name, ui.dim(detail)))
-    ui.next_hint("scan -- python app.py" if not (project / ".ras" / "scan.json").exists() else "status")
+    ui.next_hint("scan -- python app.py / node app.mjs" if not (project / ".ras" / "scan.json").exists() else "status")
     return 1 if bad else 0
 
 
@@ -53,7 +53,7 @@ def status() -> dict:
     out = {"project": str(project), "scan": None, "hardens": [], "enabled": list(state["enabled"]), "bench": None}
     if not scan:
         print("  no scan yet")
-        ui.next_hint("scan -- python app.py")
+        ui.next_hint("scan -- python app.py / node app.mjs")
         return out
     top = [f for f in scan["functions"] if f["hardenable"]][:3]
     out["scan"] = {"cmd": scan.get("display_cmd"), "top": [f["id"] for f in top]}
@@ -91,7 +91,7 @@ def status() -> dict:
         print(ui.table(["function", "verify", "availability (verify)", "swap"], rows))
     else:
         print("  nothing hardened yet; top candidates: " + ", ".join(f["id"] for f in top))
-        nxt = "harden %s --agent claude" % top[0]["id"] if top else "scan -- python app.py"
+        nxt = "harden %s --agent claude" % top[0]["id"] if top else "scan -- python app.py / node app.mjs"
     b = load_json(project / ".ras" / "bench.json")
     if b:
         o, h = b["summary"]["original"], b["summary"]["hardened"]

@@ -1,0 +1,14 @@
+ORDER RUN  12 orders
+  ORD-2001    19.00 +    4.90  paid ch_0001  label 72B 26d890fb
+  ORD-2002    16.00 +    5.20  paid ch_0002  label 71B 3ae963e5
+  ORD-2003    72.00 +   23.60  paid ch_0003  label 74B 217a3d1e
+  ORD-2004    12.50 +    9.90  paid ch_0004  label 73B f2017b75
+  ORD-2005    38.00 +  pickup  paid ch_0005  label 72B 3a32c724
+  ORD-2006    24.00 +    4.90  paid ch_0006  label 71B d9abacd1
+  ORD-2007    24.00 +    5.20  paid ch_0007  label 74B 83246f64
+  ORD-2008    25.00 +   23.60  paid ch_0008  label 73B 943dfb5f
+  ORD-2009    57.00 +   19.80  paid ch_0009  label 72B 43eea1e5
+  ORD-2010     8.00 +  pickup  paid ch_0010  label 71B ad6fa2c3
+  ORD-2011    48.00 +    9.80  paid ch_0011  label 74B c23acf62
+  ORD-2012    37.50 +   15.60  paid ch_0012  label 73B 3554a7dc
+12/12 paid · ledger: 12 charges, 0 duplicate, total 503.50 EUR

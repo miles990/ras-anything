@@ -1,0 +1,28 @@
+
+===== 2026-11-23 13:39:04  claude -p --permission-mode acceptEdits --allowedTools 'Read,Edit,Write,Glob,Grep,Bash(ras-anything verify:*),Bash(ras-anything status:*)' --add-dir /workspace/ras-anything/examples/orders-node --model opus
+`ras-anything verify orders.shippingQuote` prints **PASS**, and I edited only `hardened.mjs` in the task folder. Nothing is enabled.
+
+| gate | original | hardened |
+|---|---|---|
+| happy replay | – | 12/12 identical |
+| availability under faults | 39.2% | 100% |
+| silent wrong results | 23 | 0 |
+| hangs | 14 | 0 |
+| p99 latency | 60.00 s | 3.52 s |
+| duplicate side effects | 0 | 0 |
+
+**What changed**
+- **Timeouts:** each attempt gets 3.4 s, which is enough to survive the +3 s slow fault. The whole call is capped at 4.7 s.
+- **Retries:** up to 5 attempts with backoff, for transient errors or a 200 whose body doesn't parse. Other 4xx responses aren't retried.
+- **Status handling:** 200 returns the quote and 404 returns `null` (no carrier), as before. Any other status is now an error; the original returned `null` for those too.
+- **Dropped connections:** an error partway through the body now rejects the call. The original could hang.
+- **Giving up:** it logs `shipping_quote.failed` and throws a `RasError` with the cause chained.
+
+**No fallback, on purpose:** the caller treats `null` as "pickup" and charges the order without shipping. Returning `null` during an outage would undercharge customers.
+
+**Before enabling**
+- **Uncaught error in `app.mjs`:** it doesn't catch errors from `shippingQuote`, so a long carrier outage stops the order run. The original did this for refused connections, but on a 503 it carried on without shipping. Catch the error per order if you want the run to continue.
+- **Give-up path not exercised:** every fault recovered on a retry, so `verify` never ran the log-and-throw code (it shows "—" for logged failures). I prepared a check against a local server, but the command needed approval I couldn't get here, so that path is untested.
+- **Leftover files:** that check left `_runtime.cjs` (a stand-in) and `t.mjs` in `/tmp/sq-check/`. Both are safe to delete.
+
+===== exit 0 after 66s

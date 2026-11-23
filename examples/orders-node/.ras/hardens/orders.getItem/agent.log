@@ -1,0 +1,27 @@
+
+===== 2026-11-23 13:27:48  claude -p --permission-mode acceptEdits --allowedTools 'Read,Edit,Write,Glob,Grep,Bash(ras-anything verify:*),Bash(ras-anything status:*)' --add-dir /workspace/ras-anything/examples/orders-node --model opus
+
+===== 2026-11-23 13:38:23  claude -p --permission-mode acceptEdits --allowedTools 'Read,Edit,Write,Glob,Grep,Bash(ras-anything verify:*),Bash(ras-anything status:*)' --add-dir /workspace/ras-anything/examples/orders-node --model opus
+`ras-anything verify orders.getItem` prints **PASS**. I edited only `hardened.mjs` and enabled nothing.
+
+| gate | original | hardened |
+|---|---|---|
+| happy-path replay (no faults) | – | 12/12 identical |
+| availability under faults | 29.2% | 100% |
+| silent wrong results | 30 | 0 |
+| hangs | 16 | 0 |
+| p99 latency (limit 5 s) | 60 s | 4 s |
+| duplicate side effects | 0 | 0 |
+
+**What changed**
+- **Timeouts:** each attempt gets 3.5 s, so a slow but correct answer (+3 s) still succeeds. The whole call is capped at 4.7 s.
+- **Retries:** up to 4 attempts with jittered backoff, honouring `Retry-After`. Only transient errors and unparsable 2xx bodies are retried.
+- **HTTP errors:** 4xx and 5xx answers are no longer parsed and returned as if they were an item.
+- **Giving up:** it logs `orders.getItem.give_up` and throws a `RasError` with the cause and context (sku, url, attempts, status). The log line and the error share a trace id. Programming errors pass through unchanged.
+
+**Before you enable it**
+- **No fallback:** I declared none, because `app.mjs` prices and charges from the item and an invented price could be charged to a customer. `app.mjs` doesn't catch this error, so a lasting outage still stops the order run.
+- **4xx behaviour changes:** the original returned a 404's JSON body, and this version throws. No recorded call covers a 4xx.
+- **Give-up path not exercised:** every fault in the matrix recovered, so `verify` never ran the final log-and-throw code. I didn't test it separately.
+
+===== exit 0 after 34s

@@ -1,0 +1,685 @@
+{
+ "format": "ras-anything-cassette",
+ "version": 1,
+ "lang": "node",
+ "calls": [
+  {
+   "args": [
+    "DE",
+    180
+   ],
+   "kwargs": {},
+   "io": [
+    {
+     "req": {
+      "kind": "http",
+      "method": "GET",
+      "url": "http://127.0.0.1:32967/v1/rates?country=DE&grams=180",
+      "body_sha": "",
+      "idempotency_key": null,
+      "timeout": null,
+      "argv": null,
+      "key": "GET http://127.0.0.1/v1/rates?country=DE&grams=180"
+     },
+     "out": {
+      "status": 200,
+      "reason": "OK",
+      "headers": [
+       [
+        "Content-Type",
+        "application/json"
+       ],
+       [
+        "Content-Length",
+        "30"
+       ],
+       [
+        "Date",
+        "Mon, 23 Nov 2026 05:39:04 GMT"
+       ],
+       [
+        "Connection",
+        "keep-alive"
+       ],
+       [
+        "Keep-Alive",
+        "timeout=5"
+       ]
+      ],
+      "body": {
+       "$bytes": "eyJjYXJyaWVyIjoiUE9TVCIsImNlbnRzIjo0OTB9"
+      },
+      "url": "http://127.0.0.1:32967/v1/rates?country=DE&grams=180"
+     },
+     "dur": 0.003445
+    }
+   ],
+   "dur": 0.004963,
+   "result": {
+    "carrier": "POST",
+    "cents": 490
+   }
+  },
+  {
+   "args": [
+    "FR",
+    180
+   ],
+   "kwargs": {},
+   "io": [
+    {
+     "req": {
+      "kind": "http",
+      "method": "GET",
+      "url": "http://127.0.0.1:32967/v1/rates?country=FR&grams=180",
+      "body_sha": "",
+      "idempotency_key": null,
+      "timeout": null,
+      "argv": null,
+      "key": "GET http://127.0.0.1/v1/rates?country=FR&grams=180"
+     },
+     "out": {
+      "status": 200,
+      "reason": "OK",
+      "headers": [
+       [
+        "Content-Type",
+        "application/json"
+       ],
+       [
+        "Content-Length",
+        "30"
+       ],
+       [
+        "Date",
+        "Mon, 23 Nov 2026 05:39:04 GMT"
+       ],
+       [
+        "Connection",
+        "keep-alive"
+       ],
+       [
+        "Keep-Alive",
+        "timeout=5"
+       ]
+      ],
+      "body": {
+       "$bytes": "eyJjYXJyaWVyIjoiUE9TVCIsImNlbnRzIjo1MjB9"
+      },
+      "url": "http://127.0.0.1:32967/v1/rates?country=FR&grams=180"
+     },
+     "dur": 0.000833
+    }
+   ],
+   "dur": 0.001165,
+   "result": {
+    "carrier": "POST",
+    "cents": 520
+   }
+  },
+  {
+   "args": [
+    "TW",
+    780
+   ],
+   "kwargs": {},
+   "io": [
+    {
+     "req": {
+      "kind": "http",
+      "method": "GET",
+      "url": "http://127.0.0.1:32967/v1/rates?country=TW&grams=780",
+      "body_sha": "",
+      "idempotency_key": null,
+      "timeout": null,
+      "argv": null,
+      "key": "GET http://127.0.0.1/v1/rates?country=TW&grams=780"
+     },
+     "out": {
+      "status": 200,
+      "reason": "OK",
+      "headers": [
+       [
+        "Content-Type",
+        "application/json"
+       ],
+       [
+        "Content-Length",
+        "31"
+       ],
+       [
+        "Date",
+        "Mon, 23 Nov 2026 05:39:04 GMT"
+       ],
+       [
+        "Connection",
+        "keep-alive"
+       ],
+       [
+        "Keep-Alive",
+        "timeout=5"
+       ]
+      ],
+      "body": {
+       "$bytes": "eyJjYXJyaWVyIjoiUE9TVCIsImNlbnRzIjoyMzYwfQ=="
+      },
+      "url": "http://127.0.0.1:32967/v1/rates?country=TW&grams=780"
+     },
+     "dur": 0.000628
+    }
+   ],
+   "dur": 0.000873,
+   "result": {
+    "carrier": "POST",
+    "cents": 2360
+   }
+  },
+  {
+   "args": [
+    "US",
+    340
+   ],
+   "kwargs": {},
+   "io": [
+    {
+     "req": {
+      "kind": "http",
+      "method": "GET",
+      "url": "http://127.0.0.1:32967/v1/rates?country=US&grams=340",
+      "body_sha": "",
+      "idempotency_key": null,
+      "timeout": null,
+      "argv": null,
+      "key": "GET http://127.0.0.1/v1/rates?country=US&grams=340"
+     },
+     "out": {
+      "status": 200,
+      "reason": "OK",
+      "headers": [
+       [
+        "Content-Type",
+        "application/json"
+       ],
+       [
+        "Content-Length",
+        "30"
+       ],
+       [
+        "Date",
+        "Mon, 23 Nov 2026 05:39:04 GMT"
+       ],
+       [
+        "Connection",
+        "keep-alive"
+       ],
+       [
+        "Keep-Alive",
+        "timeout=5"
+       ]
+      ],
+      "body": {
+       "$bytes": "eyJjYXJyaWVyIjoiUE9TVCIsImNlbnRzIjo5OTB9"
+      },
+      "url": "http://127.0.0.1:32967/v1/rates?country=US&grams=340"
+     },
+     "dur": 0.000532
+    }
+   ],
+   "dur": 0.000797,
+   "result": {
+    "carrier": "POST",
+    "cents": 990
+   }
+  },
+  {
+   "args": [
+    "IS",
+    360
+   ],
+   "kwargs": {},
+   "io": [
+    {
+     "req": {
+      "kind": "http",
+      "method": "GET",
+      "url": "http://127.0.0.1:32967/v1/rates?country=IS&grams=360",
+      "body_sha": "",
+      "idempotency_key": null,
+      "timeout": null,
+      "argv": null,
+      "key": "GET http://127.0.0.1/v1/rates?country=IS&grams=360"
+     },
+     "out": {
+      "status": 404,
+      "reason": "Not Found",
+      "headers": [
+       [
+        "Content-Type",
+        "application/json"
+       ],
+       [
+        "Content-Length",
+        "22"
+       ],
+       [
+        "Date",
+        "Mon, 23 Nov 2026 05:39:04 GMT"
+       ],
+       [
+        "Connection",
+        "keep-alive"
+       ],
+       [
+        "Keep-Alive",
+        "timeout=5"
+       ]
+      ],
+      "body": {
+       "$bytes": "eyJlcnJvciI6Im5vIGNhcnJpZXIifQ=="
+      },
+      "url": "http://127.0.0.1:32967/v1/rates?country=IS&grams=360"
+     },
+     "dur": 0.000568
+    }
+   ],
+   "dur": 0.000803,
+   "result": null
+  },
+  {
+   "args": [
+    "DE",
+    270
+   ],
+   "kwargs": {},
+   "io": [
+    {
+     "req": {
+      "kind": "http",
+      "method": "GET",
+      "url": "http://127.0.0.1:32967/v1/rates?country=DE&grams=270",
+      "body_sha": "",
+      "idempotency_key": null,
+      "timeout": null,
+      "argv": null,
+      "key": "GET http://127.0.0.1/v1/rates?country=DE&grams=270"
+     },
+     "out": {
+      "status": 200,
+      "reason": "OK",
+      "headers": [
+       [
+        "Content-Type",
+        "application/json"
+       ],
+       [
+        "Content-Length",
+        "30"
+       ],
+       [
+        "Date",
+        "Mon, 23 Nov 2026 05:39:04 GMT"
+       ],
+       [
+        "Connection",
+        "keep-alive"
+       ],
+       [
+        "Keep-Alive",
+        "timeout=5"
+       ]
+      ],
+      "body": {
+       "$bytes": "eyJjYXJyaWVyIjoiUE9TVCIsImNlbnRzIjo0OTB9"
+      },
+      "url": "http://127.0.0.1:32967/v1/rates?country=DE&grams=270"
+     },
+     "dur": 0.00051
+    }
+   ],
+   "dur": 0.000734,
+   "result": {
+    "carrier": "POST",
+    "cents": 490
+   }
+  },
+  {
+   "args": [
+    "FR",
+    260
+   ],
+   "kwargs": {},
+   "io": [
+    {
+     "req": {
+      "kind": "http",
+      "method": "GET",
+      "url": "http://127.0.0.1:32967/v1/rates?country=FR&grams=260",
+      "body_sha": "",
+      "idempotency_key": null,
+      "timeout": null,
+      "argv": null,
+      "key": "GET http://127.0.0.1/v1/rates?country=FR&grams=260"
+     },
+     "out": {
+      "status": 200,
+      "reason": "OK",
+      "headers": [
+       [
+        "Content-Type",
+        "application/json"
+       ],
+       [
+        "Content-Length",
+        "30"
+       ],
+       [
+        "Date",
+        "Mon, 23 Nov 2026 05:39:04 GMT"
+       ],
+       [
+        "Connection",
+        "keep-alive"
+       ],
+       [
+        "Keep-Alive",
+        "timeout=5"
+       ]
+      ],
+      "body": {
+       "$bytes": "eyJjYXJyaWVyIjoiUE9TVCIsImNlbnRzIjo1MjB9"
+      },
+      "url": "http://127.0.0.1:32967/v1/rates?country=FR&grams=260"
+     },
+     "dur": 0.000553
+    }
+   ],
+   "dur": 0.000792,
+   "result": {
+    "carrier": "POST",
+    "cents": 520
+   }
+  },
+  {
+   "args": [
+    "TW",
+    680
+   ],
+   "kwargs": {},
+   "io": [
+    {
+     "req": {
+      "kind": "http",
+      "method": "GET",
+      "url": "http://127.0.0.1:32967/v1/rates?country=TW&grams=680",
+      "body_sha": "",
+      "idempotency_key": null,
+      "timeout": null,
+      "argv": null,
+      "key": "GET http://127.0.0.1/v1/rates?country=TW&grams=680"
+     },
+     "out": {
+      "status": 200,
+      "reason": "OK",
+      "headers": [
+       [
+        "Content-Type",
+        "application/json"
+       ],
+       [
+        "Content-Length",
+        "31"
+       ],
+       [
+        "Date",
+        "Mon, 23 Nov 2026 05:39:04 GMT"
+       ],
+       [
+        "Connection",
+        "keep-alive"
+       ],
+       [
+        "Keep-Alive",
+        "timeout=5"
+       ]
+      ],
+      "body": {
+       "$bytes": "eyJjYXJyaWVyIjoiUE9TVCIsImNlbnRzIjoyMzYwfQ=="
+      },
+      "url": "http://127.0.0.1:32967/v1/rates?country=TW&grams=680"
+     },
+     "dur": 0.000473
+    }
+   ],
+   "dur": 0.000694,
+   "result": {
+    "carrier": "POST",
+    "cents": 2360
+   }
+  },
+  {
+   "args": [
+    "US",
+    540
+   ],
+   "kwargs": {},
+   "io": [
+    {
+     "req": {
+      "kind": "http",
+      "method": "GET",
+      "url": "http://127.0.0.1:32967/v1/rates?country=US&grams=540",
+      "body_sha": "",
+      "idempotency_key": null,
+      "timeout": null,
+      "argv": null,
+      "key": "GET http://127.0.0.1/v1/rates?country=US&grams=540"
+     },
+     "out": {
+      "status": 200,
+      "reason": "OK",
+      "headers": [
+       [
+        "Content-Type",
+        "application/json"
+       ],
+       [
+        "Content-Length",
+        "31"
+       ],
+       [
+        "Date",
+        "Mon, 23 Nov 2026 05:39:04 GMT"
+       ],
+       [
+        "Connection",
+        "keep-alive"
+       ],
+       [
+        "Keep-Alive",
+        "timeout=5"
+       ]
+      ],
+      "body": {
+       "$bytes": "eyJjYXJyaWVyIjoiUE9TVCIsImNlbnRzIjoxOTgwfQ=="
+      },
+      "url": "http://127.0.0.1:32967/v1/rates?country=US&grams=540"
+     },
+     "dur": 0.000531
+    }
+   ],
+   "dur": 0.000793,
+   "result": {
+    "carrier": "POST",
+    "cents": 1980
+   }
+  },
+  {
+   "args": [
+    "IS",
+    90
+   ],
+   "kwargs": {},
+   "io": [
+    {
+     "req": {
+      "kind": "http",
+      "method": "GET",
+      "url": "http://127.0.0.1:32967/v1/rates?country=IS&grams=90",
+      "body_sha": "",
+      "idempotency_key": null,
+      "timeout": null,
+      "argv": null,
+      "key": "GET http://127.0.0.1/v1/rates?country=IS&grams=90"
+     },
+     "out": {
+      "status": 404,
+      "reason": "Not Found",
+      "headers": [
+       [
+        "Content-Type",
+        "application/json"
+       ],
+       [
+        "Content-Length",
+        "22"
+       ],
+       [
+        "Date",
+        "Mon, 23 Nov 2026 05:39:04 GMT"
+       ],
+       [
+        "Connection",
+        "keep-alive"
+       ],
+       [
+        "Keep-Alive",
+        "timeout=5"
+       ]
+      ],
+      "body": {
+       "$bytes": "eyJlcnJvciI6Im5vIGNhcnJpZXIifQ=="
+      },
+      "url": "http://127.0.0.1:32967/v1/rates?country=IS&grams=90"
+     },
+     "dur": 0.000501
+    }
+   ],
+   "dur": 0.000762,
+   "result": null
+  },
+  {
+   "args": [
+    "DE",
+    520
+   ],
+   "kwargs": {},
+   "io": [
+    {
+     "req": {
+      "kind": "http",
+      "method": "GET",
+      "url": "http://127.0.0.1:32967/v1/rates?country=DE&grams=520",
+      "body_sha": "",
+      "idempotency_key": null,
+      "timeout": null,
+      "argv": null,
+      "key": "GET http://127.0.0.1/v1/rates?country=DE&grams=520"
+     },
+     "out": {
+      "status": 200,
+      "reason": "OK",
+      "headers": [
+       [
+        "Content-Type",
+        "application/json"
+       ],
+       [
+        "Content-Length",
+        "30"
+       ],
+       [
+        "Date",
+        "Mon, 23 Nov 2026 05:39:04 GMT"
+       ],
+       [
+        "Connection",
+        "keep-alive"
+       ],
+       [
+        "Keep-Alive",
+        "timeout=5"
+       ]
+      ],
+      "body": {
+       "$bytes": "eyJjYXJyaWVyIjoiUE9TVCIsImNlbnRzIjo5ODB9"
+      },
+      "url": "http://127.0.0.1:32967/v1/rates?country=DE&grams=520"
+     },
+     "dur": 0.000394
+    }
+   ],
+   "dur": 0.000584,
+   "result": {
+    "carrier": "POST",
+    "cents": 980
+   }
+  },
+  {
+   "args": [
+    "FR",
+    1020
+   ],
+   "kwargs": {},
+   "io": [
+    {
+     "req": {
+      "kind": "http",
+      "method": "GET",
+      "url": "http://127.0.0.1:32967/v1/rates?country=FR&grams=1020",
+      "body_sha": "",
+      "idempotency_key": null,
+      "timeout": null,
+      "argv": null,
+      "key": "GET http://127.0.0.1/v1/rates?country=FR&grams=1020"
+     },
+     "out": {
+      "status": 200,
+      "reason": "OK",
+      "headers": [
+       [
+        "Content-Type",
+        "application/json"
+       ],
+       [
+        "Content-Length",
+        "31"
+       ],
+       [
+        "Date",
+        "Mon, 23 Nov 2026 05:39:04 GMT"
+       ],
+       [
+        "Connection",
+        "keep-alive"
+       ],
+       [
+        "Keep-Alive",
+        "timeout=5"
+       ]
+      ],
+      "body": {
+       "$bytes": "eyJjYXJyaWVyIjoiUE9TVCIsImNlbnRzIjoxNTYwfQ=="
+      },
+      "url": "http://127.0.0.1:32967/v1/rates?country=FR&grams=1020"
+     },
+     "dur": 0.000459
+    }
+   ],
+   "dur": 0.00069,
+   "result": {
+    "carrier": "POST",
+    "cents": 1560
+   }
+  }
+ ]
+}

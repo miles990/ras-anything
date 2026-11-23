@@ -13,6 +13,7 @@ Find the functions that break when dependencies misbehave, have a coding agent h
 prove it on recorded calls, and swap them in reversibly.
 
   ras-anything go --agent claude -- python app.py     everything below, in one go
+  ras-anything go --agent claude -- node app.mjs
 
   scan -- <cmd>          rank functions by risk × exposure × hardenability (clean + seeded chaos runs)
   harden [id] [--agent]  record real calls + their dependency I/O, write TASK.md, run your agent
@@ -88,7 +89,7 @@ def main(argv=None) -> int:
         c = a.command
         if c in ("scan", "go") and not cmd:
             raise UserError("no command given", "%s runs your app: put its command after --" % c,
-                            "%s -- python app.py" % ("scan" if c == "scan" else "go --agent claude"))
+                            "%s -- python app.py / node app.mjs" % ("scan" if c == "scan" else "go --agent claude"))
         if c == "scan":
             from .scan import scan
 

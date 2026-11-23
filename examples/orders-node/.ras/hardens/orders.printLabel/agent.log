@@ -1,0 +1,24 @@
+
+===== 2026-11-23 13:40:14  claude -p --permission-mode acceptEdits --allowedTools 'Read,Edit,Write,Glob,Grep,Bash(ras-anything verify:*),Bash(ras-anything status:*)' --add-dir /workspace/ras-anything/examples/orders-node --model opus
+`ras-anything verify orders.printLabel` prints **PASS**. I edited only `hardened.mjs` in this folder and enabled nothing.
+
+| Gate | Original | Hardened |
+|---|---|---|
+| Happy-path replay | – | 12/12 identical |
+| Availability under faults | 32.5% | 100% |
+| Silent wrong results | 0 | 0 |
+| Hangs | 13 | 0 |
+| p99 latency (limit 5 s) | 60.00 s | 3.52 s |
+| Duplicate side effects | 0 | 0 |
+
+**What changed in `printLabel`**
+- **Timeouts:** each attempt gets up to 3.4 s, so a printer that is slow by 3 s still finishes. The whole call is capped at 4.7 s. The abort signal also goes to the child process, so a hung one gets killed.
+- **Retries:** up to 5 attempts with full-jitter backoff, for transient failures and cut-off JSON only. A short outage fits in the budget because refused attempts fail at once. Reprinting is safe because `label.mjs` only computes and prints.
+- **No fallback:** the caller reads `label.bytes` and `label.sha256`, so any substitute would be wrong data. When retries run out it throws a `RasError` with the cause, order id, charge id and attempt count. Non-transient errors are logged and rethrown unchanged.
+- **Logging:** each give-up is one JSON line with a trace id. It leaves out the raw error message, because `execFile` puts the full command line, including the customer's name, in it. The name is still in the `RasError`'s `cause`, so it can appear if the app prints the full error.
+
+**Not tested:** every fault in the matrix recovered, so `verify` never ran the give-up path (it shows "—" for logged failures). I wrote a scratch test for it with real child processes, but the command to run it needed approval, so it didn't run. The unused file is `/tmp/ras-printlabel-check/t.mjs`. To run it, copy `hardened.mjs` and the runtime (as `_runtime.cjs`) next to it, then run it with `node`.
+
+**After a charge:** `app.mjs` prints the label after charging and has no try/catch visible in the excerpt. A long printer outage will therefore still raise an error after the customer has paid.
+
+===== exit 0 after 48s

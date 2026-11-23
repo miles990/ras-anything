@@ -1,0 +1,33 @@
+{
+  "id": "orders.getItem",
+  "lang": "node",
+  "module": "orders",
+  "qualname": "getItem",
+  "name": "getItem",
+  "kind": "function",
+  "file": "orders.mjs",
+  "first_line": 12,
+  "in_main": false,
+  "cmd": [
+    "node",
+    "app.mjs"
+  ],
+  "display_cmd": "node app.mjs",
+  "cwd": ".",
+  "env": {
+    "NODE_USE_SYSTEM_CA": "1",
+    "SHOP_API_URL": "http://127.0.0.1:40503"
+  },
+  "globals": {},
+  "hardened_ext": ".mjs",
+  "format": "module",
+  "accessor": "getItem",
+  "binding": "function",
+  "scope": [],
+  "budget_s": 5.0,
+  "recorded": 12,
+  "seen": 12,
+  "skipped": 0,
+  "recorded_at": "2026-11-23T13:38:23+0800",
+  "runtime": "Node.js 24.22.1"
+}

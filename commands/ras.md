@@ -1,6 +1,6 @@
 ---
 description: Make this app survive dependency failures by hardening its weakest functions (ras-anything)
-argument-hint: "[command that runs the app, e.g. python app.py]"
+argument-hint: "[command that runs the app, e.g. python app.py or node app.mjs]"
 ---
 
 Use the ras-anything skill to harden this project's reliability. The app runs with: $ARGUMENTS

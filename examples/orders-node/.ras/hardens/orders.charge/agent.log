@@ -1,0 +1,26 @@
+
+===== 2026-11-23 13:27:07  claude -p --permission-mode acceptEdits --allowedTools 'Read,Edit,Write,Glob,Grep,Bash(ras-anything verify:*),Bash(ras-anything status:*)' --add-dir /workspace/ras-anything/examples/orders-node --model opus
+`orders.charge` is hardened, and `ras-anything verify orders.charge` prints **PASS**. I edited only `hardened.mjs`, and nothing is enabled.
+
+| gate | original | hardened |
+|---|---|---|
+| happy-path replay | – | 12/12 identical |
+| availability under faults | 78.3% | 100% |
+| silent wrong results | 12 | 0 |
+| hangs | 14 | 0 |
+| p99 latency (limit 5 s) | 10.30 s | 3.60 s |
+| duplicate side effects | 28 | 0 |
+
+**What changed**
+- **Idempotency:** every attempt sends the same key, `charge-<order.id>`. A rerun the next day reuses it, so a timed-out charge that went through isn't repeated, as long as the provider still remembers the key.
+- **Retries:** there are up to 5 attempts of at most 3.5 s each, with a 4.6 s limit on the whole call. Transient failures and cut-off response bodies are retried; other 4xx responses are not.
+- **Giving up:** it logs `charge_not_confirmed` and returns the declared `null` fallback, which the app already lists as pending. Any other error is logged as `charge_failed` and thrown as a `RasError` with its cause.
+
+**Check before enabling**
+- **`null` means "not confirmed", not "not charged".** A timed-out request may have taken effect. Retrying the order is safe only if the provider honours the key until then, so check how long yours keeps keys.
+- **The key leaves out the amount on purpose.** If the price changes before a retry, the order still can't be charged twice. The provider may return the charge at the old amount or reject the request. If an order can have several charges, the key needs another part.
+- **Permanent rejections (such as 400, 401 or 402) still return `null`, as before, but are now logged.** The verify run has no such fault, so this path and the `RasError` path are untested.
+
+I couldn't read the source of `_runtime.cjs` (outside the folders I can access), so I relied on the task's description of it.
+
+===== exit 0 after 40s

@@ -1,0 +1,36 @@
+{
+  "id": "orders.printLabel",
+  "lang": "node",
+  "module": "orders",
+  "qualname": "printLabel",
+  "name": "printLabel",
+  "kind": "function",
+  "file": "orders.mjs",
+  "first_line": 47,
+  "in_main": false,
+  "cmd": [
+    "node",
+    "app.mjs"
+  ],
+  "display_cmd": "node app.mjs",
+  "cwd": ".",
+  "env": {
+    "NODE_USE_SYSTEM_CA": "1",
+    "SHOP_API_URL": "http://127.0.0.1:42781"
+  },
+  "globals": {},
+  "hardened_ext": ".mjs",
+  "format": "module",
+  "accessor": "printLabel",
+  "binding": "function",
+  "scope": [
+    "LABEL",
+    "run"
+  ],
+  "budget_s": 5.0,
+  "recorded": 12,
+  "seen": 12,
+  "skipped": 0,
+  "recorded_at": "2026-11-23T13:40:14+0800",
+  "runtime": "Node.js 24.22.1"
+}

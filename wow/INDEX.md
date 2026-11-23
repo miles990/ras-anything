@@ -6,8 +6,8 @@
 |---|---|---|
 | Package (`ras-anything` CLI, runtime, verify, bench, report, MCP) | `ras_anything/`, `pyproject.toml` | committed (`33/33` unit tests in `tests/`) |
 | README & license/credits | `README.md`, `LICENSE`, `NOTICE` | committed |
-| Visual report cards (SVG) | `docs/cards/weather.svg`, `docs/cards/payments.svg` | committed |
-| Runnable examples + measured reports | `examples/weather/` (`RAS-REPORT.md`, `REPRODUCE.md`, `.ras/`), `examples/payments/` (`RAS-REPORT.md`, `REPRODUCE.md`, `.ras/`) | committed (disabled clean) |
+| Visual report cards (SVG) | `docs/cards/weather.svg`, `docs/cards/payments.svg`, `docs/cards/orders-node.svg` | committed |
+| Runnable examples + measured reports | `examples/weather/`, `examples/payments/`, `examples/orders-node/` (each: `RAS-REPORT.md`, `REPRODUCE.md`, `.ras/`) | committed (disabled clean) |
 | Agent integrations | `.claude-plugin/`, `.mcp.json`, `commands/ras.md`, `skills/ras-anything/SKILL.md` | committed |
 
 ## Process records

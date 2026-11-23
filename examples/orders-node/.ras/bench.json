@@ -1,0 +1,701 @@
+{
+  "lang": "node",
+  "cmd": [
+    "node",
+    "app.mjs"
+  ],
+  "display_cmd": "node app.mjs",
+  "ids": [
+    "orders.charge",
+    "orders.getItem",
+    "orders.shippingQuote",
+    "orders.printLabel"
+  ],
+  "seeds": 20,
+  "rate": 0.1,
+  "outage_rate": 0.05,
+  "time_scale": 0.05,
+  "hang_cap_s": 2.0,
+  "degraded_markers": [
+    "PENDING"
+  ],
+  "clean_outputs_equal": true,
+  "summary": {
+    "original": {
+      "runs": 20,
+      "correct": 0,
+      "degraded": 0,
+      "wrong": 2,
+      "crash": 15,
+      "hang": 3,
+      "availability": 0.0,
+      "crash_rate": 0.75,
+      "hang_rate": 0.15,
+      "wrong_rate": 0.1,
+      "p50_wall": 0.3155,
+      "p99_wall": 4.1338,
+      "identical_rate": 0.0,
+      "dups": 6,
+      "faults": 52,
+      "failures_by_place": {
+        "Error in orders.shippingQuote": 7,
+        "hang in orders.printLabel": 1,
+        "TypeError in orders.getItem": 4,
+        "hang in orders.shippingQuote": 1,
+        "SyntaxError in ?": 2,
+        "Error in orders.printLabel": 2,
+        "hang in orders.getItem": 1
+      },
+      "clean_wall": 0.5027
+    },
+    "hardened": {
+      "runs": 20,
+      "correct": 18,
+      "degraded": 0,
+      "wrong": 0,
+      "crash": 2,
+      "hang": 0,
+      "availability": 0.9,
+      "crash_rate": 0.1,
+      "hang_rate": 0.0,
+      "wrong_rate": 0.0,
+      "p50_wall": 2.7391,
+      "p99_wall": 4.6238,
+      "identical_rate": 0.9,
+      "dups": 0,
+      "faults": 240,
+      "failures_by_place": {
+        "TypeError in app.<module>": 1,
+        "TimeoutError in app.<module>": 1
+      },
+      "clean_wall": 0.5165
+    }
+  },
+  "runs": {
+    "original": [
+      {
+        "seed": 1,
+        "outcome": "crash",
+        "exit": 1,
+        "wall_s": 0.0851,
+        "fallbacks": 0,
+        "faults": 1,
+        "attempts": 2,
+        "dups": 0,
+        "uncaught": {
+          "type": "Error",
+          "msg": "connect ECONNREFUSED 127.0.0.1:33839",
+          "hang": false,
+          "where": "orders.shippingQuote"
+        }
+      },
+      {
+        "seed": 2,
+        "outcome": "hang",
+        "exit": 70,
+        "wall_s": 2.1567,
+        "fallbacks": 0,
+        "faults": 1,
+        "attempts": 8,
+        "dups": 0,
+        "uncaught": {
+          "type": "ChaosHang",
+          "msg": "boundary call with no timeout hung (chaos)",
+          "hang": true,
+          "where": "orders.printLabel"
+        }
+      },
+      {
+        "seed": 3,
+        "outcome": "crash",
+        "exit": 1,
+        "wall_s": 0.1923,
+        "fallbacks": 0,
+        "faults": 1,
+        "attempts": 9,
+        "dups": 0,
+        "uncaught": {
+          "type": "TypeError",
+          "msg": "fetch failed",
+          "hang": false,
+          "where": "orders.getItem"
+        }
+      },
+      {
+        "seed": 4,
+        "outcome": "wrong",
+        "exit": 0,
+        "wall_s": 2.7361,
+        "fallbacks": 0,
+        "faults": 7,
+        "attempts": 52,
+        "dups": 3,
+        "uncaught": null
+      },
+      {
+        "seed": 5,
+        "outcome": "hang",
+        "exit": 70,
+        "wall_s": 3.922,
+        "fallbacks": 0,
+        "faults": 5,
+        "attempts": 20,
+        "dups": 1,
+        "uncaught": {
+          "type": "ChaosHang",
+          "msg": "boundary call with no timeout hung (chaos)",
+          "hang": true,
+          "where": "orders.shippingQuote"
+        }
+      },
+      {
+        "seed": 6,
+        "outcome": "crash",
+        "exit": 1,
+        "wall_s": 0.0626,
+        "fallbacks": 0,
+        "faults": 1,
+        "attempts": 1,
+        "dups": 0,
+        "uncaught": {
+          "type": "TypeError",
+          "msg": "fetch failed",
+          "hang": false,
+          "where": "orders.getItem"
+        }
+      },
+      {
+        "seed": 7,
+        "outcome": "crash",
+        "exit": 1,
+        "wall_s": 0.1583,
+        "fallbacks": 0,
+        "faults": 1,
+        "attempts": 5,
+        "dups": 0,
+        "uncaught": {
+          "type": "SyntaxError",
+          "msg": "Unterminated string in JSON at position 30 (line 1 column 31)",
+          "hang": false,
+          "where": null
+        }
+      },
+      {
+        "seed": 8,
+        "outcome": "crash",
+        "exit": 1,
+        "wall_s": 0.0781,
+        "fallbacks": 0,
+        "faults": 1,
+        "attempts": 1,
+        "dups": 0,
+        "uncaught": {
+          "type": "SyntaxError",
+          "msg": "Unterminated string in JSON at position 33 (line 1 column 34)",
+          "hang": false,
+          "where": null
+        }
+      },
+      {
+        "seed": 9,
+        "outcome": "crash",
+        "exit": 1,
+        "wall_s": 0.1975,
+        "fallbacks": 0,
+        "faults": 1,
+        "attempts": 14,
+        "dups": 0,
+        "uncaught": {
+          "type": "Error",
+          "msg": "connect ECONNREFUSED 127.0.0.1:46855",
+          "hang": false,
+          "where": "orders.shippingQuote"
+        }
+      },
+      {
+        "seed": 10,
+        "outcome": "wrong",
+        "exit": 0,
+        "wall_s": 4.1338,
+        "fallbacks": 0,
+        "faults": 14,
+        "attempts": 53,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 11,
+        "outcome": "crash",
+        "exit": 1,
+        "wall_s": 0.1641,
+        "fallbacks": 0,
+        "faults": 1,
+        "attempts": 12,
+        "dups": 0,
+        "uncaught": {
+          "type": "Error",
+          "msg": "Command failed: <python>/local/lib/nodejs/node ./label.mjs {\"id\":\"ORD-2003\",\"to\":\"C. Moreau\",\"country\":\"TW\",\"charge\":\"ch_0003\"}\ntemporarily unavailable (exit 75)\n",
+          "hang": false,
+          "where": "orders.printLabel"
+        }
+      },
+      {
+        "seed": 12,
+        "outcome": "hang",
+        "exit": 70,
+        "wall_s": 2.2386,
+        "fallbacks": 0,
+        "faults": 1,
+        "attempts": 17,
+        "dups": 0,
+        "uncaught": {
+          "type": "ChaosHang",
+          "msg": "boundary call with no timeout hung (chaos)",
+          "hang": true,
+          "where": "orders.getItem"
+        }
+      },
+      {
+        "seed": 13,
+        "outcome": "crash",
+        "exit": 1,
+        "wall_s": 0.8356,
+        "fallbacks": 0,
+        "faults": 3,
+        "attempts": 35,
+        "dups": 0,
+        "uncaught": {
+          "type": "Error",
+          "msg": "connect ECONNREFUSED 127.0.0.1:42323",
+          "hang": false,
+          "where": "orders.shippingQuote"
+        }
+      },
+      {
+        "seed": 14,
+        "outcome": "crash",
+        "exit": 1,
+        "wall_s": 1.0273,
+        "fallbacks": 0,
+        "faults": 5,
+        "attempts": 10,
+        "dups": 0,
+        "uncaught": {
+          "type": "TypeError",
+          "msg": "fetch failed",
+          "hang": false,
+          "where": "orders.getItem"
+        }
+      },
+      {
+        "seed": 15,
+        "outcome": "crash",
+        "exit": 1,
+        "wall_s": 1.4428,
+        "fallbacks": 0,
+        "faults": 3,
+        "attempts": 28,
+        "dups": 2,
+        "uncaught": {
+          "type": "Error",
+          "msg": "connect ECONNREFUSED 127.0.0.1:43533",
+          "hang": false,
+          "where": "orders.shippingQuote"
+        }
+      },
+      {
+        "seed": 16,
+        "outcome": "crash",
+        "exit": 1,
+        "wall_s": 0.0808,
+        "fallbacks": 0,
+        "faults": 1,
+        "attempts": 2,
+        "dups": 0,
+        "uncaught": {
+          "type": "Error",
+          "msg": "connect ECONNREFUSED 127.0.0.1:34995",
+          "hang": false,
+          "where": "orders.shippingQuote"
+        }
+      },
+      {
+        "seed": 17,
+        "outcome": "crash",
+        "exit": 1,
+        "wall_s": 0.3675,
+        "fallbacks": 0,
+        "faults": 2,
+        "attempts": 16,
+        "dups": 0,
+        "uncaught": {
+          "type": "Error",
+          "msg": "spawn node EAGAIN",
+          "hang": false,
+          "where": "orders.printLabel"
+        }
+      },
+      {
+        "seed": 18,
+        "outcome": "crash",
+        "exit": 1,
+        "wall_s": 0.3155,
+        "fallbacks": 0,
+        "faults": 1,
+        "attempts": 30,
+        "dups": 0,
+        "uncaught": {
+          "type": "Error",
+          "msg": "connect ECONNREFUSED 127.0.0.1:40509",
+          "hang": false,
+          "where": "orders.shippingQuote"
+        }
+      },
+      {
+        "seed": 19,
+        "outcome": "crash",
+        "exit": 1,
+        "wall_s": 0.077,
+        "fallbacks": 0,
+        "faults": 1,
+        "attempts": 2,
+        "dups": 0,
+        "uncaught": {
+          "type": "Error",
+          "msg": "connect ECONNREFUSED 127.0.0.1:33185",
+          "hang": false,
+          "where": "orders.shippingQuote"
+        }
+      },
+      {
+        "seed": 20,
+        "outcome": "crash",
+        "exit": 1,
+        "wall_s": 0.061,
+        "fallbacks": 0,
+        "faults": 1,
+        "attempts": 1,
+        "dups": 0,
+        "uncaught": {
+          "type": "TypeError",
+          "msg": "fetch failed",
+          "hang": false,
+          "where": "orders.getItem"
+        }
+      }
+    ],
+    "hardened": [
+      {
+        "seed": 1,
+        "outcome": "crash",
+        "exit": 1,
+        "wall_s": 4.1987,
+        "fallbacks": 0,
+        "faults": 27,
+        "attempts": 74,
+        "dups": 0,
+        "uncaught": {
+          "type": "TypeError",
+          "msg": "fetch failed",
+          "hang": false,
+          "where": "app.<module>"
+        }
+      },
+      {
+        "seed": 2,
+        "outcome": "correct",
+        "exit": 0,
+        "wall_s": 1.9172,
+        "fallbacks": 0,
+        "faults": 8,
+        "attempts": 57,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 3,
+        "outcome": "correct",
+        "exit": 0,
+        "wall_s": 1.9331,
+        "fallbacks": 0,
+        "faults": 12,
+        "attempts": 59,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 4,
+        "outcome": "correct",
+        "exit": 0,
+        "wall_s": 3.8285,
+        "fallbacks": 0,
+        "faults": 13,
+        "attempts": 61,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 5,
+        "outcome": "correct",
+        "exit": 0,
+        "wall_s": 2.7391,
+        "fallbacks": 0,
+        "faults": 18,
+        "attempts": 64,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 6,
+        "outcome": "correct",
+        "exit": 0,
+        "wall_s": 4.6238,
+        "fallbacks": 0,
+        "faults": 19,
+        "attempts": 68,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 7,
+        "outcome": "correct",
+        "exit": 0,
+        "wall_s": 0.768,
+        "fallbacks": 0,
+        "faults": 5,
+        "attempts": 54,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 8,
+        "outcome": "correct",
+        "exit": 0,
+        "wall_s": 1.9001,
+        "fallbacks": 0,
+        "faults": 16,
+        "attempts": 64,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 9,
+        "outcome": "correct",
+        "exit": 0,
+        "wall_s": 1.1661,
+        "fallbacks": 0,
+        "faults": 6,
+        "attempts": 53,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 10,
+        "outcome": "correct",
+        "exit": 0,
+        "wall_s": 2.9556,
+        "fallbacks": 0,
+        "faults": 20,
+        "attempts": 66,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 11,
+        "outcome": "correct",
+        "exit": 0,
+        "wall_s": 1.8778,
+        "fallbacks": 0,
+        "faults": 5,
+        "attempts": 54,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 12,
+        "outcome": "correct",
+        "exit": 0,
+        "wall_s": 3.2523,
+        "fallbacks": 0,
+        "faults": 8,
+        "attempts": 57,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 13,
+        "outcome": "correct",
+        "exit": 0,
+        "wall_s": 1.4993,
+        "fallbacks": 0,
+        "faults": 7,
+        "attempts": 53,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 14,
+        "outcome": "correct",
+        "exit": 0,
+        "wall_s": 2.8371,
+        "fallbacks": 0,
+        "faults": 9,
+        "attempts": 57,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 15,
+        "outcome": "correct",
+        "exit": 0,
+        "wall_s": 2.0726,
+        "fallbacks": 0,
+        "faults": 10,
+        "attempts": 59,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 16,
+        "outcome": "correct",
+        "exit": 0,
+        "wall_s": 3.5574,
+        "fallbacks": 0,
+        "faults": 19,
+        "attempts": 66,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 17,
+        "outcome": "crash",
+        "exit": 1,
+        "wall_s": 3.1947,
+        "fallbacks": 0,
+        "faults": 16,
+        "attempts": 62,
+        "dups": 0,
+        "uncaught": {
+          "type": "TimeoutError",
+          "msg": "The operation was aborted due to timeout",
+          "hang": false,
+          "where": "app.<module>"
+        }
+      },
+      {
+        "seed": 18,
+        "outcome": "correct",
+        "exit": 0,
+        "wall_s": 0.5081,
+        "fallbacks": 0,
+        "faults": 1,
+        "attempts": 50,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 19,
+        "outcome": "correct",
+        "exit": 0,
+        "wall_s": 2.4176,
+        "fallbacks": 0,
+        "faults": 10,
+        "attempts": 59,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 20,
+        "outcome": "correct",
+        "exit": 0,
+        "wall_s": 2.7622,
+        "fallbacks": 0,
+        "faults": 11,
+        "attempts": 59,
+        "dups": 0,
+        "uncaught": null
+      }
+    ]
+  },
+  "functions": {
+    "original": {
+      "orders.getItem": {
+        "calls": 85,
+        "ok": 78,
+        "fallback": 0,
+        "raised": 6,
+        "p99": 0.151971564
+      },
+      "orders.shippingQuote": {
+        "calls": 78,
+        "ok": 70,
+        "fallback": 0,
+        "raised": 7,
+        "p99": 0.15166501900000004
+      },
+      "orders.charge": {
+        "calls": 70,
+        "ok": 70,
+        "fallback": 0,
+        "raised": 0,
+        "p99": 0.9060786740000001
+      },
+      "orders.printLabel": {
+        "calls": 62,
+        "ok": 59,
+        "fallback": 0,
+        "raised": 2,
+        "p99": 0.049511894
+      }
+    },
+    "hardened": {
+      "orders.getItem": {
+        "calls": 240,
+        "ok": 240,
+        "fallback": 0,
+        "raised": 0,
+        "p99": 1.0035420259999999
+      },
+      "orders.shippingQuote": {
+        "calls": 240,
+        "ok": 240,
+        "fallback": 0,
+        "raised": 0,
+        "p99": 2.006444587
+      },
+      "orders.charge": {
+        "calls": 240,
+        "ok": 240,
+        "fallback": 0,
+        "raised": 0,
+        "p99": 1.54320951
+      },
+      "orders.printLabel": {
+        "calls": 240,
+        "ok": 240,
+        "fallback": 0,
+        "raised": 0,
+        "p99": 0.541046796
+      }
+    }
+  },
+  "first_wrong": null,
+  "host": {
+    "machine": "x86_64",
+    "system": "Linux",
+    "release": "6.12.113+",
+    "python": "3.13.5",
+    "runtime": "Node.js 24.22.1",
+    "cpus": 8,
+    "node": null
+  },
+  "fault_model": {
+    "timeout": "no answer: caller's timeout fires; with no timeout it hangs (POST/PUT still reach the server)",
+    "refused": "connection refused",
+    "http5xx": "HTTP 503 (subprocess: exit 75 EX_TEMPFAIL)",
+    "http429": "HTTP 429 with Retry-After: 1",
+    "slow": "+3 s latency, then the correct answer",
+    "truncated": "body (or stdout) cut in half"
+  },
+  "created": "2026-11-23T13:42:30+0800"
+}

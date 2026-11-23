@@ -1,0 +1,739 @@
+{
+ "format": "ras-anything-cassette",
+ "version": 1,
+ "lang": "node",
+ "calls": [
+  {
+   "args": [
+    {
+     "id": "ORD-2001",
+     "name": "A. Kaya",
+     "country": "DE",
+     "sku": "TEE-M",
+     "qty": 1
+    },
+    2390
+   ],
+   "kwargs": {},
+   "io": [
+    {
+     "req": {
+      "kind": "fetch",
+      "method": "POST",
+      "url": "http://127.0.0.1:40393/v1/charges",
+      "body_sha": "0a9ac13abd3a36482e0318d0f78eef70ee951adf22fe9e0b0bfe062498f4ad74",
+      "idempotency_key": null,
+      "timeout": null,
+      "argv": null,
+      "key": "POST http://127.0.0.1/v1/charges #0a9ac13abd3a"
+     },
+     "out": {
+      "status": 200,
+      "reason": "OK",
+      "headers": [
+       [
+        "connection",
+        "keep-alive"
+       ],
+       [
+        "content-type",
+        "application/json"
+       ],
+       [
+        "date",
+        "Mon, 23 Nov 2026 05:27:07 GMT"
+       ],
+       [
+        "keep-alive",
+        "timeout=5"
+       ]
+      ],
+      "body": {
+       "$bytes": "eyJpZCI6ImNoXzAwMDEiLCJvcmRlciI6Ik9SRC0yMDAxIiwiYW1vdW50X2NlbnRzIjoyMzkwLCJzdGF0dXMiOiJzdWNjZWVkZWQifQ=="
+      },
+      "url": "http://127.0.0.1:40393/v1/charges"
+     },
+     "dur": 0.00254
+    }
+   ],
+   "dur": 0.003334,
+   "result": {
+    "id": "ch_0001",
+    "order": "ORD-2001",
+    "amount_cents": 2390,
+    "status": "succeeded"
+   }
+  },
+  {
+   "args": [
+    {
+     "id": "ORD-2002",
+     "name": "B. Lin",
+     "country": "FR",
+     "sku": "PEN-3",
+     "qty": 2
+    },
+    2120
+   ],
+   "kwargs": {},
+   "io": [
+    {
+     "req": {
+      "kind": "fetch",
+      "method": "POST",
+      "url": "http://127.0.0.1:40393/v1/charges",
+      "body_sha": "de688b0eac7956f5625a4931f79182d54fa3d33c5fa44457b69d9b9016559ccd",
+      "idempotency_key": null,
+      "timeout": null,
+      "argv": null,
+      "key": "POST http://127.0.0.1/v1/charges #de688b0eac79"
+     },
+     "out": {
+      "status": 200,
+      "reason": "OK",
+      "headers": [
+       [
+        "connection",
+        "keep-alive"
+       ],
+       [
+        "content-type",
+        "application/json"
+       ],
+       [
+        "date",
+        "Mon, 23 Nov 2026 05:27:07 GMT"
+       ],
+       [
+        "keep-alive",
+        "timeout=5"
+       ]
+      ],
+      "body": {
+       "$bytes": "eyJpZCI6ImNoXzAwMDIiLCJvcmRlciI6Ik9SRC0yMDAyIiwiYW1vdW50X2NlbnRzIjoyMTIwLCJzdGF0dXMiOiJzdWNjZWVkZWQifQ=="
+      },
+      "url": "http://127.0.0.1:40393/v1/charges"
+     },
+     "dur": 0.001269
+    }
+   ],
+   "dur": 0.001584,
+   "result": {
+    "id": "ch_0002",
+    "order": "ORD-2002",
+    "amount_cents": 2120,
+    "status": "succeeded"
+   }
+  },
+  {
+   "args": [
+    {
+     "id": "ORD-2003",
+     "name": "C. Moreau",
+     "country": "TW",
+     "sku": "BAG-XL",
+     "qty": 3
+    },
+    9560
+   ],
+   "kwargs": {},
+   "io": [
+    {
+     "req": {
+      "kind": "fetch",
+      "method": "POST",
+      "url": "http://127.0.0.1:40393/v1/charges",
+      "body_sha": "c0a3eb0eacfdbe3202f9e1d30f877966db62e2d2737ff7867b03919ab0df4d07",
+      "idempotency_key": null,
+      "timeout": null,
+      "argv": null,
+      "key": "POST http://127.0.0.1/v1/charges #c0a3eb0eacfd"
+     },
+     "out": {
+      "status": 200,
+      "reason": "OK",
+      "headers": [
+       [
+        "connection",
+        "keep-alive"
+       ],
+       [
+        "content-type",
+        "application/json"
+       ],
+       [
+        "date",
+        "Mon, 23 Nov 2026 05:27:07 GMT"
+       ],
+       [
+        "keep-alive",
+        "timeout=5"
+       ]
+      ],
+      "body": {
+       "$bytes": "eyJpZCI6ImNoXzAwMDMiLCJvcmRlciI6Ik9SRC0yMDAzIiwiYW1vdW50X2NlbnRzIjo5NTYwLCJzdGF0dXMiOiJzdWNjZWVkZWQifQ=="
+      },
+      "url": "http://127.0.0.1:40393/v1/charges"
+     },
+     "dur": 0.0011
+    }
+   ],
+   "dur": 0.001433,
+   "result": {
+    "id": "ch_0003",
+    "order": "ORD-2003",
+    "amount_cents": 9560,
+    "status": "succeeded"
+   }
+  },
+  {
+   "args": [
+    {
+     "id": "ORD-2004",
+     "name": "D. Novak",
+     "country": "US",
+     "sku": "MUG-01",
+     "qty": 1
+    },
+    2240
+   ],
+   "kwargs": {},
+   "io": [
+    {
+     "req": {
+      "kind": "fetch",
+      "method": "POST",
+      "url": "http://127.0.0.1:40393/v1/charges",
+      "body_sha": "4b2e4453d8526663aaf2a2bdd1888f3d5b210cb89bdf6da8e5b521dd5183b78d",
+      "idempotency_key": null,
+      "timeout": null,
+      "argv": null,
+      "key": "POST http://127.0.0.1/v1/charges #4b2e4453d852"
+     },
+     "out": {
+      "status": 200,
+      "reason": "OK",
+      "headers": [
+       [
+        "connection",
+        "keep-alive"
+       ],
+       [
+        "content-type",
+        "application/json"
+       ],
+       [
+        "date",
+        "Mon, 23 Nov 2026 05:27:07 GMT"
+       ],
+       [
+        "keep-alive",
+        "timeout=5"
+       ]
+      ],
+      "body": {
+       "$bytes": "eyJpZCI6ImNoXzAwMDQiLCJvcmRlciI6Ik9SRC0yMDA0IiwiYW1vdW50X2NlbnRzIjoyMjQwLCJzdGF0dXMiOiJzdWNjZWVkZWQifQ=="
+      },
+      "url": "http://127.0.0.1:40393/v1/charges"
+     },
+     "dur": 0.000998
+    }
+   ],
+   "dur": 0.001226,
+   "result": {
+    "id": "ch_0004",
+    "order": "ORD-2004",
+    "amount_cents": 2240,
+    "status": "succeeded"
+   }
+  },
+  {
+   "args": [
+    {
+     "id": "ORD-2005",
+     "name": "A. Kaya",
+     "country": "IS",
+     "sku": "TEE-M",
+     "qty": 2
+    },
+    3800
+   ],
+   "kwargs": {},
+   "io": [
+    {
+     "req": {
+      "kind": "fetch",
+      "method": "POST",
+      "url": "http://127.0.0.1:40393/v1/charges",
+      "body_sha": "5d4aabb2989bb88436c59559dc23e339f00059536616fed84ced95cca54b00ac",
+      "idempotency_key": null,
+      "timeout": null,
+      "argv": null,
+      "key": "POST http://127.0.0.1/v1/charges #5d4aabb2989b"
+     },
+     "out": {
+      "status": 200,
+      "reason": "OK",
+      "headers": [
+       [
+        "connection",
+        "keep-alive"
+       ],
+       [
+        "content-type",
+        "application/json"
+       ],
+       [
+        "date",
+        "Mon, 23 Nov 2026 05:27:07 GMT"
+       ],
+       [
+        "keep-alive",
+        "timeout=5"
+       ]
+      ],
+      "body": {
+       "$bytes": "eyJpZCI6ImNoXzAwMDUiLCJvcmRlciI6Ik9SRC0yMDA1IiwiYW1vdW50X2NlbnRzIjozODAwLCJzdGF0dXMiOiJzdWNjZWVkZWQifQ=="
+      },
+      "url": "http://127.0.0.1:40393/v1/charges"
+     },
+     "dur": 0.001086
+    }
+   ],
+   "dur": 0.001341,
+   "result": {
+    "id": "ch_0005",
+    "order": "ORD-2005",
+    "amount_cents": 3800,
+    "status": "succeeded"
+   }
+  },
+  {
+   "args": [
+    {
+     "id": "ORD-2006",
+     "name": "B. Lin",
+     "country": "DE",
+     "sku": "PEN-3",
+     "qty": 3
+    },
+    2890
+   ],
+   "kwargs": {},
+   "io": [
+    {
+     "req": {
+      "kind": "fetch",
+      "method": "POST",
+      "url": "http://127.0.0.1:40393/v1/charges",
+      "body_sha": "f67149eab2335ef63e3810e64961b96906b225ce8e167ee69ee391c7884b8859",
+      "idempotency_key": null,
+      "timeout": null,
+      "argv": null,
+      "key": "POST http://127.0.0.1/v1/charges #f67149eab233"
+     },
+     "out": {
+      "status": 200,
+      "reason": "OK",
+      "headers": [
+       [
+        "connection",
+        "keep-alive"
+       ],
+       [
+        "content-type",
+        "application/json"
+       ],
+       [
+        "date",
+        "Mon, 23 Nov 2026 05:27:07 GMT"
+       ],
+       [
+        "keep-alive",
+        "timeout=5"
+       ]
+      ],
+      "body": {
+       "$bytes": "eyJpZCI6ImNoXzAwMDYiLCJvcmRlciI6Ik9SRC0yMDA2IiwiYW1vdW50X2NlbnRzIjoyODkwLCJzdGF0dXMiOiJzdWNjZWVkZWQifQ=="
+      },
+      "url": "http://127.0.0.1:40393/v1/charges"
+     },
+     "dur": 0.00073
+    }
+   ],
+   "dur": 0.000925,
+   "result": {
+    "id": "ch_0006",
+    "order": "ORD-2006",
+    "amount_cents": 2890,
+    "status": "succeeded"
+   }
+  },
+  {
+   "args": [
+    {
+     "id": "ORD-2007",
+     "name": "C. Moreau",
+     "country": "FR",
+     "sku": "BAG-XL",
+     "qty": 1
+    },
+    2920
+   ],
+   "kwargs": {},
+   "io": [
+    {
+     "req": {
+      "kind": "fetch",
+      "method": "POST",
+      "url": "http://127.0.0.1:40393/v1/charges",
+      "body_sha": "8e5e87c5c98484156f5a6e63111c77fe2f6463b9d34dbc5820aaa051a1e37512",
+      "idempotency_key": null,
+      "timeout": null,
+      "argv": null,
+      "key": "POST http://127.0.0.1/v1/charges #8e5e87c5c984"
+     },
+     "out": {
+      "status": 200,
+      "reason": "OK",
+      "headers": [
+       [
+        "connection",
+        "keep-alive"
+       ],
+       [
+        "content-type",
+        "application/json"
+       ],
+       [
+        "date",
+        "Mon, 23 Nov 2026 05:27:07 GMT"
+       ],
+       [
+        "keep-alive",
+        "timeout=5"
+       ]
+      ],
+      "body": {
+       "$bytes": "eyJpZCI6ImNoXzAwMDciLCJvcmRlciI6Ik9SRC0yMDA3IiwiYW1vdW50X2NlbnRzIjoyOTIwLCJzdGF0dXMiOiJzdWNjZWVkZWQifQ=="
+      },
+      "url": "http://127.0.0.1:40393/v1/charges"
+     },
+     "dur": 0.000707
+    }
+   ],
+   "dur": 0.000886,
+   "result": {
+    "id": "ch_0007",
+    "order": "ORD-2007",
+    "amount_cents": 2920,
+    "status": "succeeded"
+   }
+  },
+  {
+   "args": [
+    {
+     "id": "ORD-2008",
+     "name": "D. Novak",
+     "country": "TW",
+     "sku": "MUG-01",
+     "qty": 2
+    },
+    4860
+   ],
+   "kwargs": {},
+   "io": [
+    {
+     "req": {
+      "kind": "fetch",
+      "method": "POST",
+      "url": "http://127.0.0.1:40393/v1/charges",
+      "body_sha": "4f2edd6b9838bfe8151b9770c8d612101226786bb3b9ecdd8ac938449c83b863",
+      "idempotency_key": null,
+      "timeout": null,
+      "argv": null,
+      "key": "POST http://127.0.0.1/v1/charges #4f2edd6b9838"
+     },
+     "out": {
+      "status": 200,
+      "reason": "OK",
+      "headers": [
+       [
+        "connection",
+        "keep-alive"
+       ],
+       [
+        "content-type",
+        "application/json"
+       ],
+       [
+        "date",
+        "Mon, 23 Nov 2026 05:27:07 GMT"
+       ],
+       [
+        "keep-alive",
+        "timeout=5"
+       ]
+      ],
+      "body": {
+       "$bytes": "eyJpZCI6ImNoXzAwMDgiLCJvcmRlciI6Ik9SRC0yMDA4IiwiYW1vdW50X2NlbnRzIjo0ODYwLCJzdGF0dXMiOiJzdWNjZWVkZWQifQ=="
+      },
+      "url": "http://127.0.0.1:40393/v1/charges"
+     },
+     "dur": 0.000662
+    }
+   ],
+   "dur": 0.000862,
+   "result": {
+    "id": "ch_0008",
+    "order": "ORD-2008",
+    "amount_cents": 4860,
+    "status": "succeeded"
+   }
+  },
+  {
+   "args": [
+    {
+     "id": "ORD-2009",
+     "name": "A. Kaya",
+     "country": "US",
+     "sku": "TEE-M",
+     "qty": 3
+    },
+    7680
+   ],
+   "kwargs": {},
+   "io": [
+    {
+     "req": {
+      "kind": "fetch",
+      "method": "POST",
+      "url": "http://127.0.0.1:40393/v1/charges",
+      "body_sha": "b16f823c638f19c39c7f04362bda0ed7a380805477977994daadc223cf98f45a",
+      "idempotency_key": null,
+      "timeout": null,
+      "argv": null,
+      "key": "POST http://127.0.0.1/v1/charges #b16f823c638f"
+     },
+     "out": {
+      "status": 200,
+      "reason": "OK",
+      "headers": [
+       [
+        "connection",
+        "keep-alive"
+       ],
+       [
+        "content-type",
+        "application/json"
+       ],
+       [
+        "date",
+        "Mon, 23 Nov 2026 05:27:07 GMT"
+       ],
+       [
+        "keep-alive",
+        "timeout=5"
+       ]
+      ],
+      "body": {
+       "$bytes": "eyJpZCI6ImNoXzAwMDkiLCJvcmRlciI6Ik9SRC0yMDA5IiwiYW1vdW50X2NlbnRzIjo3NjgwLCJzdGF0dXMiOiJzdWNjZWVkZWQifQ=="
+      },
+      "url": "http://127.0.0.1:40393/v1/charges"
+     },
+     "dur": 0.000756
+    }
+   ],
+   "dur": 0.001018,
+   "result": {
+    "id": "ch_0009",
+    "order": "ORD-2009",
+    "amount_cents": 7680,
+    "status": "succeeded"
+   }
+  },
+  {
+   "args": [
+    {
+     "id": "ORD-2010",
+     "name": "B. Lin",
+     "country": "IS",
+     "sku": "PEN-3",
+     "qty": 1
+    },
+    800
+   ],
+   "kwargs": {},
+   "io": [
+    {
+     "req": {
+      "kind": "fetch",
+      "method": "POST",
+      "url": "http://127.0.0.1:40393/v1/charges",
+      "body_sha": "c91a2a9ef0a4972f4046fdc405b4abe78e6917e996597d21afc9f538f6a92553",
+      "idempotency_key": null,
+      "timeout": null,
+      "argv": null,
+      "key": "POST http://127.0.0.1/v1/charges #c91a2a9ef0a4"
+     },
+     "out": {
+      "status": 200,
+      "reason": "OK",
+      "headers": [
+       [
+        "connection",
+        "keep-alive"
+       ],
+       [
+        "content-type",
+        "application/json"
+       ],
+       [
+        "date",
+        "Mon, 23 Nov 2026 05:27:07 GMT"
+       ],
+       [
+        "keep-alive",
+        "timeout=5"
+       ]
+      ],
+      "body": {
+       "$bytes": "eyJpZCI6ImNoXzAwMTAiLCJvcmRlciI6Ik9SRC0yMDEwIiwiYW1vdW50X2NlbnRzIjo4MDAsInN0YXR1cyI6InN1Y2NlZWRlZCJ9"
+      },
+      "url": "http://127.0.0.1:40393/v1/charges"
+     },
+     "dur": 0.000707
+    }
+   ],
+   "dur": 0.000937,
+   "result": {
+    "id": "ch_0010",
+    "order": "ORD-2010",
+    "amount_cents": 800,
+    "status": "succeeded"
+   }
+  },
+  {
+   "args": [
+    {
+     "id": "ORD-2011",
+     "name": "C. Moreau",
+     "country": "DE",
+     "sku": "BAG-XL",
+     "qty": 2
+    },
+    5780
+   ],
+   "kwargs": {},
+   "io": [
+    {
+     "req": {
+      "kind": "fetch",
+      "method": "POST",
+      "url": "http://127.0.0.1:40393/v1/charges",
+      "body_sha": "3c3eeb2ae509afb2d7744a510bcb1fb274c9a7985b0498240b30d52deb4b225a",
+      "idempotency_key": null,
+      "timeout": null,
+      "argv": null,
+      "key": "POST http://127.0.0.1/v1/charges #3c3eeb2ae509"
+     },
+     "out": {
+      "status": 200,
+      "reason": "OK",
+      "headers": [
+       [
+        "connection",
+        "keep-alive"
+       ],
+       [
+        "content-type",
+        "application/json"
+       ],
+       [
+        "date",
+        "Mon, 23 Nov 2026 05:27:07 GMT"
+       ],
+       [
+        "keep-alive",
+        "timeout=5"
+       ]
+      ],
+      "body": {
+       "$bytes": "eyJpZCI6ImNoXzAwMTEiLCJvcmRlciI6Ik9SRC0yMDExIiwiYW1vdW50X2NlbnRzIjo1NzgwLCJzdGF0dXMiOiJzdWNjZWVkZWQifQ=="
+      },
+      "url": "http://127.0.0.1:40393/v1/charges"
+     },
+     "dur": 0.000709
+    }
+   ],
+   "dur": 0.000905,
+   "result": {
+    "id": "ch_0011",
+    "order": "ORD-2011",
+    "amount_cents": 5780,
+    "status": "succeeded"
+   }
+  },
+  {
+   "args": [
+    {
+     "id": "ORD-2012",
+     "name": "D. Novak",
+     "country": "FR",
+     "sku": "MUG-01",
+     "qty": 3
+    },
+    5310
+   ],
+   "kwargs": {},
+   "io": [
+    {
+     "req": {
+      "kind": "fetch",
+      "method": "POST",
+      "url": "http://127.0.0.1:40393/v1/charges",
+      "body_sha": "5ed6e7436ee780088a88c31ac26ac24e75f33b4d638d38d1b75638933b141a01",
+      "idempotency_key": null,
+      "timeout": null,
+      "argv": null,
+      "key": "POST http://127.0.0.1/v1/charges #5ed6e7436ee7"
+     },
+     "out": {
+      "status": 200,
+      "reason": "OK",
+      "headers": [
+       [
+        "connection",
+        "keep-alive"
+       ],
+       [
+        "content-type",
+        "application/json"
+       ],
+       [
+        "date",
+        "Mon, 23 Nov 2026 05:27:07 GMT"
+       ],
+       [
+        "keep-alive",
+        "timeout=5"
+       ]
+      ],
+      "body": {
+       "$bytes": "eyJpZCI6ImNoXzAwMTIiLCJvcmRlciI6Ik9SRC0yMDEyIiwiYW1vdW50X2NlbnRzIjo1MzEwLCJzdGF0dXMiOiJzdWNjZWVkZWQifQ=="
+      },
+      "url": "http://127.0.0.1:40393/v1/charges"
+     },
+     "dur": 0.000663
+    }
+   ],
+   "dur": 0.000871,
+   "result": {
+    "id": "ch_0012",
+    "order": "ORD-2012",
+    "amount_cents": 5310,
+    "status": "succeeded"
+   }
+  }
+ ]
+}

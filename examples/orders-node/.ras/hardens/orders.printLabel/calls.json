@@ -1,0 +1,571 @@
+{
+ "format": "ras-anything-cassette",
+ "version": 1,
+ "lang": "node",
+ "calls": [
+  {
+   "args": [
+    {
+     "id": "ORD-2001",
+     "name": "A. Kaya",
+     "country": "DE",
+     "sku": "TEE-M",
+     "qty": 1
+    },
+    "ch_0001"
+   ],
+   "kwargs": {},
+   "io": [
+    {
+     "req": {
+      "kind": "subprocess",
+      "method": "RUN",
+      "url": "",
+      "body_sha": "",
+      "idempotency_key": null,
+      "timeout": null,
+      "argv": [
+       "node",
+       "label.mjs",
+       "{\"id\":\"ORD-2001\",\"to\":\"A. Kaya\",\"country\":\"DE\",\"charge\":\"ch_0001\"}"
+      ],
+      "key": "run node label.mjs {\"id\":\"ORD-2001\",\"to\":\"A. Kaya\",\"country\":\"DE\",\"charge\":\"ch_0001\"}"
+     },
+     "out": {
+      "returncode": 0,
+      "signal": null,
+      "stdout": {
+       "$bytes": "eyJieXRlcyI6NzIsInNoYTI1NiI6IjI2ZDg5MGZiZGUxY2IyMjRlZThmOTIwYWI4M2U2Zjg3ODlmYjg2MzJmMWE5MzM5YmU2ZmE1ZWMwNmM4NmFhMmEifQo="
+      },
+      "stderr": {
+       "$bytes": ""
+      }
+     },
+     "dur": 0.030264
+    }
+   ],
+   "dur": 0.033414,
+   "result": {
+    "bytes": 72,
+    "sha256": "26d890fbde1cb224ee8f920ab83e6f8789fb8632f1a9339be6fa5ec06c86aa2a"
+   }
+  },
+  {
+   "args": [
+    {
+     "id": "ORD-2002",
+     "name": "B. Lin",
+     "country": "FR",
+     "sku": "PEN-3",
+     "qty": 2
+    },
+    "ch_0002"
+   ],
+   "kwargs": {},
+   "io": [
+    {
+     "req": {
+      "kind": "subprocess",
+      "method": "RUN",
+      "url": "",
+      "body_sha": "",
+      "idempotency_key": null,
+      "timeout": null,
+      "argv": [
+       "node",
+       "label.mjs",
+       "{\"id\":\"ORD-2002\",\"to\":\"B. Lin\",\"country\":\"FR\",\"charge\":\"ch_0002\"}"
+      ],
+      "key": "run node label.mjs {\"id\":\"ORD-2002\",\"to\":\"B. Lin\",\"country\":\"FR\",\"charge\":\"ch_0002\"}"
+     },
+     "out": {
+      "returncode": 0,
+      "signal": null,
+      "stdout": {
+       "$bytes": "eyJieXRlcyI6NzEsInNoYTI1NiI6IjNhZTk2M2U1MjAxMWFmOTBmODJhN2YzNTcxMjhlZThlYmRiNmVlZDhmOGViYzYwOTQ2ODlkNDFhZTQ2OGFiYWMifQo="
+      },
+      "stderr": {
+       "$bytes": ""
+      }
+     },
+     "dur": 0.027539
+    }
+   ],
+   "dur": 0.030007,
+   "result": {
+    "bytes": 71,
+    "sha256": "3ae963e52011af90f82a7f357128ee8ebdb6eed8f8ebc6094689d41ae468abac"
+   }
+  },
+  {
+   "args": [
+    {
+     "id": "ORD-2003",
+     "name": "C. Moreau",
+     "country": "TW",
+     "sku": "BAG-XL",
+     "qty": 3
+    },
+    "ch_0003"
+   ],
+   "kwargs": {},
+   "io": [
+    {
+     "req": {
+      "kind": "subprocess",
+      "method": "RUN",
+      "url": "",
+      "body_sha": "",
+      "idempotency_key": null,
+      "timeout": null,
+      "argv": [
+       "node",
+       "label.mjs",
+       "{\"id\":\"ORD-2003\",\"to\":\"C. Moreau\",\"country\":\"TW\",\"charge\":\"ch_0003\"}"
+      ],
+      "key": "run node label.mjs {\"id\":\"ORD-2003\",\"to\":\"C. Moreau\",\"country\":\"TW\",\"charge\":\"ch_0003\"}"
+     },
+     "out": {
+      "returncode": 0,
+      "signal": null,
+      "stdout": {
+       "$bytes": "eyJieXRlcyI6NzQsInNoYTI1NiI6IjIxN2EzZDFlMmIwMDJmZTE0ZTA5MjQzY2ZmMjYzN2Y4ZWNjZTQ4MjdiNmQzYTZmZDQ5MGRjMDA2ZWE2MGQwYTcifQo="
+      },
+      "stderr": {
+       "$bytes": ""
+      }
+     },
+     "dur": 0.029642
+    }
+   ],
+   "dur": 0.03168,
+   "result": {
+    "bytes": 74,
+    "sha256": "217a3d1e2b002fe14e09243cff2637f8ecce4827b6d3a6fd490dc006ea60d0a7"
+   }
+  },
+  {
+   "args": [
+    {
+     "id": "ORD-2004",
+     "name": "D. Novak",
+     "country": "US",
+     "sku": "MUG-01",
+     "qty": 1
+    },
+    "ch_0004"
+   ],
+   "kwargs": {},
+   "io": [
+    {
+     "req": {
+      "kind": "subprocess",
+      "method": "RUN",
+      "url": "",
+      "body_sha": "",
+      "idempotency_key": null,
+      "timeout": null,
+      "argv": [
+       "node",
+       "label.mjs",
+       "{\"id\":\"ORD-2004\",\"to\":\"D. Novak\",\"country\":\"US\",\"charge\":\"ch_0004\"}"
+      ],
+      "key": "run node label.mjs {\"id\":\"ORD-2004\",\"to\":\"D. Novak\",\"country\":\"US\",\"charge\":\"ch_0004\"}"
+     },
+     "out": {
+      "returncode": 0,
+      "signal": null,
+      "stdout": {
+       "$bytes": "eyJieXRlcyI6NzMsInNoYTI1NiI6ImYyMDE3Yjc1ZTA2ODI3ZjVmMDNiNDhlZmFmMDY5ZTFhMGY3YTRlZjQ3YWNiZDU3NDRiMDU5NDIwYWY0YWEwZDkifQo="
+      },
+      "stderr": {
+       "$bytes": ""
+      }
+     },
+     "dur": 0.028048
+    }
+   ],
+   "dur": 0.030026,
+   "result": {
+    "bytes": 73,
+    "sha256": "f2017b75e06827f5f03b48efaf069e1a0f7a4ef47acbd5744b059420af4aa0d9"
+   }
+  },
+  {
+   "args": [
+    {
+     "id": "ORD-2005",
+     "name": "A. Kaya",
+     "country": "IS",
+     "sku": "TEE-M",
+     "qty": 2
+    },
+    "ch_0005"
+   ],
+   "kwargs": {},
+   "io": [
+    {
+     "req": {
+      "kind": "subprocess",
+      "method": "RUN",
+      "url": "",
+      "body_sha": "",
+      "idempotency_key": null,
+      "timeout": null,
+      "argv": [
+       "node",
+       "label.mjs",
+       "{\"id\":\"ORD-2005\",\"to\":\"A. Kaya\",\"country\":\"IS\",\"charge\":\"ch_0005\"}"
+      ],
+      "key": "run node label.mjs {\"id\":\"ORD-2005\",\"to\":\"A. Kaya\",\"country\":\"IS\",\"charge\":\"ch_0005\"}"
+     },
+     "out": {
+      "returncode": 0,
+      "signal": null,
+      "stdout": {
+       "$bytes": "eyJieXRlcyI6NzIsInNoYTI1NiI6IjNhMzJjNzI0ZGY0YTAyYmViNzBiZTJlNjVjZDE1YWRlZGViYzM4ZWRiODNhODg1Yjg4YmRiNGYwNTIxN2Q2ZTIifQo="
+      },
+      "stderr": {
+       "$bytes": ""
+      }
+     },
+     "dur": 0.028416
+    }
+   ],
+   "dur": 0.030759,
+   "result": {
+    "bytes": 72,
+    "sha256": "3a32c724df4a02beb70be2e65cd15adedebc38edb83a885b88bdb4f05217d6e2"
+   }
+  },
+  {
+   "args": [
+    {
+     "id": "ORD-2006",
+     "name": "B. Lin",
+     "country": "DE",
+     "sku": "PEN-3",
+     "qty": 3
+    },
+    "ch_0006"
+   ],
+   "kwargs": {},
+   "io": [
+    {
+     "req": {
+      "kind": "subprocess",
+      "method": "RUN",
+      "url": "",
+      "body_sha": "",
+      "idempotency_key": null,
+      "timeout": null,
+      "argv": [
+       "node",
+       "label.mjs",
+       "{\"id\":\"ORD-2006\",\"to\":\"B. Lin\",\"country\":\"DE\",\"charge\":\"ch_0006\"}"
+      ],
+      "key": "run node label.mjs {\"id\":\"ORD-2006\",\"to\":\"B. Lin\",\"country\":\"DE\",\"charge\":\"ch_0006\"}"
+     },
+     "out": {
+      "returncode": 0,
+      "signal": null,
+      "stdout": {
+       "$bytes": "eyJieXRlcyI6NzEsInNoYTI1NiI6ImQ5YWJhY2QxNWZhNGJkNDc0ZDkyMzNkMjU3Yzc5Yjc0Y2UzODk3NTRiNDdmYWRjMzg0ZjE2YzBlY2Y1ZWNkNWMifQo="
+      },
+      "stderr": {
+       "$bytes": ""
+      }
+     },
+     "dur": 0.030191
+    }
+   ],
+   "dur": 0.032319,
+   "result": {
+    "bytes": 71,
+    "sha256": "d9abacd15fa4bd474d9233d257c79b74ce389754b47fadc384f16c0ecf5ecd5c"
+   }
+  },
+  {
+   "args": [
+    {
+     "id": "ORD-2007",
+     "name": "C. Moreau",
+     "country": "FR",
+     "sku": "BAG-XL",
+     "qty": 1
+    },
+    "ch_0007"
+   ],
+   "kwargs": {},
+   "io": [
+    {
+     "req": {
+      "kind": "subprocess",
+      "method": "RUN",
+      "url": "",
+      "body_sha": "",
+      "idempotency_key": null,
+      "timeout": null,
+      "argv": [
+       "node",
+       "label.mjs",
+       "{\"id\":\"ORD-2007\",\"to\":\"C. Moreau\",\"country\":\"FR\",\"charge\":\"ch_0007\"}"
+      ],
+      "key": "run node label.mjs {\"id\":\"ORD-2007\",\"to\":\"C. Moreau\",\"country\":\"FR\",\"charge\":\"ch_0007\"}"
+     },
+     "out": {
+      "returncode": 0,
+      "signal": null,
+      "stdout": {
+       "$bytes": "eyJieXRlcyI6NzQsInNoYTI1NiI6IjgzMjQ2ZjY0OTgyMWVlOGQyMjgxYTFhNjNlNTkzYTlkNDljZGMxOTQ4MDM3N2JmODM3MDg4OTRhMjFjY2Q3ZTIifQo="
+      },
+      "stderr": {
+       "$bytes": ""
+      }
+     },
+     "dur": 0.025762
+    }
+   ],
+   "dur": 0.027596,
+   "result": {
+    "bytes": 74,
+    "sha256": "83246f649821ee8d2281a1a63e593a9d49cdc19480377bf83708894a21ccd7e2"
+   }
+  },
+  {
+   "args": [
+    {
+     "id": "ORD-2008",
+     "name": "D. Novak",
+     "country": "TW",
+     "sku": "MUG-01",
+     "qty": 2
+    },
+    "ch_0008"
+   ],
+   "kwargs": {},
+   "io": [
+    {
+     "req": {
+      "kind": "subprocess",
+      "method": "RUN",
+      "url": "",
+      "body_sha": "",
+      "idempotency_key": null,
+      "timeout": null,
+      "argv": [
+       "node",
+       "label.mjs",
+       "{\"id\":\"ORD-2008\",\"to\":\"D. Novak\",\"country\":\"TW\",\"charge\":\"ch_0008\"}"
+      ],
+      "key": "run node label.mjs {\"id\":\"ORD-2008\",\"to\":\"D. Novak\",\"country\":\"TW\",\"charge\":\"ch_0008\"}"
+     },
+     "out": {
+      "returncode": 0,
+      "signal": null,
+      "stdout": {
+       "$bytes": "eyJieXRlcyI6NzMsInNoYTI1NiI6Ijk0M2RmYjVmMjIxZmE2YThmN2U5M2M0YzY0ZjRjNDA3NGNmNjVhY2UyYmM3NzAxMGNjMmRkMWI1MjQxOWMzNGQifQo="
+      },
+      "stderr": {
+       "$bytes": ""
+      }
+     },
+     "dur": 0.026821
+    }
+   ],
+   "dur": 0.028965,
+   "result": {
+    "bytes": 73,
+    "sha256": "943dfb5f221fa6a8f7e93c4c64f4c4074cf65ace2bc77010cc2dd1b52419c34d"
+   }
+  },
+  {
+   "args": [
+    {
+     "id": "ORD-2009",
+     "name": "A. Kaya",
+     "country": "US",
+     "sku": "TEE-M",
+     "qty": 3
+    },
+    "ch_0009"
+   ],
+   "kwargs": {},
+   "io": [
+    {
+     "req": {
+      "kind": "subprocess",
+      "method": "RUN",
+      "url": "",
+      "body_sha": "",
+      "idempotency_key": null,
+      "timeout": null,
+      "argv": [
+       "node",
+       "label.mjs",
+       "{\"id\":\"ORD-2009\",\"to\":\"A. Kaya\",\"country\":\"US\",\"charge\":\"ch_0009\"}"
+      ],
+      "key": "run node label.mjs {\"id\":\"ORD-2009\",\"to\":\"A. Kaya\",\"country\":\"US\",\"charge\":\"ch_0009\"}"
+     },
+     "out": {
+      "returncode": 0,
+      "signal": null,
+      "stdout": {
+       "$bytes": "eyJieXRlcyI6NzIsInNoYTI1NiI6IjQzZWVhMWU1M2RkN2UwODhiYjcxNjE0Zjc2YWU0MzY3ZmZiMTQ0ODM4NDM1M2EzMGMwZjgyOTQxNTFhNGZiOTgifQo="
+      },
+      "stderr": {
+       "$bytes": ""
+      }
+     },
+     "dur": 0.026082
+    }
+   ],
+   "dur": 0.027999,
+   "result": {
+    "bytes": 72,
+    "sha256": "43eea1e53dd7e088bb71614f76ae4367ffb1448384353a30c0f8294151a4fb98"
+   }
+  },
+  {
+   "args": [
+    {
+     "id": "ORD-2010",
+     "name": "B. Lin",
+     "country": "IS",
+     "sku": "PEN-3",
+     "qty": 1
+    },
+    "ch_0010"
+   ],
+   "kwargs": {},
+   "io": [
+    {
+     "req": {
+      "kind": "subprocess",
+      "method": "RUN",
+      "url": "",
+      "body_sha": "",
+      "idempotency_key": null,
+      "timeout": null,
+      "argv": [
+       "node",
+       "label.mjs",
+       "{\"id\":\"ORD-2010\",\"to\":\"B. Lin\",\"country\":\"IS\",\"charge\":\"ch_0010\"}"
+      ],
+      "key": "run node label.mjs {\"id\":\"ORD-2010\",\"to\":\"B. Lin\",\"country\":\"IS\",\"charge\":\"ch_0010\"}"
+     },
+     "out": {
+      "returncode": 0,
+      "signal": null,
+      "stdout": {
+       "$bytes": "eyJieXRlcyI6NzEsInNoYTI1NiI6ImFkNmZhMmMzMGJhNGI4OGQ3ODZmZThjOGFmYmM0NmQ2OTA2ZWEzNDI0MmU4NGM3MDY3OTBkM2UyZmI0ZWZkMmYifQo="
+      },
+      "stderr": {
+       "$bytes": ""
+      }
+     },
+     "dur": 0.028787
+    }
+   ],
+   "dur": 0.030608,
+   "result": {
+    "bytes": 71,
+    "sha256": "ad6fa2c30ba4b88d786fe8c8afbc46d6906ea34242e84c706790d3e2fb4efd2f"
+   }
+  },
+  {
+   "args": [
+    {
+     "id": "ORD-2011",
+     "name": "C. Moreau",
+     "country": "DE",
+     "sku": "BAG-XL",
+     "qty": 2
+    },
+    "ch_0011"
+   ],
+   "kwargs": {},
+   "io": [
+    {
+     "req": {
+      "kind": "subprocess",
+      "method": "RUN",
+      "url": "",
+      "body_sha": "",
+      "idempotency_key": null,
+      "timeout": null,
+      "argv": [
+       "node",
+       "label.mjs",
+       "{\"id\":\"ORD-2011\",\"to\":\"C. Moreau\",\"country\":\"DE\",\"charge\":\"ch_0011\"}"
+      ],
+      "key": "run node label.mjs {\"id\":\"ORD-2011\",\"to\":\"C. Moreau\",\"country\":\"DE\",\"charge\":\"ch_0011\"}"
+     },
+     "out": {
+      "returncode": 0,
+      "signal": null,
+      "stdout": {
+       "$bytes": "eyJieXRlcyI6NzQsInNoYTI1NiI6ImMyM2FjZjYyY2VhYmIzZGJlYTQ2ZTk2MDE3NjZkYWVmM2YyMGZiOTFjZDM5MDQ5ZGNmMjZhYjcyODA2YzJhODIifQo="
+      },
+      "stderr": {
+       "$bytes": ""
+      }
+     },
+     "dur": 0.025562
+    }
+   ],
+   "dur": 0.027655,
+   "result": {
+    "bytes": 74,
+    "sha256": "c23acf62ceabb3dbea46e9601766daef3f20fb91cd39049dcf26ab72806c2a82"
+   }
+  },
+  {
+   "args": [
+    {
+     "id": "ORD-2012",
+     "name": "D. Novak",
+     "country": "FR",
+     "sku": "MUG-01",
+     "qty": 3
+    },
+    "ch_0012"
+   ],
+   "kwargs": {},
+   "io": [
+    {
+     "req": {
+      "kind": "subprocess",
+      "method": "RUN",
+      "url": "",
+      "body_sha": "",
+      "idempotency_key": null,
+      "timeout": null,
+      "argv": [
+       "node",
+       "label.mjs",
+       "{\"id\":\"ORD-2012\",\"to\":\"D. Novak\",\"country\":\"FR\",\"charge\":\"ch_0012\"}"
+      ],
+      "key": "run node label.mjs {\"id\":\"ORD-2012\",\"to\":\"D. Novak\",\"country\":\"FR\",\"charge\":\"ch_0012\"}"
+     },
+     "out": {
+      "returncode": 0,
+      "signal": null,
+      "stdout": {
+       "$bytes": "eyJieXRlcyI6NzMsInNoYTI1NiI6IjM1NTRhN2RjY2ExOGY3MDY4YzJhOGFiOTk1N2I4MDAzMGFiZmMzZTYyODgxNDIwMjQ1MzY3ZTJkMmE0N2UwYTEifQo="
+      },
+      "stderr": {
+       "$bytes": ""
+      }
+     },
+     "dur": 0.026129
+    }
+   ],
+   "dur": 0.027933,
+   "result": {
+    "bytes": 73,
+    "sha256": "3554a7dcca18f7068c2a8ab9957b80030abfc3e62881420245367e2d2a47e0a1"
+   }
+  }
+ ]
+}
