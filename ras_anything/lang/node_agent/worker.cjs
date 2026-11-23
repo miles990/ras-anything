@@ -212,6 +212,9 @@ async function runJob(job) {
     const args = codec.dec(call.args);
     const me = `trial ${++seq}`;
     clock.reset();
+    if (t.gap_s) clock.t += t.gap_s * 1000; // one of a sequence: time passes in between, and what the code learned stays
+    else runtime.resetState();
+    clock.start = clock.t;
     handler.begin(me, call.io, t.plan);
     let s = t.seed >>> 0;
     Math.random = () => {

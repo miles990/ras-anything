@@ -378,6 +378,9 @@ In a body that arrives cut in half, `JSON.parse` / `res.json()` throws a `Syntax
     def runtime_file(self):
         return AGENT_DIR / "runtime.cjs", "_runtime.cjs"
 
+    def runtime_modules(self):
+        return [(p, p.name) for p in sorted((AGENT_DIR / "patterns").glob("*.cjs"))]
+
     # ---------------------------------------------------------------- people
 
     def doctor(self):

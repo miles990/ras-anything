@@ -157,6 +157,7 @@ class ModuleTest(unittest.TestCase):
 
         with tempfile.TemporaryDirectory() as d:
             shutil.copy(AGENT / "runtime.cjs", Path(d) / "_runtime.cjs")
+            shutil.copytree(AGENT / "patterns", Path(d) / "patterns")
             (Path(d) / "a.cjs").write_text('const { retry } = require("./_runtime.cjs"); console.log(typeof retry);')
             (Path(d) / "b.mjs").write_text('import { retry, RasError } from "./_runtime.cjs"; console.log(typeof retry, typeof RasError);')
             for f, want in (("a.cjs", "function\n"), ("b.mjs", "function function\n")):

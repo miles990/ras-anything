@@ -451,7 +451,7 @@ class SwapTest(Loop):
         self.assertIn(b"// >>> ras-anything:%s >>>" % fid.encode(), src.read_bytes())
         on = run_app()
         self.assertEqual((on.stdout, on.stderr), (clean, ""))
-        copy = next(x for x in (p.dir / "_ras_hardened").iterdir() if x.name != "_runtime.cjs")
+        copy = next(x for x in (p.dir / "_ras_hardened").iterdir() if x.is_file() and x.name != "_runtime.cjs")
         marker = copy.read_text()
         # the hardened code is what runs; the kill switch runs the original; a broken copy falls back, loudly
         copy.write_text(marker.replace("RasError", "RasError", 1) + "\nprocess.stderr.write('HARDENED LOADED\\n');\n")

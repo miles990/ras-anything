@@ -98,7 +98,15 @@ def get(name: str) -> Pattern:
 
 
 def all_patterns() -> list[Pattern]:
-    return sorted((get(n) for n in NAMES), key=lambda p: p.order)
+    """Every pattern whose module is there, outermost first."""
+    out = []
+    for n in NAMES:
+        try:
+            out.append(get(n))
+        except ModuleNotFoundError as e:
+            if e.name != "ras_anything.patterns." + n:
+                raise
+    return sorted(out, key=lambda p: p.order)
 
 
 def is_on(dependency: str, pattern: str, configured: bool) -> bool:
