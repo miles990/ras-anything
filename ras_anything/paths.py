@@ -6,7 +6,10 @@ import hashlib
 import json
 import os
 import re
+import shutil
+import stat
 import sys
+import tempfile
 from pathlib import Path
 
 PKG_DIR = Path(__file__).resolve().parent
@@ -93,6 +96,64 @@ def resolve_in_project(path: str | os.PathLike, project: Path) -> Path:
             "scan",
         )
     return resolved
+
+
+def plain_path(path: str | os.PathLike, project: Path, what: str, kind: str = "file", must_exist: bool = True) -> Path:
+    """`path` inside the project, reached without following any symlink, or a UserError.
+
+    kind is "file" or "dir". Every component below the project is checked, so neither a symlinked
+    file nor a symlinked folder can redirect a write (or a delete) somewhere else.
+    """
+    proj = project.resolve()
+    cand = Path(os.path.normpath(proj / Path(path)))
+    impact = "enable and disable only touch regular files inside %s, and nothing was changed" % proj
+    if cand == proj or not cand.is_relative_to(proj):
+        raise UserError("refusing %s %s: it is outside the project" % (what, cand), impact, "status")
+    cur = proj
+    parts = cand.relative_to(proj).parts
+    for i, part in enumerate(parts):
+        cur = cur / part
+        try:
+            mode = os.lstat(cur).st_mode
+        except FileNotFoundError:
+            if must_exist:
+                raise UserError("%s %s doesn't exist" % (what, cur), impact, "status") from None
+            return cand
+        except OSError as e:
+            raise UserError("can't look at %s %s: %s" % (what, cur, e.strerror), impact, "status") from e
+        if stat.S_ISLNK(mode):
+            raise UserError("refusing %s %s: %s is a symlink to %s" % (what, cand.relative_to(proj), cur.relative_to(proj), os.readlink(cur)),
+                            impact + " (replace the symlink with the real %s first)" % ("folder" if stat.S_ISDIR(_mode(cur)) else "file"), "status")
+        last = i == len(parts) - 1
+        if not (stat.S_ISREG(mode) if last and kind == "file" else stat.S_ISDIR(mode)):
+            raise UserError("refusing %s %s: not a regular %s" % (what, cur, kind if last else "dir"), impact, "status")
+    return cand
+
+
+def _mode(path: Path) -> int:
+    try:
+        return os.stat(path).st_mode
+    except OSError:
+        return 0
+
+
+def write_file(path: Path, data: bytes) -> None:
+    """Replace `path` in one step (never writes through a symlink or a hard link)."""
+    fd, tmp = tempfile.mkstemp(prefix=".ras-", dir=path.parent)
+    try:
+        with os.fdopen(fd, "wb") as f:
+            f.write(data)
+        if path.exists():
+            shutil.copymode(path, tmp)
+        else:
+            os.chmod(tmp, 0o644)
+        os.replace(tmp, path)
+    except BaseException:
+        try:
+            os.unlink(tmp)
+        except OSError:
+            pass
+        raise
 
 
 # --------------------------------------------------------------------------- machine-specific facts
