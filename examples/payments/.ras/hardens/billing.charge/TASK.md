@@ -10,7 +10,7 @@ folder) and iterate until it passes. Do not enable anything; do not edit the ori
 
 `billing.charge` in `billing.py` line 13. Recorded **16 real calls** from
 `python app.py`. Dependency requests it made:
-- 16× `POST http://127.0.0.1:34967/v1/charges`
+- 16× `POST http://127.0.0.1:39901/v1/charges`
 
 What the scan found:
 - retries a POST with no Idempotency-Key
@@ -50,11 +50,11 @@ How callers use the result (a fallback must be something they already handle):
 
 Recorded examples:
 - `charge({'id': 'INV-1001', 'customer': 'Acme Co', 'amount_cents': 1500, 'currency': 'us…)` → {'id': 'ch_0001', 'invoice': 'INV-1001', 'amount_cents': 1500, 'currency': 'usd', 'status': 'succeeded'}
-  dependency I/O: POST http://127.0.0.1:34967/v1/charges -> 200
+  dependency I/O: POST http://127.0.0.1:39901/v1/charges -> 200
 - `charge({'id': 'INV-1002', 'customer': 'Globex', 'amount_cents': 2237, 'currency': 'usd…)` → {'id': 'ch_0002', 'invoice': 'INV-1002', 'amount_cents': 2237, 'currency': 'usd', 'status': 'succeeded'}
-  dependency I/O: POST http://127.0.0.1:34967/v1/charges -> 200
+  dependency I/O: POST http://127.0.0.1:39901/v1/charges -> 200
 - `charge({'id': 'INV-1003', 'customer': 'Initech', 'amount_cents': 2974, 'currency': 'us…)` → {'id': 'ch_0003', 'invoice': 'INV-1003', 'amount_cents': 2974, 'currency': 'usd', 'status': 'succeeded'}
-  dependency I/O: POST http://127.0.0.1:34967/v1/charges -> 200
+  dependency I/O: POST http://127.0.0.1:39901/v1/charges -> 200
 
 ## The contract (what `verify` enforces)
 
@@ -78,6 +78,9 @@ Recorded examples:
    to declare `None` as the fallback use `RAS_FALLBACK = lambda *args, **kwargs: None`).
    Any other value that differs from the happy result counts as **silent wrong data** and fails.
    Swallowing errors (`except Exception: return None`) is the defect you are fixing.
+   A fallback counts only in a call where a dependency request really failed and never got a good
+   answer (the recorder watches the boundary; a log line alone proves nothing). An open
+   `CircuitBreaker` makes no request, so raise then.
 6. **Serviceable errors.** Log each give-up with `log_event("...", **context)` (JSON line on stderr,
    with a trace id) and chain causes (`raise ... from e`).
 

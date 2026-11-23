@@ -14,7 +14,7 @@ import time
 from pathlib import Path
 
 from . import cassette, faults, static, ui
-from .paths import UserError, find_project, harden_dir, load_json, ras_dir, rel_to_project, resolve_in_project, save_json
+from .paths import PKG_DIR, UserError, find_project, harden_dir, load_json, portable_cmd, rel_to_project, resolve_in_project, runnable_cmd, save_json, save_local, scrub
 from .runner import python_cmd, run
 
 DEFAULT_BUDGET_S = 5.0
@@ -247,6 +247,24 @@ def env_diff(child_env: dict, project: Path) -> dict:
     return {k: v for k, v in (child_env or {}).items() if not k.startswith(skip) and mine.get(k) != v}
 
 
+def portable_sys_path(entries: list[str], project: Path) -> list[str]:
+    """Import folders the app added, relative to the project. The interpreter's own and
+    ras-anything's are left out: they are there anyway when verify runs."""
+    skip = [Path(p).resolve() for p in (sys.prefix, sys.base_prefix, "/usr/lib", "/usr/local/lib", PKG_DIR.parent)]
+    proj = project.resolve()
+    out = []
+    for e in entries:
+        p = Path(e or ".")
+        p = (proj / p).resolve()
+        inside = p == proj or p.is_relative_to(proj)
+        if not p.is_dir() or (not inside and any(p == s or p.is_relative_to(s) for s in skip)) or "site-packages" in p.parts:
+            continue
+        rel = Path(os.path.relpath(p, proj)).as_posix()
+        if rel not in out:
+            out.append(rel)
+    return out
+
+
 def harden(fid: str | None = None, agent: str | None = None, model: str | None = None, budget: float | None = None,
            max_calls: int = 500, force: bool = False, extra_prompt: str = "", quiet: bool = False) -> dict:
     project = find_project()
@@ -261,7 +279,7 @@ def harden(fid: str | None = None, agent: str | None = None, model: str | None =
     scan_cwd = resolve_in_project(scan.get("cwd") or ".", project)
     scan_root = resolve_in_project(scan.get("root") or ".", project)
     fn_abs = str(resolve_in_project(fn["file"], project))
-    r = run(python_cmd(scan["cmd"]), {"mode": "record", "max_calls": max_calls, "calls_path": str(calls_path), "project": str(project),
+    r = run(python_cmd(runnable_cmd(scan["cmd"], project)), {"mode": "record", "max_calls": max_calls, "calls_path": str(calls_path), "project": str(project),
                           "target": {"file": fn_abs, "line": fn["first_line"], "name": fn["name"]}},
             scan_cwd, root=scan_root)
     if r.data is None or not calls_path.exists():
@@ -275,10 +293,9 @@ def harden(fid: str | None = None, agent: str | None = None, model: str | None =
     meta = {
         "id": fid, "module": fn["module"], "qualname": fn["qualname"], "name": fn["name"], "kind": fn["kind"],
         "file": rel_to_project(fn_abs, project), "first_line": fn["first_line"], "in_main": fn["in_main"],
-        "cmd": scan["cmd"], "display_cmd": scan.get("display_cmd", shlex.join(scan["cmd"])),
+        "cmd": portable_cmd(scan["cmd"], project), "display_cmd": scan.get("display_cmd", shlex.join(scan["cmd"])),
         "cwd": rel_to_project(scan_cwd, project),
-        "sys_path": [rel_to_project(p, project) if Path(p).resolve().is_relative_to(project.resolve()) else p for p in (r.data.get("sys_path") or [])],
-        "executable": r.data.get("executable"),
+        "sys_path": portable_sys_path(r.data.get("sys_path") or [], project),
         "env": env_diff(snap.get("env"), project),
         "globals": snap.get("globals") or {},
         "type_modules": r.data.get("type_modules") or [],
@@ -287,7 +304,9 @@ def harden(fid: str | None = None, agent: str | None = None, model: str | None =
         "recorded_at": time.strftime("%Y-%m-%dT%H:%M:%S%z"),
         "python": sys.version.split()[0],
     }
-    save_json(d / "meta.json", meta)
+    save_local(project, executable=r.data.get("executable"))
+    # env and globals are replayed as recorded (project paths in them are already relocatable)
+    save_json(d / "meta.json", {**scrub(meta, project), "env": meta["env"], "globals": meta["globals"]})
     hp = d / "hardened.py"
     kept = hp.exists() and not force
     if not kept:

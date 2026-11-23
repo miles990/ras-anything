@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import os
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -11,7 +12,7 @@ import time
 from pathlib import Path
 
 from . import faults, static, ui
-from .paths import PKG_DIR, UserError, find_project, harden_dir, load_json, save_json, sha256_file
+from .paths import PKG_DIR, UserError, find_project, harden_dir, load_json, load_local, save_json, scrub, sha256_file
 
 CLASSES = ("ok", "degraded", "error", "wrong", "hang")
 
@@ -52,7 +53,7 @@ def verify(fid: str | None = None, max_chaos: int = 60, quiet: bool = False) -> 
                "the harness that judges it." % ", ".join(peek)}}
         return _save(res, d, fid, t0, quiet)
     try:
-        exe = meta.get("executable") if meta.get("executable") and os.path.exists(meta["executable"]) else sys.executable
+        exe = interpreter(project, meta)
         p = subprocess.run([exe, "-m", "ras_anything._verify_worker", str(d), out, str(max_chaos)],
                            env=env, capture_output=True, text=True, timeout=900)
         res = json.loads(Path(out).read_text() or "null")
@@ -66,7 +67,17 @@ def verify(fid: str | None = None, max_chaos: int = 60, quiet: bool = False) -> 
             os.unlink(out)
         except OSError:
             pass
-    return _save(res, d, fid, t0, quiet)
+    return _save(scrub(res, project), d, fid, t0, quiet)
+
+
+def interpreter(project: Path, meta: dict) -> str:
+    """The app's Python: the one that ran it here, else the command's own, else this one."""
+    exe = load_local(project).get("executable")
+    if exe and os.path.exists(exe):
+        return exe
+    prog = (meta.get("cmd") or [""])[0]
+    cand = str(project / prog) if "/" in prog else (shutil.which(prog) if os.path.basename(prog).startswith("python") else None)
+    return cand if cand and os.path.exists(cand) else sys.executable
 
 
 def _save(res: dict, d: Path, fid: str, t0: float, quiet: bool) -> dict:

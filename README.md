@@ -107,8 +107,8 @@ Claude Code (Opus) through `--agent claude`. Exact commands and caveats are in e
 
 | example | verify: availability under the fault matrix | bench: app availability, 20 seeds | other bench numbers |
 |---|---|---|---|
-| [weather dashboard](examples/weather) (`fetch_forecast`, urlopen with no timeout) | 32.5% → **100.0%** (120 trials) | 40.0% → **100.0%** | hangs 15% → 0% · p99 run 2.10s → 889ms |
-| [billing run](examples/payments) (`charge` naive POST retry + `render_receipt` subprocess) | charge 76.9% → **100.0%** · render 33.1% → **100.0%** (160 trials each) | 0.0% → **90.0%** | identical 0% → 45% · dups 5 → 0 · hangs 25% → 0% · p99 3.94s → 3.87s |
+| [weather dashboard](examples/weather) (`fetch_forecast`, urlopen with no timeout) | 32.5% → **100.0%** (120 trials) | 40.0% → **100.0%** | hangs 15% → 0% · p99 run 2.15s → 954ms |
+| [billing run](examples/payments) (`charge` naive POST retry + `render_receipt` subprocess) | charge 76.9% → **100.0%** · render 33.1% → **100.0%** (160 trials each) | 0.0% → **90.0%** | identical 0% → 45% · dups 5 → 0 · hangs 25% → 0% · p99 3.99s → 3.95s |
 
 In the billing run, verify counted 38 duplicate charges for the original across its trials and 0 for
 the hardened version. The 10% of bench runs that still fail are the ledger read in `app.main`, which

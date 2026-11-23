@@ -9,7 +9,7 @@ import time
 from pathlib import Path
 
 from . import faults, ui
-from .paths import UserError, find_project, harden_dir, load_json, resolve_in_project, save_json
+from .paths import UserError, find_project, harden_dir, load_json, portable_cmd, resolve_in_project, runnable_cmd, save_json, scrub
 from .runner import python_cmd, run, project_root_for
 
 
@@ -62,8 +62,9 @@ def bench(cmd: list[str] | None = None, seeds: int = 20, rate: float = 0.1, mark
           quiet: bool = False) -> dict:
     project = find_project()
     scan = load_json(project / ".ras" / "scan.json") or {}
-    shown = shlex.join(cmd) if cmd else scan.get("display_cmd")
-    cmd = python_cmd(cmd or scan.get("cmd") or [])
+    stored = portable_cmd(cmd or scan.get("cmd") or [], project)
+    shown = shlex.join(stored)
+    cmd = python_cmd(cmd or runnable_cmd(scan.get("cmd") or [], project))
     if not cmd:
         raise UserError("no command to bench", "pass it after -- or run scan first", "bench -- python app.py")
     state = load_json(project / ".ras" / "state.json", {"enabled": {}})
@@ -162,7 +163,7 @@ def bench(cmd: list[str] | None = None, seeds: int = 20, rate: float = 0.1, mark
         for st in stats[v].values():
             st["p99"] = max(st["p99"]) if st["p99"] else None
     res = {
-        "cmd": cmd, "display_cmd": shown, "ids": ids, "seeds": seeds, "rate": rate, "outage_rate": 0.05,
+        "cmd": stored, "display_cmd": shown, "ids": ids, "seeds": seeds, "rate": rate, "outage_rate": 0.05,
         "time_scale": 0.05, "hang_cap_s": 2.0, "degraded_markers": markers, "clean_outputs_equal": same_clean,
         "summary": summary, "runs": runs, "functions": stats, "first_wrong": first_wrong_diff,
         "host": {"machine": platform.machine(), "system": platform.system(), "release": platform.release(),
@@ -170,6 +171,7 @@ def bench(cmd: list[str] | None = None, seeds: int = 20, rate: float = 0.1, mark
         "fault_model": {k: faults.DESCRIBE[k] for k in faults.KINDS},
         "created": time.strftime("%Y-%m-%dT%H:%M:%S%z"),
     }
+    res = scrub(res, project)
     save_json(project / ".ras" / "bench.json", res)
     if not quiet:
         print_bench(res)

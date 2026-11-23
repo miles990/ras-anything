@@ -9,7 +9,7 @@ import time
 from pathlib import Path
 
 from . import static, ui
-from .paths import UserError, ras_dir, rel_to_project, save_json
+from .paths import UserError, portable_cmd, ras_dir, rel_to_project, save_json, save_local, scrub
 from .runner import project_root_for, python_cmd, run
 
 W_DYNAMIC = 0.6  # measured chaos failures weigh more than static smells
@@ -51,7 +51,9 @@ def hardenability(fn: dict, fi) -> str | None:
 
 def scan(cmd: list[str], seeds: int = 5, rate: float = 0.25, cwd: Path | None = None, quiet: bool = False) -> dict:
     cwd = Path(cwd or os.getcwd()).resolve()
-    shown = shlex.join(cmd)
+    stored = portable_cmd(cmd, cwd)
+    shown = shlex.join(stored)
+    typed = list(cmd)
     cmd = python_cmd(cmd)
     root = project_root_for(cmd, cwd)
     t0 = time.perf_counter()
@@ -122,7 +124,7 @@ def scan(cmd: list[str], seeds: int = 5, rate: float = 0.25, cwd: Path | None = 
     functions.sort(key=lambda d: (-d["score"], -(d["risk"] * d["exposure"]), -d["boundary"], d["id"]))
     result = {
         "version": 1,
-        "cmd": cmd, "display_cmd": shown, "cwd": ".", "root": rel_to_project(root, cwd),
+        "cmd": stored, "display_cmd": shown, "cwd": ".", "root": rel_to_project(root, cwd),
         "created": time.strftime("%Y-%m-%dT%H:%M:%S%z"),
         "clean": {"wall_s": round(clean.wall, 3), "stdout_sha256": hashlib.sha256(clean.stdout.encode()).hexdigest(),
                   "boundary_calls": total},
@@ -130,6 +132,8 @@ def scan(cmd: list[str], seeds: int = 5, rate: float = 0.25, cwd: Path | None = 
         "functions": functions,
         "elapsed_s": round(time.perf_counter() - t0, 2),
     }
+    result = scrub(result, cwd)
+    save_local(cwd, cmd=typed, portable=stored, executable=clean.data.get("executable"))
     save_json(ras_dir(cwd) / "scan.json", result)
     (ras_dir(cwd) / "clean.stdout").write_text(clean.stdout)
     if not quiet:

@@ -34,7 +34,12 @@ ras-anything report
 ras-anything disable weather.fetch_forecast          # weather.py back byte for byte (committed disabled)
 ```
 
-Measured (from the commands above):
+For v0.2 the calls were re-recorded as JSON (`calls.json`; v0.1 used pickle) with
+`ras-anything scan -- python app.py` and `ras-anything harden weather.fetch_forecast` (which keeps the
+agent's hardened.py), then verified and benchmarked again as above. Verify's numbers came out the same;
+wall times moved with the host's load.
+
+Measured (from the commands above, v0.2):
 
 | | original | hardened |
 |---|---:|---:|
@@ -42,7 +47,7 @@ Measured (from the commands above):
 | verify: hangs / p99 latency (budget 5 s, virtual clock) | 15 / 60.00s | 0 / 3.61s |
 | bench: app availability, 20 seeds | 40.0% | 100.0% |
 | bench: crashes / hangs | 45.0% / 15.0% | 0.0% / 0.0% |
-| bench: p50 / p99 run time | 91ms / 2.10s | 316ms / 889ms |
+| bench: p50 / p99 run time | 134ms / 2.15s | 352ms / 954ms |
 
 The `unavailable` marker is the text the dashboard already prints for a city the provider has in
 maintenance; the hardened function returns that same documented shape (`RAS_FALLBACK`) when the

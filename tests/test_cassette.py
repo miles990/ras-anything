@@ -83,7 +83,7 @@ class ValuesTest(unittest.TestCase):
     def test_unsupported_values_are_refused_not_mangled(self):
         loop = []
         loop.append(loop)
-        for v in (object(), lambda: 1, open(os.devnull), loop, {"f": subprocess.Popen}):
+        for v in (object(), lambda: 1, sys.stdout.buffer, loop, {"f": subprocess.Popen}):
             self.assertRaises(Unsupported, CODEC.enc, v)
         self.assertRaises(Unsupported, Codec().enc, Order("a", []))  # not the project's class
 

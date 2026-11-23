@@ -106,7 +106,8 @@
       "scenario": "timeout",
       "original": {
         "class": "hang",
-        "latency": 10.511614,
+        "note": null,
+        "latency": 10.514688,
         "dups": 1,
         "miss": null,
         "result": "{'id': 'ch_0001', 'invoice': 'INV-1001', 'amount_cents': 1500, 'currency': 'usd', 'status': 'succeeded'}",
@@ -122,6 +123,7 @@
             "n": 0,
             "fault": "timeout",
             "reached": true,
+            "failed": true,
             "idem": null,
             "method": "POST"
           },
@@ -130,6 +132,7 @@
             "n": 1,
             "fault": null,
             "reached": true,
+            "failed": false,
             "idem": null,
             "method": "POST"
           }
@@ -137,7 +140,8 @@
       },
       "hardened": {
         "class": "ok",
-        "latency": 3.708343,
+        "note": null,
+        "latency": 3.711417,
         "dups": 0,
         "miss": null,
         "result": "{'id': 'ch_0001', 'invoice': 'INV-1001', 'amount_cents': 1500, 'currency': 'usd', 'status': 'succeeded'}",
@@ -153,6 +157,7 @@
             "n": 0,
             "fault": "timeout",
             "reached": true,
+            "failed": true,
             "idem": "charge-INV-1001",
             "method": "POST"
           },
@@ -161,6 +166,7 @@
             "n": 1,
             "fault": null,
             "reached": true,
+            "failed": false,
             "idem": "charge-INV-1001",
             "method": "POST"
           }
@@ -178,8 +184,8 @@
     "hang": 20,
     "miss": 0,
     "availability": 0.76875,
-    "p50": 0.504153,
-    "p99": 13.503873,
+    "p50": 0.508018,
+    "p99": 13.503991,
     "max": 21.5,
     "dups": 38,
     "logged_failures": null,
@@ -194,7 +200,7 @@
     "hang": 0,
     "miss": 0,
     "availability": 1.0,
-    "p50": 0.171559,
+    "p50": 0.175199,
     "p99": 4.5,
     "max": 4.5,
     "dups": 0,
@@ -212,10 +218,10 @@
   },
   "passed": true,
   "fallback": "callable",
-  "elapsed_s": 0.03,
+  "elapsed_s": 0.09,
   "hardened_sha256": "bf773e849ada07b84d650a91238e0acd7d435b75faae4643d38c09f7cc523de0",
-  "verified_at": "2026-11-23T12:12:22+0800",
-  "wall_s": 0.15,
+  "verified_at": "2026-11-23T12:16:33+0800",
+  "wall_s": 0.19,
   "fault_model": {
     "timeout": "no answer: caller's timeout fires; with no timeout it hangs (POST/PUT still reach the server)",
     "refused": "connection refused",

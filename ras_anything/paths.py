@@ -5,6 +5,8 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import re
+import sys
 from pathlib import Path
 
 PKG_DIR = Path(__file__).resolve().parent
@@ -91,3 +93,74 @@ def resolve_in_project(path: str | os.PathLike, project: Path) -> Path:
             "scan",
         )
     return resolved
+
+
+# --------------------------------------------------------------------------- machine-specific facts
+#
+# What goes into .ras/*.json is meant to be committed, so it never holds absolute paths. The exact
+# command and interpreter of the last scan/record on this machine live in .ras/runs/ (gitignored).
+
+
+def local_path(project: Path) -> Path:
+    return project / ".ras" / "runs" / "launcher.local"
+
+
+def load_local(project: Path) -> dict:
+    try:
+        d = load_json(local_path(project), {})
+    except ValueError:
+        d = {}
+    return d if isinstance(d, dict) else {}
+
+
+def save_local(project: Path, **facts) -> None:
+    ras_dir(project)
+    try:
+        save_json(local_path(project), {**load_local(project), **facts})
+    except OSError:  # only a convenience: verify falls back to the interpreter on PATH
+        pass
+
+
+def portable_cmd(cmd: list[str], project: Path) -> list[str]:
+    """The command without this machine's absolute paths: relative inside the project, else the name."""
+    out = []
+    for a in cmd:
+        if os.path.isabs(a):
+            rel = os.path.relpath(a, project)  # not resolved: .venv/bin/python is a symlink out of the project
+            a = os.path.basename(a) if rel.startswith("..") else rel
+        out.append(a)
+    return out
+
+
+def runnable_cmd(stored: list[str], project: Path) -> list[str]:
+    """A stored command as it was typed on this machine, or as stored when it wasn't recorded here."""
+    local = load_local(project)
+    cmd = local.get("cmd")
+    if local.get("portable") == stored and isinstance(cmd, list) and cmd and (
+            not os.path.isabs(cmd[0]) or os.path.exists(cmd[0])):
+        return cmd
+    return stored
+
+
+def scrub(data, project: Path):
+    """`data` with this machine's paths replaced (project -> ".", the tool, Python, home)."""
+    subs = []
+    for path, name in ((project, "."), (project.resolve(), "."), (PKG_DIR, "ras_anything"), (PKG_DIR.parent, "<ras-anything>"),
+                       (sys.prefix, "<python>"), (sys.base_prefix, "<python>"), (Path.home(), "~")):
+        if len(str(path)) > 3:
+            subs.append((re.compile(re.escape(str(path)) + r"(?![\w.\-])"), name))
+    for lib in ("/usr/lib/python3", "/usr/local/lib/python3"):
+        subs.append((re.compile(re.escape(lib)), "<python>/lib/python3"))
+
+    def walk(x):
+        if isinstance(x, str):
+            for rx, name in subs:
+                x = rx.sub(lambda m: name, x)
+            return x
+        if isinstance(x, dict):
+            return {k: walk(v) for k, v in x.items()}
+        if isinstance(x, (list, tuple)):
+            return [walk(v) for v in x]
+        return x
+
+    return walk(data)

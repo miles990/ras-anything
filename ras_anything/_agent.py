@@ -386,7 +386,7 @@ class Agent:
     def finish(self):
         sys.setprofile(None)
         sys.settrace(None)
-        out = {"mode": self.mode, "uncaught": self.uncaught, "executable": sys.executable, "sys_path": [p for p in sys.path if "_inject" not in p],
+        out = {"mode": self.mode, "uncaught": self.uncaught, "executable": sys.executable, "sys_path": [p for p in sys.path if "_inject" not in p and not p.startswith("__editable__")],
                "main_file": os.path.realpath(sys.argv[0]) if sys.argv and sys.argv[0] else None,
                "boundary_total": self.boundary_total}
         out["functions"] = [

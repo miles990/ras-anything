@@ -41,7 +41,13 @@ ras-anything report
 ras-anything disable billing.charge && ras-anything disable billing.render_receipt   # committed disabled
 ```
 
-Measured (from the commands above):
+For v0.2 the calls were re-recorded as JSON (`calls.json`; v0.1 used pickle) with
+`ras-anything scan -- python app.py` and `ras-anything harden <id>` for both (which keeps the agent's
+hardened.py), then verified and benchmarked again as above. v0.2 also asks more of a fallback: it only
+counts in a call where a dependency request was seen to fail and never got a good answer. Verify's
+numbers came out the same; wall times moved with the host's load.
+
+Measured (from the commands above, v0.2):
 
 | | original | hardened |
 |---|---:|---:|
@@ -52,7 +58,7 @@ Measured (from the commands above):
 | bench: byte-identical output | 0.0% | 45.0% |
 | bench: crashes / hangs / wrong output | 60.0% / 25.0% / 15.0% | 10.0% / 0.0% / 0.0% |
 | bench: duplicate charges | 5 | 0 |
-| bench: p50 / p99 run time | 1.79s / 3.94s | 1.28s / 3.87s |
+| bench: p50 / p99 run time | 1.83s / 3.99s | 1.38s / 3.95s |
 
 Degraded runs are runs where `charge` returned its declared fallback (`None`, which the app already
 prints as `PENDING (payment failed, retry tomorrow)`; safe now because the retry tomorrow reuses the
