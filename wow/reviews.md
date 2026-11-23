@@ -41,3 +41,10 @@ One surgical pass applied (plus re-measurement of `examples/weather` and `exampl
   - Residual P2: 7 tracked `examples/*/.ras/hardens/*/agent.log` files contained `/workspace/ras-anything` paths → fixed in `2071425` (`harden.py` scrubs `agent.log` on save + scrubbed committed examples + regression test, `382/382 tests`).
 - **Claude Fable 5-2 (`fable-v02-r1.md`, read-only `--tools Read`, HEAD `2071425`)**: **達成**（核心範圍可交付，無阻塞項目；7/7 關通過：W1 通過，W2–W7 通過附保留）。
   - Followed up on Fable's low-cost polish items: aligned `README.md` p99 cells (`weather` `2.11s→1.25s`, `payments` `4.03s→4.24s`, `orders-node` `4.18s→4.97s`), fixed `export.py` cross-function serviceability mean (`0.0%→7.1%` matching `inventory-go/RAS-REPORT.md`), switched `pyproject.toml` `license = "MIT"` (eliminating setuptools deprecation warning), pre-checked `$SHIM` conflicts in `install.sh` + `--force` test, fixed AI verify header fault count (`20 faults + 3 mixes`), added SLO Target column to `dashboard-sample/index.html` + full-height screenshot `docs/cards/dashboard-sample.png`, and updated `wow/progress.md` + `wow/INDEX.md`.
+- **Claude Fable 5-2 Round 2 (`fable-v02-r2.md`, read-only `--tools Read`, HEAD `74574b0`)**: **達成**（核心範圍可交付，無阻塞項目；「是否需要下一輪修復：不需要」）。
+  - 確認已消除：README 三格 p99、Go 服務性 `0.0% → 7.1%`、SLO Target 欄、全頁截圖、AI total spend 揭露、`0 leaks` 註明、V-19 改標「部分完成」、SPDX `license = "MIT"`、shim 衝突先檢與 `--force` 測試、`wow/INDEX.md` 與贏面表。
+  - 依 Fable Round 2 最後建議再補齊：
+    1. `verify.py:283` 改用與 `measure()` 同一份 `cassette.load(d / "calls.json")` 偵測 `has_ai`（實測 `support.triage_ticket` 印出 `20 faults + 3 seeded mixes`）。
+    2. `pyproject.toml:2` 升至 `requires = ["setuptools>=77"]`；`install.sh` 預檢兩邊 skill 衝突避免殘留 venv；`README.md:215` 刪重複詞；`tests/test_schema_export.py` 新增 `inventory-go` 服務性 `7.1%` 迴歸測試。
+    3. 重跑乾淨 HOME 安裝並重產 `wow/proof/install-clean-home.md`（去除 `/workspace/` 路徑），確認 `license` 棄用警告已完全消失（`False`），並誠實記錄 `check.warn(importable)`（`205` 行安裝 stderr）仍在。
+    4. 重跑 `bash wow/work/s/ptest.sh`：**383 tests, 0 failures**。

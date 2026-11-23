@@ -280,7 +280,12 @@ def verify(fid: str | None = None, max_chaos: int = 60, quiet: bool = False) -> 
     if not hp.exists():
         raise UserError("%s is missing" % os.path.relpath(hp), "verify replays the calls through it", "harden %s" % fid)
     if not quiet:
-        _n_faults = len(faults.MATRIX) + (len(ai.AI_FAULTS) if any(k in str(meta.get("dependencies") or "") for k in ("openai", "anthropic", "llm", "chat/completions", "/messages")) else 0)
+        try:
+            _calls = cassette.load(d / "calls.json")
+        except (cassette.BadCassette, OSError):
+            _calls = []
+        _has_ai = any(x.get("req", {}).get("ai") for c in _calls for x in c.get("io", []))
+        _n_faults = len(faults.MATRIX) + (len(ai.AI_FAULTS) if _has_ai else 0)
         ui.headline("verify", "%s %s %d recorded calls %s %d faults + 3 seeded mixes %s virtual clock" % (
             fid, ui.DOT, meta["recorded"], ui.DOT, _n_faults, ui.DOT))
     t0 = time.perf_counter()

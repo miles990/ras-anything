@@ -217,5 +217,13 @@ class SchemaExportTests(unittest.TestCase):
                 self.assertNotIn("/workspace/", txt, f"private /workspace/ path in {p}")
                 self.assertNotIn("/home/", txt, f"private /home/ path in {p}")
 
+
+    def test_sync_out_serviceability_aggregates_all_verified_functions(self):
+        inv_rep = _load(SAMPLE_OUT / "inventory-go" / "report.json")
+        srv = inv_rep["serviceability"]
+        # Mean across 3 functions: (0.212766 + 0.0 + 0.0) / 3 == 0.070922 (matches RAS-REPORT.md 7.1%)
+        self.assertAlmostEqual(srv["orig_detection_rate"], 0.0)
+        self.assertAlmostEqual(srv["hard_detection_rate"], 0.0709219858, places=4)
+
 if __name__ == "__main__":
     unittest.main()

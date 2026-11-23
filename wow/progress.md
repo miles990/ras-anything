@@ -100,11 +100,11 @@
 | **C** `build2c` | Go adapter + `examples/inventory-go/` 實測＋holdout 拒壞加固 | **完成** | `examples/inventory-go/` verify（FetchStock 28.3%→100.0%、ReserveStock 35.0%→100.0%、AuditTag 31.7%→100.0%，0 leaks）、bench 20 seeds **5.0% → 100.0%**（identical 5%→95%、crashes 80%→0%、hangs 15%→0%、dups 0→0、SLO 4/4 met）、holdout 4/4 壞加固全拒、360 tests OK |
 | **E** `build2e` | V-14 AI 依賴 adapter + `examples/support-ai/`（本機 mock，API $0）、V-15 生態決策寫入 docs/AI.md | **完成** | `examples/support-ai/` verify（`support.triage_ticket` 9.9%→100.0%，semantic 9.9%→100.0%，injection 100.0%，cost/ok $0.000188→$0.000055，0 leaks）、bench 20 seeds **50.0% → 100.0%**（crashes 40%→0%、hangs 10%→0%、SLO 4/4 met）、`drift` `small→backup` PASS（100%）、`docs/AI.md`（V-14/V-15）、Node parity、holdout 5/5 壞加固全拒、367 tests OK |
 | **V** `build2v` | V-19 視覺化資料契約（docs/schema、`.ras/out`、export、MCP、dashboard-sample） | **部分完成（核心契約可用）** | `docs/schema/`（draft 2020-12 `ras-run`/`ras-event` + `README.md`）、`.ras/out/` 寫出、`ras-anything export`（`json`/`ndjson`/`prom`/`otlp-json`）、MCP `ras_export` + `ras_events`、`examples/dashboard-sample/` + `docs/cards/dashboard-sample.png`（已修服務性跨函式彙總 `7.1%` 與 SLO Target 欄）。佔位保留項：`mttd_s`/`mttr_s`/`restore_s`、`breakers`/`bulkheads`、`ax.records` 仍為空值，events 目前寫出 4 種里程碑事件 |
-| **I** `build2i` | V-6 `./install.sh`+`make install`、雙用途 README、skill 複製到 ~/.claude 與 ~/.codex、MCP/plugin 驗證、V-11 `docs/RELEASE.md`（不公開、不上架） | **完成** | `./install.sh`／`make install`（pipx 或 `~/.local/share/ras-anything` venv + `~/.local/bin` shim，冪等、`--uninstall`）；skill 複製到 `~/.claude/skills` 與 `~/.codex/skills` 並在乾淨暫存 HOME 驗證兩邊讀得到；MCP `initialize` + 12 tools 啟動通過；plugin 清單可載入（未對外上架）；`docs/RELEASE.md` 只寫流程（Alex gate，未公開、未 `twine upload`）；本機 `twine check` sdist+wheel **PASSED**（wheel 含 node_agent 與 go_agent）；證據 `wow/proof/install-clean-home.md`；379 tests OK |
+| **I** `build2i` | V-6 `./install.sh`+`make install`、雙用途 README、skill 複製到 ~/.claude 與 ~/.codex、MCP/plugin 驗證、V-11 `docs/RELEASE.md`（不公開、不上架） | **完成** | `./install.sh`／`make install`（pipx 或 `~/.local/share/ras-anything` venv + `~/.local/bin` shim，冪等、`--uninstall`）；skill 複製到 `~/.claude/skills` 與 `~/.codex/skills` 並在乾淨暫存 HOME 驗證兩邊讀得到；MCP `initialize` + 12 tools 啟動通過；plugin 清單可載入（未對外上架）；`docs/RELEASE.md` 只寫流程（Alex gate，未公開、未 `twine upload`）；本機 `twine check` sdist+wheel **PASSED**（wheel 含 node_agent 與 go_agent）；證據 `wow/proof/install-clean-home.md`；383 tests OK |
 | **D** `build2d` | 其餘 fast-anything 語言：Java、C#、PHP、Ruby、Kotlin、bun/deno、C/C++（各 adapter+範例+測試+holdout；做不完要在覆蓋表寫原因與下一步） | 未開始 | |
-| **W3** V-10 | 新手 30 秒／首次結果計時（只給 README 的盲測 agent） | 未開始 | 放在 I 之後、評審之前 |
-| **審查** | Codex 獨立跑測試+兩邊範例+安裝+嘗試破壞；判決 SHIP/FIX-FIRST；修 P0/P1 再跑一次 | 未開始 | 建造全部可審範圍後 |
-| **評審** | Fable 5-2（`--model claude-fable-5-2 --effort high --tools Read`）最多 3 次 | **完成** | `fable-v02-r1` 總評 **達成**（7/7 關通過，無阻塞項），並已完成順手修訂與最終複審（詳見 `wow/reviews.md`） |
+| **W3** V-10 | 新手 30 秒／首次結果計時（只給 README 的盲測 agent） | **完成** | `12.10s`（`0` 次猜錯，讀 `README.md` → `ras-anything scan -- python app.py`），證據 `wow/proof/w3-blind-timer.md`（haiku 盲測，CLI 已預裝） |
+| **審查** | Codex 獨立跑測試+兩邊範例+安裝+嘗試破壞；判決 SHIP/FIX-FIRST；修 P0/P1 再跑一次 | **完成** | r1 `FIX-FIRST`（2 P0 + 1 P1 + 1 P2，已於 `cab2582` 全修）；r2 驗證 4 項全修＋3 項對抗繞過全拒＋381 tests OK，唯餘 1 P2 `agent.log` 路徑已於 `2071425` 修畢並補測試 |
+| **評審** | Fable 5-2（`--model claude-fable-5-2 --effort high --tools Read`）最多 3 次 | **完成** | `fable-v02-r1` 與 `fable-v02-r2` 皆評 **達成**（7/7 關通過附保留，無阻塞項），並已依 r2 補齊 `verify.py` AI 故障數、setuptools>=77、`install-clean-home.md` 重產、383 tests OK |
 
 HEAD：見最新 main。工作樹應保持可推。中間產物在 `wow/work/`。
 
@@ -112,11 +112,11 @@ HEAD：見最新 main。工作樹應保持可推。中間產物在 `wow/work/`�
 | 關 | 狀態 | 關鍵證據 |
 |---|---|---|
 | W1 痛點 | **通過** | 5 範例重現 hang／5xx／dup／13 AI 故障（`0%→90%` / `5%→100%` / `50%→100%`） |
-| W2 美觀 | **通過（附保留）** | 5 張 SVG 卡片 + `docs/cards/dashboard-sample.png`（1440×1740 全頁無裁切）；setuptools 棄用警告已以 SPDX `license = "MIT"` 消除 |
+| W2 美觀 | **通過（附保留）** | 5 張 SVG 卡片 + `docs/cards/dashboard-sample.png`（1440×1740 全頁無裁切）；SPDX `license = "MIT"` 已消除 2027-02-18 棄用警告，仍餘 `check.warn(importable)`（`node_agent/`/`go_agent/` 非 Python package 目錄提示） |
 | W3 好用 | **通過（附保留）** | `wow/proof/w3-blind-timer.md`：`12.10s`、`0` 猜錯（haiku 讀 `README.md` 跑出 `scan`） |
 | W4 可視化與介面 | **通過（附保留）** | `README.md` p99 已與報告/卡片對齊、`export.py` 跨函式彙總 `7.1%`、SLO Target 欄補齊；V-19 佔位欄位已誠實標註 |
 | W5 驚豔 | **通過** | 精準抓出重複扣款通話；Go `5%→100%`、AI `9.9%→100%`（cost/ok `$0.000188→$0.000055`）、13 模式量測表 |
 | W6 領域與實作 | **通過（附保留）** | 3 項對抗繞過全拒、symlink 防護、unowned skill 保護；保留項：`payments`/`orders-node` 舊範例報告仍列 minor raw-URL leaks（2+3 筆）、Go 服務性偏低（`7.1%`）、AI 注入字詞與成本門檻待加強 |
-| W7 工作流 | **通過** | `wow/spec.md` 先行、W3+Codex 2 輪+Fable 終審角色分離、Alex gate 嚴守（未公開、未上架） |
+| W7 工作流 | **通過（附保留）** | `wow/spec.md` 先行、W3+Codex 2 輪+Fable 2 輪角色分離、Alex gate 嚴守；保留項：`wow/work/` 原始紀錄不入版控，最後收尾修訂由 383 tests 把關 |
 
 接續備註（2026-11-23 18:30 台北時間）：W3 計時盲測、Codex 兩輪獨立審查與修復、Fable 評審與低成本收尾修訂皆已完成（`wow/work/STOP` 保留）。Stage D（其餘 8 語言）依決策留待下一步，或依 `docs/RELEASE.md` 由 Alex 決定是否公開。

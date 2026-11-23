@@ -81,7 +81,7 @@ skill_is_ours() {
   [ -f "$1/$SKILL_MARK" ]
 }
 
-copy_skill() {
+check_skill_target() {
   src=$1
   dest=$2
   [ -f "$src/SKILL.md" ] || die "skill source missing: $src/SKILL.md"
@@ -92,6 +92,12 @@ copy_skill() {
       fi
     fi
   fi
+}
+
+copy_skill() {
+  src=$1
+  dest=$2
+  check_skill_target "$src" "$dest"
   mkdir -p "$dest"
   # Refresh contents without deleting unexpected user files in the dest dir.
   cp -f "$src/SKILL.md" "$dest/SKILL.md"
@@ -197,6 +203,8 @@ do_install() {
   [ -f "$ROOT/pyproject.toml" ] || die "run this script from a ras-anything checkout (missing pyproject.toml)"
   [ -f "$SKILL_SRC/SKILL.md" ] || die "missing $SKILL_SRC/SKILL.md"
   check_python >/dev/null
+  check_skill_target "$SKILL_SRC" "$CLAUDE_SKILL"
+  check_skill_target "$SKILL_SRC" "$CODEX_SKILL"
   mkdir -p "$DATA_DIR" "$BIN_DIR"
 
   if have pipx && pipx --version >/dev/null 2>&1; then
