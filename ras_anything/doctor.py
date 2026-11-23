@@ -12,7 +12,7 @@ from . import lang, ui
 from .paths import find_project, load_json, sha256_file
 
 
-def doctor() -> int:
+def doctor() -> dict:
     project = find_project()
     ui.headline("doctor", str(project))
     checks = []
@@ -43,7 +43,7 @@ def doctor() -> int:
         bad += ok is False
         print("  %s %-24s %s" % (sym, name, ui.dim(detail)))
     ui.next_hint("scan -- python app.py / node app.mjs" if not (project / ".ras" / "scan.json").exists() else "status")
-    return 1 if bad else 0
+    return {"ok": bad == 0, "checks": [{"ok": ok, "name": name, "detail": detail} for ok, name, detail in checks]}
 
 
 def status() -> dict:

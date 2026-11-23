@@ -5,6 +5,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follo
 ## Unreleased
 
 ### Added
+- `--json` on every result-producing command writes a `cli-result` object to stdout (progress and logs go to stderr; `export --format json` stays a bundle). Errors remain RFC 9457 on stderr.
 - `schema_version` lives in `contracts.SCHEMA_VERSION` and is **1.1.0** (additive `coverage.adapters[].enabled`; see `docs/schema/README.md`).
 - Export formats are auto-discovered modules in `ras_anything/exporters/` (new format = new file, 0 core changes).
 - `wow.manifest.json` (wow INTEROP 1.0, wow-common 1.0): skills with CLI, MCP tool, output schema and JSON-Pointer evidence.

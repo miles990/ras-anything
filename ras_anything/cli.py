@@ -43,7 +43,7 @@ def _split(argv):
 def parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(prog="ras-anything", description=USAGE, formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument("--version", action="version", version="ras-anything " + __version__)
-    p.add_argument("--json", action="store_true", help="errors as RFC 9457 problem+json on stderr (one line)")
+    p.add_argument("--json", action="store_true", help="JSON result on stdout; errors as RFC 9457 problem+json on stderr")
     sub = p.add_subparsers(dest="command", metavar="<command>")
 
     s = sub.add_parser("scan", help="rank functions by risk × exposure × hardenability (-- <cmd>)")
@@ -135,31 +135,31 @@ class _UsageError(Exception):
 def _scan(a, cmd):
     from .scan import scan
 
-    scan(cmd, seeds=a.seeds, rate=a.rate)
+    return scan(cmd, seeds=a.seeds, rate=a.rate)
 
 
 def _harden(a, cmd):
     from .harden import harden
 
-    harden(a.id, agent=a.agent, model=a.model, budget=a.budget, max_calls=a.calls, force=a.force)
+    return harden(a.id, agent=a.agent, model=a.model, budget=a.budget, max_calls=a.calls, force=a.force)
 
 
 def _verify(a, cmd):
     from .verify import verify
 
-    return 0 if verify(a.id, max_chaos=a.chaos_calls).get("passed") else 1
+    return verify(a.id, max_chaos=a.chaos_calls)
 
 
 def _enable(a, cmd):
     from .enable import enable
 
-    enable(a.id, canary=a.canary, shadow=a.shadow)
+    return enable(a.id, canary=a.canary, shadow=a.shadow)
 
 
 def _disable(a, cmd):
     from .enable import disable
 
-    disable(a.id)
+    return disable(a.id)
 
 
 def _bench(a, cmd):
@@ -168,23 +168,24 @@ def _bench(a, cmd):
 
         from . import lab
 
-        lab.run(a.seeds, Path(a.out) if a.out else None)
-        return 0
+        return lab.run(a.seeds, Path(a.out) if a.out else None)
     from .bench import bench
 
-    bench(cmd or None, seeds=a.seeds, rate=a.rate, markers=a.markers, slo_spec=a.slo)
+    return bench(cmd or None, seeds=a.seeds, rate=a.rate, markers=a.markers, slo_spec=a.slo)
 
 
 def _report(a, cmd):
     from .report import report
 
-    report(a.title, slo_spec=a.slo)
+    return report(a.title, slo_spec=a.slo)
 
 
 def _replay(a, cmd):
     from . import replay as _r
 
-    _r.print_list() if a.list else _r.replay(a.id)
+    if a.list:
+        return {"incidents": _r.print_list()}
+    return _r.replay(a.id)
 
 
 def _flag(a, cmd):
@@ -196,7 +197,7 @@ def _flag(a, cmd):
 def _status(a, cmd):
     from .doctor import status
 
-    status()
+    return status()
 
 
 def _doctor(a, cmd):
@@ -214,14 +215,14 @@ def _mcp(a, cmd):
 def _drift(a, cmd):
     from .drift import drift
 
-    return 0 if drift(a.model, eval_ref=a.eval_ref, provider_url=a.provider_url,
-                      export_promptfoo_path=a.export_promptfoo, threshold=a.threshold).get("passed") else 1
+    return drift(a.model, eval_ref=a.eval_ref, provider_url=a.provider_url,
+                 export_promptfoo_path=a.export_promptfoo, threshold=a.threshold)
 
 
 def _export(a, cmd):
     from .export import export_data
 
-    sys.stdout.write(export_data(fmt=a.format, out_path=a.out))
+    return {"format": a.format, "text": export_data(fmt=a.format, out_path=a.out)}
 
 
 def _go(a, cmd):
@@ -250,7 +251,7 @@ def _parse(p, head, as_json):
     return p.parse_args(head)
 
 
-def _run(p, a, cmd) -> int:
+def _run(p, a, cmd):
     c = a.command
     if c in ("scan", "go") and not cmd:
         raise UserError("no command given", "%s runs your app: put its command after --" % c,
@@ -259,11 +260,55 @@ def _run(p, a, cmd) -> int:
     if fn is None:
         p.print_help()
         return 2
-    rc = fn(a, cmd)
-    return 0 if rc is None else rc
+    return fn(a, cmd)
+
+
+def _exit_of(result) -> int:
+    if result is None:
+        return 0
+    if isinstance(result, int):
+        return result
+    if isinstance(result, dict):
+        if result.get("passed") is False or result.get("ok") is False:
+            return 1
+        if isinstance(result.get("exit_code"), int):
+            return result["exit_code"]
+    return 0
+
+
+def _cli_result(command: str, result, exit_code: int) -> dict:
+    from .contracts import SCHEMA_VERSION
+
+    doc = {"schema_version": SCHEMA_VERSION, "kind": "cli-result", "command": command,
+           "ok": exit_code == 0, "exit_code": exit_code}
+    if result is not None and not isinstance(result, int):
+        doc["result"] = result
+    return doc
+
+
+_JSON_EXPORT = {"json", "ndjson", "otlp-json", "cloudevents"}
+
+
+def _present(command: str, result, as_json: bool) -> int:
+    """Write the command's result: JSON on stdout when --json, otherwise any payload the shell still holds."""
+    code = _exit_of(result)
+    if command == "mcp":
+        return code
+    if isinstance(result, dict) and "text" in result and command == "export":
+        text, fmt = result.get("text") or "", result.get("format")
+        if as_json and fmt not in _JSON_EXPORT:
+            print(json.dumps(_cli_result(command, {"format": fmt, "body": text}, code), sort_keys=True))
+            return code
+        sys.stdout.write(text)
+        return code
+    if as_json:
+        print(json.dumps(_cli_result(command, result, code), sort_keys=True, default=str))
+    return code
 
 
 def main(argv=None) -> int:
+    import contextlib
+
     argv = list(sys.argv[1:] if argv is None else argv)
     head, cmd = _split(argv)
     as_json = "--json" in head
@@ -273,8 +318,15 @@ def main(argv=None) -> int:
     except _UsageError as e:
         print(json.dumps(problem("usage", "invalid command line", str(e), "--help", 2)), file=sys.stderr)
         return 2
+    if a.command == "flag" and "--json" in (a.rest or []):
+        as_json = True
+        a.rest = [x for x in a.rest if x != "--json"]
     try:
-        return _run(p, a, cmd)
+        if as_json and a.command != "mcp":
+            with contextlib.redirect_stdout(sys.stderr):
+                result = _run(p, a, cmd)
+            return _present(a.command, result, True)
+        return _present(a.command, _run(p, a, cmd), False)
     except UserError as e:
         if as_json:
             print(json.dumps(problem("user-error", e.what, e.impact, e.nxt)), file=sys.stderr)
