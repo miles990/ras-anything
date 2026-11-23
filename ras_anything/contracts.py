@@ -30,22 +30,19 @@ LANGUAGE_ENTRY_POINT_GROUP = "ras_anything.languages"
 # constant in the single-file Go and Java runtimes). tests/test_contracts.py fails if they drift.
 
 
-def write_schema_version():
-    """Rewrite Node/Go/Java incident schema_version from SCHEMA_VERSION. Run after bumping it."""
+def schema_version_files():
+    """(path, expected text) for each vendored incident schema_version target. Does not write."""
     import json
     import re
     from pathlib import Path
 
     root = Path(__file__).resolve().parent
-    written = []
-
     node = root / "lang" / "node_agent" / "patterns" / "schema_version.cjs"
-    node.write_text(
+    node_text = (
         "// Generated from ras_anything.contracts.SCHEMA_VERSION by write_schema_version(). Do not edit by hand.\n"
-        "module.exports = " + json.dumps(SCHEMA_VERSION) + ";\n",
-        encoding="utf-8",
+        "module.exports = " + json.dumps(SCHEMA_VERSION) + ";\n"
     )
-    written.append(node)
+    items = [(node, node_text)]
 
     go = root / "lang" / "go_agent" / "rasruntime" / "runtime.go"
     go_pat = re.compile(
@@ -55,9 +52,7 @@ def write_schema_version():
     new_go, n = go_pat.subn(r"\g<1>" + SCHEMA_VERSION + r"\2", go_text, count=1)
     if n != 1:
         raise ValueError("schema_version marker missing or not unique in %s" % go)
-    if new_go != go_text:
-        go.write_text(new_go, encoding="utf-8")
-    written.append(go)
+    items.append((go, new_go))
 
     java = root / "lang" / "java_agent" / "runtime" / "RasRt.java"
     java_pat = re.compile(
@@ -68,7 +63,15 @@ def write_schema_version():
     new_java, n = java_pat.subn(r"\g<1>" + SCHEMA_VERSION + r"\2", java_text, count=1)
     if n != 1:
         raise ValueError("schema_version marker missing or not unique in %s" % java)
-    if new_java != java_text:
-        java.write_text(new_java, encoding="utf-8")
-    written.append(java)
+    items.append((java, new_java))
+    return items
+
+
+def write_schema_version():
+    """Rewrite Node/Go/Java incident schema_version from SCHEMA_VERSION. Run after bumping it."""
+    written = []
+    for path, text in schema_version_files():
+        if not path.is_file() or path.read_text(encoding="utf-8") != text:
+            path.write_text(text, encoding="utf-8")
+        written.append(path)
     return written

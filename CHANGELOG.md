@@ -6,6 +6,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follo
 
 ### Fixed
 - The pattern lab worker no longer crashes on Python 3.10 when an attempt times out (`asyncio.TimeoutError` is not `OSError` until 3.11).
+- The schema_version drift test compares expected files in memory and no longer rewrites tracked runtimes.
 
 ### Changed
 - MCP `call_tool` and `handle` route through dispatch tables so every shell function is complexity ≤ 10 (W8 E7).

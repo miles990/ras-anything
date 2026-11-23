@@ -252,13 +252,7 @@ class SchemaVersionContract(unittest.TestCase):
         self.assertNotIn('map("schema_version", "1.0.0"', java)
 
     def test_write_schema_version_is_current(self):
-        """The generated/marked files already match what the writer would emit."""
-        paths = [
-            REPO / "ras_anything" / "lang" / "node_agent" / "patterns" / "schema_version.cjs",
-            REPO / "ras_anything" / "lang" / "go_agent" / "rasruntime" / "runtime.go",
-            REPO / "ras_anything" / "lang" / "java_agent" / "runtime" / "RasRt.java",
-        ]
-        before = {p: p.read_bytes() for p in paths}
-        contracts.write_schema_version()
-        after = {p: p.read_bytes() for p in paths}
-        self.assertEqual(before, after, "generated schema_version files are stale; run contracts.write_schema_version()")
+        """The generated/marked files already match what the writer would emit. Does not write."""
+        for path, expected in contracts.schema_version_files():
+            self.assertEqual(path.read_text(encoding="utf-8"), expected,
+                             "%s is stale; run contracts.write_schema_version()" % path)
