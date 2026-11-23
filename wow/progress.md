@@ -55,3 +55,16 @@
 | W5 驚豔 | 是 | **通過** | `billing.charge/verify.json` 重現雙重扣款序；`holdout-verify-v2.txt` 精準攔截 GET-then-POST `retry_post.py` | `verify` 假設上游實作 `Idempotency-Key` 去重 | README 補上該假設說明 |
 | W6 領域與實作 | 是 | **通過（附保留）** | timeout/full-jitter/Retry-After/單探針 half-open/不重試 4xx/未記 log fallback 擋下/相對路徑隔離/`tests/` 33 OK | pickle cassette、logged fake fallback、無跨呼叫 outage 恢復、bench 缺 SLO | 納入 v0.2 backlog |
 | W7 工作流 | 是 | **通過（附保留）** | `wow/spec.md` 先行、trunk `main` 乾淨、真 agent log、`REPRODUCE.md` 誠實揭露修復與重測 | holdout 在 gitignored `wow/work/`、範例 `meta.json` 仍含 `cmd` 絕對 venv 路徑 | 公開前將 holdout 昇格進 `tests/` |
+
+---
+
+# v0.2 進度（2026-11-23 起）
+
+## 資源宣告
+- 時間盒：分階段（A→B→P→F→S→C→E→V→I→D），每階段 Opus 逾時 120–360 分；新增付費成本上限 0（只用現有訂閱 CLI、免費工具鏈；AI 範例全用本機 mock provider，API 花費 0）
+- 角色：建造＝Claude Opus（`claude -p --model opus`，wow-agent build2*）；答案卷／holdout＝Codex（answerkey2/2b，不寫產品碼）；獨立審查＋測試＝Codex（review1/2，未寫被審程式碼）；評審＝Claude Fable 5-1 judge only（≤3 次）；協調＝Grok Bot
+- 呼叫上限：Opus 建造 ≤ 1/階段（+修復 ≤ 2）、Codex 審查 ≤ 2、Fable ≤ 3、盲測 ≤ 2
+- 工具鏈（免費安裝）：Go 1.27、Node 24、bun 1.4、deno、OpenJDK 21、kotlinc 2.4.21、dotnet 8、PHP 8.4、Ruby 3.3、gcc/g++ 14、pipx
+
+## 範圍（wow/spec.md V-1..V-19）
+多語言 adapter（對齊 fast-anything 10 種）、v0.1 缺口、Python 邊界擴充、韌性模式目錄（量測保留／淘汰）、可服務性（MTTD/診斷/還原）、SLI/SLO、旗標／熱更新／模組化／飛航記錄器＋replay＋RCA、爆炸半徑（canary/shadow/隔離/fail-safe）、AI 依賴 adapter、AI 時代工具調研、AX 結構化錯誤＋人類閘門、視覺化資料契約、安裝／README／發佈準備、30 秒新手測試。
