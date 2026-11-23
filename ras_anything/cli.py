@@ -23,6 +23,7 @@ prove it on recorded calls, and swap them in reversibly.
   bench --patterns       every resilience pattern on vs off under simulated trouble (docs/PATTERNS.md)
   report [--slo SPEC]    RAS-REPORT.md + ras-card.svg + docs/RUNBOOK.md + .ras/slo.json
   replay [id] [--list]   deterministically replay a recorded incident + write RCA
+  drift --model M        replay recorded AI evals against model M (+ --export-promptfoo)
   flag list|get|set|delete  OpenFeature/flagd flags (`.ras/flags.json`), hot-reloaded
   status · doctor · mcp
 """
@@ -85,6 +86,13 @@ def parser() -> argparse.ArgumentParser:
     sub.add_parser("status", help="what's scanned, hardened, verified, enabled; flags; the next step")
     sub.add_parser("doctor", help="check python, agents, git, .ras")
     sub.add_parser("mcp", help="stdio MCP server")
+
+    dr = sub.add_parser("drift", help="replay recorded AI evals against another model")
+    dr.add_argument("--model", required=True, help="candidate model id")
+    dr.add_argument("--eval", dest="eval_ref", help="eval suite name (e.g. support@v1) or file path")
+    dr.add_argument("--provider-url", help="optional OpenAI-compatible URL to call")
+    dr.add_argument("--export-promptfoo", help="write promptfoo YAML config to path")
+    dr.add_argument("--threshold", type=float, default=0.05, help="allowed semantic drop (default 0.05)")
 
     g = sub.add_parser("go", help="scan → harden → verify → enable → bench → report (-- <cmd>)")
     g.add_argument("--agent", required=True, help="claude | codex | any shell command that reads the task on stdin")
@@ -163,6 +171,11 @@ def main(argv=None) -> int:
             from .mcp import serve
 
             return serve()
+        elif c == "drift":
+            from .drift import drift
+
+            return 0 if drift(a.model, eval_ref=a.eval_ref, provider_url=a.provider_url,
+                              export_promptfoo_path=a.export_promptfoo, threshold=a.threshold).get("passed") else 1
         elif c == "go":
             from .go import go
 

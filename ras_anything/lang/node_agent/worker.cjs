@@ -69,6 +69,24 @@ class Replay extends boundary.Faulting {
       at = i;
       if (!this.used.has(i)) break;
     }
+    if (at < 0 && req.ai) {
+      const lurl = boundary.logicalUrl(req.url);
+      const wantTool = Boolean(req.ai.has_tool_result);
+      let bestSameTurn = -1;
+      let bestAny = -1;
+      for (const [i, x] of this.io.entries()) {
+        const xr = x.req;
+        if (!xr.ai) continue;
+        if (xr.method === req.method && boundary.logicalUrl(xr.url || "") === lurl) {
+          if (Boolean(xr.ai.has_tool_result) === wantTool) {
+            if (!this.used.has(i)) { bestSameTurn = i; break; }
+            bestSameTurn = i;
+          }
+          if (bestAny < 0 || !this.used.has(i)) bestAny = i;
+        }
+      }
+      at = bestSameTurn >= 0 ? bestSameTurn : bestAny;
+    }
     if (at < 0) return this.miss(req.key);
     return () => {
       this.used.add(at);

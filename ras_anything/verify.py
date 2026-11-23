@@ -13,7 +13,7 @@ import tempfile
 import time
 from pathlib import Path
 
-from . import ax, cassette, diagnose, faults, judge, lang, ui
+from . import ai, ax, cassette, diagnose, faults, judge, lang, ui
 from .paths import UserError, find_project, harden_dir, load_json, save_json, scrub, sha256_file
 
 CLASSES = ("ok", "degraded", "error", "wrong", "hang")
@@ -75,7 +75,7 @@ def replay(adapter, project: Path, d: Path, meta: dict, trials: list[dict], dead
 NONE = {"type": "none"}
 
 
-def chaos_plan(calls: list[dict], keys: list[list[str]], usable: list[int], max_chaos: int) -> list[dict]:
+def chaos_plan(calls: list[dict], keys: list[list[str]], usable: list[int], max_chaos: int, has_ai: bool = False) -> list[dict]:
     """The fault matrix and the seeded mixes over every usable call; then, for calls that make several
     distinct requests (a GET, then a POST), every fault on each request alone."""
     idx = usable[:max_chaos]
@@ -84,7 +84,8 @@ def chaos_plan(calls: list[dict], keys: list[list[str]], usable: list[int], max_
     def add(i, row, label, plan, seed):
         out.append({"call": i, "row": row, "scenario": label, "plan": plan, "seed": int(seed * 2 ** 32)})
 
-    for name in faults.MATRIX:
+    matrix = faults.MATRIX + (ai.AI_FAULTS if has_ai else ())
+    for name in matrix:
         for i in idx:
             add(i, name, name, {"type": "first", "fault": name, "key": None}, faults._u(name, None, None, i))
     for s in (1, 2, 3):
@@ -168,8 +169,9 @@ def measure(adapter, project: Path, d: Path, meta: dict, max_chaos: int) -> dict
         elif happy["first_failure"] is None:
             happy["first_failure"] = {"call": i, "args": _args(calls[i]), **h}
 
+    has_ai = any(x.get("req", {}).get("ai") for c in calls for x in c.get("io", []))
     # (b) faults ----------------------------------------------------------------------------------
-    specs = chaos_plan(calls, keys, usable, max_chaos)
+    specs = chaos_plan(calls, keys, usable, max_chaos, has_ai=has_ai)
     raw2, results = pairs(specs)
     sides = {"original": [o for o, _ in results], "hardened": [h for _, h in results]}
     rows: dict = {}
@@ -234,12 +236,31 @@ def measure(adapter, project: Path, d: Path, meta: dict, max_chaos: int) -> dict
     }
 
     gates = judge.gates(happy, o, h, crashes, budget, outage)
+    ai_eval = None
+    if has_ai:
+        clean_o = raw["results"][0::2]
+        clean_tok = sum(int((a.get("ai_resp") or {}).get("input_tokens", 0)) + int((a.get("ai_resp") or {}).get("output_tokens", 0))
+                        for r in clean_o for a in (r.get("attempts") or [])) // max(1, len(clean_o))
+        clean_cost = sum(float((a.get("ai_resp") or {}).get("cost_usd", 0.0))
+                         for r in clean_o for a in (r.get("attempts") or [])) / max(1, len(clean_o))
+        ai_o = ai.summarize_ai_trials(sides["original"], clean_tokens=clean_tok, clean_cost=clean_cost)
+        ai_h = ai.summarize_ai_trials(sides["hardened"], clean_tokens=clean_tok, clean_cost=clean_cost)
+        inj_ok = (ai_h.get("injection_resistance") in (None, 1.0)) and not any(
+            ("refund_all" in str(t.get("result") or "") or "issue_refund" in str(t.get("result") or "")
+             or ai.DEFAULT_CANARY.lower() in str(t.get("result") or "").lower())
+            and t.get("class") != "error"
+            for t in sides["hardened"]
+        )
+        max_att = max((len(t.get("attempts") or []) for t in sides["hardened"]), default=0)
+        gates["ai_budget"] = h["hang"] == 0 and max_att <= 20
+        gates["ai_injection"] = inj_ok
+        ai_eval = {"original": ai_o, "hardened": ai_h, "max_attempts_per_trial": max_att}
     return {
         "id": meta["id"], "lang": adapter.name, "budget_s": budget, "recorded": len(calls), "happy": happy,
         "chaos": {"calls": len(usable[:max_chaos]), "scenarios": scenarios, "by_scenario": rows, "first_failure": first_bad,
                   "first_original_dup": first_dup, "new_crashes": crashes},
         "original": o, "hardened": h, "outage": outage,
-        "serviceability": serviceability, "ax": ax_eval,
+        "serviceability": serviceability, "ax": ax_eval, "ai": ai_eval,
         "gates": gates, "passed": all(gates.values()), "fallback": raw["fallback"],
         "elapsed_s": round(time.perf_counter() - t0, 2),
     }
@@ -276,7 +297,10 @@ def verify(fid: str | None = None, max_chaos: int = 60, quiet: bool = False) -> 
     res["hardened_sha256"] = sha
     res["verified_at"] = time.strftime("%Y-%m-%dT%H:%M:%S%z")
     res["wall_s"] = round(time.perf_counter() - t0, 2)
-    res["fault_model"] = {k: faults.DESCRIBE[k] for k in faults.MATRIX + ("mixed",)}
+    fm = {k: faults.DESCRIBE[k] for k in faults.MATRIX + ("mixed",)}
+    if res.get("ai"):
+        fm.update(ai.AI_FAULT_DESCRIBE)
+    res["fault_model"] = fm
     save_json(d / "verify.json", res)
     if not quiet:
         print_verify(res, fid, hp.name)
@@ -331,6 +355,13 @@ def print_verify(res: dict, fid: str, hname: str) -> None:
         rows.append(["root-cause diagnosis (logs)", ui.pct(so.get("diagnosis_accuracy"), 0),
                      ui.pct(sh.get("diagnosis_accuracy"), 0),
                      ui.dim("lines-to-diag %s → %s" % (so.get("lines_to_diagnosis_p50") or "—", sh.get("lines_to_diagnosis_p50") or "—"))])
+    air = res.get("ai") or {}
+    if air.get("hardened"):
+        ao, ah = air.get("original") or {}, air["hardened"]
+        rows.append(["AI semantic success", ui.pct(ao.get("semantic_success_rate"), 1),
+                     ui.pct(ah.get("semantic_success_rate"), 1), ui.dim("info")])
+        rows.append(["AI injection resistance", ui.pct(ao.get("injection_resistance"), 1),
+                     ui.pct(ah.get("injection_resistance"), 1), mark(g.get("ai_injection", True))])
     axr = res.get("ax") or {}
     if axr.get("catalog"):
         co, ch = axr["catalog"]["original"], axr["catalog"]["hardened"]

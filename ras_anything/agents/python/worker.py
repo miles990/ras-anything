@@ -49,7 +49,29 @@ class Replay(boundary.FaultingHandler):
                 if not self.used[i]:
                     return i
                 last = i
-        return last
+        if last is not None:
+            return last
+        # AI endpoints: hardened prompts/max_tokens/backup-model change the JSON body sha.
+        # Match by (method, logical_url, has_tool_result) against recorded AI exchanges only.
+        if req.ai is not None:
+            lurl = boundary._logical_url(req.url)
+            want_tool = bool(req.ai.get("has_tool_result"))
+            best_same_turn = None
+            best_any = None
+            for i, x in enumerate(self.io):
+                xr = x["req"]
+                xai = xr.get("ai")
+                if not xai:
+                    continue
+                if xr.get("method") == req.method and boundary._logical_url(xr.get("url", "")) == lurl:
+                    if bool(xai.get("has_tool_result")) == want_tool:
+                        if not self.used[i]:
+                            return i
+                        best_same_turn = i
+                    if best_any is None or not self.used[i]:
+                        best_any = i
+            return best_same_turn if best_same_turn is not None else best_any
+        return None
 
     def source(self, req):
         """The recorded answer to this request, as a `serve` callable."""
@@ -247,7 +269,8 @@ def run_job(job: dict) -> dict:
             "problem": exc.problem if isinstance(exc, runtime.RasError) else None,
             "stderr": err.getvalue()[:8000],
             "state": _state(codec, meta, args, kwargs) if t["plan"]["type"] == "none" else None,
-            "attempts": [{k: a[k] for k in ("key", "n", "fault", "reached", "failed", "idem", "method", "nonidempotent", "outage")}
+            "attempts": [{**{k: a[k] for k in ("key", "n", "fault", "reached", "failed", "idem", "method", "nonidempotent", "outage")},
+                          **({"ai_resp": a["ai_resp"]} if "ai_resp" in a else {})}
                          for a in handler.attempts],
         }
 

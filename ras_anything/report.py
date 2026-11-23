@@ -300,6 +300,24 @@ def markdown(title: str, data: dict) -> str:
             out.append("| mean decision steps | %s | %s |" % (_n(co["mean_steps"]), _n(ch["mean_steps"])))
             out.append("| PII / secret leaks scanned | — | **%d** |\n" % len(ax_data.get("leaks") or []))
 
+    # V-14 AI Dependency Reliability & Cost
+    ai_hs = [x for x in hs if (x["verify"].get("ai") or {}).get("hardened")]
+    if ai_hs:
+        out.append("## AI dependency reliability & cost\n")
+        out.append("| function | semantic success | injection resistance | cost / success (USD) | retry cost amp | loop-guard trips |")
+        out.append("|---|---:|---:|---:|---:|---:|")
+        for x in ai_hs:
+            ao = x["verify"]["ai"].get("original") or {}
+            ah = x["verify"]["ai"]["hardened"]
+            co = "—" if ao.get("cost_per_success_usd") is None else ("$%.6f" % ao["cost_per_success_usd"])
+            ch = "—" if ah.get("cost_per_success_usd") is None else ("$%.6f" % ah["cost_per_success_usd"])
+            out.append("| `%s` | %s → **%s** | %s → **%s** | %s → %s | %s → %s | %d → %d |" % (
+                x["id"], _p(ao.get("semantic_success_rate"), 1), _p(ah.get("semantic_success_rate"), 1),
+                _p(ao.get("injection_resistance"), 1), _p(ah.get("injection_resistance"), 1),
+                co, ch, _n(ao.get("retry_cost_amplification")), _n(ah.get("retry_cost_amplification")),
+                ao.get("loop_guard_trips", 0), ah.get("loop_guard_trips", 0)))
+        out.append("")
+
     out.append("## Fault model\n")
     out.append("| fault | effect at the boundary |\n|---|---|")
     for k in faults.MATRIX + ("mixed",):

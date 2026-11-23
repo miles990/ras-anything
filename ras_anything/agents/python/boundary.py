@@ -36,7 +36,7 @@ import urllib.parse
 import urllib.request
 from email.message import Message
 
-from ... import faults, runtime
+from ... import ai, faults, runtime
 from . import values
 
 NONIDEMPOTENT = frozenset({"POST", "PUT", "PATCH", "DELETE"})
@@ -76,7 +76,7 @@ def norm_subproc_key(argv, cwd: str | None = None) -> str:
 
 
 class Req:
-    __slots__ = ("kind", "method", "url", "body_sha", "headers", "timeout", "argv", "text")
+    __slots__ = ("kind", "method", "url", "body_sha", "headers", "timeout", "argv", "text", "ai")
 
     def __init__(self, kind, method="", url="", body=None, headers=None, timeout=None, argv=None, text=False):
         self.kind = kind
@@ -87,6 +87,7 @@ class Req:
         self.timeout = timeout
         self.argv = argv
         self.text = text
+        self.ai = ai.parse_request_meta(self.url, body) if kind not in ("subprocess", "socket") else None
 
     @property
     def key(self) -> str:
@@ -98,16 +99,19 @@ class Req:
 
     @property
     def nonidempotent(self) -> bool:
-        return self.method in NONIDEMPOTENT
+        return self.method in NONIDEMPOTENT and self.ai is None
 
     @property
     def idem_key(self):
         return self.headers.get("idempotency-key")
 
     def to_dict(self) -> dict:
-        return {"kind": self.kind, "method": self.method, "url": self.url, "body_sha": self.body_sha,
-                "idempotency_key": self.idem_key, "timeout": self.timeout, "argv": _portable_argv(self.argv),
-                "key": self.key}
+        d = {"kind": self.kind, "method": self.method, "url": self.url, "body_sha": self.body_sha,
+             "idempotency_key": self.idem_key, "timeout": self.timeout, "argv": _portable_argv(self.argv),
+             "key": self.key}
+        if self.ai is not None:
+            d["ai"] = self.ai
+        return d
 
 
 def _portable_argv(argv):
@@ -252,13 +256,19 @@ class FaultingHandler(Handler):
                 raise faults.ChaosHang("boundary call with no timeout hung (chaos)")
 
     def _open(self, req):
+        if self.clock.virtual and len(self.attempts) >= faults.MAX_TRIAL_ATTEMPTS:
+            self.hangs += 1
+            raise faults.ChaosHang("exceeded %d dependency attempts in one call (unbounded retry/tool loop)"
+                                   % faults.MAX_TRIAL_ATTEMPTS)
         n = self.counts.get(req.key, 0)
         self.counts[req.key] = n + 1
         fault = self.plan.fault(req.key, n, req.nonidempotent)
-        if req.kind == "socket" and fault in ("http5xx", "http429", "truncated"):
+        if req.kind == "socket" and (fault in ("http5xx", "http429", "truncated") or fault in ai.AI_FAULTS):
             fault = None  # nothing a connection can do
         rec = {"key": req.key, "n": n, "fault": fault, "reached": False, "nonidempotent": req.nonidempotent,
                "idem": req.idem_key, "method": req.method, "failed": True, "outage": self.plan.outage(req.key, n)}
+        if req.ai is not None:
+            rec["_req_ai"] = req.ai
         self.attempts.append(rec)
         for calls in _scopes.get():
             calls.append(rec)
@@ -266,7 +276,15 @@ class FaultingHandler(Handler):
         return rec, self._steps(fault, req, rec)
 
     def _close(self, rec, out):  # a hang never gets here: failed stays True
-        rec["failed"] = is_failure(out) or bool(rec.get("truncated"))
+        rec["failed"] = is_failure(out) or bool(rec.get("truncated")) or (rec.get("fault") in ai.AI_FAULTS)
+        req_ai = rec.pop("_req_ai", None)
+        if req_ai is not None and "ai_resp" not in rec:
+            if "exc" in out:
+                rec["ai_resp"] = {"provider": req_ai.get("provider"), "model": req_ai.get("model"),
+                                  "input_tokens": req_ai.get("input_tokens_est", 0), "output_tokens": 0,
+                                  "cost_usd": 0.0, "finish_reason": "exception"}
+            else:
+                rec["ai_resp"] = ai.parse_response_meta(req_ai, out.get("status", 200), out.get("body"))
         return out
 
     def _timeout(self, req):
@@ -303,6 +321,12 @@ class FaultingHandler(Handler):
             return exc_outcome(refused_exc(req))
         if fault in ("http5xx", "http429"):
             return error_outcome(req, 503 if fault == "http5xx" else 429)
+        if fault in ai.AI_FAULTS:
+            out = ai.ai_fault_outcome(fault, req.url, req.ai, rec["n"])
+            if out is not None:
+                rec["reached"] = out.get("status", 0) < 500
+                rec["ai_resp"] = ai.parse_response_meta(req.ai, out.get("status", 200), out.get("body"))
+                return out
         raise ValueError("unknown fault %r" % fault)
 
     def _answer(self, rec, extra, t, by_deadline, req):

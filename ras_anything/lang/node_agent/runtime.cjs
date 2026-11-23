@@ -126,6 +126,8 @@ for (const name of registry.NAMES) {
 
 const { problem, requireApproval, setApprover, ApprovalRequired } = support("problem");
 const { dumpIncident } = support("recorder");
+const { AIPolicy, TokenBudget, ExactCache, ToolAllowlist, LoopGuard, StepJournal, validateSchema, frameUntrusted,
+  checkInjectionLeaks, SchemaValidationError, ToolNotAllowedError, LoopGuardError, BudgetExceededError } = support("ai");
 const { health, traceparent, traceHeaders, faultClass, observe, RejectedError, DeadlineExceeded, dependencyFailed, notAccepted, withTimeout, withDeadline, remainingMs, traceId, newTraceId, withTrace, sleep, sleepSync,
   seed, resetState, TRANSIENT_HTTP } = core;
 const { retry, retrySync, RetryBudget, retryAfterS, attemptTimeout, CircuitBreaker, CircuitOpenError, Bulkhead, BulkheadFullError, AdaptiveThrottle,
@@ -149,4 +151,5 @@ module.exports = { RasError, swap, RejectedError, DeadlineExceeded, HttpError, P
   AdaptiveConcurrency, ConcurrencyLimitError, hedge, StaleCache, idempotencyKey, isIdempotencyConflict, isIdempotencyMismatch,
   isTransient, dependencyFailed, notAccepted, raiseForStatus, retryAfterS, logEvent, traceId, newTraceId, withTrace, sleep, sleepSync, seed, resetState,
   scope, enable, TRANSIENT_HTTP, problem, requireApproval, setApprover, ApprovalRequired, dumpIncident, health, traceparent, traceHeaders, faultClass,
-  observe };
+  observe, AIPolicy, TokenBudget, ExactCache, ToolAllowlist, LoopGuard, StepJournal, validateSchema, frameUntrusted,
+  checkInjectionLeaks, SchemaValidationError, ToolNotAllowedError, LoopGuardError, BudgetExceededError };

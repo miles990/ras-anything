@@ -53,6 +53,10 @@ _PATTERN_NAMES = {
     # not patterns, but modules that live (and are vendored) with them
     "problem": "problem", "require_approval": "problem", "set_approver": "problem", "ApprovalRequired": "problem",
     "dump_incident": "recorder",
+    "AIPolicy": "ai", "TokenBudget": "ai", "ExactCache": "ai", "ToolAllowlist": "ai",
+    "LoopGuard": "ai", "StepJournal": "ai", "validate_schema": "ai", "frame_untrusted": "ai",
+    "check_injection_leaks": "ai", "SchemaValidationError": "ai", "ToolNotAllowedError": "ai",
+    "LoopGuardError": "ai", "BudgetExceededError": "ai",
 }
 
 __all__ = [

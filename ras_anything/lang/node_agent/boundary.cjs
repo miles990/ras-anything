@@ -63,10 +63,34 @@ function portableArg(s, i, cwd) {
   return s;
 }
 
+function parseAiMeta(url, body) {
+  let pathname = "";
+  try { pathname = new URL(url).pathname.replace(/\/+$/, ""); } catch { return null; }
+  const endpoints = { "/v1/chat/completions": ["openai", "chat"], "/v1/responses": ["openai", "responses"], "/v1/messages": ["anthropic", "chat"] };
+  const ep = Object.entries(endpoints).find(([s]) => pathname.endsWith(s));
+  if (!ep) return null;
+  let doc = {};
+  try {
+    const text = Buffer.isBuffer(body) ? body.toString("utf8") : (typeof body === "string" ? body : "");
+    if (text) doc = JSON.parse(text);
+  } catch {}
+  const msgs = Array.isArray(doc?.messages) ? doc.messages : (Array.isArray(doc?.input) ? doc.input : []);
+  const hasToolResult = msgs.some((m) => m && typeof m === "object" && m.role === "tool");
+  const rawLen = Buffer.isBuffer(body) ? body.length : (typeof body === "string" ? Buffer.byteLength(body) : 0);
+  return {
+    provider: ep[1][0], operation: ep[1][1], model: String(doc?.model || "default"),
+    max_tokens: doc?.max_tokens ?? doc?.max_output_tokens ?? null,
+    stream: Boolean(doc?.stream), has_tool_result: hasToolResult, msg_count: msgs.length,
+    input_tokens_est: Math.max(1, Math.floor(rawLen / 4)),
+  };
+}
+
 function httpReq(kind, method, url, body, headers) {
   const bodySha = sha(body);
-  return { kind, method, url, bodySha, headers, timeout: null, argv: null, nonidempotent: NONIDEMPOTENT.has(method),
-    idem: headers["idempotency-key"] ?? null, key: `${method} ${logicalUrl(url)}${bodySha ? ` #${bodySha.slice(0, 12)}` : ""}` };
+  const ai = parseAiMeta(url, body);
+  return { kind, method, url, bodySha, headers, timeout: null, argv: null, nonidempotent: NONIDEMPOTENT.has(method) && !ai,
+    idem: headers["idempotency-key"] ?? null, ai,
+    key: `${method} ${logicalUrl(url)}${bodySha ? ` #${bodySha.slice(0, 12)}` : ""}` };
 }
 
 /** argv: the list of a file and its arguments, or a shell command line. */
@@ -77,8 +101,11 @@ function cpReq(argv, timeoutMs) {
     argv: list ?? argv, nonidempotent: false, idem: null, key: `run ${list ? list.join(" ") : argv}` };
 }
 
-const reqDict = (r) => ({ kind: r.kind, method: r.method, url: r.url, body_sha: r.bodySha, idempotency_key: r.idem, timeout: r.timeout,
-  argv: r.argv, key: r.key });
+const reqDict = (r) => {
+  const d = { kind: r.kind, method: r.method, url: r.url, body_sha: r.bodySha, idempotency_key: r.idem, timeout: r.timeout, argv: r.argv, key: r.key };
+  if (r.ai) d.ai = r.ai;
+  return d;
+};
 
 const excOutcome = (e) => ({ exc: dumpError(e), _live: e });
 const errorOf = (out) => out._live ?? buildError(out.exc);
@@ -751,4 +778,4 @@ function seal(miss) {
   require("node:module").syncBuiltinESMExports();
 }
 
-module.exports = { install, seal, blame, Watcher, Recorder, Faulting, ReplayMiss, reqDict, recorded, excOutcome, isFailure, quietly };
+module.exports = { install, seal, blame, Watcher, Recorder, Faulting, ReplayMiss, reqDict, recorded, excOutcome, isFailure, quietly, logicalUrl };
