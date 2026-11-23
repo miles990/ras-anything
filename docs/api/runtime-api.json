@@ -216,5 +216,5 @@
  },
  "module": "ras_anything.runtime",
  "policy": "SemVer: removing or renaming a name, or removing a parameter, needs a major version; adding names is minor. Regenerate with: python -m tests.test_library_api --write",
- "version": "0.1.0"
+ "version": "0.2.0"
 }

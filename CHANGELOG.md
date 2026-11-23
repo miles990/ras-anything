@@ -4,10 +4,14 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follo
 
 ## Unreleased
 
+## 0.2.0 — 2026-11-23
+
+First public release (GitHub tag `v0.2.0`). Not published to PyPI or npm.
+
 ### Added
 - mypy now checks the pipeline modules (scan, harden, verify, export, and the rest of that layer) as well as the original five files.
 - The Node pattern list (`lang/node_agent/patterns/names.cjs`) is generated from `ras_anything.patterns.NAMES`.
-- `--json` on every result-producing command writes a `cli-result` object to stdout (progress and logs go to stderr; `export --format json` stays a bundle). Errors remain RFC 9457 on stderr.
+- `--json` on every result-producing command writes a `cli-result` object to stdout (progress and logs go to stderr). `export --json` wraps every format in that object (`format` + `body`); without `--json`, export still writes the raw payload. Errors remain RFC 9457 on stderr.
 - `schema_version` lives in `contracts.SCHEMA_VERSION` and is **1.1.0** (additive `coverage.adapters[].enabled`; see `docs/schema/README.md`).
 - Export formats are auto-discovered modules in `ras_anything/exporters/` (new format = new file, 0 core changes).
 - `wow.manifest.json` (wow INTEROP 1.0, wow-common 1.0): skills with CLI, MCP tool, output schema and JSON-Pointer evidence.
@@ -20,6 +24,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follo
 - `wow/eng.json` and `wow/eng-baseline.json`: W8 engineering measurements and the frozen baseline.
 
 ### Fixed
+- `--json flag` includes the flag value in `cli-result`; `--json export` is one `cli-result` per invocation; progress is buffered so a later error leaves stderr as a single RFC 9457 object. Unreadable `.ras/out` snapshots are rebuilt.
 - Vendored Node runtime now includes the generated pattern list (`names.cjs`); the vendored Python recorder no longer imports `contracts` (that import broke enabled copies).
 - W8: moved exporter complexity keys in `wow/eng-baseline.json` after the format split; export formats declared toggle-N/A; `cli.main` kept at CC ≤ 10 after `--json`.
 - `export` / `sync_out` leave versioned `.ras/out` snapshots (including SLO series timestamps) unchanged when the payload has not changed.

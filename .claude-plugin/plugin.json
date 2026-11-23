@@ -1,6 +1,6 @@
 {
   "name": "ras-anything",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Find the 5% of your app that breaks when dependencies misbehave, harden just that, and prove it on recorded calls.",
   "author": {
     "name": "miles990"

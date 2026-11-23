@@ -10,6 +10,8 @@ import tempfile
 import unittest
 from pathlib import Path
 
+from ras_anything import __version__
+
 REPO = Path(__file__).resolve().parent.parent
 INSTALL_SH = REPO / "install.sh"
 MAKEFILE = REPO / "Makefile"
@@ -120,7 +122,7 @@ class InstallAndReleaseTests(unittest.TestCase):
         release = (REPO / "docs" / "RELEASE.md").read_text(encoding="utf-8")
         low = release.lower()
         for needle in ("alex gate", "v0.2.0", "python -m build", "twine check",
-                       "trusted publishing", "do not make it public", "private"):
+                       "trusted publishing", "is **public**"):
             self.assertIn(needle, low)
         self.assertIn("do not upload to pypi or npm", low)
         self.assertIn("never publishes to PyPI or npm", INSTALL_SH.read_text(encoding="utf-8"))
@@ -251,7 +253,7 @@ class InstallAndReleaseTests(unittest.TestCase):
             # Also verify clean install in a space-containing HOME from scratch.
             _run(["./install.sh"], env=env, timeout=360)
             ver = _run([str(shim), "--version"], env=env, timeout=30)
-            self.assertIn("0.1.0", ver.stdout)
+            self.assertIn(__version__, ver.stdout)
             _run(["./install.sh", "--uninstall"], env=env, timeout=120)
             self._assert_uninstalled(home)
 
@@ -260,7 +262,7 @@ class InstallAndReleaseTests(unittest.TestCase):
         self.assertTrue(shim.is_file(), f"missing shim; stdout={completed.stdout}\nstderr={completed.stderr}")
         self.assertTrue(os.access(shim, os.X_OK))
         ver = _run([str(shim), "--version"], env=env, timeout=30)
-        self.assertIn("0.1.0", ver.stdout)
+        self.assertIn(__version__, ver.stdout)
 
         claude = home / ".claude" / "skills" / "ras-anything" / "SKILL.md"
         codex = home / ".codex" / "skills" / "ras-anything" / "SKILL.md"

@@ -101,7 +101,7 @@ The same loop as the CLI, driven by the agent instead of by you typing each comm
 |---|---|
 | **Skill** (any agent that reads `SKILL.md`) | [`skills/ras-anything/SKILL.md`](skills/ras-anything/SKILL.md) is installed to `~/.claude/skills/ras-anything/` and `~/.codex/skills/ras-anything/`. Ask the agent to harden the app; it should follow the skill's scan → harden → edit stub per `TASK.md` → verify until PASS → enable → bench → report loop, then tell you before → after numbers and how to undo. |
 | **MCP server** (stdlib, stdio JSON-RPC 2.0) | `claude mcp add ras-anything -- ras-anything mcp`. Other clients can point at the committed [`.mcp.json`](.mcp.json): command `ras-anything`, args `["mcp"]`. 12 tools: `ras_scan`, `ras_harden`, `ras_verify`, `ras_enable`, `ras_disable`, `ras_bench`, `ras_report`, `ras_status`, `ras_replay`, `ras_flag`, `ras_export`, `ras_events`. |
-| **Claude Code plugin** | From this clone (the GitHub repo is private; do not publish it): `/plugin marketplace add /path/to/ras-anything`, then `/plugin install ras-anything@ras-anything` and `/ras-anything:ras python app.py` (or `node app.mjs` / `go run .` / `java App.java`). |
+| **Claude Code plugin** | From this clone or the public GitHub repo: `/plugin marketplace add /path/to/ras-anything`, then `/plugin install ras-anything@ras-anything` and `/ras-anything:ras python app.py` (or `node app.mjs` / `go run .` / `java App.java`). |
 
 The agent writes the hardened function; ras-anything only measures, records, checks and swaps. Do not let the agent edit `calls.json` / `meta.json`, skip verify, or enable a version that did not PASS.
 

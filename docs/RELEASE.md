@@ -1,12 +1,11 @@
 # Release process (V-11)
 
-**This document is a runbook, not permission.** The GitHub repository `miles990/ras-anything`
-is **private**. Do not make it public, do not tag a release, and do not upload to PyPI or npm
-unless Alex explicitly approves that specific step (the "Alex gate"). Anyone can *build* and
-run `twine check` locally; publishing is a human decision.
+**This document is a runbook, not permission for later gates.** The GitHub repository
+`miles990/ras-anything` is **public**. Tag `v0.2.0` and the matching GitHub Release are
+the first public release and were authorized for this version. **Do not upload to PyPI or npm** unless Alex explicitly approves that specific step. Anyone can *build* and run
+`twine check` locally; registry publishing is a human decision.
 
-Current in-tree version: `0.1.0` (see `pyproject.toml` and `ras_anything/__version__`).
-The first public tag contemplated by this runbook is **v0.2.0**.
+Current in-tree version: `0.2.0` (see `pyproject.toml` and `ras_anything.__version__`).
 
 The Node agent ships **inside the Python wheel** as package data (`ras_anything/lang/node_agent/`,
 plus the Go agent under `ras_anything/lang/go_agent/` and the Java agent under `ras_anything/lang/java_agent/`). A separate npm package is **not required**
@@ -45,30 +44,26 @@ python3 -m venv /tmp/ras-rel-venv
 You may delete `dist/` and `build/` afterwards. **Stop here** unless Alex has approved
 the next section.
 
-## 2. Make the repository public (Alex gate — do not run)
+## 2. Repository visibility
 
-Only after an explicit "make `miles990/ras-anything` public" from Alex:
+The repository was made public on 2026-11-23. Do not change visibility without Alex's approval.
 
-1. Recheck step 0 (history, secrets, license).
-2. On GitHub: Settings → General → Danger Zone → Change repository visibility → Public.
-   (Equivalent CLI, also gated: `gh repo edit miles990/ras-anything --visibility public`.)
-3. Confirm the default branch is `main`, that Issues/Discussions settings are intended,
-   and that no private fork-only workflows were relying on privacy.
-4. Record the time and the acting user in the release notes.
+Rollback (if ever needed): Settings → Change visibility → Private (know that stargazers/forks may already exist).
 
-Rollback: Settings → Change visibility → Private (know that stargazers/forks may already exist).
+## 3. Tag and GitHub Release
 
-## 3. Tag v0.2.0 (Alex gate — do not run without approval)
+`v0.2.0` is the first public tag. For a later version, after tests are green:
 
 ```sh
 git checkout main
 git pull --ff-only origin main
-git tag -a v0.2.0 -m "ras-anything 0.2.0"
-# Push the tag only after Alex approves:
-# git push origin v0.2.0
+git tag -a vX.Y.Z -m "ras-anything X.Y.Z"
+# Push the tag and create the GitHub Release only after Alex approves that version:
+# git push origin vX.Y.Z
+# gh release create vX.Y.Z --title "ras-anything X.Y.Z" --notes-file notes.md
 ```
 
-Rollback: `git push origin :refs/tags/v0.2.0` and `git tag -d v0.2.0` (only if no one has
+Rollback: `git push origin :refs/tags/vX.Y.Z` and `git tag -d vX.Y.Z` (only if no one has
 already consumed the tag). Never `--force` a published tag.
 
 ## 4. Publish to PyPI (Alex gate — do not run)
@@ -101,12 +96,12 @@ agents travel with the Python sdist/wheel. Revisit only with a written decision.
 
 ## 6. After a public release (also gated)
 
-- Confirm `pipx install ras-anything` (or `pipx install git+https://github.com/miles990/ras-anything`)
+- Confirm `pipx install git+https://github.com/miles990/ras-anything`
   installs `0.2.0` and `ras-anything doctor` runs.
-- The README Install snippet can then mention the PyPI name; until then it must keep saying
-  the GitHub repo is private and must not be published.
-- Optionally draft a GitHub Release from tag `v0.2.0` (notes + checksums of `dist/*`).
-  Creating the GitHub Release is also an Alex-gated step.
+- The README must not say the repo is private. Do not mention a PyPI package name until
+  that gate is approved and the upload has succeeded.
+- A GitHub Release from tag `v0.2.0` (not a draft) is part of this version. Later releases
+  still need Alex's approval for that tag.
 
 ## Record of local checks
 
