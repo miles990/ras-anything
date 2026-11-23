@@ -250,12 +250,19 @@ class ParityTest(unittest.TestCase):
 class NodeContractTest(unittest.TestCase):
     def test_modules_are_independent(self):
         """Each requires ./core.cjs and built-ins only; retry looks for Retry-After support, hedge for the drivers, both lazily."""
-        allowed = {"retry.cjs": {"./core.cjs", "./retry_after.cjs"}, "hedge.cjs": {"./core.cjs", "./policy.cjs"}, "core.cjs": set(), "index.cjs": {"./flags.cjs"}, "flags.cjs": set(),
+        allowed = {"retry.cjs": {"./core.cjs", "./retry_after.cjs"}, "hedge.cjs": {"./core.cjs", "./policy.cjs"}, "core.cjs": set(), "index.cjs": {"./flags.cjs", "./names.json"}, "flags.cjs": set(),
                    "policy.cjs": {"./core.cjs", "./index.cjs"}, "problem.cjs": {"./core.cjs", "./retry_after.cjs"}, "recorder.cjs": {"./core.cjs", "./problem.cjs"}}
         self.assertEqual({f.stem for f in PDIR.glob("*.cjs")} - {"core", "index", "policy", "flags", "problem", "recorder", "ai"}, set(patterns.NAMES))
         for f in PDIR.glob("*.cjs"):
             for spec in re.findall(r"""require\(["'](.+?)["']\)""", f.read_text()):
                 self.assertTrue(spec.startswith("node:") or spec in allowed.get(f.name, {"./core.cjs"}), "%s requires %s" % (f.name, spec))
+
+    def test_node_names_are_generated_from_python(self):
+        path = PDIR / "names.json"
+        self.assertEqual(json.loads(path.read_text(encoding="utf-8")), list(patterns.NAMES),
+                         "names.json is stale; run ras_anything.patterns.write_node_names()")
+        listed = json.loads(node("console.log(JSON.stringify(require(process.argv[2]).NAMES))", str(PDIR / "index.cjs")).stdout)
+        self.assertEqual(listed, list(patterns.NAMES))
 
     def test_any_module_can_be_missing(self):
         code = """

@@ -19,7 +19,7 @@ Read [AGENTS.md](AGENTS.md) first (setup, tests, structure, boundaries). Decisio
 ## Add a resilience pattern
 1. `ras_anything/patterns/<name>.py` with a module-level `PATTERN` (name, order, params, default_on, layer). `patterns.NAMES` picks it up.
 2. A test in `tests/`. It is switchable with the flag `ras.pattern.<name>`.
-3. Still manual (known gap, docs/REVIEW-PRACTICES.md): the runtime's `_PATTERN_NAMES` if it exports helpers, and the Node `patterns/index.cjs`.
+3. If it exports helpers, still add them to the runtime's `_PATTERN_NAMES` (known gap). The Node list is generated: run `python -c 'from ras_anything.patterns import write_node_names; write_node_names()'` so `lang/node_agent/patterns/names.json` matches `patterns.NAMES`.
 
 ## Add an export format (a component: new files only)
 1. `ras_anything/exporters/<name>.py` with module-level `FORMAT` (the `--format` name), optional `ORDER` (lower first; json is 10), and `render(project, od, bundle, snapshots, events) -> str`. `exporters.FORMATS` picks it up; the CLI and MCP enum follow.

@@ -43,6 +43,23 @@ def __getattr__(name):  # PEP 562: NAMES is computed on first use, so importing 
         return _discover()
     raise AttributeError("module %r has no attribute %r" % (__name__, name))
 
+
+# The Node runtime reads this file (lang/node_agent/patterns/names.json); it is generated from NAMES, not handwritten.
+def node_names_path():
+    from pathlib import Path
+
+    return Path(__file__).resolve().parents[1] / "lang" / "node_agent" / "patterns" / "names.json"
+
+
+def write_node_names(path=None):
+    """Rewrite the Node pattern list from this registry. Run after adding a Python pattern that has a Node module."""
+    import json
+    from pathlib import Path
+
+    dest = Path(path) if path else node_names_path()
+    dest.write_text(json.dumps(list(_discover()), indent=1) + "\n", encoding="utf-8")
+    return dest
+
 ADOPTED, OPT_IN, REJECTED = "adopted", "opt-in", "rejected"
 
 SAFE_METHODS = frozenset({"GET", "HEAD", "OPTIONS", "TRACE", "RUN"})  # RUN: a subprocess, like the recordings call it
