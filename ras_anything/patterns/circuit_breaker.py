@@ -50,15 +50,26 @@ class CircuitBreaker:
         with self._lock:
             self._clear()
 
+    def health(self) -> dict:
+        out = {"kind": "breaker", "name": self.name, "state": self.state, "failures": self.failures}
+        if self.opened_at is not None:
+            out["open_for_s"] = round(rt._now() - self.opened_at, 3)
+            out["retry_after_s"] = round(max(0.0, self.cooldown_s - (rt._now() - self.opened_at)), 3)
+        return out
+
+    def _wait_s(self) -> float:
+        return round(max(0.0, self.cooldown_s - (rt._now() - self.opened_at)), 3) if self.opened_at is not None else 0.0
+
     def acquire(self):
         """Admit one call: a ticket for release(), or CircuitOpenError."""
         with self._lock:
             st = self.state
             if st == "open" or (st == "half_open" and self._probes >= self.half_open_probes):
-                raise CircuitOpenError("circuit open for %s" % self.name,
+                raise CircuitOpenError("circuit open for %s" % self.name, dependency=self.name, retry_after_s=self._wait_s(),
                                        context={"failures": self.failures, "cooldown_s": self.cooldown_s})
             if st == "half_open":
                 self._probes += 1
+                rt.transition("breaker", self.name, "open", "half_open")
             return self._gen, st == "half_open"
 
     def release(self, ticket, error: BaseException | None = None) -> None:
@@ -75,16 +86,17 @@ class CircuitBreaker:
                     self._probe_successes += 1
                     if self._probe_successes >= self.half_open_probes:
                         self._clear()
+                        rt.transition("breaker", self.name, "half_open", "closed")
                 else:
                     self._recent.append(False)
             elif self.count(error):
                 self.failures += 1
                 if probe:
-                    self._open()
+                    self._open("half_open")
                 else:
                     self._recent.append(True)
                     if self._tripped():
-                        self._open()
+                        self._open("closed")
 
     def _tripped(self) -> bool:
         if self.fail_threshold is not None and self.failures >= self.fail_threshold:
@@ -92,10 +104,11 @@ class CircuitBreaker:
         n = len(self._recent)
         return self.failure_rate is not None and n >= self.min_calls and sum(self._recent) >= self.failure_rate * n
 
-    def _open(self) -> None:
+    def _open(self, before: str) -> None:
         failures = self.failures
         self._clear()
         self.failures, self.opened_at = failures, rt._now()
+        rt.transition("breaker", self.name, before, "open", **{"ras.breaker.failures": failures, "ras.retry_after_s": self.cooldown_s})
 
     def call(self, fn, *args, **kwargs):
         ticket = self.acquire()

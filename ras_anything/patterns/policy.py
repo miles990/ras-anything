@@ -78,17 +78,38 @@ class Policy:
 
     def _steps(self, method, idempotency_key, cache_key):
         call = Call(self.dependency, method=method, idempotency_key=idempotency_key, cache_key=cache_key)
-        on = [x for name, configured, x in self.layers if is_on(self.dependency, name, configured)]
+        chosen = [(name, x) for name, configured, x in self.layers if is_on(self.dependency, name, configured)]
+        names, on = [n for n, _ in chosen], [x for _, x in chosen]
 
         def attempt(c):
             t = c.timeout_s
             if t is None and c.deadline is not None:  # no attempt timeout: what is left of the whole
                 t = max(0.001, c.deadline - rt._now())
-            return (yield ("call", Attempt(next(c.numbers), t, c.carry_key, c.headers), _ends(c)))
+            a = Attempt(next(c.numbers), t, c.carry_key, {**(rt.trace_headers() if rt.span_id() else {}), **c.headers})
+            c.attempts, t0 = max(c.attempts, a.n), rt._now()
+            try:
+                result = yield ("call", a, _ends(c))
+            except Exception as e:
+                rt.attempt_failed(e, a.n, rt._now() - t0, dependency=self.dependency, key=c.carry_key)
+                raise
+            rt.attempt_ok(a.n, rt._now() - t0, dependency=self.dependency)
+            return result
 
         def chain(i):
-            return attempt if i == len(on) else lambda c: on[i].run(c, chain(i + 1))
+            run = attempt if i == len(on) else lambda c: on[i].run(c, chain(i + 1))
+            return reported(run) if i == outer else run
 
+        def reported(run):  # the policy has had its say: the caller degrades (fallback layer), or gets this error
+            def call_(c):
+                try:
+                    return (yield from run(c))
+                except Exception as e:
+                    rt.gave_up(e, c.attempts, c.stopped or ("rejected" if isinstance(e, rt.RejectedError) else "not retried"),
+                               dependency=self.dependency, key=c.carry_key)
+                    raise
+            return call_
+
+        outer = 1 if names and names[0] == "fallback" else 0
         return chain(0)(call)
 
     def call(self, fn, *, method: str = "GET", idempotency_key: str | None = None, cache_key=None):

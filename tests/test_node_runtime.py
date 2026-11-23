@@ -111,12 +111,13 @@ class ErrorsTest(unittest.TestCase):
             done([e instanceof Error, e.message, String(e), e.cause.code, JSON.parse(JSON.stringify(e)), e.traceId]);""")
         line = json.loads(out.stderr)
         r = json.loads(out.stdout)
-        self.assertEqual((line["event"], line["order"], line["error"], line["deep"]), ("gave_up", 7, "Error: EPIPE", '{"a":1}'))
+        a = line["Attributes"]
+        self.assertEqual((line["event"], a["order"], a["error"], a["deep"]), ("gave_up", 7, "Error: EPIPE", '{"a":1}'))
         self.assertEqual(line["trace_id"], r[5])
-        self.assertRegex(r[5], r"^[0-9a-f]{16}$")
+        self.assertRegex(r[5], r"^[0-9a-f]{32}$")
         self.assertEqual(r[:2] + r[3:4], [True, "charge failed", "EPIPE"])
-        self.assertIn("charge failed | order=7 | cause=Error: EPIPE | trace_id=" + r[5], r[2])
-        self.assertEqual(r[4]["trace_id"], r[5])
+        self.assertEqual(r[2], "RasError: charge failed (cause: unavailable; next: retry_later; trace_id=%s)" % r[5])
+        self.assertEqual((r[4]["correlation_id"], r[4]["cause"]), (r[5], "unavailable"))
 
     def test_fallback_is_logged(self):
         out = run_js(HEAD + """

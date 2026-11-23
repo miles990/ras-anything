@@ -57,7 +57,7 @@ class VirtualCase(unittest.TestCase):
         self.addCleanup(ctx.__exit__, None, None, None)
 
     def logged(self):
-        return [json.loads(ln) for ln in self.err.getvalue().splitlines()]
+        return [r for r in map(json.loads, self.err.getvalue().splitlines()) if "event" in r]  # (not the runtime's own diagnostics)
 
 
 class Dep:
@@ -104,7 +104,7 @@ class ContractTest(unittest.TestCase):
         self.assertEqual([p.name for p in ps], list(patterns.NAMES))
         self.assertEqual(len({p.order for p in ps}), len(ps))
         files = {f.stem for f in PKG.glob("*.py")} - {"__init__", "policy"}
-        self.assertEqual(files, set(patterns.NAMES))
+        self.assertEqual(files - {"problem", "recorder"}, set(patterns.NAMES))  # (support modules: errors for agents, flight recorder)
         self.assertRaises(KeyError, patterns.get, "nope")
 
     def test_every_module_keeps_the_contract(self):
@@ -753,9 +753,9 @@ class FallbackTest(VirtualCase):
         time.sleep(2)
         self.assertEqual(pol.call(down, cache_key="k"), {"status": "unavailable"})  # too old now
         self.assertRaises(ConnectionRefusedError, Policy("d", **only(fallback=True)).call, down, cache_key="k")
-        self.assertEqual([x["level"] for x in self.logged()], ["stale"] + ["degraded"] * 3)
-        self.assertEqual(self.logged()[0]["age_s"], 59.0)
-        self.assertTrue(all(len(x["trace_id"]) == 16 for x in self.logged()))
+        self.assertEqual([x["Attributes"]["level"] for x in self.logged()], ["stale"] + ["degraded"] * 3)
+        self.assertEqual(self.logged()[0]["Attributes"]["age_s"], 59.0)
+        self.assertTrue(all(len(x["trace_id"]) == 32 for x in self.logged()))
 
     def test_the_dependency_is_always_asked_first(self):
         pol, d = Policy("d", **only(fallback=True)), Dep()

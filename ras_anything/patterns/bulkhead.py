@@ -31,7 +31,7 @@ class Bulkhead:
     def acquire(self) -> None:
         with self._lock:
             if self.in_use >= self.max_concurrent:
-                raise BulkheadFullError("bulkhead full for %s" % self.name, context={"max_concurrent": self.max_concurrent})
+                raise BulkheadFullError("bulkhead full for %s" % self.name, dependency=self.name, context={"max_concurrent": self.max_concurrent})
             self.in_use += 1
 
     def release(self) -> None:

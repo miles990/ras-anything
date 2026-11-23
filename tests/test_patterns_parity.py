@@ -224,7 +224,7 @@ class ParityTest(unittest.TestCase):
         """Every helper of Python's runtime has its twin."""
         have = set(json.loads(node("console.log(JSON.stringify(Object.keys(require(process.argv[2]))))", str(AGENT / "runtime.cjs")).stdout))
         twins = {"aretry": "retry", "ahedge": "hedge", "remaining_s": "remainingMs", "deadline": "withDeadline", "call_with_timeout": "withTimeout",
-                 "retry_after_s": "retryAfterS", "TRANSIENT_HTTP": "TRANSIENT_HTTP", "Attempt": "Policy"}
+                 "retry_after_s": "retryAfterS", "TRANSIENT_HTTP": "TRANSIENT_HTTP", "Attempt": "Policy", "trace": "withTrace"}
         for name in runtime.__all__:
             want = twins.get(name) or (name if name[0].isupper() else camel(name))
             self.assertIn(want, have, name)
@@ -252,8 +252,8 @@ class NodeContractTest(unittest.TestCase):
     def test_modules_are_independent(self):
         """Each requires ./core.cjs and built-ins only; retry looks for Retry-After support, hedge for the drivers, both lazily."""
         allowed = {"retry.cjs": {"./core.cjs", "./retry_after.cjs"}, "hedge.cjs": {"./core.cjs", "./policy.cjs"}, "core.cjs": set(), "index.cjs": {"./flags.cjs"}, "flags.cjs": set(),
-                   "policy.cjs": {"./core.cjs", "./index.cjs"}}
-        self.assertEqual({f.stem for f in PDIR.glob("*.cjs")} - {"core", "index", "policy", "flags"}, set(patterns.NAMES))
+                   "policy.cjs": {"./core.cjs", "./index.cjs"}, "problem.cjs": {"./core.cjs", "./retry_after.cjs"}, "recorder.cjs": {"./core.cjs", "./problem.cjs"}}
+        self.assertEqual({f.stem for f in PDIR.glob("*.cjs")} - {"core", "index", "policy", "flags", "problem", "recorder"}, set(patterns.NAMES))
         for f in PDIR.glob("*.cjs"):
             for spec in re.findall(r"""require\(["'](.+?)["']\)""", f.read_text()):
                 self.assertTrue(spec.startswith("node:") or spec in allowed.get(f.name, {"./core.cjs"}), "%s requires %s" % (f.name, spec))
@@ -348,7 +348,7 @@ class NodeContractTest(unittest.TestCase):
           console.log(JSON.stringify([out, seen]));"""
         p = node(code, str(AGENT / "runtime.cjs"))
         self.assertEqual(json.loads(p.stdout), [["ok", "degraded"], [True] * 3])
-        self.assertEqual(json.loads(p.stderr)["level"], "degraded")
+        self.assertEqual([r["Attributes"]["level"] for r in map(json.loads, p.stderr.splitlines()) if "event" in r], ["degraded"])
 
     def test_budget_bound_and_breaker_probes(self):
         code = """

@@ -38,14 +38,38 @@ class Policy {
 
   steps(options) {
     const call = new core.Call(this.dependency, options);
-    const on = this.layers.filter((x) => registry.hooks.isOn(this.dependency, x.name, x.on)).map((x) => x.layer);
+    const chosen = this.layers.filter((x) => registry.hooks.isOn(this.dependency, x.name, x.on));
+    const on = chosen.map((x) => x.layer);
+    const { dependency } = this;
     function* attempt(c) {
       let t = c.timeoutMs ?? undefined;
       if (t === undefined && c.deadline !== null) t = Math.max(1, c.deadline - core.nowMs()); // no attempt timeout: what is left of the whole
-      const a = { attempt: ++c.attempts, timeoutMs: t, idempotencyKey: c.carryKey, headers: { ...c.headers } };
-      return yield ["call", a, ends(c)];
+      const a = { attempt: ++c.attempts, timeoutMs: t, idempotencyKey: c.carryKey, headers: { ...(core.spanId() ? core.traceHeaders() : {}), ...c.headers } };
+      const t0 = core.nowMs();
+      let value;
+      try {
+        value = yield ["call", a, ends(c)];
+      } catch (e) {
+        core.attemptFailed(e, a.attempt, core.nowMs() - t0, { dependency, key: c.carryKey });
+        throw e;
+      }
+      core.attemptOk(a.attempt, core.nowMs() - t0, { dependency });
+      return value;
     }
-    const chain = (i) => (i === on.length ? attempt : (c) => on[i].run(c, chain(i + 1)));
+    const outer = chosen[0]?.name === "fallback" ? 1 : 0;
+    const chain = (i) => {
+      const run = i === on.length ? attempt : (c) => on[i].run(c, chain(i + 1));
+      return i === outer ? reported(run) : run;
+    };
+    // the policy has had its say: the caller degrades (fallback layer), or gets this error
+    const reported = (run) => function* (c) {
+      try {
+        return yield* run(c);
+      } catch (e) {
+        core.gaveUp(e, c.attempts, c.stopped ?? (e instanceof core.RejectedError ? "rejected" : "not retried"), { dependency, key: c.carryKey });
+        throw e;
+      }
+    };
     return chain(0)(call);
   }
 

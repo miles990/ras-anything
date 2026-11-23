@@ -23,7 +23,7 @@ class Bulkhead extends core.Guard {
   reset() {} // calls in progress stay in progress
 
   acquire() {
-    if (this.inUse >= this.maxConcurrent) throw new BulkheadFullError(`bulkhead full for ${this.name}`, { context: { max_concurrent: this.maxConcurrent } });
+    if (this.inUse >= this.maxConcurrent) throw new BulkheadFullError(`bulkhead full for ${this.name}`, { dependency: this.name, context: { max_concurrent: this.maxConcurrent } });
     this.inUse++;
   }
 

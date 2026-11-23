@@ -179,8 +179,8 @@ class ErrorsAndLogsTest(unittest.TestCase):
         cause = TimeoutError("slow")
         e = RasError("fetch failed", cause=cause, context={"city": "Lima"})
         self.assertIs(e.__cause__, cause)
-        self.assertIn("city=Lima", str(e))
-        self.assertEqual(len(e.trace_id), 16)
+        self.assertNotIn("Lima", str(e))  # context is for our logs, str() is for anyone
+        self.assertEqual(len(e.trace_id), 32)
         self.assertEqual(e.to_dict()["context"], {"city": "Lima"})
 
     def test_log_event_json_line(self):
@@ -188,7 +188,7 @@ class ErrorsAndLogsTest(unittest.TestCase):
         with mock.patch.object(sys, "stderr", buf):
             runtime.log_event("gave_up", city="Lima", attempts=3)
         rec = json.loads(buf.getvalue())
-        self.assertEqual((rec["event"], rec["city"], rec["attempts"]), ("gave_up", "Lima", 3))
+        self.assertEqual((rec["event"], rec["Attributes"]), ("gave_up", {"city": "Lima", "attempts": 3}))
         self.assertIn("trace_id", rec)
 
     def test_call_with_timeout(self):

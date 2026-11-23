@@ -44,13 +44,27 @@ class CircuitBreaker extends core.Guard {
     this.#gen++;
   }
 
+  health() {
+    const out = { kind: "breaker", name: this.name, state: this.state, failures: this.failures };
+    if (this.openedAt === null) return out;
+    return { ...out, open_for_s: Math.round(core.nowMs() - this.openedAt) / 1000, retry_after_s: this.#waitS() };
+  }
+
+  #waitS() {
+    return this.openedAt === null ? 0 : Math.max(0, Math.round(this.cooldownMs - (core.nowMs() - this.openedAt)) / 1000);
+  }
+
   /** Admit one call: a ticket for release(), or CircuitOpenError. */
   acquire() {
     const st = this.state;
     if (st === "open" || (st === "half_open" && this.#probes >= this.halfOpenProbes)) {
-      throw new CircuitOpenError(`circuit open for ${this.name}`, { context: { failures: this.failures, cooldown_ms: this.cooldownMs } });
+      throw new CircuitOpenError(`circuit open for ${this.name}`, { dependency: this.name, retryAfterS: this.#waitS(),
+        context: { failures: this.failures, cooldown_ms: this.cooldownMs } });
     }
-    if (st === "half_open") this.#probes++;
+    if (st === "half_open") {
+      this.#probes++;
+      core.transition("breaker", this.name, "open", "half_open");
+    }
     return { gen: this.#gen, probe: st === "half_open" };
   }
 
@@ -61,7 +75,10 @@ class CircuitBreaker extends core.Guard {
     if (error === undefined) {
       this.failures = 0;
       if (!probe) this.#note(false);
-      else if (++this.#probeSuccesses >= this.halfOpenProbes) this.reset();
+      else if (++this.#probeSuccesses >= this.halfOpenProbes) {
+        this.reset();
+        core.transition("breaker", this.name, "half_open", "closed");
+      }
     } else if (this.count(error)) {
       this.failures++;
       if (!probe) this.#note(true);
@@ -69,6 +86,7 @@ class CircuitBreaker extends core.Guard {
         const { failures } = this;
         this.reset();
         Object.assign(this, { failures, openedAt: core.nowMs() });
+        core.transition("breaker", this.name, probe ? "half_open" : "closed", "open", { "ras.breaker.failures": failures, "ras.retry_after_s": this.cooldownMs / 1000 });
       }
     }
   }

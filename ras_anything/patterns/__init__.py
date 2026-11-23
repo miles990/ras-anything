@@ -81,6 +81,8 @@ class Call:
     invited: bool = False               # the last failure said when to come back (retry_after layer): no gate is asked
     delay_rules: list = field(default_factory=list)   # (exc, delay_s) -> delay_s
     retry_rules: list = field(default_factory=list)   # (exc) -> bool: also worth a retry
+    stopped: str | None = None          # why no further attempt was made (for the diagnostics)
+    attempts: int = 0                   # made so far
 
     @property
     def safe(self) -> bool:

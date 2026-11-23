@@ -13,9 +13,6 @@ Isolation: `Policy.shard(key)` (see patterns/policy.py) gives a key its own brea
 
 from __future__ import annotations
 
-import os
-import time
-import traceback
 from typing import Callable
 
 from . import flags, runtime
@@ -147,38 +144,9 @@ def blast_radius(affected: int, total: int, contained_s: float | None = None) ->
     return {"affected": affected, "total": total, "share": affected / total, "contained_s": contained_s}
 
 
-# --------------------------------------------------------------------------- human gate (V-18, small hook; used by charges/deletes)
-
-
-class NeedsApproval(runtime.RasError):
-    """The operation is irreversible and no approver accepted it."""
-
-    def __init__(self, op: str, details: dict | None = None, **kw):
-        super().__init__("human authorization required for %s" % op, context={"op": op, **(details or {})}, **kw)
-        self.op = op
-        self.needs_human_authorization = True
-        self.next_action = "escalate"
-
-
-_approver: Callable | None = None
-
-
-def set_approver(fn: Callable | None) -> Callable | None:
-    global _approver
-    prev, _approver = _approver, fn
-    return prev
-
-
-def require_approval(op: str, details: dict | None = None):
-    """Default deny in non-interactive runs. A registered approver returning a truthy value lets it through."""
-    if _approver is not None:
-        if _approver(op, details or {}):
-            runtime.log_event("ras.approval.granted", op=op)
-            return True
-        raise NeedsApproval(op, details)
-    if os.environ.get("RAS_ANYTHING_APPROVE") == "1":
-        return True
-    raise NeedsApproval(op, details)
+# The human gate is part of the runtime (patterns/problem.py); these names stay importable from here.
+from .patterns.problem import ApprovalRequired as NeedsApproval  # noqa: E402
+from .patterns.problem import require_approval, set_approver  # noqa: E402,F401
 
 # The runtime (vendored with enabled apps) is the implementation.
 swap = runtime.swap

@@ -13,6 +13,14 @@ const registry = require("./patterns/index.cjs");
 const { Policy } = require("./patterns/policy.cjs");
 
 const { RasError, isTransient, logEvent } = core;
+const support = (name) => {
+  try {
+    return require(`./patterns/${name}.cjs`);
+  } catch (e) {
+    if (e.code !== "MODULE_NOT_FOUND") throw e;
+    return {};
+  }
+};
 
 // ---------------------------------------------------------------- HTTP
 
@@ -67,7 +75,7 @@ function scope(id) {
 
 /** Used by the marked block: the function that runs hardened code, loaded on the first call; if it can't be
  *  loaded, the original, loudly. */
-function enable({ id, name, original, names, load, module }) {
+function enable({ id, name, original, names, load, module, dependencies }) {
   if (names) scopes.set(id, names);
   let impl = null;
   const swaps = globalThis[Symbol.for("ras-anything.swaps")];
@@ -93,7 +101,8 @@ function enable({ id, name, original, names, load, module }) {
       try { core.logEvent("ras.shadow.skip", { id, reason: "no suppressor" }); } catch {}
       return out;
     }
-    return Reflect.apply(get(), self, args);
+    const fn = get();
+    return fn === original ? Reflect.apply(fn, self, args) : core.observe(id, dependencies, fn, self, args);
   };
   const swapped = new Proxy(original, { apply: (_, self, args) => (core.inTrace() ? run(self, args) : core.withTrace(() => run(self, args))) });
   if (module) {
@@ -115,20 +124,22 @@ for (const name of registry.NAMES) {
   }
 }
 
-const { RejectedError, DeadlineExceeded, dependencyFailed, notAccepted, withTimeout, withDeadline, remainingMs, traceId, newTraceId, withTrace, sleep, sleepSync,
+const { problem, requireApproval, setApprover, ApprovalRequired } = support("problem");
+const { dumpIncident } = support("recorder");
+const { health, traceparent, traceHeaders, faultClass, observe, RejectedError, DeadlineExceeded, dependencyFailed, notAccepted, withTimeout, withDeadline, remainingMs, traceId, newTraceId, withTrace, sleep, sleepSync,
   seed, resetState, TRANSIENT_HTTP } = core;
 const { retry, retrySync, RetryBudget, retryAfterS, attemptTimeout, CircuitBreaker, CircuitOpenError, Bulkhead, BulkheadFullError, AdaptiveThrottle,
   ThrottledError, AdaptiveConcurrency, ConcurrencyLimitError, hedge, StaleCache, idempotencyKey, isIdempotencyConflict,
   isIdempotencyMismatch } = patterns;
 
-function swap(id, original, hardened) {
+function swap(id, original, hardened, dependencies) {
   return new Proxy(original, {
     apply(_, self, args) {
       let choice = "hardened";
       try { const f = require("./patterns/flags.cjs"); choice = f.route(id, f.targetingKey(args)); } catch {}
       if (choice === "original") return Reflect.apply(original, self, args);
       if (choice === "shadow") return Reflect.apply(original, self, args);
-      return Reflect.apply(hardened, self, args);
+      return core.observe(id, dependencies, hardened, self, args);
     },
   });
 }
@@ -137,4 +148,5 @@ module.exports = { RasError, swap, RejectedError, DeadlineExceeded, HttpError, P
   attemptTimeout, withFallback, CircuitBreaker, CircuitOpenError, Bulkhead, BulkheadFullError, AdaptiveThrottle, ThrottledError,
   AdaptiveConcurrency, ConcurrencyLimitError, hedge, StaleCache, idempotencyKey, isIdempotencyConflict, isIdempotencyMismatch,
   isTransient, dependencyFailed, notAccepted, raiseForStatus, retryAfterS, logEvent, traceId, newTraceId, withTrace, sleep, sleepSync, seed, resetState,
-  scope, enable, TRANSIENT_HTTP };
+  scope, enable, TRANSIENT_HTTP, problem, requireApproval, setApprover, ApprovalRequired, dumpIncident, health, traceparent, traceHeaders, faultClass,
+  observe };

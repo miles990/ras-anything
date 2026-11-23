@@ -48,9 +48,9 @@ class AdaptiveThrottle:
     def acquire(self) -> None:
         """Ask for one attempt; ThrottledError when it is shed."""
         p = self.reject_probability()
-        if p > 0.0 and rt._rng.random() < p:
+        if p > 0.0 and rt.rng().random() < p:
             self._count(0)
-            raise ThrottledError("shedding load to %s" % self.name, context={"reject_probability": round(p, 3)})
+            raise ThrottledError("shedding load to %s" % self.name, dependency=self.name, context={"reject_probability": round(p, 3)})
 
     def release(self, error: BaseException | None = None) -> None:
         """Say how the attempt ended."""

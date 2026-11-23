@@ -30,7 +30,7 @@ class AdaptiveConcurrency extends core.Guard {
 
   acquire() {
     if (this.inFlight >= Math.trunc(this.limit)) {
-      throw new ConcurrencyLimitError(`concurrency limit for ${this.name}`, { context: { limit: Math.trunc(this.limit) } });
+      throw new ConcurrencyLimitError(`concurrency limit for ${this.name}`, { dependency: this.name, context: { limit: Math.trunc(this.limit) } });
     }
     this.inFlight++;
   }

@@ -49,7 +49,7 @@ class AdaptiveThrottle extends core.Guard {
     const p = this.rejectProbability();
     if (p > 0 && core.random() < p) {
       this.#count(0);
-      throw new ThrottledError(`shedding load to ${this.name}`, { context: { reject_probability: Math.round(p * 1000) / 1000 } });
+      throw new ThrottledError(`shedding load to ${this.name}`, { dependency: this.name, context: { reject_probability: Math.round(p * 1000) / 1000 } });
     }
   }
 

@@ -33,7 +33,7 @@ class AdaptiveConcurrency:
     def acquire(self) -> None:
         with self._lock:
             if self.in_flight >= int(self.limit):
-                raise ConcurrencyLimitError("concurrency limit for %s" % self.name, context={"limit": int(self.limit)})
+                raise ConcurrencyLimitError("concurrency limit for %s" % self.name, dependency=self.name, context={"limit": int(self.limit)})
             self.in_flight += 1
 
     def release(self, error: BaseException | None = None) -> None:
