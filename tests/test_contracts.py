@@ -34,6 +34,24 @@ class ExportFormatContract(unittest.TestCase):
         self.assertEqual(tuple(mcp.TOOLS["ras_export"][1]["format"]["enum"]), contracts.EXPORT_FORMATS)
 
 
+class CloudEventsExport(unittest.TestCase):
+    def test_every_event_is_a_cloudevent(self):
+        import shutil
+        with tempfile.TemporaryDirectory() as d:
+            p = Path(d) / "wx"
+            shutil.copytree(REPO / "examples" / "weather", p)
+            text = export.export_data(p, fmt="cloudevents")
+        lines = [json.loads(x) for x in text.splitlines()]
+        self.assertGreater(len(lines), 0)
+        for ce in lines:
+            self.assertEqual(ce["specversion"], "1.0")
+            for k in ("id", "source", "type", "time"):
+                self.assertTrue(ce[k], k)
+            self.assertRegex(ce["type"], r"^dev\.ras-anything\.[a-z0-9_.-]+$")
+            self.assertRegex(ce["time"], r"[+-]\d\d:\d\d$|Z$")
+        self.assertEqual(len({ce["id"] for ce in lines}), len(lines))
+
+
 class _Ruby(PythonAdapter):  # a stand-in plugin: any LangAdapter works
     name, label = "rubyx", "RubyX"
 

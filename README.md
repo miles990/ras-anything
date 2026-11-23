@@ -72,7 +72,7 @@ Or step by step:
 | `enable` / `disable [id]` | swaps the hardened function in or out (one marked block, removed byte for byte) |
 | `bench [-- <cmd>]` | whole-app runs under live seeded chaos, original vs hardened interleaved, same seed per pair |
 | `report` | `RAS-REPORT.md` + `ras-card.svg` for your PR, with measured numbers only |
-| `replay [id]` · `flag` · `export` | replay a recorded incident + RCA · OpenFeature flags · export `.ras/out` as json / ndjson / prom / otlp-json |
+| `replay [id]` · `flag` · `export` | replay a recorded incident + RCA · OpenFeature flags · export `.ras/out` as json / ndjson / prom / otlp-json / cloudevents |
 | `status` · `doctor` | where you are and what's next · checks Python, Node, Go, Java, agents on PATH, git, `.ras/` |
 
 A scan looks like this (examples/payments):
