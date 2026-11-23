@@ -168,6 +168,38 @@ class ShopTest(unittest.TestCase):
         self.assertEqual(v["hardened"]["dups"], 0)
 
 
+class GetThenPostTest(unittest.TestCase):
+    fid = "cart.checkout"
+
+    @classmethod
+    def setUpClass(cls):
+        cls.p = Project(FIX / "cart")
+        with quiet():
+            scan([sys.executable, "app.py"], seeds=1, quiet=True)
+            harden(cls.fid, quiet=True)
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.p.close()
+
+    def test_rejects_retrying_the_whole_sequence_without_a_key(self):
+        v = self.p.use(self.fid, "cart_retry_post.py")
+        self.assertTrue(v["gates"]["happy"])
+        self.assertFalse(v["passed"])
+        self.assertFalse(v["gates"]["dups"])
+        self.assertEqual(v["original"]["dups"], 0)
+        self.assertGreater(v["hardened"]["dups"], 0)
+        self.assertIn("timeout (per-key)", v["chaos"]["by_scenario"])  # each request is also faulted on its own
+        posts = [a for a in v["chaos"]["first_failure"]["hardened"]["attempts"] if a["method"] == "POST" and a["reached"]]
+        self.assertGreaterEqual(len(posts), 2)
+        self.assertEqual({a["idem"] for a in posts}, {None})
+
+    def test_accepts_step_retries_with_one_key(self):
+        v = self.p.use(self.fid, "cart_retry_with_key.py")
+        self.assertTrue(v["passed"], v["gates"])
+        self.assertEqual(v["hardened"]["dups"], 0)
+
+
 class AgentHardenedExamplesTest(unittest.TestCase):
     """Positive control: the hardened code a real agent wrote for the examples still passes verify."""
 
