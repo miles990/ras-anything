@@ -8,9 +8,9 @@
   "display_cmd": "python app.py",
   "cwd": ".",
   "root": ".",
-  "created": "2026-11-23T12:28:20+0800",
+  "created": "2026-11-23T12:40:09+0800",
   "clean": {
-    "wall_s": 0.507,
+    "wall_s": 0.489,
     "stdout_sha256": "ebe99fcc08dee5da092ce71548ff6d1f9773ee4d71c7a0d780a37930cc857fe6",
     "boundary_calls": 33
   },
@@ -23,7 +23,7 @@
         "seed": 1,
         "outcome": "hang",
         "exit": 1,
-        "wall_s": 2.116,
+        "wall_s": 2.125,
         "faults": 1,
         "uncaught": {
           "type": "ChaosHang",
@@ -36,7 +36,7 @@
         "seed": 2,
         "outcome": "hang",
         "exit": 1,
-        "wall_s": 2.146,
+        "wall_s": 2.138,
         "faults": 1,
         "uncaught": {
           "type": "ChaosHang",
@@ -49,7 +49,7 @@
         "seed": 3,
         "outcome": "crash",
         "exit": 1,
-        "wall_s": 0.167,
+        "wall_s": 0.146,
         "faults": 1,
         "uncaught": {
           "type": "JSONDecodeError",
@@ -62,7 +62,7 @@
         "seed": 4,
         "outcome": "crash",
         "exit": 1,
-        "wall_s": 0.319,
+        "wall_s": 0.287,
         "faults": 2,
         "uncaught": {
           "type": "JSONDecodeError",
@@ -75,7 +75,7 @@
         "seed": 5,
         "outcome": "crash",
         "exit": 1,
-        "wall_s": 3.572,
+        "wall_s": 3.596,
         "faults": 7,
         "uncaught": {
           "type": "JSONDecodeError",
@@ -244,7 +244,7 @@
       "in_main": false,
       "signals": {},
       "static_risk": 0.0,
-      "refused": "method of a class (top-level functions and @staticmethod only)",
+      "refused": null,
       "file": "upstream.py",
       "first_line": 24,
       "calls": 17,
@@ -258,7 +258,7 @@
       "risk": 0.0,
       "exposure": 0.0,
       "hardenable": false,
-      "verdict": "method of a class (top-level functions and @staticmethod only)",
+      "verdict": "arguments (or self) can't be stored as JSON, so calls can't be recorded",
       "score": 0.0,
       "why": ""
     },
@@ -273,7 +273,7 @@
       "in_main": false,
       "signals": {},
       "static_risk": 0.0,
-      "refused": "method of a class (top-level functions and @staticmethod only)",
+      "refused": null,
       "file": "upstream.py",
       "first_line": 50,
       "calls": 1,
@@ -281,13 +281,13 @@
       "boundary_kinds": {},
       "gen": false,
       "arg_ok": false,
-      "ret_ok": true,
+      "ret_ok": null,
       "chaos": null,
       "dynamic_risk": null,
       "risk": 0.0,
       "exposure": 0.0,
       "hardenable": false,
-      "verdict": "method of a class (top-level functions and @staticmethod only)",
+      "verdict": "arguments (or self) can't be stored as JSON, so calls can't be recorded",
       "score": 0.0,
       "why": ""
     },
@@ -302,7 +302,7 @@
       "in_main": false,
       "signals": {},
       "static_risk": 0.0,
-      "refused": "method of a class (top-level functions and @staticmethod only)",
+      "refused": null,
       "file": "upstream.py",
       "first_line": 32,
       "calls": 16,
@@ -316,7 +316,7 @@
       "risk": 0.0,
       "exposure": 0.0,
       "hardenable": false,
-      "verdict": "method of a class (top-level functions and @staticmethod only)",
+      "verdict": "arguments (or self) can't be stored as JSON, so calls can't be recorded",
       "score": 0.0,
       "why": ""
     },
@@ -331,7 +331,7 @@
       "in_main": false,
       "signals": {},
       "static_risk": 0.0,
-      "refused": "method of a class (top-level functions and @staticmethod only)",
+      "refused": null,
       "file": "upstream.py",
       "first_line": 62,
       "calls": 17,
@@ -345,7 +345,7 @@
       "risk": 0.0,
       "exposure": 0.0,
       "hardenable": false,
-      "verdict": "method of a class (top-level functions and @staticmethod only)",
+      "verdict": "arguments (or self) can't be stored as JSON, so calls can't be recorded",
       "score": 0.0,
       "why": ""
     },
@@ -360,7 +360,7 @@
       "in_main": false,
       "signals": {},
       "static_risk": 0.0,
-      "refused": "method of a class (top-level functions and @staticmethod only)",
+      "refused": "special method (__init__)",
       "file": "upstream.py",
       "first_line": 15,
       "calls": 1,
@@ -374,7 +374,7 @@
       "risk": 0.0,
       "exposure": 0.0,
       "hardenable": false,
-      "verdict": "method of a class (top-level functions and @staticmethod only)",
+      "verdict": "special method (__init__)",
       "score": 0.0,
       "why": ""
     },
@@ -408,5 +408,5 @@
       "why": ""
     }
   ],
-  "elapsed_s": 8.83
+  "elapsed_s": 8.79
 }

@@ -1,28 +1,35 @@
-"""Interception of the dependency boundary: urllib.request.urlopen, subprocess.run and (if
-installed) requests.Session.request.
+"""Interception of the dependency boundary, in the app's process:
 
-Every intercepted call is normalized into a `Req` and handed to the active `Handler` together with
-a `serve` callable that produces the real outcome. Outcomes are plain dicts (so they can be
-recorded into a cassette and replayed):
+    urllib.request.urlopen · subprocess.run · requests.Session.request · httpx.Client/AsyncClient.send ·
+    aiohttp.ClientSession._request · socket.create_connection (connection faults only)
 
-    http:       {"status", "reason", "headers": [[k, v]...], "body": bytes, "url"}
-    subprocess: {"returncode", "stdout", "stderr"}
-    any:        {"exc": {"type", "module", "msg", ...}}   (see values.dump_exc)
+The third-party clients are patched when the app imports them, so nothing is loaded that the app
+doesn't use. Every intercepted call is normalized into a `Req` and handed to the active `Handler`
+together with a `serve` callable that produces the real outcome. Outcomes are plain dicts (so they
+can be recorded into a cassette and replayed):
 
-A live exception also travels as out["_live"] so running code gets the original object; it is never
-recorded. The adapter then turns the outcome back into exactly what the API returns or raises.
+    http clients: {"status", "reason", "headers": [[k, v]...], "body": bytes, "url"}
+    subprocess:   {"returncode", "stdout", "stderr"}
+    any:          {"exc": {"type", "module", "msg", ...}}   (see values.dump_exc)
+
+Keys starting with "_" ("_live": the original exception object, "_socket") serve running code and are
+never recorded. The patch then turns the outcome back into exactly what the API returns or raises.
 """
 
 from __future__ import annotations
 
 import errno
 import contextvars
+import datetime
 import hashlib
+import importlib.abc
+import importlib.util
 import io
+import json
 import os
 import socket
 import subprocess
-import threading
+import sys
 import time
 import urllib.error
 import urllib.parse
@@ -36,9 +43,10 @@ NONIDEMPOTENT = frozenset({"POST", "PUT", "PATCH", "DELETE"})
 
 _orig_urlopen = urllib.request.urlopen
 _orig_run = subprocess.run
-_orig_requests = None
+_orig_create_connection = socket.create_connection
+_orig: dict = {}  # originals of the third-party client methods
 _installed = False
-_tls = threading.local()
+_busy: contextvars.ContextVar[bool] = contextvars.ContextVar("ras_busy", default=False)
 
 
 class ReplayMiss(BaseException):
@@ -84,11 +92,13 @@ class Req:
     def key(self) -> str:
         if self.kind == "subprocess":
             return norm_subproc_key(self.argv)
+        if self.kind == "socket":
+            return "CONNECT " + self.url
         return "%s %s%s" % (self.method, _logical_url(self.url), (" #" + self.body_sha[:12]) if self.body_sha else "")
 
     @property
     def nonidempotent(self) -> bool:
-        return self.kind != "subprocess" and self.method in NONIDEMPOTENT
+        return self.method in NONIDEMPOTENT
 
     @property
     def idem_key(self):
@@ -134,7 +144,7 @@ def exc_outcome(e: BaseException) -> dict:
 
 def recorded(out: dict) -> dict:
     """The outcome as it goes into a cassette."""
-    return {k: v for k, v in out.items() if k != "_live"}
+    return {k: v for k, v in out.items() if not k.startswith("_")}
 
 
 def raise_outcome(out: dict):
@@ -155,10 +165,24 @@ def is_failure(out: dict) -> bool:
 
 
 class Handler:
-    """Pass-through. Subclasses decide faults, record, or replay."""
+    """Passes calls through. Subclasses look on (before/after), inject faults, or replay."""
+
+    def before(self, req: Req) -> None:
+        pass
+
+    def after(self, req: Req, out: dict, dur: float) -> None:
+        pass
 
     def perform(self, req: Req, serve):
-        out, _dur = serve()
+        self.before(req)
+        out, dur = serve()
+        self.after(req, out, dur)
+        return out
+
+    async def aperform(self, req: Req, serve):
+        self.before(req)
+        out, dur = await serve()
+        self.after(req, out, dur)
         return out
 
 
@@ -195,16 +219,53 @@ class FaultingHandler(Handler):
         pass
 
     def perform(self, req, serve):
+        rec, steps = self._open(req)
+        result = None
+        try:
+            while True:
+                op, arg = steps.send(result)
+                if op == "serve":
+                    result = serve()
+                elif op == "wait":
+                    result = self.clock.wait(arg)
+                else:
+                    self.hangs += 1
+                    self.clock.hang()
+        except StopIteration as e:
+            return self._close(rec, e.value)
+
+    async def aperform(self, req, serve):
+        rec, steps = self._open(req)
+        result = None
+        while True:
+            try:
+                op, arg = steps.send(result)
+            except StopIteration as e:
+                return self._close(rec, e.value)
+            if op == "serve":
+                result = await serve()
+            elif op == "wait":
+                result = await self.clock.await_(arg)
+            else:
+                await self.clock.await_hang()  # a wait_for around it may cut this short: then it's no hang
+                self.hangs += 1
+                raise faults.ChaosHang("boundary call with no timeout hung (chaos)")
+
+    def _open(self, req):
         n = self.counts.get(req.key, 0)
         self.counts[req.key] = n + 1
         fault = self.plan.fault(req.key, n, req.nonidempotent)
+        if req.kind == "socket" and fault in ("http5xx", "http429", "truncated"):
+            fault = None  # nothing a connection can do
         rec = {"key": req.key, "n": n, "fault": fault, "reached": False, "nonidempotent": req.nonidempotent,
                "idem": req.idem_key, "method": req.method, "failed": True}
         self.attempts.append(rec)
         for calls in _scopes.get():
             calls.append(rec)
         self.on_attempt(req, rec)
-        out = self.execute(fault, req, serve, rec)  # a hang raises: failed stays True
+        return rec, self._steps(fault, req, rec)
+
+    def _close(self, rec, out):  # a hang never gets here: failed stays True
         rec["failed"] = is_failure(out) or bool(rec.get("truncated"))
         return out
 
@@ -215,54 +276,56 @@ class FaultingHandler(Handler):
             return rem, True
         return t, False
 
-    def _serve(self, serve, rec, extra=0.0, t=None, by_deadline=False, req=None):
-        if self.clock.virtual:
-            out, dur = serve()
-            rec["reached"] = True
-            total = extra + (dur or 0.0)
-            if t is not None and total > t:
-                self.clock.wait(t)
-                return exc_outcome(timeout_exc(req, t, by_deadline))
-            self.clock.wait(total)
-            return out
-        if extra:
-            if t is not None and t < extra:
-                if req.nonidempotent:
-                    serve()
-                    rec["reached"] = True
-                self.clock.wait(t)
-                return exc_outcome(timeout_exc(req, t, by_deadline))
-            self.clock.wait(extra)
-        out, _ = serve()
-        rec["reached"] = True
-        return out
+    # What happens to one attempt, as steps the sync or async loop above carries out:
+    # ("serve", None) -> (outcome, seconds) · ("wait", seconds) · ("hang", None).
 
-    def execute(self, fault, req, serve, rec):
+    def _steps(self, fault, req, rec):
         t, by_deadline = self._timeout(req)
         if fault is None:
-            return self._serve(serve, rec, 0.0, t, by_deadline, req)
+            return (yield from self._answer(rec, 0.0, t, by_deadline, req))
         if fault == "slow":
-            return self._serve(serve, rec, faults.SLOW_S, t, by_deadline, req)
+            return (yield from self._answer(rec, faults.SLOW_S, t, by_deadline, req))
         if fault == "truncated":
-            whole = self._serve(serve, rec, 0.0, t, by_deadline, req)
+            whole = yield from self._answer(rec, 0.0, t, by_deadline, req)
             out = truncate(whole)
             rec["truncated"] = out != whole
             return out
         if fault == "timeout":
             if req.nonidempotent:  # the request went out; only the answer is lost
-                serve()
+                yield "serve", None
                 rec["reached"] = True
             if t is None:
-                self.hangs += 1
                 rec["hang"] = True
-                self.clock.hang()
-            self.clock.wait(t)
+                yield "hang", None
+            yield "wait", t
             return exc_outcome(timeout_exc(req, t, by_deadline))
         if fault == "refused":
             return exc_outcome(refused_exc(req))
         if fault in ("http5xx", "http429"):
             return error_outcome(req, 503 if fault == "http5xx" else 429)
         raise ValueError("unknown fault %r" % fault)
+
+    def _answer(self, rec, extra, t, by_deadline, req):
+        if self.clock.virtual:
+            out, dur = yield "serve", None
+            rec["reached"] = True
+            total = extra + (dur or 0.0)
+            if t is not None and total > t:
+                yield "wait", t
+                return exc_outcome(timeout_exc(req, t, by_deadline))
+            yield "wait", total
+            return out
+        if extra:
+            if t is not None and t < extra:
+                if req.nonidempotent:
+                    yield "serve", None
+                    rec["reached"] = True
+                yield "wait", t
+                return exc_outcome(timeout_exc(req, t, by_deadline))
+            yield "wait", extra
+        out, _ = yield "serve", None
+        rec["reached"] = True
+        return out
 
 
 def truncate(out: dict) -> dict:
@@ -283,6 +346,16 @@ def timeout_exc(req: Req, t, by_deadline=False) -> BaseException:
         import requests
 
         return requests.exceptions.ReadTimeout("Read timed out. (read timeout=%s)" % t)
+    if req.kind == "httpx":
+        import httpx
+
+        return httpx.ReadTimeout("The read operation timed out")
+    if req.kind == "aiohttp":
+        import asyncio
+
+        return asyncio.TimeoutError()
+    if req.kind == "socket":
+        return socket.timeout("timed out")
     return urllib.error.URLError(socket.timeout("timed out"))
 
 
@@ -293,6 +366,15 @@ def refused_exc(req: Req) -> BaseException:
         import requests
 
         return requests.exceptions.ConnectionError("Connection refused: %s" % req.url)
+    if req.kind == "httpx":
+        import httpx
+
+        return httpx.ConnectError("[Errno %d] Connection refused" % errno.ECONNREFUSED)
+    if req.kind == "aiohttp":
+        u = urllib.parse.urlsplit(req.url)
+        return values.aiohttp_connector_error(u.hostname, u.port, errno.ECONNREFUSED, "Connect call failed")
+    if req.kind == "socket":
+        return ConnectionRefusedError(errno.ECONNREFUSED, "Connection refused")
     return urllib.error.URLError(ConnectionRefusedError(errno.ECONNREFUSED, "Connection refused"))
 
 
@@ -317,21 +399,51 @@ _handler: Handler = Handler()
 
 def install(handler: Handler) -> None:
     """Route every boundary call through `handler` (patches are installed once per process)."""
-    global _handler, _installed, _orig_requests
+    global _handler, _installed
     _handler = handler
     if _installed:
         return
     _installed = True
     urllib.request.urlopen = _urlopen
     subprocess.run = _run
-    try:
-        import requests  # noqa: F401
-        import requests.sessions
+    socket.create_connection = _create_connection
+    on_import("requests", _patch_requests)
+    on_import("httpx", _patch_httpx)
+    on_import("aiohttp", _patch_aiohttp)
 
-        _orig_requests = requests.sessions.Session.request
-        requests.sessions.Session.request = _requests_request
-    except Exception:  # requests is optional
-        _orig_requests = None
+
+def on_import(name: str, patch) -> None:
+    """Run patch(module) once the module is imported (now, if it already is)."""
+    if name in sys.modules:
+        return patch(sys.modules[name])
+    sys.meta_path.insert(0, _PatchOnImport(name, patch))
+
+
+class _PatchOnImport(importlib.abc.MetaPathFinder):
+    def __init__(self, name, patch):
+        self.name, self.patch, self.searching = name, patch, False
+
+    def find_spec(self, name, path, target=None):
+        if name != self.name or self.searching:
+            return None
+        self.searching = True  # let the other finders answer
+        try:
+            spec = importlib.util.find_spec(name)
+        finally:
+            self.searching = False
+        if spec is None or not hasattr(spec.loader, "exec_module"):
+            return spec
+        run = spec.loader.exec_module
+
+        def exec_module(module):
+            run(module)
+            try:
+                self.patch(module)
+            except Exception as e:  # an unfamiliar version: leave the app alone, say so
+                sys.stderr.write("ras-anything: can't watch %s: %r\n" % (name, e))
+
+        spec.loader.exec_module = exec_module
+        return spec
 
 
 def set_handler(handler: Handler) -> None:
@@ -340,13 +452,29 @@ def set_handler(handler: Handler) -> None:
 
 
 def _dispatch(req: Req, real) -> dict:
-    if getattr(_tls, "busy", False):  # a boundary call made by a boundary call: pass through
+    if _busy.get():  # a boundary call made by a boundary call: pass through
         return real()
-    _tls.busy = True
+    token = _busy.set(True)
     try:
         return _handler.perform(req, _live_serve(real))
     finally:
-        _tls.busy = False
+        _busy.reset(token)
+
+
+async def _adispatch(req: Req, real) -> dict:
+    if _busy.get():
+        return await real()
+
+    async def serve():
+        t0 = time.perf_counter()
+        out = await real()
+        return out, time.perf_counter() - t0
+
+    token = _busy.set(True)
+    try:
+        return await _handler.aperform(req, serve)
+    finally:
+        _busy.reset(token)
 
 
 # urllib ------------------------------------------------------------------------------------------
@@ -378,6 +506,10 @@ class FakeResponse(io.BytesIO):
         return list(self.headers.items())
 
 
+def _pairs(items) -> list:
+    return [[str(k), str(v)] for k, v in items]
+
+
 def _headers(pairs) -> Message:
     m = Message()
     for k, v in pairs or []:
@@ -402,7 +534,7 @@ def _urlopen(url, data=None, timeout=socket._GLOBAL_DEFAULT_TIMEOUT, *args, **kw
             resp = _orig_urlopen(url, data, timeout, *args, **kwargs)
             try:
                 body_ = resp.read()
-                return {"status": resp.status, "reason": resp.reason, "headers": [list(h) for h in resp.headers.items()],
+                return {"status": resp.status, "reason": resp.reason, "headers": _pairs(resp.headers.items()),
                         "body": body_, "url": resp.geturl()}
             finally:
                 resp.close()
@@ -411,7 +543,7 @@ def _urlopen(url, data=None, timeout=socket._GLOBAL_DEFAULT_TIMEOUT, *args, **kw
                 b = e.read()
             except Exception:
                 b = b""
-            return {"status": e.code, "reason": str(e.reason), "headers": [list(h) for h in (e.headers or {}).items()],
+            return {"status": e.code, "reason": str(e.reason), "headers": _pairs((e.headers or {}).items()),
                     "body": b, "url": e.url or full}
         except Exception as e:
             return exc_outcome(e)
@@ -455,6 +587,11 @@ def _run(*popenargs, **kwargs):
 # requests ----------------------------------------------------------------------------------------
 
 
+def _patch_requests(requests):
+    _orig["requests"] = requests.Session.request
+    requests.Session.request = _requests_request
+
+
 def _requests_request(self, method, url, *args, **kwargs):
     import requests
 
@@ -473,8 +610,8 @@ def _requests_request(self, method, url, *args, **kwargs):
 
     def real():
         try:
-            r = _orig_requests(self, method, url, *args, **kwargs)
-            return {"status": r.status_code, "reason": r.reason, "headers": [list(h) for h in r.headers.items()],
+            r = _orig["requests"](self, method, url, *args, **kwargs)
+            return {"status": r.status_code, "reason": r.reason, "headers": _pairs(r.headers.items()),
                     "body": r.content, "url": r.url}
         except Exception as e:
             return exc_outcome(e)
@@ -491,3 +628,93 @@ def _requests_request(self, method, url, *args, **kwargs):
     r.request = prep
     r.encoding = None
     return r
+
+
+# httpx -------------------------------------------------------------------------------------------
+
+
+def _patch_httpx(httpx):
+    _orig["httpx"], _orig["httpx-async"] = httpx.Client.send, httpx.AsyncClient.send
+    httpx.Client.send, httpx.AsyncClient.send = _httpx_send, _httpx_asend
+
+
+def _httpx_req(request, body) -> Req:
+    t = request.extensions.get("timeout") or {}
+    return Req("httpx", request.method, str(request.url), body, dict(request.headers), t.get("read"))
+
+
+def _httpx_outcome(r) -> dict:
+    return {"status": r.status_code, "reason": r.reason_phrase, "headers": _decoded(r.headers.multi_items()),
+            "body": r.content, "url": str(r.url)}
+
+
+def _decoded(pairs) -> list:
+    """Headers of a response whose body is already decoded and complete."""
+    return [[str(k), str(v)] for k, v in pairs if k.lower() not in ("content-encoding", "content-length", "transfer-encoding")]
+
+
+def _httpx_result(out, request):
+    import httpx
+
+    if "exc" in out:
+        e = out.get("_live") or values.build_exc(out["exc"])
+        if isinstance(e, httpx.RequestError):
+            e.request = request
+        raise e
+    r = httpx.Response(out["status"], headers=[tuple(h) for h in out.get("headers") or []], content=out.get("body") or b"",
+                       request=request, extensions={"http_version": b"HTTP/1.1", "reason_phrase": (out.get("reason") or "").encode()})
+    r.elapsed = datetime.timedelta(0)
+    return r
+
+
+def _httpx_send(self, request, *, stream=False, **kw):
+    def real():
+        try:
+            return _httpx_outcome(_orig["httpx"](self, request, **kw))
+        except Exception as e:
+            return exc_outcome(e)
+
+    return _httpx_result(_dispatch(_httpx_req(request, request.read()), real), request)
+
+
+async def _httpx_asend(self, request, *, stream=False, **kw):
+    async def real():
+        try:
+            return _httpx_outcome(await _orig["httpx-async"](self, request, **kw))
+        except Exception as e:
+            return exc_outcome(e)
+
+    return _httpx_result(await _adispatch(_httpx_req(request, await request.aread()), real), request)
+
+
+# aiohttp -----------------------------------------------------------------------------------------
+
+
+def _patch_aiohttp(aiohttp):
+    from . import fake_aiohttp
+
+    _orig["aiohttp"] = aiohttp.ClientSession._request
+    aiohttp.ClientSession._request = fake_aiohttp.request
+
+
+# sockets -----------------------------------------------------------------------------------------
+
+
+def _create_connection(address, timeout=socket._GLOBAL_DEFAULT_TIMEOUT, *args, **kwargs):
+    if _busy.get():
+        return _orig_create_connection(address, timeout, *args, **kwargs)
+    host, port = str(address[0]), address[1]
+    where = host if host in ("localhost", "::1") or host.startswith("127.") else "%s:%s" % (host, port)
+    t = socket.getdefaulttimeout() if timeout is socket._GLOBAL_DEFAULT_TIMEOUT else timeout
+    req = Req("socket", "CONNECT", where, None, None, t)
+
+    def real():
+        try:
+            return {"_socket": _orig_create_connection(address, timeout, *args, **kwargs)}
+        except Exception as e:
+            return exc_outcome(e)
+
+    out = _dispatch(req, real)
+    if "exc" in out:
+        raise_outcome(out)
+    return out["_socket"]

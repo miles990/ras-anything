@@ -8,9 +8,9 @@
   "display_cmd": "python app.py",
   "cwd": ".",
   "root": ".",
-  "created": "2026-11-23T12:28:11+0800",
+  "created": "2026-11-23T12:40:00+0800",
   "clean": {
-    "wall_s": 0.162,
+    "wall_s": 0.157,
     "stdout_sha256": "cfb411e89b79dadd1fbca1d605114c466e7d4d84da63f5a19aca8a78f2d8c821",
     "boundary_calls": 12
   },
@@ -23,7 +23,7 @@
         "seed": 1,
         "outcome": "crash",
         "exit": 1,
-        "wall_s": 0.123,
+        "wall_s": 0.138,
         "faults": 1,
         "uncaught": {
           "type": "JSONDecodeError",
@@ -36,7 +36,7 @@
         "seed": 2,
         "outcome": "crash",
         "exit": 1,
-        "wall_s": 0.122,
+        "wall_s": 0.096,
         "faults": 1,
         "uncaught": {
           "type": "URLError",
@@ -49,7 +49,7 @@
         "seed": 3,
         "outcome": "hang",
         "exit": 1,
-        "wall_s": 2.127,
+        "wall_s": 2.098,
         "faults": 1,
         "uncaught": {
           "type": "ChaosHang",
@@ -62,7 +62,7 @@
         "seed": 4,
         "outcome": "crash",
         "exit": 1,
-        "wall_s": 0.114,
+        "wall_s": 0.111,
         "faults": 1,
         "uncaught": {
           "type": "JSONDecodeError",
@@ -75,7 +75,7 @@
         "seed": 5,
         "outcome": "crash",
         "exit": 1,
-        "wall_s": 0.119,
+        "wall_s": 0.118,
         "faults": 1,
         "uncaught": {
           "type": "JSONDecodeError",
@@ -169,7 +169,7 @@
       "in_main": false,
       "signals": {},
       "static_risk": 0.0,
-      "refused": "method of a class (top-level functions and @staticmethod only)",
+      "refused": null,
       "file": "upstream.py",
       "first_line": 28,
       "calls": 12,
@@ -183,7 +183,7 @@
       "risk": 0.0,
       "exposure": 0.0,
       "hardenable": false,
-      "verdict": "method of a class (top-level functions and @staticmethod only)",
+      "verdict": "arguments (or self) can't be stored as JSON, so calls can't be recorded",
       "score": 0.0,
       "why": ""
     },
@@ -198,7 +198,7 @@
       "in_main": false,
       "signals": {},
       "static_risk": 0.0,
-      "refused": "method of a class (top-level functions and @staticmethod only)",
+      "refused": null,
       "file": "upstream.py",
       "first_line": 45,
       "calls": 12,
@@ -212,7 +212,7 @@
       "risk": 0.0,
       "exposure": 0.0,
       "hardenable": false,
-      "verdict": "method of a class (top-level functions and @staticmethod only)",
+      "verdict": "arguments (or self) can't be stored as JSON, so calls can't be recorded",
       "score": 0.0,
       "why": ""
     },
@@ -304,5 +304,5 @@
       "why": ""
     }
   ],
-  "elapsed_s": 2.77
+  "elapsed_s": 2.72
 }

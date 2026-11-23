@@ -30,6 +30,7 @@ __all__ = [
     "CircuitBreaker",
     "call_with_timeout",
     "retry",
+    "aretry",
     "is_transient",
     "retry_after_s",
     "log_event",
@@ -183,9 +184,11 @@ def call_with_timeout(fn, timeout_s: float, *args, **kwargs):
 def _http_status(exc: BaseException) -> int | None:
     if isinstance(exc, urllib.error.HTTPError):
         return exc.code
-    resp = getattr(exc, "response", None)  # requests.HTTPError
+    resp = getattr(exc, "response", None)  # requests.HTTPError, httpx.HTTPStatusError
     code = getattr(resp, "status_code", None)
-    return code if isinstance(code, int) else None
+    if code is None and (type(exc).__module__ or "").startswith("aiohttp"):  # ClientResponseError
+        code = getattr(exc, "status", None)
+    return code if isinstance(code, int) and code else None
 
 
 def is_transient(exc: BaseException) -> bool:
@@ -202,6 +205,10 @@ def is_transient(exc: BaseException) -> bool:
     if mod.startswith("requests"):
         name = type(exc).__name__
         return name in {"ConnectionError", "Timeout", "ConnectTimeout", "ReadTimeout", "ChunkedEncodingError"}
+    if mod.startswith("httpx"):  # connect/read/write/pool timeouts and network errors
+        return any(c.__name__ in {"TimeoutException", "NetworkError", "RemoteProtocolError"} for c in type(exc).__mro__)
+    if mod.startswith("aiohttp"):
+        return any(c.__name__ in {"ClientConnectionError", "ClientPayloadError"} for c in type(exc).__mro__)
     return False
 
 
@@ -239,31 +246,60 @@ def retry(fn, *, attempts: int = 3, base: float = 0.1, cap: float = 2.0, budget_
     note listing the attempts. `retry_on` is a predicate or a tuple of exception types.
     `sleep` defaults to time.sleep looked up at call time.
     """
+    step = _backoff(attempts, base, cap, budget_s, retry_on, on_retry)
+    while True:
+        try:
+            return fn()
+        except Exception as e:
+            delay = step(e)
+            if delay is None:
+                raise
+            (sleep or time.sleep)(delay)
+
+
+async def aretry(fn, *, attempts: int = 3, base: float = 0.1, cap: float = 2.0, budget_s: float | None = None,
+                 retry_on=is_transient, on_retry=None):
+    """retry() for an async fn: awaits fn() and waits with asyncio.sleep."""
+    import asyncio
+
+    step = _backoff(attempts, base, cap, budget_s, retry_on, on_retry)
+    while True:
+        try:
+            return await fn()
+        except Exception as e:
+            delay = step(e)
+            if delay is None:
+                raise
+            await asyncio.sleep(delay)
+
+
+def _backoff(attempts, base, cap, budget_s, retry_on, on_retry):
+    """step(error) -> seconds to wait before the next attempt, or None to give up (the error gets a note)."""
     if attempts < 1:
         raise ValueError("attempts must be >= 1")
     if isinstance(retry_on, (type, tuple)):
         types = retry_on
         retry_on = lambda e: isinstance(e, types)  # noqa: E731
-    start = _now()
-    for n in range(attempts):
-        try:
-            return fn()
-        except Exception as e:
-            last = n + 1 >= attempts
-            if last or not retry_on(e):
-                _note(e, "ras retry: gave up after %d attempt(s)" % (n + 1))
-                raise
-            delay = _rng.uniform(0.0, min(cap, base * (2 ** n)))
-            ra = retry_after_s(e)
-            if ra is not None:
-                delay = max(delay, ra)
-            if budget_s is not None and (_now() - start) + delay > budget_s:
-                _note(e, "ras retry: stopped after %d attempt(s), budget %.3gs exhausted" % (n + 1, budget_s))
-                raise
-            if on_retry is not None:
-                on_retry(n + 1, e, delay)
-            (sleep or time.sleep)(delay)
-    raise AssertionError("unreachable")
+    start, n = _now(), 0
+
+    def step(e):
+        nonlocal n
+        n += 1
+        if n >= attempts or not retry_on(e):
+            _note(e, "ras retry: gave up after %d attempt(s)" % n)
+            return None
+        delay = _rng.uniform(0.0, min(cap, base * (2 ** (n - 1))))
+        ra = retry_after_s(e)
+        if ra is not None:
+            delay = max(delay, ra)
+        if budget_s is not None and (_now() - start) + delay > budget_s:
+            _note(e, "ras retry: stopped after %d attempt(s), budget %.3gs exhausted" % (n, budget_s))
+            return None
+        if on_retry is not None:
+            on_retry(n, e, delay)
+        return delay
+
+    return step
 
 
 def _note(e: BaseException, text: str) -> None:

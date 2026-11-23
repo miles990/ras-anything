@@ -7,7 +7,9 @@ hardened code see the *same* fault on the same attempt even though they retry di
 
 from __future__ import annotations
 
+import asyncio
 import hashlib
+import selectors
 import time
 
 KINDS = ("timeout", "refused", "http5xx", "http429", "slow", "truncated")
@@ -92,7 +94,8 @@ def schedule(plan: Plan, keys: list[str], attempts: int = 4) -> list[list[str | 
 
 
 class LiveClock:
-    """Real time, with injected waits scaled down by `scale` (hangs capped at `hang_s`)."""
+    """Real time, with injected waits scaled down by `scale`; nothing blocks longer than `hang_s`
+    (a 300 s client timeout shouldn't cost 15 s of chaos run)."""
 
     virtual = False
 
@@ -104,7 +107,14 @@ class LiveClock:
 
     def wait(self, s: float) -> None:
         if s > 0:
-            time.sleep(s * self.scale)
+            time.sleep(min(s * self.scale, self.hang_s))
+
+    async def await_(self, s: float) -> None:
+        if s > 0:
+            await asyncio.sleep(min(s * self.scale, self.hang_s))
+
+    async def await_hang(self) -> None:
+        await asyncio.sleep(self.hang_s)
 
     def hang(self) -> None:
         time.sleep(self.hang_s)
@@ -112,7 +122,8 @@ class LiveClock:
 
 
 class VirtualClock:
-    """Simulated time. `install()` patches time.sleep/monotonic/time/perf_counter."""
+    """Simulated time. `install()` patches time.sleep/monotonic/time/perf_counter, and lets event
+    loops that wait for a timer move the clock instead of waiting."""
 
     virtual = True
     LIMIT_S = HANG_CAP_S * 20  # a call that spends this much virtual time is a hang, whatever it does
@@ -137,6 +148,13 @@ class VirtualClock:
         if self.t - self.start > self.LIMIT_S:
             raise ChaosHang("call kept running for %.0f virtual seconds" % (self.t - self.start))
 
+    async def await_(self, s: float) -> None:
+        if s and s > 0:
+            await asyncio.sleep(s)  # costs no real time: see install
+
+    async def await_hang(self) -> None:
+        await asyncio.sleep(HANG_CAP_S)
+
     def hang(self) -> None:
         self.wait(HANG_CAP_S)
         raise ChaosHang("boundary call with no timeout hung (virtual %.0fs)" % HANG_CAP_S)
@@ -153,6 +171,20 @@ class VirtualClock:
                 raise ValueError("sleep length must be non-negative")
             self.wait(s)
 
+        cls = selectors.DefaultSelector
+        real_select = cls.select
+        self._select = (cls, real_select)
+
+        def select(sel, timeout=None):
+            if timeout is None or timeout <= 0:
+                return real_select(sel, timeout)
+            ready = real_select(sel, 0.002)  # a moment for other threads (executors) to finish
+            if ready:
+                return ready
+            self.wait(timeout)
+            return real_select(sel, 0)
+
+        cls.select = select
         _t.sleep = sleep
         _t.monotonic = self.now
         _t.perf_counter = self.now
@@ -168,3 +200,5 @@ class VirtualClock:
             (_t.sleep, _t.monotonic, _t.time, _t.perf_counter, _t.monotonic_ns, _t.time_ns,
              _t.perf_counter_ns) = self._saved
             self._saved = None
+            cls, real_select = self._select
+            cls.select = real_select

@@ -20,10 +20,11 @@ The `ras-anything` CLI measures, records, replays, checks and swaps. You write t
    - Same happy path: same requests, same result for every recorded call. Where the original raised, same type.
    - `timeout=` on every dependency call; total worst case under the budget (default 5 s), sleeps included.
    - Retry only transient errors (timeouts, connection errors, 408/425/429/5xx, truncated 2xx bodies), with
-     full-jitter backoff (`ras_anything.runtime.retry`). Never retry other 4xx.
+     full-jitter backoff (`ras_anything.runtime.retry`, or `await aretry(...)` in async code). Never retry other 4xx.
    - POST/PUT/PATCH/DELETE: one deterministic `Idempotency-Key` across all attempts, or don't retry.
    - When the dependency stays down: return the declared `RAS_FALLBACK` (only a value callers already handle)
-     or raise `RasError(..., cause=e, context={...}) from e`. Log with `log_event`. Never swallow.
+     or raise `RasError(..., cause=e, context={...}) from e`. Log with `log_event`. Never swallow. A fallback only
+     counts in a call where a request was seen to fail and never got a good answer.
 4. **Verify**: `ras-anything verify <id>` replays every recorded call (no network, virtual clock), then the
    fault matrix for the original and your version. Fix and re-run until PASS. Never edit `calls.json`/`meta.json`.
 5. **Enable**: `ras-anything enable <id>`, then `ras-anything bench` and `ras-anything report`.
@@ -36,5 +37,5 @@ The `ras-anything` CLI measures, records, replays, checks and swaps. You write t
 - Don't enable a hardened function that hasn't passed verify (enable refuses anyway).
 - Don't "pass" by catching everything and returning a default: undeclared values count as silent wrong data,
   and `ChaosHang` (a BaseException) can't be caught by `except Exception`.
-- If a function shows ✗ (class method, nested, async, arguments that can't be stored as JSON), say why it can't be hardened
-  yet. Suggest moving the dependency call into a top-level function when that's the blocker.
+- If a function shows ✗ (nested, generator, property, uses super(), raw socket, arguments that can't be stored as JSON), say why it can't be hardened
+  yet. Suggest moving the dependency call into a top-level function or method when that's the blocker.

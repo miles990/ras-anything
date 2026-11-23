@@ -15,7 +15,7 @@
   "display_cmd": "python app.py",
   "cwd": ".",
   "env": {
-    "PAYMENTS_API_URL": "http://127.0.0.1:35913"
+    "PAYMENTS_API_URL": "http://127.0.0.1:46455"
   },
   "globals": {
     "RENDER": {
@@ -33,6 +33,6 @@
   "recorded": 16,
   "seen": 16,
   "skipped": 0,
-  "recorded_at": "2026-11-23T12:28:22+0800",
+  "recorded_at": "2026-11-23T12:40:11+0800",
   "runtime": "Python 3.13.5"
 }

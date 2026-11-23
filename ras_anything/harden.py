@@ -172,9 +172,12 @@ def harden(fid: str | None = None, agent: str | None = None, model: str | None =
     r = run(adapter, cmd, {"mode": "record", "max_calls": max_calls, "calls_path": str(calls_path),
                            "project": str(project), "target": adapter.record_target(fn, project)},
             scan_cwd, root=scan_root)
-    if r.data is None or not calls_path.exists():
-        raise UserError("recording failed (exit %s)" % r.code, (r.stderr or "").strip()[-300:], "doctor")
+    if r.code != 0 or r.data is None or not calls_path.exists():
+        raise UserError("recording failed (exit %s)" % r.code, (r.stderr or "").strip()[-300:] or "the app printed no error", "doctor")
     calls = cassette.load(calls_path)
+    if not calls and r.data.get("skipped"):
+        raise UserError("none of the %d calls of %s could be recorded" % (r.data["skipped"], fid),
+                        "their arguments, results or dependency answers can't be stored as JSON", "status")
     if not calls:
         raise UserError("%s wasn't called while the workload ran" % fid, "is the command the same as for scan?",
                         "scan -- " + scan.get("display_cmd", ""))

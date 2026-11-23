@@ -334,6 +334,9 @@ def dump_exc(e: BaseException, depth: int = 0) -> dict:
     reason = getattr(e, "reason", None)
     if mod == "urllib.error" and name == "URLError" and depth < 4:
         d["reason"] = dump_exc(reason, depth + 1) if isinstance(reason, BaseException) else str(reason)
+    key = getattr(e, "_conn_key", None)
+    if mod == "aiohttp.client_exceptions" and key is not None:
+        d["host"], d["port"] = getattr(key, "host", None), getattr(key, "port", None)
     if mod == "subprocess":
         d["cmd"] = [str(x) for x in e.cmd] if isinstance(e.cmd, (list, tuple)) else str(e.cmd)
         for k in ("timeout", "returncode"):
@@ -352,6 +355,13 @@ def exc_type(d: dict) -> type | None:
     except ImportError:  # requests/httpx/aiohttp not installed here
         return None
     return cls if isinstance(cls, type) and issubclass(cls, Exception) else None
+
+
+def aiohttp_connector_error(host, port, code: int, msg: str, cls=None):
+    import aiohttp
+
+    key = types.SimpleNamespace(host=host, port=port, ssl=True, is_ssl=False)
+    return (cls or aiohttp.ClientConnectorError)(key, OSError(code, msg))
 
 
 def build_exc(d: dict) -> Exception:
@@ -373,6 +383,8 @@ def build_exc(d: dict) -> Exception:
             return cls(d.get("cmd") or "", d.get("timeout") or 0)
         if cls is subprocess.CalledProcessError:
             return cls(d.get("returncode") or 1, d.get("cmd") or "")
+        if "host" in d and d.get("module") == "aiohttp.client_exceptions":
+            return aiohttp_connector_error(d["host"], d.get("port"), d.get("errno") or 0, msg, cls)
         if cls is json.JSONDecodeError:
             return cls(msg, "", 0)
         if issubclass(cls, OSError) and isinstance(d.get("errno"), int):

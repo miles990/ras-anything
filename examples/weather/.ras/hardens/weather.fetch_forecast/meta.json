@@ -15,7 +15,7 @@
   "display_cmd": "python app.py",
   "cwd": ".",
   "env": {
-    "WEATHER_API_URL": "http://127.0.0.1:37803"
+    "WEATHER_API_URL": "http://127.0.0.1:33555"
   },
   "globals": {},
   "sys_path": [
@@ -26,6 +26,6 @@
   "recorded": 12,
   "seen": 12,
   "skipped": 0,
-  "recorded_at": "2026-11-23T12:28:11+0800",
+  "recorded_at": "2026-11-23T12:40:00+0800",
   "runtime": "Python 3.13.5"
 }

@@ -1,3 +1,4 @@
+import asyncio
 import io
 import json
 import sys
@@ -26,6 +27,41 @@ class Flaky:
         if self.errors:
             raise self.errors.pop(0)
         return self.value
+
+
+class AsyncRetryTest(unittest.TestCase):
+    def run_flaky(self, errors, **kw):
+        f = Flaky(errors)
+
+        async def call():
+            return f()
+
+        return f, asyncio.run(runtime.aretry(call, base=0.001, cap=0.002, **kw))
+
+    def test_same_rules_as_retry(self):
+        f, out = self.run_flaky([TimeoutError(), http_error(503)], attempts=3)
+        self.assertEqual((out, f.calls), ("ok", 3))
+        with self.assertRaises(urllib.error.HTTPError):
+            self.run_flaky([http_error(404)], attempts=3)
+        with self.assertRaises(TimeoutError):
+            self.run_flaky([TimeoutError()] * 3, attempts=3)
+        with self.assertRaises(urllib.error.HTTPError):
+            self.run_flaky([http_error(429, retry_after=9)], attempts=3, budget_s=1)
+
+    def test_transient_errors_of_optional_clients(self):
+        try:
+            import httpx
+            import aiohttp
+        except ImportError:
+            self.skipTest("httpx/aiohttp not installed")
+        req = httpx.Request("GET", "http://x")
+        for e, yes in ((httpx.ReadTimeout("t"), True), (httpx.ConnectError("c"), True), (httpx.RemoteProtocolError("p"), True),
+                       (httpx.InvalidURL("u"), False), (aiohttp.ServerDisconnectedError(), True), (aiohttp.ClientPayloadError(), True),
+                       (aiohttp.InvalidURL("u"), False), (aiohttp.ClientResponseError(None, (), status=503), True),
+                       (aiohttp.ClientResponseError(None, (), status=404), False),
+                       (httpx.HTTPStatusError("s", request=req, response=httpx.Response(502, request=req)), True),
+                       (httpx.HTTPStatusError("s", request=req, response=httpx.Response(403, request=req)), False)):
+            self.assertEqual(is_transient(e), yes, repr(e))
 
 
 class RetryTest(unittest.TestCase):

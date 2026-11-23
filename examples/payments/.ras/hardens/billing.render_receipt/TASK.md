@@ -71,7 +71,8 @@ Recorded examples:
    raise the same exception type (or a subclass).
 2. **Bounded latency: 5 s per call**, everything included: timeouts, backoff sleeps,
    Retry-After waits. Every boundary call needs a timeout (`urlopen(..., timeout=t)`,
-   `subprocess.run(..., timeout=t)`, `requests.get(..., timeout=t)`); a call with no timeout that
+   `subprocess.run(..., timeout=t)`, `requests.get(..., timeout=t)`,
+   `httpx.get(..., timeout=t)`); a call with no timeout that
    hangs is a hard fail. Budget the attempts so worst case stays under 5 s.
 3. **Retry only transient failures**: timeouts, connection errors, HTTP 408/425/429/500/502/503/504
    (honour `Retry-After`), EAGAIN, a truncated/undecodable body from a 2xx, a subprocess exit 75. Exponential

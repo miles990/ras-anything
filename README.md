@@ -107,8 +107,8 @@ Claude Code (Opus) through `--agent claude`. Exact commands and caveats are in e
 
 | example | verify: availability under the fault matrix | bench: app availability, 20 seeds | other bench numbers |
 |---|---|---|---|
-| [weather dashboard](examples/weather) (`fetch_forecast`, urlopen with no timeout) | 32.5% → **100.0%** (120 trials) | 40.0% → **100.0%** | hangs 15% → 0% · p99 run 2.15s → 954ms |
-| [billing run](examples/payments) (`charge` naive POST retry + `render_receipt` subprocess) | charge 76.9% → **100.0%** · render 33.1% → **100.0%** (160 trials each) | 0.0% → **90.0%** | identical 0% → 45% · dups 5 → 0 · hangs 25% → 0% · p99 3.99s → 3.95s |
+| [weather dashboard](examples/weather) (`fetch_forecast`, urlopen with no timeout) | 32.5% → **100.0%** (120 trials) | 40.0% → **100.0%** | hangs 15% → 0% · p99 run 2.17s → 889ms |
+| [billing run](examples/payments) (`charge` naive POST retry + `render_receipt` subprocess) | charge 76.9% → **100.0%** · render 33.1% → **100.0%** (160 trials each) | 0.0% → **90.0%** | identical 0% → 45% · dups 5 → 0 · hangs 25% → 0% · p99 3.96s → 3.93s |
 
 In the billing run, verify counted 38 duplicate charges for the original across its trials and 0 for
 the hardened version. The 10% of bench runs that still fail are the ledger read in `app.main`, which
@@ -118,8 +118,17 @@ sometimes slower at p50, because they wait out faults instead of dying on them.
 
 ## Fault model
 
-Faults are injected per dependency attempt, at `urllib.request.urlopen`, `subprocess.run` and (if
-installed) `requests.Session.request`.
+Faults are injected per dependency attempt. What is intercepted in Python (third-party clients only if
+your app imports them):
+
+| boundary | scan / bench faults | recorded and replayed by verify |
+|---|---|---|
+| `urllib.request.urlopen` | all | yes |
+| `requests` (`Session.request`) | all | yes |
+| `httpx` (`Client.send`, `AsyncClient.send`) | all | yes |
+| `aiohttp` (`ClientSession._request`; not websockets) | all | yes |
+| `subprocess.run` (and `check_output`) | all | yes |
+| `socket.create_connection` (raw sockets, `http.client`, `smtplib`, pure-Python drivers) | timeout, refused, slow, outage | no: traffic after the connect isn't captured |
 
 | fault | what happens |
 |---|---|
@@ -134,14 +143,18 @@ installed) `requests.Session.request`.
 `verify` applies each fault to the first attempt of every request (outage: the first 3), plus three
 seeded mixes (p=0.3 per attempt). `bench` and `scan` draw faults live from a hash of
 (seed, request, attempt number), so the original and the hardened app see the same fault on the same
-attempt. In live runs injected waits are scaled ×0.05, and a call with no timeout counts as hung
-after 2 s.
+attempt. In live runs injected waits are scaled ×0.05 (2 s at most), and a call with no timeout counts as hung
+after 2 s. In async code the waits are `asyncio.sleep`, so `asyncio.wait_for` around a call cuts them.
 
 ## What it can't do yet
 
 - Python only for now. Node.js/TypeScript is next (the adapter seam is in place), then others.
-- Top-level functions and `@staticmethod`s only: no methods, nested functions, async functions or generators. Arguments and results must be storable as JSON (plain data, bytes, dates, decimals, and instances of your project's own classes).
-- Boundaries: `urlopen`, `subprocess.run` (and `check_output`, which goes through it) and `requests`. Not raw sockets, `http.client` used directly, database drivers, `asyncio`, `Popen` used directly, or file I/O faults.
+- What can be swapped: top-level functions, methods, `@staticmethod`s and `@classmethod`s of top-level classes, sync or `async`. Not: nested functions, generators, properties and other decorated methods, `__special__` methods (except `__call__`), methods that use `super()`, anything in the entry script without an `if __name__ == "__main__"` guard, and async functions in the entry script.
+- Arguments (for methods that includes `self`) and results must be storable as JSON: plain data, bytes, dates, decimals, and instances of your project's own classes. Locks, loggers, `requests.Session` and `httpx.Client` inside `self` are recreated fresh (custom auth, adapters and transports are not); other live objects, like an `aiohttp.ClientSession` argument, can't be recorded. Aliasing between arguments isn't kept.
+- A hardened method is a module-level function taking `self`/`cls`; on the happy path verify also checks that it leaves its arguments and `self` as the original does (extra attributes are fine).
+- Not covered: connections opened by other means than `socket.create_connection` (`asyncio.open_connection`, C database drivers, `urllib3` used directly), `Popen` used directly, file I/O faults. Functions that talk over a raw socket are measured by scan but can't be hardened.
+- Responses handed to your code are complete, already-decoded bodies: streaming works, but reads can't fail half way. `aiohttp` responses carry no live connection, and `httpx` response history is empty.
+- Async calls are replayed one at a time, each in its own event loop.
 - Fault decisions ignore the port, so two dependencies on the same host and path share a schedule.
 - Verify checks that a fallback is *declared* and *earned* (a request failed with an exception, timeout, 5xx/429, a cut-off body, or a temp-failed process, and never got a good answer). An open circuit breaker makes no request, so return-the-fallback-while-open counts as wrong: raise instead.
 - The checks catch mistakes and shortcuts, not sabotage: hardened code runs in the same process as the recorder.
@@ -164,14 +177,15 @@ else gets an error saying what to run instead.
 - **Skill**: [`skills/ras-anything`](skills/ras-anything/SKILL.md) teaches any agent the loop.
 - `--agent claude` runs `claude -p --permission-mode acceptEdits` (edits plus `ras-anything verify` allowed) in the harden folder with `TASK.md` on stdin; `--agent codex` runs `codex exec --full-auto`. Anything else is run as a shell command with the task on stdin. `go` gives the agent one retry with the verify failure appended.
 
-Hardened code may use `ras_anything.runtime`: `retry` (full-jitter backoff, honours `Retry-After`,
+Hardened code may use `ras_anything.runtime`: `retry` / `aretry` (full-jitter backoff, honours `Retry-After`,
 total time budget, re-raises the original error), `is_transient`, `call_with_timeout`,
 `CircuitBreaker`, `RasError` (cause, context, trace id) and `log_event` (a JSON line on stderr).
 
 ## Tests
 
 ```sh
-python -m unittest discover -s tests        # offline, ~15 s (from the repo root)
+python -m unittest discover -s tests        # offline, ~70 s (from the repo root)
+pip install requests httpx aiohttp                 # optional: without them their tests are skipped
 ```
 
 ## Credits

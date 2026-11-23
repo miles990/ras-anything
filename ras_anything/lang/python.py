@@ -50,7 +50,7 @@ class PythonAdapter(LangAdapter):
     label = "Python"
     launchers = "python, python3, pypy, py, or uv / poetry / pipenv / pdm / hatch / rye run"
     example = "python app.py"
-    boundaries = "urlopen, requests, subprocess.run"
+    boundaries = "urlopen, requests, httpx, aiohttp, subprocess.run, socket.create_connection"
     fence = "python"
     hardened_name = "hardened.py"
     private_env = ("PYTHONPATH", "PYTHONHASHSEED")
@@ -131,12 +131,19 @@ class PythonAdapter(LangAdapter):
                 "static_risk": signals.risk(a["signals"]), "refused": self._refused(info, fi, in_main)}
 
     def _refused(self, info, fi, in_main):
-        if info["kind"] == "nested":
-            return "nested function (top-level functions only)"
-        if info["kind"] in ("method", "classmethod"):
-            return "%s of a class (top-level functions and @staticmethod only)" % info["kind"]
-        if info["async"]:
-            return "async function (not supported for Python yet)"
+        kind, name = info["kind"], info["qualname"].rsplit(".", 1)[-1]
+        if kind == "nested":
+            return "nested function (top-level functions and methods only)"
+        if info["async"] and in_main:
+            return "async function in the entry script (move it to a module)"
+        if kind in ("method", "classmethod"):
+            other = [d for d in info["decorators"] if d not in ("staticmethod", "classmethod")]
+            if other:
+                return "method with @%s" % other[0]
+            if name.startswith("__") and name.endswith("__") and name != "__call__":
+                return "special method (%s)" % name
+            if any(isinstance(n, ast.Name) and n.id in ("super", "__class__") for n in ast.walk(info["node"])):
+                return "method that uses super(): it can't move out of its class"
         if in_main and not fi.has_main_guard:
             return "in the entry script with no `if __name__ == \"__main__\"` guard"
         return None
@@ -146,8 +153,11 @@ class PythonAdapter(LangAdapter):
             return d["refused"]
         if d.get("gen"):
             return "generator (not supported yet)"
+        if "socket" in (d.get("boundary_kinds") or {}):
+            return "talks over a raw socket (connection faults are measured, but its traffic can't be replayed)"
         if d.get("arg_ok") is False:
-            return "arguments can't be stored as JSON, so calls can't be recorded"
+            return "arguments%s can't be stored as JSON, so calls can't be recorded" % (
+                " (or self)" if d["kind"] == "method" else "")
         if d.get("ret_ok") is False:
             return "return value can't be stored as JSON, so results can't be compared"
         if not d["boundary"]:
@@ -162,8 +172,11 @@ class PythonAdapter(LangAdapter):
         first = min([node.lineno] + [d.lineno for d in node.decorator_list])
         src = "\n".join(lines[first - 1: node.end_lineno])
         src = textwrap.dedent(src)
-        if info["kind"] == "staticmethod":
-            src = "\n".join(ln for ln in src.splitlines() if ln.strip() != "@staticmethod")
+        if info["kind"] in ("staticmethod", "classmethod"):
+            src = "\n".join(ln for ln in src.splitlines() if ln.strip() not in ("@staticmethod", "@classmethod"))
+        if "." in info["qualname"]:  # self.__x means self._Class__x inside the class
+            cls = info["qualname"].split(".")[0].lstrip("_")
+            src = re.sub(r"\.(__[A-Za-z0-9_]*[A-Za-z0-9](?:_(?!_))?)(?!\w)", r"._%s\1" % cls, src)
         return src
 
     def stub(self, fn, project):
@@ -192,7 +205,8 @@ class PythonAdapter(LangAdapter):
             "",
             *imports,
             "",
-            "from ras_anything.runtime import RasError, CircuitBreaker, call_with_timeout, is_transient, log_event, retry",
+            "from ras_anything.runtime import RasError, CircuitBreaker, call_with_timeout, is_transient, log_event, %s" % (
+                "aretry" if fn.get("async") else "retry"),
         ]
         if from_mod:
             lines.append("from %s import %s  # module-level names the original uses" % (mod, ", ".join(from_mod)))
@@ -229,8 +243,10 @@ class PythonAdapter(LangAdapter):
 
     def task_texts(self, fn):
         return {
-            "kind": "Python function",
-            "timeouts": "Every boundary call needs a timeout (`urlopen(..., timeout=t)`,\n   `subprocess.run(..., timeout=t)`, `requests.get(..., timeout=t)`)",
+            "kind": ("async " if fn.get("async") else "") + "Python " + fn["kind"] + (
+                " (write it as a top-level function; `%s` is its first argument)" % ("self" if fn["kind"] == "method" else "cls")
+                if fn["kind"] in ("method", "classmethod") else ""),
+            "timeouts": "Every boundary call needs a timeout (`urlopen(..., timeout=t)`,\n   `subprocess.run(..., timeout=t)`, `requests.get(..., timeout=t)`,\n   `httpx.get(..., timeout=t)`)",
             "transient": "EAGAIN, a truncated/undecodable body from a 2xx, a subprocess exit 75",
             "raise": '`raise RasError("...", cause=e, context={...}) from e`',
             "declare": "Declare it at module level as `RAS_FALLBACK` (a value, or a callable taking the same arguments;\n"
@@ -250,13 +266,16 @@ class PythonAdapter(LangAdapter):
 - `CircuitBreaker(fail_threshold, cooldown_s)`: `.call(fn, *args)`; raises `CircuitOpenError` while open.
 - `RasError(message, *, cause=None, context=None)`: structured error with a trace id.
 - `log_event(event, **fields)`: one JSON line on stderr.
-""",
+""" + ("""- `await aretry(fn, ...)`: `retry` for an async `fn` (same arguments; waits with `asyncio.sleep`). Use
+  `asyncio.wait_for(...)` for overall timeouts, and never block the event loop (`time.sleep`, `urlopen`).
+""" if fn.get("async") else ""),
         }
 
     # ---------------------------------------------------------------- record / replay
 
     def record_target(self, fn, project):
-        return {"file": str(resolve_in_project(fn["file"], project)), "line": fn["first_line"], "name": fn["name"]}
+        return {"file": str(resolve_in_project(fn["file"], project)), "line": fn["first_line"], "name": fn["name"],
+                "async": fn.get("async", False), "module": fn["module"], "qualname": fn["qualname"]}
 
     def record_meta(self, fn, data, project):
         return {"sys_path": _portable_sys_path(data.get("sys_path") or [], project),
@@ -284,7 +303,8 @@ class PythonAdapter(LangAdapter):
         qual = meta["qualname"]
         if "." in qual:
             cls, name = qual.split(".", 1)
-            bind = "    %s.%s = staticmethod(_ras_fn)" % (cls, name)
+            wrap = "%s(_ras_fn)" % meta["kind"] if meta["kind"] in ("staticmethod", "classmethod") else "_ras_fn"
+            bind = "    %s.%s = %s" % (cls, name, wrap)
         else:
             name = qual
             bind = "    %s = _ras_fn" % name
@@ -311,12 +331,16 @@ class PythonAdapter(LangAdapter):
         out = []
         v = sys.version_info
         out.append((v >= (3, 10), "python %d.%d.%d" % v[:3], "" if v >= (3, 10) else "ras-anything needs Python 3.10+"))
-        try:
-            import requests
+        from importlib import metadata
 
-            out.append((True, "requests", "%s (intercepted too)" % requests.__version__))
-        except ImportError:
-            out.append((None, "requests", "not installed (optional: urllib and subprocess are covered)"))
+        have = []
+        for pkg in ("requests", "httpx", "aiohttp"):
+            try:
+                have.append("%s %s" % (pkg, metadata.version(pkg)))
+            except metadata.PackageNotFoundError:
+                pass
+        out.append((True if have else None, "HTTP clients", (", ".join(have) + " (intercepted, like urllib)") if have else
+                    "no requests/httpx/aiohttp here (optional: urllib and subprocess are covered)"))
         return out
 
 

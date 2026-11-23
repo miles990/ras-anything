@@ -11,8 +11,10 @@ Results go to cfg["out"] as JSON when the process exits.
 from __future__ import annotations
 
 import atexit
+import contextlib
+import contextvars
 import functools
-import importlib.abc
+import inspect
 import json
 import os
 import platform
@@ -23,7 +25,24 @@ import time
 from ... import cassette, faults, runtime
 from . import boundary, values
 
-CO_GEN = 0x20 | 0x80 | 0x100 | 0x200  # generator, coroutine, iterable coroutine, async generator
+CO_GEN = 0x20 | 0x100 | 0x200  # generator, iterable coroutine, async generator
+CO_COROUTINE, CO_NESTED = 0x80, 0x10
+
+
+def find_target(module, qualname):
+    """(owner, what the owner holds, the plain function) for `name` or `Class.name`; function None if absent."""
+    owner, attr = module, qualname
+    if "." in attr:
+        cls, attr = attr.split(".", 1)
+        owner = getattr(module, cls, None)
+    raw = vars(owner).get(attr) if owner is not None else None
+    fn = raw.__func__ if isinstance(raw, (staticmethod, classmethod)) else raw
+    return owner, raw, fn if callable(fn) else None
+
+
+def rebind(raw, fn):
+    """fn, as the kind of attribute `raw` was."""
+    return type(raw)(fn) if isinstance(raw, (staticmethod, classmethod)) else fn
 
 
 class Agent:
@@ -36,6 +55,7 @@ class Agent:
         self._owned: dict = {}
         self.type_modules: set = set()
         self._user: dict = {}
+        self._starts: dict = {}  # coroutine code -> f_lasti when it starts
         self.funcs: dict = {}
         self.boundary_by_fn: dict = {}
         self.boundary_total = 0
@@ -78,15 +98,22 @@ class Agent:
             "site-packages" not in real and "_ras_hardened" not in real and os.sep + ".ras" + os.sep not in real
 
     def innermost(self):
+        """The project function a boundary call belongs to: the innermost one on the stack, helpers
+        defined inside a function counting as that function."""
         f = sys._getframe(2)
+        nested = None
         while f is not None:
             k = self.user_key(f.f_code)
             if k is not None:
-                mod = f.f_globals.get("__name__", "")
-                self.note_module(k, mod)
-                return k
+                if not f.f_code.co_flags & CO_NESTED:
+                    self.note_module(k, f.f_globals.get("__name__", ""))
+                    return k
+                nested = nested or (k, f.f_globals.get("__name__", ""))
             f = f.f_back
-        return None
+        if nested is None:
+            return None
+        self.note_module(*nested)
+        return nested[0]
 
     def note_module(self, k, mod):
         st = self.funcs.get(k)
@@ -105,6 +132,8 @@ class Agent:
             if k is None:
                 return
             st = self.note_module(k, frame.f_globals.get("__name__", ""))
+            if frame.f_code.co_flags & CO_COROUTINE and frame.f_lasti != self._starts.setdefault(frame.f_code, frame.f_lasti):
+                return  # an await resuming, not a new call
             st["calls"] += 1
             if frame.f_code.co_flags & CO_GEN:
                 st["gen"] = True
@@ -116,7 +145,7 @@ class Agent:
                 st["arg_ok"] = ok if st["arg_ok"] is None else (st["arg_ok"] and ok)
         elif event == "return":
             k = self._user.get(frame.f_code)
-            if not k:
+            if not k or frame.f_code.co_flags & CO_COROUTINE:  # (a coroutine also "returns" at every await)
                 return
             st = self.funcs.get(k)
             if st is not None and st["calls"] <= 3:
@@ -127,6 +156,7 @@ class Agent:
 
     def start_record(self):
         tgt = self.cfg["target"]
+        self.recording: contextvars.ContextVar = contextvars.ContextVar("ras_recording", default=None)
         self.t_file = os.path.realpath(tgt["file"])
         self.t_line = tgt["line"]
         self.t_name = tgt["name"]
@@ -139,18 +169,82 @@ class Agent:
         agent = self
 
         class Recorder(boundary.Handler):
-            def perform(self, req, serve):
-                out, dur = serve()
-                cur = getattr(agent.tls, "current", None)
-                if cur is not None:
+            def after(self, req, out, dur):
+                cur = getattr(agent.tls, "current", None) or agent.recording.get()
+                if cur is None:
+                    return
+                try:
                     cur["io"].append({"req": agent.codec.enc(req.to_dict()),
                                       "out": agent.codec.enc(boundary.recorded(out)), "dur": round(dur, 6)})
-                return out
+                except Exception:  # an answer that isn't data: this call can't be replayed
+                    cur["bad"] = True
 
         self.handler = Recorder()
         boundary.install(self.handler)
-        sys.settrace(self.trace)
-        threading.settrace(self.trace)
+        if tgt.get("async"):
+            boundary.on_import(tgt["module"], lambda module: self.wrap_record(module, tgt["qualname"]))
+        else:
+            sys.settrace(self.trace)
+            threading.settrace(self.trace)
+
+    def take_snapshot(self, g, code):
+        if self.snapshot is None:
+            simple = (str, int, float, bool, type(None))
+            self.snapshot = {"env": self.codec.enc(dict(os.environ)),
+                             "globals": {n: self.codec.enc(g[n]) for n in code.co_names if n in g and type(g[n]) in simple}}
+
+    def wrap_record(self, module, qualname):
+        """Coroutines are recorded by a wrapper: tracing can't tell their awaits from their end."""
+        owner, raw, fn = find_target(module, qualname)
+        if fn is None:
+            return
+
+        @functools.wraps(fn)
+        async def wrapper(*a, **kw):
+            self.target_seen += 1
+            self.take_snapshot(fn.__globals__, fn.__code__)
+            rec = None
+            if len(self.records) < self.max_calls and self.recording.get() is None:
+                try:
+                    rec = {"args": self.codec.enc(list(a)), "kwargs": self.codec.enc(kw), "io": []}
+                except Exception:
+                    self.skipped += 1
+            if rec is None:
+                return await fn(*a, **kw)
+            token = self.recording.set(rec)
+            t0 = time.perf_counter()
+            res = exc = None
+            try:
+                res = await fn(*a, **kw)
+                return res
+            except Exception as e:
+                exc = e
+                raise
+            except BaseException:  # cancelled: not a result to compare with
+                rec = None
+                raise
+            finally:
+                self.recording.reset(token)
+                if rec is not None:
+                    self.keep(rec, t0, res, exc)
+
+        setattr(owner, qualname.rsplit(".", 1)[-1], rebind(raw, wrapper))
+
+    def keep(self, rec, t0, res, exc):
+        rec["dur"] = round(time.perf_counter() - t0, 6)
+        if rec.get("bad"):
+            self.skipped += 1
+            return
+        try:
+            if exc is not None:
+                rec["exc"] = values.dump_exc(exc)
+            else:
+                rec["result"] = self.codec.enc(res)
+            with self.lock:
+                if len(self.records) < self.max_calls:
+                    self.records.append(rec)
+        except Exception:
+            self.skipped += 1
 
     def is_target(self, code):
         k = self._user.get(code, False)
@@ -169,12 +263,7 @@ class Agent:
         if depth > 0:
             return self._local_depth_only
         self.target_seen += 1
-        if self.snapshot is None:
-            g = frame.f_globals
-            simple = (str, int, float, bool, type(None))
-            self.snapshot = {"env": self.codec.enc(dict(os.environ)),
-                             "globals": {n: self.codec.enc(g[n]) for n in frame.f_code.co_names
-                                         if n in g and type(g[n]) in simple}}
+        self.take_snapshot(frame.f_globals, frame.f_code)
         rec = None
         if len(self.records) < self.max_calls:
             code = frame.f_code
@@ -216,18 +305,7 @@ class Agent:
             rec = tls.current
             tls.current = None
             if rec is not None:
-                rec["dur"] = round(time.perf_counter() - rec.pop("t0"), 6)
-                exc = tls.pending_exc
-                try:
-                    if exc is not None:
-                        rec["exc"] = values.dump_exc(exc)
-                    else:
-                        rec["result"] = self.codec.enc(arg)
-                    with self.lock:
-                        if len(self.records) < self.max_calls:
-                            self.records.append(rec)
-                except Exception:
-                    self.skipped += 1
+                self.keep(rec, rec.pop("t0"), arg, tls.pending_exc)
             tls.pending_exc = None
         return self._local
 
@@ -243,75 +321,63 @@ class Agent:
             return
         agent = self
 
-        class Finder(importlib.abc.MetaPathFinder):
-            def find_spec(self, name, path, target=None):
-                if name not in by_mod:
-                    return None
-                for f in sys.meta_path:
-                    if f is self or not hasattr(f, "find_spec"):
-                        continue
-                    spec = f.find_spec(name, path, target)
-                    if spec is not None:
-                        break
-                else:
-                    return None
-                loader = spec.loader
-                orig_exec = loader.exec_module
+        def wrap_all(module):
+            for t in by_mod[module.__name__]:
+                agent.wrap_stats(module, t)
 
-                def exec_module(module):
-                    orig_exec(module)
-                    for t in by_mod[name]:
-                        agent.wrap_stats(module, t)
-
-                loader.exec_module = exec_module
-                return spec
-
-        sys.meta_path.insert(0, Finder())
+        for name in by_mod:
+            boundary.on_import(name, wrap_all)
 
     def wrap_stats(self, module, t):
-        owner, attr = module, t["qualname"]
-        if "." in attr:
-            cls, attr = attr.split(".", 1)
-            owner = getattr(module, cls, None)
-        fn = getattr(owner, attr, None)
-        if fn is None or not callable(fn):
+        owner, raw, fn = find_target(module, t["qualname"])
+        if fn is None:
             return
         st = self.stats.setdefault(t["id"], {"calls": 0, "ok": 0, "raised": {}, "fallback": 0, "lat": [],
                                              "hardened": "_ras_hardened" in (getattr(fn, "__code__", None) and fn.__code__.co_filename or "")})
         fallback = getattr(fn, "__globals__", {}).get("RAS_FALLBACK")
 
-        @functools.wraps(fn)
-        def wrapper(*a, **kw):
-            attempts: list = []  # what this call (and threads it hands its context to) asked of dependencies
+        @contextlib.contextmanager
+        def watch(a, kw):
+            attempts: list = []  # what this call (and tasks/threads it hands its context to) asked of dependencies
+            box: dict = {}
             token = boundary._scopes.set(boundary._scopes.get() + (attempts,))
             t0 = time.perf_counter()
             st["calls"] += 1
             try:
-                res = fn(*a, **kw)
+                yield box
             except BaseException as e:
                 name = type(e).__name__
                 st["raised"][name] = st["raised"].get(name, 0) + 1
-                st["lat"].append(time.perf_counter() - t0)
                 raise
             finally:
                 boundary._scopes.reset(token)
-            st["lat"].append(time.perf_counter() - t0)
+                st["lat"].append(time.perf_counter() - t0)
             fb = None
             try:
                 fb = fallback(*a, **kw) if callable(fallback) else fallback
             except Exception:
                 pass
-            # a fallback only counts when this very call saw a dependency fail
-            if fallback is not None and res == fb and any(x["failed"] for x in attempts):
+            # a fallback only counts when this very call saw a request fail that never got a good answer
+            answered = {x["key"] for x in attempts if not x["failed"]}
+            if fallback is not None and box["res"] == fb and any(x["key"] not in answered for x in attempts):
                 st["fallback"] += 1
             else:
                 st["ok"] += 1
-            return res
 
-        if owner is not module and isinstance(owner.__dict__.get(attr), staticmethod):
-            setattr(owner, attr, staticmethod(wrapper))
+        if inspect.iscoroutinefunction(fn):
+            @functools.wraps(fn)
+            async def wrapper(*a, **kw):
+                with watch(a, kw) as box:
+                    box["res"] = await fn(*a, **kw)
+                return box["res"]
         else:
-            setattr(owner, attr, wrapper)
+            @functools.wraps(fn)
+            def wrapper(*a, **kw):
+                with watch(a, kw) as box:
+                    box["res"] = fn(*a, **kw)
+                return box["res"]
+
+        setattr(owner, t["qualname"].rsplit(".", 1)[-1], rebind(raw, wrapper))
 
     # ---------------------------------------------------------------- start / finish
 
@@ -321,7 +387,7 @@ class Agent:
             agent = self
 
             class Counter(boundary.Handler):
-                def perform(self, req, serve):
+                def before(self, req):
                     k = agent.innermost()
                     agent.boundary_total += 1
                     if k is not None:
@@ -329,8 +395,6 @@ class Agent:
                         st["boundary"] += 1
                         st.setdefault("kinds", {})
                         st["kinds"][req.kind] = st["kinds"].get(req.kind, 0) + 1
-                    out, _ = serve()
-                    return out
 
             self.handler = Counter()
             boundary.install(self.handler)

@@ -124,14 +124,18 @@ Written to `cfg.out` as JSON when the process exits, however it exits (uncaught 
 **Request key.** HTTP: `METHOD scheme://host/path?query` without the port, plus ` #<first 12 hex of the
 body's sha256>` when there is a body. Subprocess: `run <argv…>`, the interpreter reduced to its name and
 paths under the working directory made relative. The same logical request must have the same key in
-every run, on every machine.
+every run, on every machine. Kind `socket` (key `CONNECT host[:port]`) marks a raw connection: it gets
+connection faults only and is never recorded.
+
+**Attribution.** Boundary work belongs to the innermost project function on the stack; helpers defined
+inside a function count as that function.
 
 **Observed failure** (`failed`): the dependency call ended in an exception (timeout, refused, reset…),
 HTTP 5xx or 429, a process killed or exiting 75, or a body the agent cut. Other 4xx are answers. This is
 the only evidence that can earn a fallback; text the app prints can't.
 
-`stats[id].fallback` counts calls that returned the declared fallback **and** saw a failed attempt inside
-that same call.
+`stats[id].fallback` counts calls that returned the declared fallback **and** made, inside that same call,
+a request that failed and never got a good answer.
 
 ## Faults
 
@@ -169,7 +173,10 @@ A hang is raised as something ordinary error handling can't swallow (Python: `Ch
 }
 ```
 
-- **REQ** `{"kind": "http" | "requests" | "subprocess" | …, "method", "url", "body_sha", "idempotency_key", "timeout", "argv", "key"}`.
+Async functions are recorded from the call to the end of the await, each with its own `io` even when
+several run concurrently (Python: a context variable).
+
+- **REQ** `{"kind": "http" | "requests" | "httpx" | "aiohttp" | "subprocess" | …, "method", "url", "body_sha", "idempotency_key", "timeout", "argv", "key"}`.
   Request headers and bodies are not stored.
 - **OUT** `{"status", "reason", "headers": [[k, v]…], "body": V, "url"}`, or
   `{"returncode", "stdout": V, "stderr": V}`, or `{"exc": E}`.
@@ -221,7 +228,8 @@ The worker imports the original module (with `RAS_ANYTHING_DISABLE=1`, the recor
 and working directory), then the hardened file, then runs the trials in order in one process. For each:
 fresh arguments decoded from the cassette, boundary calls served from that call's `io` by key (first
 unused match, else the last match), faults from the plan, a virtual clock (sleeps and timeouts cost no
-real time; `slow` and recorded durations are added to it), randomness seeded with `seed`. No network: a
+real time; `slow` and recorded durations are added to it; event-loop timers advance it too, so
+`asyncio.sleep` and `wait_for` work), an event loop of its own for async functions, randomness seeded with `seed`. No network: a
 request that isn't in the recording raises an uncatchable miss.
 
 ```jsonc

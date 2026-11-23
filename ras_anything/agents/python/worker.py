@@ -6,6 +6,7 @@ Usage: python -m ras_anything.agents.python.worker <job.json>   (protocol: docs/
 
 from __future__ import annotations
 
+import asyncio
 import hashlib
 import importlib
 import importlib.util
@@ -50,7 +51,8 @@ class Replay(boundary.FaultingHandler):
                 last = i
         return last
 
-    def perform(self, req, _live_serve):
+    def source(self, req):
+        """The recorded answer to this request, as a `serve` callable."""
         if not self.active:
             raise ReplayMiss("dependency call outside a replayed call: %s" % req.key)
         i = self.match(req)
@@ -63,7 +65,18 @@ class Replay(boundary.FaultingHandler):
             x = self.io[i]
             return x["out"], x.get("dur") or 0.0
 
-        return super().perform(req, serve)
+        return serve
+
+    def perform(self, req, _live_serve):
+        return super().perform(req, self.source(req))
+
+    async def aperform(self, req, _live_serve):
+        recorded = self.source(req)
+
+        async def serve():
+            return recorded()
+
+        return await super().aperform(req, serve)
 
 
 def class_finder(meta):
@@ -184,6 +197,8 @@ def run_job(job: dict) -> dict:
         outcome, miss = "return", None
         try:
             res = fn(*args, **kwargs)
+            if inspect.iscoroutine(res):
+                res = asyncio.run(res)
         except ChaosHang:
             outcome = "hang"
         except ReplayMiss as e:

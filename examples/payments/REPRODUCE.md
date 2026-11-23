@@ -58,7 +58,7 @@ Measured (from the commands above, v0.2):
 | bench: byte-identical output | 0.0% | 45.0% |
 | bench: crashes / hangs / wrong output | 60.0% / 25.0% / 15.0% | 10.0% / 0.0% / 0.0% |
 | bench: duplicate charges | 5 | 0 |
-| bench: p50 / p99 run time | 1.83s / 3.99s | 1.38s / 3.95s |
+| bench: p50 / p99 run time | 1.79s / 3.96s | 1.33s / 3.93s |
 
 Degraded runs are runs where `charge` returned its declared fallback (`None`, which the app already
 prints as `PENDING (payment failed, retry tomorrow)`; safe now because the retry tomorrow reuses the

@@ -81,13 +81,23 @@ class FileInfo:
             return "http", "urlopen", verb
         if full.startswith("subprocess.") and full.split(".")[-1] in SUBPROCESS:
             return "subprocess", "subprocess." + full.split(".")[-1], "RUN"
-        if last in HTTP_VERBS and (full.startswith("requests.") or "session" in head.lower()
+        if full == "socket.create_connection":
+            return "socket", "socket.create_connection", "CONNECT"
+        if last in HTTP_VERBS and (full.startswith(("requests.", "httpx.")) or "session" in head.lower()
                                    or head.lower().endswith(("client", "http"))):
             verb = last.upper()
             if last == "request":
                 verb = (_const_str(call.args[0]) if call.args else _kw_str(call, "method")) or "REQUEST"
             return "http", name, verb.upper()
         return None
+
+    def _httpx(self, call: ast.Call) -> bool:
+        """httpx.get(...), or a client in a file that uses httpx and no other client library."""
+        root = dotted(call.func).split(".")[0]
+        if self.imports.get(root, "").split(".")[0] == "httpx":
+            return True
+        tops = {v.split(".")[0] for v in self.imports.values()}
+        return "httpx" in tops and not tops & {"requests", "aiohttp"} and dotted(call.func).rpartition(".")[2] in HTTP_VERBS
 
     def analyze(self, info: dict) -> dict:
         node = info["node"]
@@ -138,7 +148,11 @@ class FileInfo:
             if verb == "GET" and requests_made:
                 verb = next(iter(requests_made.values()))
             boundary_calls.append((kind, name, verb))
-            has_timeout = any(k.arg == "timeout" for k in n.keywords) or (name == "urlopen" and len(n.args) >= 3)
+            has_timeout = any(k.arg == "timeout" and not (isinstance(k.value, ast.Constant) and k.value.value is None)
+                              for k in n.keywords) or (name == "urlopen" and len(n.args) >= 3) or (
+                name == "socket.create_connection" and len(n.args) >= 2)
+            if self._httpx(n) and not any(k.arg == "timeout" for k in n.keywords):
+                has_timeout = True  # httpx waits 5 s unless told otherwise
             if not has_timeout and not self.sets_default_timeout and "call_with_timeout" not in seg:
                 found.setdefault("no_timeout", SIGNALS["no_timeout"][1].format(call=name))
             if verb.lower() in WRITE_VERBS:

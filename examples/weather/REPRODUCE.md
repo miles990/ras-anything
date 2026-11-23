@@ -47,7 +47,7 @@ Measured (from the commands above, v0.2):
 | verify: hangs / p99 latency (budget 5 s, virtual clock) | 15 / 60.00s | 0 / 3.61s |
 | bench: app availability, 20 seeds | 40.0% | 100.0% |
 | bench: crashes / hangs | 45.0% / 15.0% | 0.0% / 0.0% |
-| bench: p50 / p99 run time | 134ms / 2.15s | 352ms / 954ms |
+| bench: p50 / p99 run time | 118ms / 2.17s | 336ms / 889ms |
 
 The `unavailable` marker is the text the dashboard already prints for a city the provider has in
 maintenance; the hardened function returns that same documented shape (`RAS_FALLBACK`) when the

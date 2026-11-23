@@ -12,7 +12,7 @@
 | hangs | 15.0% | 0.0% |
 | wrong output | 0.0% | 0.0% |
 | duplicate non-idempotent side effects | 0 | 0 |
-| p50 / p99 run time | 134ms / 2.15s | 352ms / 954ms |
+| p50 / p99 run time | 118ms / 2.17s | 336ms / 889ms |
 | faults injected (total) | 14 | 49 |
 
 A run counts as *degraded* when its output differs only where a hardened function returned its declared `RAS_FALLBACK` in that run (and symmetrically for the original if its output matches a declared-degraded output) or on lines containing `unavailable`.
@@ -42,7 +42,7 @@ Each hardened function was replayed on its recorded real calls (dependency answe
 
 Whole-app bench: each dependency attempt draws its fault from a hash of (seed, request, attempt number), so original and hardened see the same fault on the same attempt. Outages hit 5% of requests. Injected waits are scaled ×0.05 in real time and a call with no timeout is declared hung after 2s; the real local upstream answers everything else.
 
-Host: Linux 6.12.113+ x86_64, 8 CPUs, Python 3.13.5 · 2026-11-23T12:16:52+0800
+Host: Linux 6.12.113+ x86_64, 8 CPUs, Python 3.13.5 · 2026-11-23T12:40:28+0800
 
 Undo: `ras-anything disable <id>` removes the swap byte for byte; `RAS_ANYTHING_DISABLE=1` runs the originals.
 
