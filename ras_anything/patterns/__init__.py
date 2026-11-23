@@ -111,6 +111,9 @@ def all_patterns() -> list[Pattern]:
 
 
 def is_on(dependency: str, pattern: str, configured: bool) -> bool:
-    """Is a pattern on for this call? Asked on every call of every policy. (The one place a flag provider
-    will hook into.)"""
-    return configured
+    """Is a pattern on for this call? Asked on every call of every policy. Flags (`.ras/flags.json`) hook in here."""
+    try:
+        import importlib
+        return importlib.import_module("ras_anything.runtime").is_pattern_on(dependency, pattern, configured)
+    except Exception:
+        return configured

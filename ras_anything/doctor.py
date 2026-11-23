@@ -105,5 +105,16 @@ def status() -> dict:
             nxt = ("harden %s --agent claude" % more[0]) if more else "disable <id>   (to undo a swap)"
     elif state["enabled"]:
         nxt = nxt or "bench"
+    try:
+        from .flags import store as flag_store
+        snap = flag_store(project).snapshot()
+        out["flags"] = snap
+        if snap["flags"]:
+            print()
+            print("  flags    %s  %s" % (snap["source"], ui.dim("v%d" % snap["version"])))
+            for k, v in snap["flags"].items():
+                print("           %s = %s" % (k, v["value"]))
+    except Exception:
+        pass
     ui.next_hint(nxt or "report")
     return out

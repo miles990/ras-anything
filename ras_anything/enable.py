@@ -31,7 +31,7 @@ def places(adapter, project: Path, module_file: str, fid: str) -> tuple[Path, Pa
     return src, folder, copy, rt
 
 
-def enable(fid: str | None = None, quiet: bool = False) -> dict:
+def enable(fid: str | None = None, quiet: bool = False, canary: str | None = None, shadow: bool = False) -> dict:
     project = find_project()
     fid = resolve_id(project, fid)
     d = harden_dir(project, fid)
@@ -93,7 +93,25 @@ def enable(fid: str | None = None, quiet: bool = False) -> dict:
         print("  %s copied hardened code to %s" % (ui.good(ui.OK), os.path.relpath(copy_abs)))
         print(ui.dim("  undo any time: ras-anything disable %s · one run on the original: RAS_ANYTHING_DISABLE=1" % fid))
         ui.next_hint("bench -- " + meta["display_cmd"])
+    if canary or shadow:
+        _apply_rollout(fid, canary, shadow, quiet=quiet)
     return entry
+
+
+def _apply_rollout(fid: str, canary: str | None, shadow: bool, quiet: bool = False) -> None:
+    from . import flags, ui
+    if shadow:
+        flags.store().set_flag(flags.shadow_key(fid), True)
+        if not quiet:
+            print("  %s shadow on %s" % (ui.good(ui.OK), fid))
+    if canary:
+        parts = [int(x) for x in str(canary).split(",") if x.strip() != ""]
+        pct = parts[0]
+        flags.store().set_flag(flags.enable_key(fid), pct)
+        plan = parts if len(parts) > 1 else [pct, 100]
+        flags.store().set_flag(flags.enable_key(fid) + ".plan", ",".join(str(x) for x in plan))
+        if not quiet:
+            print("  %s canary %d%% (plan %s, sticky by key)" % (ui.good(ui.OK), pct, ",".join(map(str, plan))))
 
 
 def check_entry(project: Path, fid: str, e: dict) -> dict:

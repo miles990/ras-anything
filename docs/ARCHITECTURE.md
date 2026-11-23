@@ -287,6 +287,7 @@ and in bench per call of the enabled functions (and per call that met an outage 
 | `scan.json` `state.json` `bench.json` `clean.stdout` | yes | no absolute paths (`paths.portable_cmd`, `paths.scrub`) |
 | `hardens/<id>/{meta,calls,verify}.json`, hardened file, `TASK.md`, `agent.log` | yes | recordings hold real arguments and responses: review them |
 | `runs/launcher.local` | no (gitignored) | this machine's interpreter and exact command |
+| `flags.json` | optional | OpenFeature/flagd file, hot-reloaded; see [FLAGS.md](FLAGS.md) |
 
 `enable` writes exactly these places, after checking that none of them (nor any folder on the way) is a
 symlink: the module (one marked block), `_ras_hardened/<copy>`, `_ras_hardened/<runtime>` and

@@ -1,0 +1,186 @@
+"""Canary routing, shadow mode, fail-safe swap, isolation shards, blast-radius helpers.
+
+The marked enable block (Python and Node) hands the original and the hardened function to
+`swap(id, original, hardened)`. Every call then:
+
+- `RAS_ANYTHING_DISABLE=1` or `ras.enable.<id>` at 0 → original
+- `--shadow` → serve the original; optionally run hardened with side effects suppressed
+- `--canary N` → sticky-hash the targeting key; N% of keys get the hardened function
+- a bug in the router or flag evaluation itself → original (fail-safe)
+
+Isolation: `Policy.shard(key)` (see patterns/policy.py) gives a key its own breaker/budget.
+"""
+
+from __future__ import annotations
+
+import os
+import time
+import traceback
+from typing import Callable
+
+from . import flags, runtime
+
+
+def fail_safe(fn, fallback, *args, **kwargs):
+    """Run `fn`; on any unexpected exception, return `fallback()` (or `fallback` if not callable)."""
+    try:
+        return fn(*args, **kwargs)
+    except Exception as e:
+        runtime.log_event("ras.fail_safe", error=type(e).__name__, where=getattr(fn, "__name__", "fn"))
+        return fallback(*args, **kwargs) if callable(fallback) else fallback
+
+
+def route(fid: str, key: str | None = None) -> str:
+    """'original' | 'hardened' | 'shadow'. Never raises."""
+    def _route():
+        if flags.disabled() or flags.enable_percent(fid) <= 0:
+            return "original"
+        if flags.shadow_on(fid):
+            return "shadow"
+        return "hardened" if flags.in_canary(fid, key) else "original"
+    return fail_safe(_route, "original")
+
+
+# Optional hook: tests (or an in-process agent) can run the shadowed function with writes suppressed.
+_suppress: Callable | None = None
+
+
+def set_shadow_suppressor(fn: Callable | None) -> Callable | None:
+    """`fn(hardened, args, kwargs)` runs the shadow call; return the previous hook."""
+    global _suppress
+    prev, _suppress = _suppress, fn
+    return prev
+
+
+def swap(fid: str, original, hardened):
+    """A wrapper that looks like `original` and routes each call. Bugs in the wrapper use `original`."""
+
+    def _key(args, kwargs):
+        return fail_safe(lambda: flags.targeting_key(*args, **kwargs), fid)
+
+    def _pick(args, kwargs):
+        return route(fid, _key(args, kwargs))
+
+    def _call(fn, args, kwargs):
+        return fn(*args, **kwargs)
+
+    def wrapped(*args, **kwargs):
+        choice = fail_safe(_pick, "original", args, kwargs)
+        if choice == "original":
+            return original(*args, **kwargs)
+        if choice == "shadow":
+            out = original(*args, **kwargs)
+            try:
+                if _suppress is not None:
+                    other = _suppress(hardened, args, kwargs)
+                else:
+                    other = None  # production: don't double-call a write
+                    runtime.log_event("ras.shadow.skip", id=fid, reason="no suppressor")
+                if other is not None and other != out:
+                    runtime.log_event("ras.shadow.mismatch", id=fid, correlation_id=runtime.trace_id())
+            except Exception as e:
+                runtime.log_event("ras.shadow.error", id=fid, error=type(e).__name__)
+            return out
+        try:
+            return hardened(*args, **kwargs)
+        except Exception:
+            # Hardened business errors propagate; only a failure to *call* is fail-safe, and that's above.
+            raise
+
+    try:
+        wrapped.__name__ = getattr(original, "__name__", "swapped")
+        wrapped.__doc__ = getattr(original, "__doc__", None)
+        wrapped.__wrapped__ = original
+        wrapped.__ras_id__ = fid
+        wrapped.__ras_hardened__ = hardened
+    except Exception:
+        pass
+    return wrapped
+
+
+# --------------------------------------------------------------------------- canary analysis (promote / rollback)
+
+
+def analyse(window: dict, *, min_calls: int = 20) -> dict:
+    """Decide promote / rollback / wait from a window of original vs canary SLIs.
+
+    `window` = {"original": {availability, p99, error_rate, dups, n}, "canary": {...}, "percent": int, "plan": [5,25,...]}.
+    A canary is rolled back if availability drops more than 2 points, p99 grows >20% with no availability gain,
+    dups appear, or error_rate doubles above 1%. Otherwise, if `n` is enough, promote to the next step (or 100).
+    """
+    o, c = window["original"], window["canary"]
+    reasons = []
+    if c.get("dups", 0) > o.get("dups", 0):
+        reasons.append("canary added duplicate side effects (%s → %s)" % (o.get("dups", 0), c.get("dups", 0)))
+    if o.get("availability", 1) - c.get("availability", 1) > 0.02:
+        reasons.append("availability dropped more than 2 points (%.1f%% → %.1f%%)" % (100 * o.get("availability", 1), 100 * c.get("availability", 1)))
+    if c.get("error_rate", 0) > max(0.01, 2 * o.get("error_rate", 0)) and c.get("error_rate", 0) - o.get("error_rate", 0) > 0.01:
+        reasons.append("error rate rose (%.2f%% → %.2f%%)" % (100 * o.get("error_rate", 0), 100 * c.get("error_rate", 0)))
+    if o.get("p99", 0) and c.get("p99", 0) > 1.2 * o["p99"] and c.get("availability", 1) <= o.get("availability", 1) + 0.005:
+        reasons.append("p99 grew more than 20%% without an availability gain (%.3fs → %.3fs)" % (o["p99"], c["p99"]))
+    n = int(c.get("n") or 0)
+    if reasons:
+        return {"decision": "rollback", "percent": 0, "reasons": reasons, "n": n}
+    if n < min_calls:
+        return {"decision": "wait", "percent": int(window.get("percent") or 0), "reasons": ["need %d canary calls, have %d" % (min_calls, n)], "n": n}
+    plan = list(window.get("plan") or [5, 25, 50, 100])
+    cur = int(window.get("percent") or 0)
+    nxt = next((p for p in plan if p > cur), 100)
+    return {"decision": "promote", "percent": nxt, "reasons": ["SLIs hold over %d calls" % n], "n": n}
+
+
+def apply_decision(fid: str, decision: dict) -> dict:
+    """Write the canary percent from an analyse() result (0 on rollback). Logs the reason."""
+    pct = int(decision.get("percent") or 0)
+    flags.store().set_flag(flags.enable_key(fid), pct)
+    runtime.log_event("ras.canary." + decision["decision"], id=fid, percent=pct, reason="; ".join(decision.get("reasons") or []))
+    return decision
+
+
+# --------------------------------------------------------------------------- blast radius
+
+
+def blast_radius(affected: int, total: int, contained_s: float | None = None) -> dict:
+    """Share of requests touched by an incident, and (optional) time to automatic containment."""
+    if total <= 0:
+        return {"affected": 0, "total": 0, "share": None, "contained_s": contained_s}
+    return {"affected": affected, "total": total, "share": affected / total, "contained_s": contained_s}
+
+
+# --------------------------------------------------------------------------- human gate (V-18, small hook; used by charges/deletes)
+
+
+class NeedsApproval(runtime.RasError):
+    """The operation is irreversible and no approver accepted it."""
+
+    def __init__(self, op: str, details: dict | None = None, **kw):
+        super().__init__("human authorization required for %s" % op, context={"op": op, **(details or {})}, **kw)
+        self.op = op
+        self.needs_human_authorization = True
+        self.next_action = "escalate"
+
+
+_approver: Callable | None = None
+
+
+def set_approver(fn: Callable | None) -> Callable | None:
+    global _approver
+    prev, _approver = _approver, fn
+    return prev
+
+
+def require_approval(op: str, details: dict | None = None):
+    """Default deny in non-interactive runs. A registered approver returning a truthy value lets it through."""
+    if _approver is not None:
+        if _approver(op, details or {}):
+            runtime.log_event("ras.approval.granted", op=op)
+            return True
+        raise NeedsApproval(op, details)
+    if os.environ.get("RAS_ANYTHING_APPROVE") == "1":
+        return True
+    raise NeedsApproval(op, details)
+
+# The runtime (vendored with enabled apps) is the implementation.
+swap = runtime.swap
+set_shadow_suppressor = runtime.set_shadow_suppressor
+route = runtime.route

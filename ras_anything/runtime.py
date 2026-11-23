@@ -28,6 +28,7 @@ import threading
 import time
 import urllib.error
 import weakref
+from pathlib import Path
 
 # Names that live in a pattern module: resolved by __getattr__ below, so a pattern that isn't used costs nothing.
 _PATTERN_NAMES = {
@@ -60,6 +61,7 @@ __all__ = [
     "new_trace_id",
     "seed",
     "reset_state",
+    "swap",
     "TRANSIENT_HTTP",
     *_PATTERN_NAMES,
 ]
@@ -99,6 +101,247 @@ def reset_state() -> None:
     before each independent trial; tests may want it too.)"""
     for obj in list(_stateful):
         obj.reset()
+
+
+# --------------------------------------------------------------------------- flags (also vendored with this file)
+
+_FLAG_PATTERN = "ras.pattern."
+_FLAG_ENABLE = "ras.enable."
+_FLAG_SHADOW = "ras.shadow."
+
+
+def _flag_path() -> Path:
+    import os
+    env = os.environ.get("RAS_ANYTHING_FLAGS")
+    if env:
+        return Path(env)
+    here = Path(os.getcwd()).resolve()
+    for folder in (here, *here.parents):
+        ras = folder / ".ras"
+        if ras.is_dir():  # the project: do not inherit a parent repo's flags
+            return ras / "flags.json"
+    return here / ".ras" / "flags.json"
+
+
+class _FlagStore:
+    """flagd-compatible file, mtime+size poll, last-known-good, never raises to the caller."""
+
+    def __init__(self):
+        self.path = None
+        self.doc = {"flags": {}}
+        self.last_good = {"flags": {}}
+        self.mtime_ns = 0
+        self.size = -1
+        self.version = 0
+        self.source = "default"
+        self.last_error = None
+        self._loaded = False
+
+    def bind(self, path: Path | None = None) -> "_FlagStore":
+        p = Path(path) if path else _flag_path()
+        if self.path is not None and self.path.resolve() != p.resolve():
+            self.__init__()
+        self.path = p
+        return self
+
+    def maybe_reload(self) -> None:
+        if self.path is None:
+            self.bind()
+        try:
+            st = self.path.stat()
+        except FileNotFoundError:
+            if self._loaded and self.source != "missing":
+                self.doc = {"flags": {}}
+                self.last_good = {"flags": {}}
+                self.source = "missing"
+                self.version += 1
+            self._loaded = True
+            self.mtime_ns = 0
+            self.size = -1
+            return
+        if self._loaded and st.st_mtime_ns == self.mtime_ns and st.st_size == self.size:
+            return
+        try:
+            doc = json.loads(self.path.read_text())
+            if not isinstance(doc, dict) or not isinstance(doc.get("flags", {}), dict):
+                raise ValueError("flags.json must be an object with a 'flags' object")
+            doc.setdefault("flags", {})
+            self.doc = self.last_good = doc
+            self.last_error = None
+            self.source = "file"
+        except (OSError, ValueError, json.JSONDecodeError) as e:
+            self.last_error = str(e)
+            self.doc = self.last_good
+            self.source = "last-known-good"
+        self.mtime_ns = st.st_mtime_ns
+        self.size = st.st_size
+        self._loaded = True
+        self.version += 1
+
+    def flag(self, key: str):
+        try:
+            self.maybe_reload()
+            f = self.doc.get("flags", {}).get(key)
+            return f if isinstance(f, dict) else None
+        except Exception:
+            return None
+
+    def evaluate(self, key: str, default):
+        try:
+            f = self.flag(key)
+            if not f:
+                return default
+            if str(f.get("state", "ENABLED")).upper() == "DISABLED":
+                if isinstance(default, bool):
+                    return False
+                if isinstance(default, (int, float)):
+                    return 0
+                return default
+            variants = f.get("variants") or {}
+            name = f.get("defaultVariant")
+            if name in variants:
+                return variants[name]
+            if variants:
+                return next(iter(variants.values()))
+            return default
+        except Exception:
+            return default
+
+
+_flag_store = _FlagStore()
+
+
+def flag_store(path: Path | None = None) -> _FlagStore:
+    return _flag_store.bind(path)
+
+
+def reset_flags() -> None:
+    _flag_store.__init__()
+
+
+def flags_disabled() -> bool:
+    import os
+    return os.environ.get("RAS_ANYTHING_DISABLE") == "1"
+
+
+def is_pattern_on(dependency: str, pattern: str, configured: bool) -> bool:
+    if flags_disabled():
+        return configured
+    s = flag_store()
+    specific = _FLAG_PATTERN + pattern + "@" + dependency
+    if s.flag(specific):
+        return bool(s.evaluate(specific, configured))
+    general = _FLAG_PATTERN + pattern
+    if s.flag(general):
+        return bool(s.evaluate(general, configured))
+    return configured
+
+
+def enable_percent(fid: str) -> int:
+    if flags_disabled():
+        return 0
+    v = flag_store().evaluate(_FLAG_ENABLE + fid, 100)
+    try:
+        n = int(v)
+    except (TypeError, ValueError):
+        n = 100 if v else 0
+    return max(0, min(100, n))
+
+
+def shadow_on(fid: str) -> bool:
+    if flags_disabled():
+        return False
+    return bool(flag_store().evaluate(_FLAG_SHADOW + fid, False))
+
+
+def sticky_bucket(key: str, buckets: int = 100) -> int:
+    import hashlib
+    h = hashlib.sha256(str(key).encode()).digest()
+    return int.from_bytes(h[:8], "big") % buckets
+
+
+def in_canary(fid: str, targeting_key: str | None) -> bool:
+    pct = enable_percent(fid)
+    if pct >= 100:
+        return True
+    if pct <= 0:
+        return False
+    return sticky_bucket(targeting_key or fid) < pct
+
+
+def targeting_key(*args, **kwargs) -> str | None:
+    for k in ("idempotency_key", "targeting_key", "key", "order_id", "id"):
+        if kwargs.get(k) not in (None, ""):
+            return str(kwargs[k])
+    if args:
+        a = args[0]
+        if isinstance(a, (str, int)):
+            return str(a)
+        if isinstance(a, dict):
+            for k in ("id", "key", "order_id"):
+                if a.get(k) not in (None, ""):
+                    return str(a[k])
+    return None
+
+
+def route(fid: str, key: str | None = None) -> str:
+    try:
+        if flags_disabled() or enable_percent(fid) <= 0:
+            return "original"
+        if shadow_on(fid):
+            return "shadow"
+        return "hardened" if in_canary(fid, key) else "original"
+    except Exception:
+        return "original"
+
+
+_shadow_suppressor = None
+
+
+def set_shadow_suppressor(fn):
+    """`fn(hardened, args, kwargs)` runs a shadow call; return the previous hook."""
+    global _shadow_suppressor
+    prev, _shadow_suppressor = _shadow_suppressor, fn
+    return prev
+
+
+
+def swap(fid: str, original, hardened):
+    """A wrapper that looks like `original` and routes each call (canary / shadow / disable).
+
+    A bug in the router or flag evaluation itself uses the original (fail-safe).
+    """
+
+    def wrapped(*args, **kwargs):
+        try:
+            choice = route(fid, targeting_key(*args, **kwargs) or fid)
+        except Exception:
+            choice = "original"
+        if choice == "original":
+            return original(*args, **kwargs)
+        if choice == "shadow":
+            out = original(*args, **kwargs)
+            try:
+                if _shadow_suppressor is not None:
+                    other = _shadow_suppressor(hardened, args, kwargs)
+                    if other is not None and other != out:
+                        log_event("ras.shadow.mismatch", id=fid, correlation_id=trace_id())
+                else:
+                    log_event("ras.shadow.skip", id=fid, reason="no suppressor")
+            except Exception as e:
+                log_event("ras.shadow.error", id=fid, error=type(e).__name__)
+            return out
+        return hardened(*args, **kwargs)
+
+    try:
+        wrapped.__name__ = getattr(original, "__name__", "swapped")
+        wrapped.__doc__ = getattr(original, "__doc__", None)
+        wrapped.__wrapped__ = original
+        wrapped.__ras_id__ = fid
+        wrapped.__ras_hardened__ = hardened
+    except Exception:
+        pass
+    return wrapped
 
 
 def seed(n: int) -> None:

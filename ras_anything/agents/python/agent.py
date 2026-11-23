@@ -332,10 +332,16 @@ class Agent:
         owner, raw, fn = find_target(module, t["qualname"])
         if fn is None:
             return
+        impl = fn
+        for _ in range(6):
+            nxt = getattr(impl, "__ras_hardened__", None) or getattr(impl, "__wrapped__", None)
+            if nxt is None or nxt is impl:
+                break
+            impl = nxt
         st = self.stats.setdefault(t["id"], {"calls": 0, "ok": 0, "raised": {}, "fallback": 0, "lat": [],
                                              "attempts": 0, "outage_calls": 0, "outage_attempts": 0,
-                                             "hardened": "_ras_hardened" in (getattr(fn, "__code__", None) and fn.__code__.co_filename or "")})
-        fallback = getattr(fn, "__globals__", {}).get("RAS_FALLBACK")
+                                             "hardened": "_ras_hardened" in (getattr(impl, "__code__", None) and impl.__code__.co_filename or "")})
+        fallback = getattr(impl, "__globals__", {}).get("RAS_FALLBACK")
 
         @contextlib.contextmanager
         def watch(a, kw):

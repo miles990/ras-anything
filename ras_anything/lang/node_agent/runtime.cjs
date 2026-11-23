@@ -84,7 +84,17 @@ function enable({ id, name, original, names, load, module }) {
     }
     return impl;
   };
-  const run = (self, args) => Reflect.apply(get(), self, args);
+  const run = (self, args) => {
+    let choice = "hardened";
+    try { choice = require("./patterns/flags.cjs").route(id, require("./patterns/flags.cjs").targetingKey(args)); } catch {}
+    if (choice === "original") return Reflect.apply(original, self, args);
+    if (choice === "shadow") {
+      const out = Reflect.apply(original, self, args);
+      try { core.logEvent("ras.shadow.skip", { id, reason: "no suppressor" }); } catch {}
+      return out;
+    }
+    return Reflect.apply(get(), self, args);
+  };
   const swapped = new Proxy(original, { apply: (_, self, args) => (core.inTrace() ? run(self, args) : core.withTrace(() => run(self, args))) });
   if (module) {
     if (module.exports === original) module.exports = swapped;
@@ -111,7 +121,19 @@ const { retry, retrySync, RetryBudget, retryAfterS, attemptTimeout, CircuitBreak
   ThrottledError, AdaptiveConcurrency, ConcurrencyLimitError, hedge, StaleCache, idempotencyKey, isIdempotencyConflict,
   isIdempotencyMismatch } = patterns;
 
-module.exports = { RasError, RejectedError, DeadlineExceeded, HttpError, Policy, retry, retrySync, RetryBudget, withTimeout, withDeadline, remainingMs,
+function swap(id, original, hardened) {
+  return new Proxy(original, {
+    apply(_, self, args) {
+      let choice = "hardened";
+      try { const f = require("./patterns/flags.cjs"); choice = f.route(id, f.targetingKey(args)); } catch {}
+      if (choice === "original") return Reflect.apply(original, self, args);
+      if (choice === "shadow") return Reflect.apply(original, self, args);
+      return Reflect.apply(hardened, self, args);
+    },
+  });
+}
+
+module.exports = { RasError, swap, RejectedError, DeadlineExceeded, HttpError, Policy, retry, retrySync, RetryBudget, withTimeout, withDeadline, remainingMs,
   attemptTimeout, withFallback, CircuitBreaker, CircuitOpenError, Bulkhead, BulkheadFullError, AdaptiveThrottle, ThrottledError,
   AdaptiveConcurrency, ConcurrencyLimitError, hedge, StaleCache, idempotencyKey, isIdempotencyConflict, isIdempotencyMismatch,
   isTransient, dependencyFailed, notAccepted, raiseForStatus, retryAfterS, logEvent, traceId, newTraceId, withTrace, sleep, sleepSync, seed, resetState,

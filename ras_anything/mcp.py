@@ -32,15 +32,25 @@ TOOLS = {
                   {**_cwd, **_cmd, "seeds": {"type": "integer"},
                    "degraded_marker": {"type": "string", "description": "text marking a deliberately degraded output line"}}, []),
     "ras_report": ("Write RAS-REPORT.md and ras-card.svg from measured results.", {**_cwd}, []),
-    "ras_status": ("Show scan, hardened functions, verify state, what is enabled and the next step.", {**_cwd}, []),
+    "ras_status": ("Show scan, hardened functions, verify state, what is enabled, flags and the next step.", {**_cwd}, []),
+    "ras_flag": ("List, get, set or delete flags in .ras/flags.json (hot-reloaded in running processes).",
+                 {**_cwd, "argv": {"type": "array", "items": {"type": "string"},
+                                   "description": "flag args, e.g. set ras.pattern.retry off, or list"}}, []),
 }
 
 
 def _argv(name: str, a: dict) -> list[str]:
     cmd = name.split("_", 1)[1]
     argv = [cmd]
+    if cmd == "flag":
+        argv += list(a.get("argv") or ["list"])
+        return argv
     if a.get("id") and cmd in ("harden", "verify", "enable", "disable"):
         argv.append(a["id"])
+    if a.get("canary") and cmd == "enable":
+        argv += ["--canary", str(a["canary"])]
+    if a.get("shadow") and cmd == "enable":
+        argv.append("--shadow")
     if a.get("agent") and cmd == "harden":
         argv += ["--agent", a["agent"]]
     if a.get("seeds") and cmd in ("scan", "bench"):

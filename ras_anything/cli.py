@@ -22,6 +22,7 @@ prove it on recorded calls, and swap them in reversibly.
   bench [-- <cmd>]       whole-app runs under live chaos, original vs hardened, interleaved
   bench --patterns       every resilience pattern on vs off under simulated trouble (docs/PATTERNS.md)
   report                 RAS-REPORT.md + ras-card.svg (measured numbers only)
+  flag list|get|set|delete  OpenFeature/flagd flags (`.ras/flags.json`), hot-reloaded
   status · doctor · mcp
 """
 
@@ -54,10 +55,12 @@ def parser() -> argparse.ArgumentParser:
     v.add_argument("id", nargs="?")
     v.add_argument("--chaos-calls", type=int, default=60, help="recorded calls replayed under each fault (default 60)")
 
-    for name, text in (("enable", "swap the verified hardened function in (one marked block)"),
-                       ("disable", "remove the block, restoring the file byte for byte")):
-        e = sub.add_parser(name, help=text)
-        e.add_argument("id", nargs="?")
+    e = sub.add_parser("enable", help="swap the verified hardened function in (one marked block)")
+    e.add_argument("id", nargs="?")
+    e.add_argument("--canary", help="route this percent of calls (sticky by key), or a plan 5,25,50,100")
+    e.add_argument("--shadow", action="store_true", help="serve the original; compare the hardened path when a suppressor is set")
+    d = sub.add_parser("disable", help="remove the block, restoring the file byte for byte")
+    d.add_argument("id", nargs="?")
 
     b = sub.add_parser("bench", help="whole-app runs under live chaos, original vs hardened (-- <cmd>)")
     b.add_argument("--seeds", type=int, default=20)
@@ -70,7 +73,9 @@ def parser() -> argparse.ArgumentParser:
     r = sub.add_parser("report", help="RAS-REPORT.md + ras-card.svg")
     r.add_argument("--title", help="project name on the card (default: folder name)")
 
-    sub.add_parser("status", help="what's scanned, hardened, verified, enabled; the next step")
+    fl = sub.add_parser("flag", help="list, get, set or delete flags in .ras/flags.json (hot-reloaded)")
+    fl.add_argument("rest", nargs=argparse.REMAINDER, help="list | get NAME | set NAME on|off|--canary N|--shadow|--disabled | delete NAME")
+    sub.add_parser("status", help="what's scanned, hardened, verified, enabled; flags; the next step")
     sub.add_parser("doctor", help="check python, agents, git, .ras")
     sub.add_parser("mcp", help="stdio MCP server")
 
@@ -108,7 +113,7 @@ def main(argv=None) -> int:
         elif c == "enable":
             from .enable import enable
 
-            enable(a.id)
+            enable(a.id, canary=a.canary, shadow=a.shadow)
         elif c == "disable":
             from .enable import disable
 
@@ -128,6 +133,10 @@ def main(argv=None) -> int:
             from .report import report
 
             report(a.title)
+        elif c == "flag":
+            from .flags import run as flag_run
+
+            return flag_run(a.rest)
         elif c == "status":
             from .doctor import status
 

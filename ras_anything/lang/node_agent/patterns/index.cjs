@@ -24,7 +24,9 @@ const all = () => NAMES.flatMap((name) => {
   }
 }).sort((a, b) => a.order - b.order);
 
-/** Is a pattern on for this call? Asked on every call of every policy. (The one place a flag provider will hook into.) */
-const hooks = { isOn: (dependency, pattern, configured) => configured };
+/** Is a pattern on for this call? Asked on every call of every policy. Flags (`.ras/flags.json`) hook in here. */
+const hooks = { isOn: (dependency, pattern, configured) => {
+  try { return require("./flags.cjs").isOn(dependency, pattern, configured); } catch { return configured; }
+} };
 
 module.exports = { NAMES, get, all, hooks, camel, snake };

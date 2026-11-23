@@ -534,7 +534,7 @@ class MethodTest(Case):
         clean = subprocess.run([sys.executable, "app.py"], capture_output=True, text=True).stdout
         with quiet():
             enable(fid, quiet=True)
-        self.assertIn("Client.cget = classmethod(_ras_fn)", (p.dir / "lib.py").read_text())
+        self.assertIn("Client.cget = classmethod(_ras_swap(", (p.dir / "lib.py").read_text())
         self.assertEqual(subprocess.run([sys.executable, "app.py"], capture_output=True, text=True).stdout, clean)
         off = subprocess.run([sys.executable, "app.py"], capture_output=True, text=True, env={**os.environ, "RAS_ANYTHING_DISABLE": "1"})
         self.assertEqual(off.stdout, clean)

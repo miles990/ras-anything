@@ -43,6 +43,8 @@ class Attempt:
 class Policy:
     def __init__(self, dependency: str, **patterns):
         self.dependency = dependency
+        self._kwargs = patterns
+        self._shards = {}
         self.layers = []
         known = {p.name: p for p in all_patterns()}
         unknown = sorted(set(patterns) - set(known))
@@ -62,6 +64,17 @@ class Policy:
     def layer(self, name: str):
         """The layer of a pattern (its state: breaker, budget, ...), switched on or not."""
         return next(x for n, _, x in self.layers if n == name)
+
+    def shard(self, key: str) -> "Policy":
+        """A policy with the same patterns whose breaker/budget/cache are this key's alone.
+
+        Isolation is opt-in: one failing key cannot open the breaker the others use.
+        """
+        if key in self._shards:
+            return self._shards[key]
+        child = Policy("%s#%s" % (self.dependency, key), **self._kwargs)
+        self._shards[key] = child
+        return child
 
     def _steps(self, method, idempotency_key, cache_key):
         call = Call(self.dependency, method=method, idempotency_key=idempotency_key, cache_key=cache_key)
