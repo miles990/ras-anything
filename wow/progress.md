@@ -68,3 +68,39 @@
 
 ## 範圍（wow/spec.md V-1..V-19）
 多語言 adapter（對齊 fast-anything 10 種）、v0.1 缺口、Python 邊界擴充、韌性模式目錄（量測保留／淘汰）、可服務性（MTTD/診斷/還原）、SLI/SLO、旗標／熱更新／模組化／飛航記錄器＋replay＋RCA、爆炸半徑（canary/shadow/隔離/fail-safe）、AI 依賴 adapter、AI 時代工具調研、AX 結構化錯誤＋人類閘門、視覺化資料契約、安裝／README／發佈準備、30 秒新手測試。
+
+
+## 接續點（2026-11-23 14:09 台北時間，HEAD `bdbc197`）
+
+評審改用 `claude -p --model claude-fable-5-2 --effort high --tools Read`（最多 3 次）。Codex 獨立審查＋測試（未寫被審程式碼）。
+
+### 已完成（不要重做）
+| 項 | 證據 |
+|---|---|
+| V-5(a) pickle→JSON cassette | `2e2c308` |
+| V-5(b) fake-fallback 必須有觀測到的邊界失敗 | `0b23471` |
+| V-5(c) 範例 `.ras` JSON 無絕對路徑 | `c940866` |
+| V-5(d) GET-then-POST 負對照進 `tests/` | `0ed4cc1` |
+| V-5(e) enable/disable symlink／原子寫入 | `aa72a74` |
+| V-1 語言 adapter 架構 `lang/` + `docs/ARCHITECTURE.md` | `c1e484a` |
+| V-4 Python httpx/aiohttp/socket＋methods/async | `c9387c6`；weather/payments 再量測 |
+| V-2/V-3 Node.js/TS adapter + `examples/orders-node/` 實測 | `d1fc117` `e2c827c` `4da9986` `09ee610`；verify 四函式皆到 100%；bench **0.0% → 90.0%**（20 seeds，dups 6→0） |
+| V-13/V-16.3 patterns-as-plugins（Python+Node，12 模組，parity 測試） | `17db78c` `bdbc197` |
+| Holdout 答案卷（多語言+AI fixtures） | gitignored `wow/work/holdout/`（INDEX-v02.md 已核實跑過） |
+
+### 未完成（按階段；完成一項就 commit+push，並更新本表）
+| 階段 | 規格 | 狀態 | 下一步 |
+|---|---|---|---|
+| **P 餘** | V-13 量測保留/淘汰：`docs/PATTERNS.md`、retry amplification、ON vs OFF 數字、TASK.md 指引 | **進行中**（build2p，plugins 已推；缺目錄與量測） | 等 build2p 寫完並推；若中斷則補這份文件與實驗 |
+| **F** `build2f` | V-16.1 旗標、V-16.2 熱更新（切換延遲、0 丟請求）、V-17 canary/shadow/隔離/fail-safe/爆炸半徑 | 未開始 | 等 P 餘完成後啟動 |
+| **S** `build2s` | V-8 可服務性（OTel 日誌、health、RUNBOOK、diagnoser、MTTD/診斷/還原）、V-9 SLI/SLO、V-16.4 飛航記錄器+replay+RCA、V-18 AX 結構化錯誤+人類閘門 | 未開始 | |
+| **C** `build2c` | Go adapter + `examples/inventory-go/` 實測＋holdout 拒壞加固 | 未開始 | |
+| **E** `build2e` | V-14 AI 依賴 adapter + `examples/support-ai/`（本機 mock，API $0）、V-15 生態決策寫入 docs/AI.md | 未開始 | |
+| **V** `build2v` | V-19 視覺化資料契約（docs/schema、`.ras/out`、export、MCP、dashboard-sample） | 未開始 | |
+| **I** `build2i` | V-6 `./install.sh`+`make install`、雙用途 README、skill 複製到 ~/.claude 與 ~/.codex、MCP/plugin 驗證、V-11 `docs/RELEASE.md`（不公開、不上架） | 未開始 | |
+| **D** `build2d` | 其餘 fast-anything 語言：Java、C#、PHP、Ruby、Kotlin、bun/deno、C/C++（各 adapter+範例+測試+holdout；做不完要在覆蓋表寫原因與下一步） | 未開始 | |
+| **W3** V-10 | 新手 30 秒／首次結果計時（只給 README 的盲測 agent） | 未開始 | 放在 I 之後、評審之前 |
+| **審查** | Codex 獨立跑測試+兩邊範例+安裝+嘗試破壞；判決 SHIP/FIX-FIRST；修 P0/P1 再跑一次 | 未開始 | 建造全部可審範圍後 |
+| **評審** | Fable 5-2（`--model claude-fable-5-2 --effort high --tools Read`）最多 3 次 | 未開始 | Codex 後 |
+
+HEAD：`bdbc197`。工作樹應保持可推。中間產物在 `wow/work/`。
