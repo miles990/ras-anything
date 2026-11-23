@@ -31,7 +31,13 @@ file is the contract: a new language implements the adapter interface and the ag
 | `lang/base.py` | the `LangAdapter` interface |
 | `lang/python.py`, `lang/python_static.py` | the Python adapter; its AST signals |
 | `agents/python/` | the Python agent: `_inject/sitecustomize.py` (loads it), `agent.py` (modes), `boundary.py` (interception), `values.py` (JSON ⇄ Python values), `worker.py` (replay) |
-| `runtime.py` | helpers hardened Python code may import; vendored next to it by `enable` |
+| `runtime.py` | the core of what hardened Python code may import (errors, log, clock, deadlines); vendored next to it by `enable` |
+| `patterns/` | the resilience patterns as plugins: registry and contract (`__init__.py`), composition (`policy.py`), one module per pattern; vendored with the runtime. Reached through `runtime` (lazy names) |
+
+**Dependency rules** (tests check them): core ↛ language specifics; `patterns/*` import `runtime` and the contract
+only: no adapter, no pipeline module, no other pattern (`hedge` uses the drivers in `policy.py`). Patterns cooperate
+through the `Call` a policy passes along, so any one can be off or missing. The runtime works with no pattern at all.
+A new pattern = one module + its name in `patterns.NAMES` (and the same in `lang/node_agent/patterns/`).
 
 ## The adapter interface (`lang/base.py`)
 
@@ -54,7 +60,7 @@ Attributes: `name` (stored in scan/meta/cassette), `label`, `launchers`, `exampl
 | `refuse_hardened` (path) | reason not to run this hardened file (it imports the harness), or `None` |
 | `worker_cmd` (exe, job) | argv + env of the replay worker |
 | `markers` / `block` / `insertion` | the marked block and where it goes in the module |
-| `copy_name` / `runtime_file` | names of the hardened copy and the vendored runtime in `_ras_hardened/` |
+| `copy_name` / `runtime_file` / `runtime_modules` | names of the hardened copy, the vendored runtime and its pattern modules (`_ras_hardened/patterns/`) |
 | `doctor` / `runtime_label` | optional: checks; "Python 3.13.5" for reports |
 
 To add a language: `lang/<name>.py` + agent files, an entry in `lang.ADAPTERS`, package data in
@@ -265,6 +271,7 @@ requests, every fault on each request alone. Gates: see `judge.gates`.
 | `hardens/<id>/{meta,calls,verify}.json`, hardened file, `TASK.md`, `agent.log` | yes | recordings hold real arguments and responses: review them |
 | `runs/launcher.local` | no (gitignored) | this machine's interpreter and exact command |
 
-`enable` writes exactly three places, after checking that none of them (nor any folder on the way) is a
-symlink: the module (one marked block), `_ras_hardened/<copy>`, `_ras_hardened/<runtime>`. `disable`
+`enable` writes exactly these places, after checking that none of them (nor any folder on the way) is a
+symlink: the module (one marked block), `_ras_hardened/<copy>`, `_ras_hardened/<runtime>` and
+`_ras_hardened/patterns/`. `disable`
 validates every entry of `state.json` before it changes anything.

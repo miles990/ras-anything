@@ -139,6 +139,10 @@ class LangAdapter(ABC):
     def runtime_file(self) -> tuple[Path, str]:
         """(runtime helpers to vendor next to the copy, file name there)."""
 
+    def runtime_modules(self) -> list[tuple[Path, str]]:
+        """(file, name in the folder `patterns` next to the vendored runtime): the pattern modules it loads."""
+        return []
+
     # ---------------------------------------------------------------- people
 
     def doctor(self) -> list[tuple]:

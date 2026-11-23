@@ -325,6 +325,9 @@ class PythonAdapter(LangAdapter):
     def runtime_file(self):
         return PKG_DIR / "runtime.py", "_runtime.py"
 
+    def runtime_modules(self):
+        return [(p, p.name) for p in sorted((PKG_DIR / "patterns").glob("*.py"))]
+
     # ---------------------------------------------------------------- people
 
     def doctor(self):
@@ -376,9 +379,10 @@ def _ras_anything_load():
             import ras_anything.runtime  # noqa: F401
         except ImportError:  # not installed here: use the copy enable put next to the hardened code
             import types
+            pkg = sys.modules.setdefault("ras_anything", types.ModuleType("ras_anything"))
+            pkg.__path__ = [os.path.join(here, "_ras_hardened")]  # its patterns/ are imported from there
             rt = importlib.util.spec_from_file_location("ras_anything.runtime", os.path.join(here, "_ras_hardened", "_runtime.py"))
-            sys.modules.setdefault("ras_anything", types.ModuleType("ras_anything"))
-            sys.modules["ras_anything.runtime"] = m = importlib.util.module_from_spec(rt)
+            sys.modules["ras_anything.runtime"] = pkg.runtime = m = importlib.util.module_from_spec(rt)
             rt.loader.exec_module(m)
         if __name__ == "__main__":  # `from {module} import ...` in the hardened code means this very module
             sys.modules.setdefault({module!r}, sys.modules["__main__"])

@@ -179,7 +179,7 @@ def run_job(job: dict) -> dict:
         raise Fatal("import %s" % os.path.basename(job["hardened"]), traceback.format_exc(limit=6))
     fallback = getattr(hmod, "RAS_FALLBACK", None)
 
-    runtime.VIRTUAL_CLOCK = True
+    runtime.VIRTUAL_CLOCK = clock
     clock.install()
     real_stderr = sys.stderr
 
@@ -190,6 +190,11 @@ def run_job(job: dict) -> dict:
         handler.begin(call["io"], plan_of(t["plan"]))
         random.seed(t["seed"])
         runtime.seed(t["seed"])
+        if t.get("gap_s"):  # one of a sequence: time passes in between, and what the code learned stays
+            clock.reset()
+            clock.wait(t["gap_s"])
+        else:
+            runtime.reset_state()
         clock.reset()
         err = io.StringIO()
         sys.stderr = err

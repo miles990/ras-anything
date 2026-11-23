@@ -15,15 +15,19 @@ from .verify import resolve_id
 
 
 COPY_DIR = "_ras_hardened"
+PATTERNS_DIR = "patterns"  # in COPY_DIR: the runtime's pattern modules
 
 
 def places(adapter, project: Path, module_file: str, fid: str) -> tuple[Path, Path, Path, Path]:
-    """The four paths a swap touches (module, copies' folder, hardened copy, runtime copy), all checked
-    to be plain files/folders inside the project."""
+    """The paths a swap touches (module, copies' folder, hardened copy, runtime copy; the runtime's pattern
+    modules), all checked to be plain files/folders inside the project."""
     src = plain_path(module_file, project, "the module")
     folder = plain_path(src.parent / COPY_DIR, project, "the folder for hardened copies", "dir", must_exist=False)
     copy = plain_path(folder / adapter.copy_name(fid, src), project, "the hardened copy", must_exist=False)
     rt = plain_path(folder / adapter.runtime_file()[1], project, "the runtime copy", must_exist=False)
+    pats = plain_path(folder / PATTERNS_DIR, project, "the folder for pattern modules", "dir", must_exist=False)
+    for _, name in adapter.runtime_modules():
+        plain_path(pats / name, project, "a pattern module", must_exist=False)
     return src, folder, copy, rt
 
 
@@ -76,6 +80,11 @@ def enable(fid: str | None = None, quiet: bool = False) -> dict:
     folder.mkdir(exist_ok=True)
     write_file(copy_abs, hp.read_bytes())
     write_file(rt_abs, adapter.runtime_file()[0].read_bytes())
+    modules = adapter.runtime_modules()
+    if modules:
+        (folder / PATTERNS_DIR).mkdir(exist_ok=True)
+    for source, name in modules:
+        write_file(folder / PATTERNS_DIR / name, source.read_bytes())
     write_file(src_path, new)
     save_json(state_path, state)
     if not quiet:
@@ -144,7 +153,7 @@ def disable(fid: str | None = None, quiet: bool = False) -> dict:
     write_file(p, data)
     try:
         os.unlink(c["copy"])
-        if not any(x for x in c["folder"].iterdir() if x.name not in ("__pycache__", c["runtime"])):
+        if not any(x for x in c["folder"].iterdir() if x.name not in ("__pycache__", c["runtime"], PATTERNS_DIR)):
             shutil.rmtree(c["folder"])
     except OSError:
         pass

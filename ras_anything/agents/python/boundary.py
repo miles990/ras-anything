@@ -271,7 +271,7 @@ class FaultingHandler(Handler):
 
     def _timeout(self, req):
         t = req.timeout
-        rem = runtime.remaining_s()
+        rem = runtime.enforced_remaining_s()
         if rem is not None and (t is None or rem < t):
             return rem, True
         return t, False

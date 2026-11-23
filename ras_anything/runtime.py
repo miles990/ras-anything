@@ -2,7 +2,11 @@
 
 Hardened functions may import these:
 
-    from ras_anything.runtime import retry, call_with_timeout, CircuitBreaker, RasError, log_event
+    from ras_anything.runtime import Policy, retry, call_with_timeout, CircuitBreaker, RasError, log_event
+
+This module is the core (clock, randomness, trace ids, errors, logging, deadlines, what counts as
+transient). Each resilience pattern is a module of its own in ras_anything/patterns/ and is loaded
+when a name of it is first used here (docs/PATTERNS.md).
 
 Everything that sleeps or reads the clock looks up ``time.sleep`` / ``time.monotonic`` at call
 time, so ``ras-anything verify`` can run your code on a virtual clock (hangs and backoff cost no
@@ -23,30 +27,77 @@ import sys
 import threading
 import time
 import urllib.error
+import weakref
+
+# Names that live in a pattern module: resolved by __getattr__ below, so a pattern that isn't used costs nothing.
+_PATTERN_NAMES = {
+    "Policy": "policy", "Attempt": "policy",
+    "retry": "retry", "aretry": "retry",
+    "RetryBudget": "retry_budget",
+    "retry_after_s": "retry_after",
+    "attempt_timeout": "attempt_timeout",
+    "CircuitBreaker": "circuit_breaker", "CircuitOpenError": "circuit_breaker",
+    "Bulkhead": "bulkhead", "BulkheadFullError": "bulkhead",
+    "AdaptiveThrottle": "adaptive_throttle", "ThrottledError": "adaptive_throttle",
+    "AdaptiveConcurrency": "adaptive_concurrency", "ConcurrencyLimitError": "adaptive_concurrency",
+    "hedge": "hedge", "ahedge": "hedge",
+    "StaleCache": "fallback",
+    "idempotency_key": "idempotency", "is_idempotency_conflict": "idempotency", "is_idempotency_mismatch": "idempotency",
+}
 
 __all__ = [
     "RasError",
-    "CircuitOpenError",
-    "CircuitBreaker",
+    "RejectedError",
+    "DeadlineExceeded",
     "call_with_timeout",
-    "retry",
-    "aretry",
+    "deadline",
+    "remaining_s",
     "is_transient",
-    "retry_after_s",
+    "dependency_failed",
     "log_event",
     "trace_id",
     "new_trace_id",
     "seed",
+    "reset_state",
     "TRANSIENT_HTTP",
+    *_PATTERN_NAMES,
 ]
+
+
+def __getattr__(name):
+    mod = _PATTERN_NAMES.get(name)
+    if mod is None:
+        raise AttributeError("module %r has no attribute %r" % (__name__, name))
+    import importlib
+
+    value = globals()[name] = getattr(importlib.import_module("ras_anything.patterns." + mod), name)
+    return value
+
 
 TRANSIENT_HTTP = frozenset({408, 425, 429, 500, 502, 503, 504})
 
 _rng = random.Random()
 _trace: contextvars.ContextVar[str | None] = contextvars.ContextVar("ras_trace_id", default=None)
 _deadline: contextvars.ContextVar[float | None] = contextvars.ContextVar("ras_deadline", default=None)
-# Set by `ras-anything verify` while it replays calls on a virtual clock.
-VIRTUAL_CLOCK = False
+# A call_with_timeout in progress on the virtual clock: the replayed boundary is cut at this time.
+_enforced: contextvars.ContextVar[float | None] = contextvars.ContextVar("ras_enforced", default=None)
+# The virtual clock, while `ras-anything verify` replays calls on one.
+VIRTUAL_CLOCK = None
+
+_stateful: "weakref.WeakSet" = weakref.WeakSet()
+
+
+def track(obj):
+    """Register an object whose state (tokens, open circuits, caches) reset_state() clears."""
+    _stateful.add(obj)
+    return obj
+
+
+def reset_state() -> None:
+    """Forget what every breaker, budget, throttle, bulkhead and cache has seen so far. (verify does this
+    before each independent trial; tests may want it too.)"""
+    for obj in list(_stateful):
+        obj.reset()
 
 
 def seed(n: int) -> None:
@@ -113,8 +164,12 @@ def _rebuild_ras_error(cls, message, context, trace_id):
     return cls(message, context=context, trace_id=trace_id)
 
 
-class CircuitOpenError(RasError):
-    """Raised without calling the dependency while the breaker is open."""
+class RejectedError(RasError):
+    """A pattern of this runtime refused to call the dependency (open circuit, full bulkhead, load shed, ...)."""
+
+
+class DeadlineExceeded(TimeoutError):
+    """The caller's deadline has passed: there is no time left for (another) attempt."""
 
 
 def log_event(event: str, **fields) -> None:
@@ -132,21 +187,42 @@ def log_event(event: str, **fields) -> None:
 
 
 def remaining_s() -> float | None:
-    """Seconds left before the innermost call_with_timeout deadline, or None."""
-    d = _deadline.get()
-    return None if d is None else max(0.0, d - _now())
+    """Seconds left before the innermost deadline around this code (deadline(), a Policy's deadline,
+    call_with_timeout), or None."""
+    ends = [d for d in (_deadline.get(), _enforced.get()) if d is not None]
+    return max(0.0, min(ends) - _now()) if ends else None
 
 
 @contextlib.contextmanager
 def deadline(timeout_s: float):
-    """Bound everything inside to timeout_s (nested deadlines keep the earliest)."""
-    d = _now() + timeout_s
-    cur = _deadline.get()
-    token = _deadline.set(d if cur is None else min(cur, d))
+    """Everything inside shares one deadline, timeout_s from now; a nested deadline can only be earlier.
+
+    It travels with the context (threads started with a copied context, asyncio tasks). It can't interrupt
+    a blocking call by itself: give the call ``timeout=attempt_timeout(3.0)``, which is cut to what is left.
+    retry() and Policy honour it: no attempt and no wait crosses it."""
+    token = set_deadline(_now() + timeout_s)
     try:
         yield
     finally:
         _deadline.reset(token)
+
+
+def set_deadline(at: float | None):
+    """Make `at` (monotonic seconds) the deadline of this context unless an earlier one is set; returns the reset token."""
+    cur = _deadline.get()
+    return _deadline.set(at if cur is None else cur if at is None else min(cur, at))
+
+
+def clear_deadline(token) -> None:
+    """Undo a set_deadline."""
+    _deadline.reset(token)
+
+
+def enforced_remaining_s() -> float | None:
+    """Seconds left of a call_with_timeout running on the virtual clock: the only limit that cuts a call
+    which wasn't given a timeout itself."""
+    d = _enforced.get()
+    return None if d is None else max(0.0, d - _now())
 
 
 def call_with_timeout(fn, timeout_s: float, *args, **kwargs):
@@ -157,10 +233,15 @@ def call_with_timeout(fn, timeout_s: float, *args, **kwargs):
     it runs inline against a virtual deadline.
     """
     if VIRTUAL_CLOCK:
-        with deadline(timeout_s):
+        cur, end = _enforced.get(), _now() + timeout_s
+        token = _enforced.set(end if cur is None else min(cur, end))
+        try:
             return fn(*args, **kwargs)
+        finally:
+            _enforced.reset(token)
     box: dict = {}
     ctx = contextvars.copy_context()
+    ctx.run(set_deadline, _now() + timeout_s)
 
     def target():
         try:
@@ -178,7 +259,7 @@ def call_with_timeout(fn, timeout_s: float, *args, **kwargs):
     return box.get("value")
 
 
-# --------------------------------------------------------------------------- retry
+# --------------------------------------------------------------------------- what a failure means
 
 
 def _http_status(exc: BaseException) -> int | None:
@@ -214,157 +295,15 @@ def is_transient(exc: BaseException) -> bool:
     return False
 
 
-def retry_after_s(exc: BaseException) -> float | None:
-    """The Retry-After delay (seconds) an HTTP error asked for, if any."""
-    headers = getattr(exc, "headers", None)
-    if headers is None:
-        headers = getattr(getattr(exc, "response", None), "headers", None)
-    if headers is None:
-        return None
-    try:
-        value = headers.get("Retry-After")
-    except Exception:
-        return None
-    if value is None:
-        return None
-    try:
-        return max(0.0, float(value))
-    except ValueError:
-        try:
-            from email.utils import parsedate_to_datetime
-
-            return max(0.0, parsedate_to_datetime(value).timestamp() - time.time())
-        except Exception:
-            return None
+def dependency_failed(exc: BaseException) -> bool:
+    """Does this error say the dependency is in trouble? (what breakers and throttles count: transient errors,
+    but not our own deadline running out before the dependency was asked)"""
+    return is_transient(exc) and not isinstance(exc, DeadlineExceeded)
 
 
-def retry(fn, *, attempts: int = 3, base: float = 0.1, cap: float = 2.0, budget_s: float | None = None,
-          retry_on=is_transient, sleep=None, on_retry=None):
-    """Call fn() up to `attempts` times, retrying only errors `retry_on` accepts.
-
-    Backoff is "full jitter" (AWS): sleep = random(0, min(cap, base * 2**n)), at least the
-    server's Retry-After when it sent one. `budget_s` bounds the total time: a retry whose wait
-    would cross it is not attempted. The last error is re-raised unchanged (same type), with a
-    note listing the attempts. `retry_on` is a predicate or a tuple of exception types.
-    `sleep` defaults to time.sleep looked up at call time.
-    """
-    step = _backoff(attempts, base, cap, budget_s, retry_on, on_retry)
-    while True:
-        try:
-            return fn()
-        except Exception as e:
-            delay = step(e)
-            if delay is None:
-                raise
-            (sleep or time.sleep)(delay)
-
-
-async def aretry(fn, *, attempts: int = 3, base: float = 0.1, cap: float = 2.0, budget_s: float | None = None,
-                 retry_on=is_transient, on_retry=None):
-    """retry() for an async fn: awaits fn() and waits with asyncio.sleep."""
-    import asyncio
-
-    step = _backoff(attempts, base, cap, budget_s, retry_on, on_retry)
-    while True:
-        try:
-            return await fn()
-        except Exception as e:
-            delay = step(e)
-            if delay is None:
-                raise
-            await asyncio.sleep(delay)
-
-
-def _backoff(attempts, base, cap, budget_s, retry_on, on_retry):
-    """step(error) -> seconds to wait before the next attempt, or None to give up (the error gets a note)."""
-    if attempts < 1:
-        raise ValueError("attempts must be >= 1")
-    if isinstance(retry_on, (type, tuple)):
-        types = retry_on
-        retry_on = lambda e: isinstance(e, types)  # noqa: E731
-    start, n = _now(), 0
-
-    def step(e):
-        nonlocal n
-        n += 1
-        if n >= attempts or not retry_on(e):
-            _note(e, "ras retry: gave up after %d attempt(s)" % n)
-            return None
-        delay = _rng.uniform(0.0, min(cap, base * (2 ** (n - 1))))
-        ra = retry_after_s(e)
-        if ra is not None:
-            delay = max(delay, ra)
-        if budget_s is not None and (_now() - start) + delay > budget_s:
-            _note(e, "ras retry: stopped after %d attempt(s), budget %.3gs exhausted" % (n, budget_s))
-            return None
-        if on_retry is not None:
-            on_retry(n, e, delay)
-        return delay
-
-    return step
-
-
-def _note(e: BaseException, text: str) -> None:
+def note(e: BaseException, text: str) -> None:
     if hasattr(e, "add_note"):
         try:
             e.add_note(text)
         except Exception:
             pass
-
-
-# --------------------------------------------------------------------------- circuit breaker
-
-
-class CircuitBreaker:
-    """Opens after `fail_threshold` consecutive failures; after `cooldown_s` lets one trial call
-    through (half-open): success closes it, failure re-opens it."""
-
-    def __init__(self, fail_threshold: int = 5, cooldown_s: float = 30.0, name: str = "dependency",
-                 count=is_transient):
-        self.fail_threshold = fail_threshold
-        self.cooldown_s = cooldown_s
-        self.name = name
-        self.count = count
-        self.failures = 0
-        self.opened_at: float | None = None
-        self._probing = False
-        self._lock = threading.Lock()
-
-    @property
-    def state(self) -> str:
-        if self.opened_at is None:
-            return "closed"
-        return "half_open" if _now() - self.opened_at >= self.cooldown_s else "open"
-
-    def reset(self) -> None:
-        with self._lock:
-            self.failures = 0
-            self.opened_at = None
-            self._probing = False
-
-    def call(self, fn, *args, **kwargs):
-        with self._lock:
-            st = self.state
-            if st == "open" or (st == "half_open" and self._probing):
-                raise CircuitOpenError("circuit open for %s" % self.name,
-                                       context={"failures": self.failures, "cooldown_s": self.cooldown_s})
-            if st == "half_open":
-                self._probing = True
-        try:
-            result = fn(*args, **kwargs)
-        except Exception as e:
-            with self._lock:
-                if st == "half_open":
-                    self._probing = False
-                if self.count(e):
-                    self.failures += 1
-                    if st == "half_open" or self.failures >= self.fail_threshold:
-                        self.opened_at = _now()
-            raise
-        with self._lock:
-            self.failures = 0
-            self.opened_at = None
-            self._probing = False
-        return result
-
-    __call__ = call

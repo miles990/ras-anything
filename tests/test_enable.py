@@ -4,6 +4,8 @@ import hashlib
 import json
 import os
 import shutil
+import subprocess
+import sys
 import unittest
 from pathlib import Path
 
@@ -111,6 +113,16 @@ class SymlinkTest(unittest.TestCase):
         self.assertEqual((self.out / "victim.py").read_text(), "victim = 1\n")
         self.dis()
 
+    def test_enable_refuses_symlinked_pattern_modules(self):
+        d = self.p.dir / "_ras_hardened"
+        d.mkdir()
+        self.swap_for_link(d / "patterns", self.out)
+        self.refuses(self.en, "patterns", "symlink")
+        (d / "patterns").unlink()
+        (d / "patterns").mkdir()
+        self.swap_for_link(d / "patterns" / "retry.py", self.out / "victim.py")
+        self.refuses(self.en, "retry.py", "symlink")
+
     # disable -----------------------------------------------------------------------------------
 
     def test_disable_refuses_symlinks_that_appeared_later(self):
@@ -159,6 +171,29 @@ class SymlinkTest(unittest.TestCase):
         self.en()
         self.dis()
         self.assertEqual((self.p.dir / "billing.py").stat().st_mode & 0o777, 0o750)
+
+
+class VendoredRuntimeTest(unittest.TestCase):
+    """An enabled app runs where ras-anything isn't installed, patterns included."""
+
+    def test_policy_runs_from_the_vendored_modules(self):
+        p = Project(REPO / "examples" / "payments")
+        try:
+            shutil.copytree(REPO / "examples" / "payments" / ".ras", p.dir / ".ras")
+            v = p.use(FID, "payments_policy.py")
+            self.assertTrue(v["passed"], v.get("fatal") or v["gates"])
+            self.assertEqual(v["hardened"]["dups"], 0)
+            enable(FID, quiet=True)
+            (p.dir / "probe.py").write_text("import sys, app\napp.main()\nm = sys.modules['ras_anything.patterns.policy']\nprint(m.__file__)\n")
+            # -S: no site-packages, so no ras_anything
+            r = subprocess.run([sys.executable, "-S", "probe.py"], cwd=p.dir, capture_output=True, text=True, timeout=60)
+            self.assertEqual(r.stderr, "")
+            self.assertIn("16/16 paid", r.stdout)
+            self.assertEqual(Path(r.stdout.splitlines()[-1]), p.dir / "_ras_hardened" / "patterns" / "policy.py")
+            disable(FID, quiet=True)
+            self.assertFalse((p.dir / "_ras_hardened").exists())
+        finally:
+            p.close()
 
 
 if __name__ == "__main__":
