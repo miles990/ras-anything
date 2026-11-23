@@ -4,6 +4,9 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follo
 
 ## Unreleased
 
+### Fixed
+- The pattern lab worker no longer crashes on Python 3.10 when an attempt times out (`asyncio.TimeoutError` is not `OSError` until 3.11).
+
 ### Changed
 - MCP `call_tool` and `handle` route through dispatch tables so every shell function is complexity ≤ 10 (W8 E7).
 - Node, Go and Java incident documents carry `contracts.SCHEMA_VERSION` (1.1.0). Run `python -c 'from ras_anything.contracts import write_schema_version; write_schema_version()'` after bumping it (generates `schema_version.cjs`; updates the marked Go/Java constants). A contract test fails on drift.

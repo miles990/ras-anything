@@ -244,7 +244,9 @@ def simulate(adapter, specs: list[tuple[str, str, int]], vs: dict) -> list[dict]
             argv, env = adapter.lab_cmd(job)
             p = subprocess.run(argv, env=env, capture_output=True, text=True, timeout=3600)
             if p.returncode:
-                raise UserError("the %s lab worker failed" % adapter.label, p.stderr.strip()[-800:], "doctor")
+                detail = (p.stderr or p.stdout or "").strip()
+                hint = next((ln for ln in reversed(detail.splitlines()) if ln and not ln.startswith("task:")), "no output")
+                raise UserError("the %s lab worker failed: %s" % (adapter.label, hint[:200]), detail[-800:], "doctor")
             return [metrics(SCENARIOS[s], r) for (s, _, _), r in zip(chunk, json.loads(out.read_text()))]
 
     done: dict = {}

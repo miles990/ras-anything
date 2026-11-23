@@ -187,3 +187,14 @@ class CliTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class WorkerCompatTest(unittest.TestCase):
+    def test_asyncio_timeout_is_an_expected_call_error(self):
+        """On Python 3.10 asyncio.TimeoutError is not OSError; the worker must still record it, not crash."""
+        import asyncio
+        from ras_anything.agents.python import lab as worker
+
+        self.assertTrue(worker.is_expected_call_error(asyncio.TimeoutError()))
+        self.assertTrue(worker.is_expected_call_error(TimeoutError("late")))
+        self.assertFalse(worker.is_expected_call_error(RuntimeError("bug")))

@@ -21,6 +21,11 @@ from ...faults import _u
 from ...runtime import Policy
 
 
+def is_expected_call_error(e: BaseException) -> bool:
+    """A dependency failure the simulation records; anything else is a bug in the worker."""
+    return isinstance(e, (OSError, TimeoutError, asyncio.TimeoutError, runtime.RejectedError))
+
+
 class Clock:
     def __init__(self):
         self.t = 1000.0
@@ -196,7 +201,8 @@ class Sim:
         e = task.exception()
         if e is not None:
             call["outcome"] = "error"
-            if not isinstance(e, (OSError, runtime.RejectedError)):
+            # 3.10: asyncio.TimeoutError is not the builtin TimeoutError (so not OSError). From 3.11 it is.
+            if not is_expected_call_error(e):
                 raise e
         else:
             r = task.result()

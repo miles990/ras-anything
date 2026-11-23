@@ -219,3 +219,24 @@ D 階段其餘語言**暫停**，直到上表的 adapter 介面寫成文件化�
 
 新鮮 clone（commit 7299031，模擬 Linux CI、無 `wow/work/holdout/`）：**426 tests, 0 failures, 11 skipped**；ruff、mypy 通過。分支覆蓋率約 69%（缺 holdout 資料，低於本機有 holdout 的 71%）。
 
+## 14. Phase 3 量測（2026-11-23，台北時間）
+
+`wow-eng all --run --cwd examples/weather`。前：phase 2 結束。後：本階段結束（E7 外殼拆分、incident `schema_version` 同步、Python 3.10 lab worker 修正；CI workflow 已在 `.github/workflows/ci.yml`）。
+
+| W8 子項 | 前（phase 2） | 後（phase 3） | 狀態 |
+|---|---|---|---|
+| E1＋E2 | 可用率 100.0%、SLO met、verify 通過 | 同左（export@weather） | 通過 |
+| E3 可維護 | maxCC 114、最長函式 194、baseline 107 筆 | 同左 | 通過（含 baseline） |
+| E4 可擴充 | 新格式核心 0；歷史 cloudevents core 2 | 同左 | 通過（新格式）；歷史紀錄保留 |
+| E5 模組化 | 循環 1、分層 0 | 同左 | 通過（含 baseline） |
+| E6 組件化 | 語言 4、模式 13、匯出格式 5 | 同左 | 通過 |
+| E7 lib 化 | L2 外殼最大 CC 11（mcp `call_tool`／`handle`） | L2 外殼最大 CC **9**（方法與工具改走 dispatch table，邏輯留在核心／小函式） | 通過 |
+| E8 共同編輯 | C1–C3、C5 ✓ | 同左 | 通過 |
+| E9 互通 | X1–X8 全過 | 同左 | 通過 |
+| E10 安全與可移植 | S3／S4 未過（workflow 還在 `docs/ci/`） | S1–S4 全過（`.github/workflows/ci.yml` 已在 main，a7f6019；`permissions: contents: read`、Actions SHA 釘選、Linux 每次跑、macOS／Windows 手動） | 通過 |
+| E11 共同規範 | 通過 | 同左 | 通過 |
+
+本機完整套件（有 holdout）：**443 tests, 0 failures**（Python 3.13）。Python 3.10 先前 CI 因 lab worker 把 `asyncio.TimeoutError` 當致命錯誤而失敗（3.10 裡它不是 `OSError`）；已修正並加回歸測試。
+
+Node／Go／Java 事件文件的 `schema_version` 與 `contracts.SCHEMA_VERSION`（1.1.0）對齊：`write_schema_version()` 產生 Node 模組並更新 Go／Java 標記常數；契約測試會在漂移時失敗。
+
