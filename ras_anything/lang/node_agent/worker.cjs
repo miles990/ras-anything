@@ -310,8 +310,9 @@ async function runJob(job) {
       problem: error instanceof runtime.RasError ? error.problem : null,
       stderr: logged.slice(0, 8000),
       state: t.plan.type === "none" ? { args: digest(args) } : null,
-      attempts: handler.attempts.map(({ key, n, fault, reached, failed, idem, method, nonidempotent, outage }) =>
-        ({ key, n, fault, reached, failed, idem, method, nonidempotent, outage })),
+      attempts: handler.attempts.map(({ key, n, fault, reached, failed, idem, method, nonidempotent, outage, ai_resp }) =>
+        ai_resp ? { key, n, fault, reached, failed, idem, method, nonidempotent, outage, ai_resp }
+                : { key, n, fault, reached, failed, idem, method, nonidempotent, outage }),
     };
   }
 

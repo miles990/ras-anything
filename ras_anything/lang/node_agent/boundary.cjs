@@ -63,6 +63,117 @@ function portableArg(s, i, cwd) {
   return s;
 }
 
+const AI_FAULTS = new Set([
+  "ai_rate_limit", "ai_quota", "ai_context_limit", "ai_overloaded",
+  "ai_sse_truncated", "ai_finish_length", "ai_malformed_json", "ai_refusal",
+  "ai_plausible_wrong", "ai_tool_error", "ai_tool_loop", "ai_model_deprecated",
+  "ai_prompt_injection",
+]);
+
+const AI_PRICES = {
+  small: [0.15, 0.60], backup: [0.30, 1.20], "gpt-mini": [0.15, 0.60],
+  "gpt-fallback": [0.30, 1.20], "gpt-long": [0.50, 1.50], "gpt-4o-mini": [0.15, 0.60],
+  "gpt-4o": [2.50, 10.00], "claude-haiku": [0.80, 4.00], "claude-sonnet": [3.00, 15.00],
+  default: [0.25, 1.00],
+};
+
+function estimateAiCost(model, inTok, outTok) {
+  const [pin, pout] = AI_PRICES[model] || AI_PRICES.default;
+  return Math.round(((Math.max(0, inTok) * pin + Math.max(0, outTok) * pout) / 1_000_000) * 1e8) / 1e8;
+}
+
+function parseAiResponseMeta(reqAi, status, outBody) {
+  const model = reqAi?.model || "default";
+  const provider = reqAi?.provider || "openai";
+  let inTok = reqAi?.input_tokens_est || 0;
+  let outTok = 0;
+  let finish = null;
+  let respModel = model;
+  const toolNames = [];
+  let doc = null;
+  try {
+    const text = Buffer.isBuffer(outBody) ? outBody.toString("utf8") : (typeof outBody === "string" ? outBody : "");
+    if (text) doc = JSON.parse(text);
+  } catch {}
+  if (doc && typeof doc === "object" && !Array.isArray(doc)) {
+    respModel = String(doc.model || model);
+    if (doc.usage && typeof doc.usage === "object") {
+      inTok = Number(doc.usage.prompt_tokens ?? doc.usage.input_tokens ?? inTok);
+      outTok = Number(doc.usage.completion_tokens ?? doc.usage.output_tokens ?? 0);
+    }
+    if (Array.isArray(doc.choices) && doc.choices.length) {
+      const c0 = doc.choices[0] || {};
+      finish = c0.finish_reason ?? null;
+      const msg = c0.message || {};
+      for (const tc of msg.tool_calls || []) {
+        if (tc?.function?.name) toolNames.push(String(tc.function.name));
+      }
+      if (!finish && (msg.tool_calls || []).length) finish = "tool_calls";
+      if (outTok === 0) outTok = Math.max(1, Math.floor(JSON.stringify(msg).length / 4));
+    } else if (doc.stop_reason) {
+      finish = doc.stop_reason;
+    }
+  }
+  if (status >= 400) { outTok = 0; finish = `error_${status}`; }
+  return { provider, model: respModel, input_tokens: inTok, output_tokens: outTok, finish_reason: finish, tool_names: toolNames, cost_usd: estimateAiCost(respModel, inTok, outTok) };
+}
+
+function aiFaultOutcome(fault, url, reqAi, attemptN = 0) {
+  const model = reqAi?.model || "small";
+  const jsonOut = (status, reason, headers, obj) => ({
+    status, reason, headers, body: Buffer.from(JSON.stringify(obj), "utf8"), url,
+  });
+  switch (fault) {
+    case "ai_rate_limit":
+      return jsonOut(429, "Too Many Requests", [["Content-Type", "application/json"], ["Retry-After", "1"]],
+        { error: { message: "Rate limit exceeded", type: "rate_limit_error", code: "rate_limit_exceeded" } });
+    case "ai_quota":
+      return jsonOut(429, "Too Many Requests", [["Content-Type", "application/json"]],
+        { error: { message: "You exceeded your current quota", type: "insufficient_quota", code: "insufficient_quota" } });
+    case "ai_context_limit":
+      return jsonOut(400, "Bad Request", [["Content-Type", "application/json"]],
+        { error: { message: `This model's maximum context length exceeded for ${model}`, type: "invalid_request_error", code: "context_length_exceeded" } });
+    case "ai_overloaded":
+      return jsonOut(529, "Site is overloaded", [["Content-Type", "application/json"], ["Retry-After", "1"]],
+        { error: { message: "Overloaded", type: "overloaded_error" } });
+    case "ai_model_deprecated":
+      return jsonOut(404, "Not Found", [["Content-Type", "application/json"]],
+        { error: { message: `The model \`${model}\` does not exist`, type: "invalid_request_error", code: "model_not_found" } });
+    case "ai_sse_truncated":
+      return { status: 200, reason: "OK", headers: [["Content-Type", "text/event-stream"]],
+        body: Buffer.from('data: {"choices":[{"delta":{"content":"{\\"ans"}}]}\n\n', "utf8"), url };
+    case "ai_finish_length":
+      return jsonOut(200, "OK", [["Content-Type", "application/json"]],
+        { id: "cmpl-len", model, usage: { prompt_tokens: 40, completion_tokens: 128 },
+          choices: [{ index: 0, finish_reason: "length", message: { role: "assistant", content: '{"answer":"The library' } }] });
+    case "ai_malformed_json":
+      return jsonOut(200, "OK", [["Content-Type", "application/json"]],
+        { id: "cmpl-bad", model, usage: { prompt_tokens: 40, completion_tokens: 18 },
+          choices: [{ index: 0, finish_reason: "stop", message: { role: "assistant", content: "Sure! Here is the JSON: {broken" } }] });
+    case "ai_refusal":
+      return jsonOut(200, "OK", [["Content-Type", "application/json"]],
+        { id: "cmpl-ref", model, usage: { prompt_tokens: 40, completion_tokens: 12 },
+          choices: [{ index: 0, finish_reason: "content_filter", message: { role: "assistant", content: "I cannot assist with that request.", refusal: "policy_violation" } }] });
+    case "ai_plausible_wrong":
+      return jsonOut(200, "OK", [["Content-Type", "application/json"]],
+        { id: "cmpl-pw", model, usage: { prompt_tokens: 40, completion_tokens: 10 },
+          choices: [{ index: 0, finish_reason: "stop", message: { role: "assistant", content: '{"answer":""}' } }] });
+    case "ai_tool_error":
+    case "ai_prompt_injection":
+      return jsonOut(200, "OK", [["Content-Type", "application/json"]],
+        { id: "cmpl-inj", model, usage: { prompt_tokens: 48, completion_tokens: 22 },
+          choices: [{ index: 0, finish_reason: "tool_calls", message: { role: "assistant", content: null,
+            tool_calls: [{ id: `call_bad_${attemptN}`, type: "function", function: { name: "refund_all", arguments: "{}" } }] } }] });
+    case "ai_tool_loop":
+      return jsonOut(200, "OK", [["Content-Type", "application/json"]],
+        { id: "cmpl-loop", model, usage: { prompt_tokens: 44, completion_tokens: 20 },
+          choices: [{ index: 0, finish_reason: "tool_calls", message: { role: "assistant", content: null,
+            tool_calls: [{ id: `call_loop_${attemptN}`, type: "function", function: { name: "lookup_hours", arguments: '{"branch":"central"}' } }] } }] });
+    default:
+      return null;
+  }
+}
+
 function parseAiMeta(url, body) {
   let pathname = "";
   try { pathname = new URL(url).pathname.replace(/\/+$/, ""); } catch { return null; }
@@ -206,10 +317,15 @@ class Faulting {
   onAttempt() {}
 
   open(req) {
+    if (this.clock.virtual && this.attempts.length >= (C.max_trial_attempts ?? 50)) {
+      this.clock.hangs = (this.clock.hangs || 0) + 1;
+      throw new ChaosHang(`exceeded ${C.max_trial_attempts ?? 50} dependency attempts in one call`);
+    }
     const n = this.counts.get(req.key) ?? 0;
     this.counts.set(req.key, n + 1);
     const rec = { key: req.key, n, fault: this.plan(req.key, n), reached: false, nonidempotent: req.nonidempotent, idem: req.idem,
       method: req.method, failed: true, outage: this.plan.outage(req.key, n) };
+    if (req.ai) rec._reqAi = req.ai;
     this.attempts.push(rec);
     this.onAttempt(req, rec);
     this.clock.touch();
@@ -217,7 +333,17 @@ class Faulting {
   }
 
   close(rec, out) {
-    rec.failed = isFailure(out) || Boolean(rec.truncated);
+    rec.failed = isFailure(out) || Boolean(rec.truncated) || AI_FAULTS.has(rec.fault);
+    const reqAi = rec._reqAi;
+    delete rec._reqAi;
+    if (reqAi && !rec.ai_resp) {
+      if ("exc" in out) {
+        rec.ai_resp = { provider: reqAi.provider, model: reqAi.model, input_tokens: reqAi.input_tokens_est || 0,
+          output_tokens: 0, cost_usd: 0, finish_reason: "exception" };
+      } else {
+        rec.ai_resp = parseAiResponseMeta(reqAi, out.status ?? 200, out.body);
+      }
+    }
     this.clock.touch();
     return out;
   }
@@ -260,7 +386,17 @@ class Faulting {
         await this.clock.wait(Infinity, ctl);
         return this.close(rec, ctl.outcome());
       case "refused": return this.close(rec, excOutcome(refused(req)));
-      default: return this.close(rec, errorAnswer(req, rec.fault === "http5xx" ? 503 : 429));
+      default: {
+        if (AI_FAULTS.has(rec.fault)) {
+          const out = aiFaultOutcome(rec.fault, req.url, req.ai, rec.n);
+          if (out) {
+            rec.reached = (out.status ?? 0) < 500;
+            rec.ai_resp = parseAiResponseMeta(req.ai, out.status ?? 200, out.body);
+            return this.close(rec, out);
+          }
+        }
+        return this.close(rec, errorAnswer(req, rec.fault === "http5xx" ? 503 : 429));
+      }
     }
   }
 
@@ -778,4 +914,4 @@ function seal(miss) {
   require("node:module").syncBuiltinESMExports();
 }
 
-module.exports = { install, seal, blame, Watcher, Recorder, Faulting, ReplayMiss, reqDict, recorded, excOutcome, isFailure, quietly, logicalUrl };
+module.exports = { install, seal, blame, Watcher, Recorder, Faulting, ReplayMiss, reqDict, recorded, excOutcome, isFailure, quietly, logicalUrl, AI_FAULTS, aiFaultOutcome };

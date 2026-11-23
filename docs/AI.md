@@ -51,7 +51,7 @@ Both Python (`ras_anything/patterns/ai.py`, re-exported from `ras_anything.runti
 
 ### Turn-Based Replay Matching
 
-Hardening an LLM call legitimately changes the HTTP request body (adding untrusted framing, `max_tokens`, tightened system prompt, or switching from `"small"` to `"backup"`). In `ras_anything/agents/python/worker.py` and `ras_anything/lang/node_agent/worker.cjs`, `Replay.match` tries exact `key` (`method + logical_url + #body_sha`) first; for AI endpoints only, it falls back to matching `(method, logical_url, has_tool_result)` against recorded AI exchanges, while still raising `ReplayMiss` for any unrecorded URL or non-AI endpoint.
+Hardening an LLM call legitimately changes the HTTP request body (adding untrusted framing, `max_tokens`, tightened system prompt, or switching from `"small"` to `"backup"`). Both Python (`boundary.py`/`worker.py`) and Node (`boundary.cjs`/`worker.cjs`) implement all 13 AI L7 fault outcomes (`ai_fault_outcome` / `aiFaultOutcome`), `MAX_TRIAL_ATTEMPTS` loop guard, `ai_resp` token/cost telemetry, and turn-based replay matching: `Replay.match` tries exact `key` (`method + logical_url + #body_sha`) first; for AI endpoints only, it falls back to matching `(method, logical_url, has_tool_result)` against recorded AI exchanges, while still raising `ReplayMiss` for any unrecorded URL or non-AI endpoint.
 
 Note on idempotency: pure completion endpoints (`req.ai is not None`) are treated as stateless inference (`nonidempotent = False`) so retrying a timed-out completion on a fallback model is accounted via `retry_cost_amplification` and `cost_per_success_usd` rather than falsely flagged as a duplicate side effect (mutating tool endpoints remain `nonidempotent = True`).
 

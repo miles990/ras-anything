@@ -257,6 +257,70 @@ class AINodeParityTest(unittest.TestCase):
         self.assertIn("NODE_PARITY_OK", p.stdout)
 
 
+
+    def test_node_boundary_13_ai_faults_and_loop_guard_parity(self):
+        bnd = str(REPO / "ras_anything" / "lang" / "node_agent" / "boundary.cjs")
+        flt = str(REPO / "ras_anything" / "lang" / "node_agent" / "faults.cjs")
+        script = r"""
+        const assert = require("node:assert/strict");
+        const bnd = require(process.argv[1]);
+        const flt = require(process.argv[2]);
+        const faults = JSON.parse(process.argv[3]);
+
+        (async () => {
+          const outMap = {};
+          for (const f of faults) {
+            const o = bnd.aiFaultOutcome(f, "http://127.0.0.1/v1/chat/completions", { model: "small" }, 0);
+            outMap[f] = { status: o.status, headers: o.headers, body: o.body.toString("utf8") };
+          }
+          // Exercise Faulting with VirtualClock on each AI fault via fetch()
+          for (const f of faults) {
+            const clock = new flt.VirtualClock();
+            const handler = new bnd.Faulting({ type: "first", fault: f, key: null }, clock);
+            bnd.install(handler);
+            const res = await fetch("http://127.0.0.1:9999/v1/chat/completions", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ model: "small", messages: [{ role: "user", content: "hi" }] }),
+            });
+            assert.equal(res.status, outMap[f].status, f);
+            assert.equal(handler.attempts[0].fault, f);
+            assert.equal(handler.attempts[0].failed, true);
+            assert.ok(handler.attempts[0].ai_resp, f + " missing ai_resp");
+          }
+          // Exercise MAX_TRIAL_ATTEMPTS loop guard on VirtualClock
+          const clock = new flt.VirtualClock();
+          const handler = new bnd.Faulting({ type: "down" }, clock);
+          bnd.install(handler);
+          let tripped = false;
+          for (let i = 0; i < 60; i += 1) {
+            try {
+              await fetch("http://127.0.0.1:9999/v1/chat/completions", {
+                method: "POST",
+                body: JSON.stringify({ model: "small", messages: [{ role: "user", content: "loop" }] }),
+              });
+            } catch (e) {
+              if (e instanceof flt.ChaosHang) { tripped = true; break; }
+            }
+          }
+          assert.ok(tripped, "expected ChaosHang loop guard");
+          console.log(JSON.stringify(outMap));
+        })();
+        """
+        proc = subprocess.run([NODE, "-e", script, bnd, flt, json.dumps(list(ai.AI_FAULTS))],
+                              capture_output=True, text=True, check=True)
+        node_map = json.loads(proc.stdout.strip().splitlines()[-1])
+        req_ai = {"provider": "openai", "model": "small", "input_tokens_est": 10}
+        for f in ai.AI_FAULTS:
+            py_out = ai.ai_fault_outcome(f, "http://127.0.0.1/v1/chat/completions", req_ai, 0)
+            self.assertEqual(node_map[f]["status"], py_out["status"], f)
+            self.assertEqual(node_map[f]["headers"], py_out["headers"], f)
+            if f == "ai_sse_truncated":
+                self.assertEqual(node_map[f]["body"], py_out["body"].decode("utf-8"), f)
+            else:
+                self.assertEqual(json.loads(node_map[f]["body"]), json.loads(py_out["body"].decode("utf-8")), f)
+
+
 class DriftAndSupportAIExampleTest(unittest.TestCase):
     def test_committed_support_ai_artifacts_and_portability(self):
         ex = REPO / "examples" / "support-ai"
