@@ -1,0 +1,99 @@
+{
+  "generated_at": "2026-11-23T17:50:33+0800",
+  "kind": "patterns",
+  "patterns": [
+    {
+      "amplification": 1.918,
+      "name": "fallback",
+      "off_availability": 0.9953,
+      "on_availability": 1.0,
+      "verdict": "adopted"
+    },
+    {
+      "amplification": 1.918,
+      "name": "deadline",
+      "off_availability": 0.9969,
+      "on_availability": 1.0,
+      "verdict": "adopted"
+    },
+    {
+      "amplification": 1.918,
+      "name": "bulkhead",
+      "off_availability": 1.0,
+      "on_availability": 1.0,
+      "verdict": "opt-in"
+    },
+    {
+      "amplification": 1.918,
+      "name": "idempotency",
+      "off_availability": 1.0,
+      "on_availability": 1.0,
+      "verdict": "adopted"
+    },
+    {
+      "amplification": 1.918,
+      "name": "retry_budget",
+      "off_availability": 1.0,
+      "on_availability": 1.0,
+      "verdict": "adopted"
+    },
+    {
+      "amplification": 1.918,
+      "name": "retry_after",
+      "off_availability": 1.0,
+      "on_availability": 1.0,
+      "verdict": "adopted"
+    },
+    {
+      "amplification": 1.918,
+      "name": "retry",
+      "off_availability": 0.8229,
+      "on_availability": 1.0,
+      "verdict": "adopted"
+    },
+    {
+      "amplification": 1.918,
+      "name": "circuit_breaker",
+      "off_availability": 1.0,
+      "on_availability": 1.0,
+      "verdict": "adopted"
+    },
+    {
+      "amplification": 1.387,
+      "name": "adaptive_throttle",
+      "off_availability": 1.0,
+      "on_availability": 0.9,
+      "verdict": "opt-in"
+    },
+    {
+      "amplification": 1.918,
+      "name": "adaptive_concurrency",
+      "off_availability": 1.0,
+      "on_availability": 1.0,
+      "verdict": "opt-in"
+    },
+    {
+      "amplification": 1.978,
+      "name": "hedge",
+      "off_availability": 1.0,
+      "on_availability": 1.0,
+      "verdict": "opt-in"
+    },
+    {
+      "amplification": 1.918,
+      "name": "attempt_timeout",
+      "off_availability": 0.9667,
+      "on_availability": 1.0,
+      "verdict": "adopted"
+    },
+    {
+      "amplification": 1.918,
+      "name": "jitter",
+      "off_availability": 1.0,
+      "on_availability": 1.0,
+      "verdict": "adopted"
+    }
+  ],
+  "project": "patterns-lab",
+  "schema_version": "1.0.0"
+}

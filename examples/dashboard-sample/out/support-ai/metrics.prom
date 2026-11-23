@@ -1,0 +1,54 @@
+# HELP ras_availability_ratio Availability ratio (0..1) under injected faults
+# TYPE ras_availability_ratio gauge
+ras_availability_ratio{project="support-ai",scope="bench",variant="original"} 0.5
+ras_availability_ratio{project="support-ai",scope="bench",variant="hardened"} 1.0
+ras_availability_ratio{project="support-ai",scope="verify",function="support.triage_ticket",variant="original"} 0.0990990990990991
+ras_availability_ratio{project="support-ai",scope="verify",function="support.triage_ticket",variant="hardened"} 1.0
+# HELP ras_identical_ratio Strict byte-identical output ratio (0..1)
+# TYPE ras_identical_ratio gauge
+ras_identical_ratio{project="support-ai",scope="bench",variant="original"} 0.5
+ras_identical_ratio{project="support-ai",scope="bench",variant="hardened"} 0.95
+# HELP ras_crash_rate Whole-app crash rate (0..1)
+# TYPE ras_crash_rate gauge
+ras_crash_rate{project="support-ai",scope="bench",variant="original"} 0.4
+ras_crash_rate{project="support-ai",scope="bench",variant="hardened"} 0.0
+# HELP ras_hang_rate Whole-app hang rate (0..1)
+# TYPE ras_hang_rate gauge
+ras_hang_rate{project="support-ai",scope="bench",variant="original"} 0.1
+ras_hang_rate{project="support-ai",scope="bench",variant="hardened"} 0.0
+# HELP ras_p99_seconds p99 latency in seconds
+# TYPE ras_p99_seconds gauge
+ras_p99_seconds{project="support-ai",scope="bench",variant="original"} 2.1041
+ras_p99_seconds{project="support-ai",scope="bench",variant="hardened"} 2.6095
+ras_p99_seconds{project="support-ai",scope="verify",function="support.triage_ticket",variant="original"} 60.004472
+ras_p99_seconds{project="support-ai",scope="verify",function="support.triage_ticket",variant="hardened"} 3.719763
+# HELP ras_duplicates_total Duplicate non-idempotent side effects
+# TYPE ras_duplicates_total gauge
+ras_duplicates_total{project="support-ai",scope="bench",variant="original"} 0
+ras_duplicates_total{project="support-ai",scope="bench",variant="hardened"} 0
+ras_duplicates_total{project="support-ai",scope="verify",function="support.triage_ticket",variant="original"} 0
+ras_duplicates_total{project="support-ai",scope="verify",function="support.triage_ticket",variant="hardened"} 0
+# HELP ras_error_budget_burn_ratio Error budget burn ratio (1.0 = 100%)
+# TYPE ras_error_budget_burn_ratio gauge
+ras_error_budget_burn_ratio{project="support-ai",variant="original"} 50.0
+ras_error_budget_burn_ratio{project="support-ai",variant="hardened"} 0.0
+# HELP ras_ai_semantic_success_ratio AI semantic success rate (0..1)
+# TYPE ras_ai_semantic_success_ratio gauge
+ras_ai_semantic_success_ratio{project="support-ai",variant="original"} 0.0991
+ras_ai_semantic_success_ratio{project="support-ai",variant="hardened"} 1.0
+# HELP ras_ai_injection_resistance_ratio Prompt-injection resistance rate (0..1)
+# TYPE ras_ai_injection_resistance_ratio gauge
+ras_ai_injection_resistance_ratio{project="support-ai",variant="original"} 1.0
+ras_ai_injection_resistance_ratio{project="support-ai",variant="hardened"} 1.0
+# HELP ras_ai_cost_per_success_usd AI USD cost per semantic success
+# TYPE ras_ai_cost_per_success_usd gauge
+ras_ai_cost_per_success_usd{project="support-ai",variant="original"} 0.000188
+ras_ai_cost_per_success_usd{project="support-ai",variant="hardened"} 5.5e-05
+# HELP ras_ax_accuracy_ratio AX policy agent next-action accuracy (0..1)
+# TYPE ras_ax_accuracy_ratio gauge
+ras_ax_accuracy_ratio{project="support-ai",variant="original"} 0.3
+ras_ax_accuracy_ratio{project="support-ai",variant="hardened"} 1.0
+# HELP ras_serviceability_detection_ratio Fault detection rate from logs (0..1)
+# TYPE ras_serviceability_detection_ratio gauge
+ras_serviceability_detection_ratio{project="support-ai",variant="original"} 0.0
+ras_serviceability_detection_ratio{project="support-ai",variant="hardened"} 1.0

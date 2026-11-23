@@ -1,0 +1,42 @@
+# HELP ras_availability_ratio Availability ratio (0..1) under injected faults
+# TYPE ras_availability_ratio gauge
+ras_availability_ratio{project="weather",scope="bench",variant="original"} 0.4
+ras_availability_ratio{project="weather",scope="bench",variant="hardened"} 1.0
+ras_availability_ratio{project="weather",scope="verify",function="weather.fetch_forecast",variant="original"} 0.325
+ras_availability_ratio{project="weather",scope="verify",function="weather.fetch_forecast",variant="hardened"} 1.0
+# HELP ras_identical_ratio Strict byte-identical output ratio (0..1)
+# TYPE ras_identical_ratio gauge
+ras_identical_ratio{project="weather",scope="bench",variant="original"} 0.4
+ras_identical_ratio{project="weather",scope="bench",variant="hardened"} 1.0
+# HELP ras_crash_rate Whole-app crash rate (0..1)
+# TYPE ras_crash_rate gauge
+ras_crash_rate{project="weather",scope="bench",variant="original"} 0.45
+ras_crash_rate{project="weather",scope="bench",variant="hardened"} 0.0
+# HELP ras_hang_rate Whole-app hang rate (0..1)
+# TYPE ras_hang_rate gauge
+ras_hang_rate{project="weather",scope="bench",variant="original"} 0.15
+ras_hang_rate{project="weather",scope="bench",variant="hardened"} 0.0
+# HELP ras_p99_seconds p99 latency in seconds
+# TYPE ras_p99_seconds gauge
+ras_p99_seconds{project="weather",scope="bench",variant="original"} 2.1071
+ras_p99_seconds{project="weather",scope="bench",variant="hardened"} 1.2549
+ras_p99_seconds{project="weather",scope="verify",function="weather.fetch_forecast",variant="original"} 60.0
+ras_p99_seconds{project="weather",scope="verify",function="weather.fetch_forecast",variant="hardened"} 3.598089
+# HELP ras_duplicates_total Duplicate non-idempotent side effects
+# TYPE ras_duplicates_total gauge
+ras_duplicates_total{project="weather",scope="bench",variant="original"} 0
+ras_duplicates_total{project="weather",scope="bench",variant="hardened"} 0
+ras_duplicates_total{project="weather",scope="verify",function="weather.fetch_forecast",variant="original"} 0
+ras_duplicates_total{project="weather",scope="verify",function="weather.fetch_forecast",variant="hardened"} 0
+# HELP ras_error_budget_burn_ratio Error budget burn ratio (1.0 = 100%)
+# TYPE ras_error_budget_burn_ratio gauge
+ras_error_budget_burn_ratio{project="weather",variant="original"} 60.0
+ras_error_budget_burn_ratio{project="weather",variant="hardened"} 0.0
+# HELP ras_ax_accuracy_ratio AX policy agent next-action accuracy (0..1)
+# TYPE ras_ax_accuracy_ratio gauge
+ras_ax_accuracy_ratio{project="weather",variant="original"} 0.3
+ras_ax_accuracy_ratio{project="weather",variant="hardened"} 1.0
+# HELP ras_serviceability_detection_ratio Fault detection rate from logs (0..1)
+# TYPE ras_serviceability_detection_ratio gauge
+ras_serviceability_detection_ratio{project="weather",variant="original"} 0.0
+ras_serviceability_detection_ratio{project="weather",variant="hardened"} 1.0

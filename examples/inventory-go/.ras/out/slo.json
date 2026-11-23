@@ -1,0 +1,53 @@
+{
+  "schema_version": "1.0.0",
+  "kind": "slo",
+  "generated_at": "2026-11-23T17:49:57+0800",
+  "project": "inventory-go",
+  "slo": {
+    "source": "bench",
+    "targets": {
+      "availability": 0.95,
+      "p99_s": 3.0,
+      "error_rate": 0.05
+    },
+    "original": {
+      "availability": 0.05,
+      "error_rate": 0.95,
+      "p50_s": 0.006,
+      "p99_s": 2.0101,
+      "error_budget": 0.05,
+      "error_budget_burn_ratio": 19.0,
+      "error_budget_burn_pct": 1900.0,
+      "checks": {
+        "availability": false,
+        "p99_s": true,
+        "error_rate": false
+      },
+      "status": "missed"
+    },
+    "hardened": {
+      "availability": 1.0,
+      "error_rate": 0.0,
+      "p50_s": 0.4113,
+      "p99_s": 2.3903,
+      "error_budget": 0.05,
+      "error_budget_burn_ratio": 0.0,
+      "error_budget_burn_pct": 0.0,
+      "checks": {
+        "availability": true,
+        "p99_s": true,
+        "error_rate": true
+      },
+      "status": "met"
+    },
+    "series": [
+      {
+        "ts": "2026-11-23T17:49:57+0800",
+        "availability": 1.0,
+        "p99_s": 2.3903,
+        "error_rate": 0.0,
+        "burn_pct": 0.0
+      }
+    ]
+  }
+}

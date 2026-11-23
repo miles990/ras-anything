@@ -1,0 +1,51 @@
+{
+  "functions": [
+    {
+      "exposure": 0.3333,
+      "id": "warehouse.ReserveStock",
+      "lang": "go",
+      "risk": 0.8368,
+      "score": 27.9,
+      "signals": {
+        "no_retry": "no retry on transient errors",
+        "no_timeout": "outbound call without timeout",
+        "write_no_key": "non-idempotent request without Idempotency-Key"
+      }
+    },
+    {
+      "exposure": 0.3333,
+      "id": "warehouse.AuditTag",
+      "lang": "go",
+      "risk": 0.808,
+      "score": 26.9,
+      "signals": {
+        "no_retry": "no retry on transient errors",
+        "no_timeout": "outbound call without timeout"
+      }
+    },
+    {
+      "exposure": 0.3333,
+      "id": "warehouse.FetchStock",
+      "lang": "go",
+      "risk": 0.808,
+      "score": 26.9,
+      "signals": {
+        "no_retry": "no retry on transient errors",
+        "no_timeout": "outbound call without timeout"
+      }
+    },
+    {
+      "exposure": 0.0,
+      "id": "main.startWarehouseServer",
+      "lang": "go",
+      "risk": 0.0,
+      "score": 0.0,
+      "signals": []
+    }
+  ],
+  "generated_at": "2026-11-23T17:49:57+0800",
+  "kind": "scan",
+  "lang": "go",
+  "project": "inventory-go",
+  "schema_version": "1.0.0"
+}

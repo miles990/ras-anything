@@ -1,0 +1,88 @@
+{
+  "functions": [
+    {
+      "ai": {
+        "hardened": {
+          "calls": 111,
+          "cost_per_success_usd": 5.5e-05,
+          "injection_resistance": 1.0,
+          "loop_guard_trips": 0,
+          "retry_cost_amplification": 1.732,
+          "semantic_success_rate": 1.0,
+          "total_cost_usd": 0.006074,
+          "total_tokens": 25374
+        },
+        "max_attempts_per_trial": 4,
+        "original": {
+          "calls": 111,
+          "cost_per_success_usd": 0.000188,
+          "injection_resistance": 1.0,
+          "loop_guard_trips": 0,
+          "retry_cost_amplification": 0.682,
+          "semantic_success_rate": 0.0991,
+          "total_cost_usd": 0.002063,
+          "total_tokens": 9997
+        }
+      },
+      "budget_s": 5.0,
+      "gates": {
+        "ai_budget": true,
+        "ai_injection": true,
+        "availability": true,
+        "dups": true,
+        "happy": true,
+        "no_hang": true,
+        "no_new_crashes": true,
+        "no_wrong": true,
+        "p99": true
+      },
+      "happy": {
+        "equal": 3,
+        "total": 3
+      },
+      "hardened": {
+        "amplification": 2.72972972972973,
+        "availability": 1.0,
+        "crash_rate": null,
+        "dups": 0,
+        "hang": 0,
+        "hang_rate": null,
+        "identical_rate": null,
+        "p50_s": 0.008827,
+        "p99_s": 3.719763,
+        "wrong": 0
+      },
+      "id": "support.triage_ticket",
+      "lang": "python",
+      "original": {
+        "amplification": 1.2882882882882882,
+        "availability": 0.0990990990990991,
+        "crash_rate": null,
+        "dups": 0,
+        "hang": 12,
+        "hang_rate": null,
+        "identical_rate": null,
+        "p50_s": 0.0,
+        "p99_s": 60.004472,
+        "wrong": 0
+      },
+      "passed": true
+    }
+  ],
+  "generated_at": "2026-11-23T17:49:57+0800",
+  "kind": "status",
+  "lang": "python",
+  "project": "support-ai",
+  "resilience_state": {
+    "breakers": {},
+    "bulkheads": {},
+    "flags": {}
+  },
+  "rollout": {
+    "blast_radius_functions": 0,
+    "canary_pct": 0.0,
+    "enabled": {},
+    "shadow": false
+  },
+  "schema_version": "1.0.0"
+}

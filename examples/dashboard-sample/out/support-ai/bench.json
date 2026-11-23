@@ -1,0 +1,35 @@
+{
+  "bench": {
+    "hardened": {
+      "amplification": 2.4833333333333334,
+      "availability": 1.0,
+      "crash_rate": 0.0,
+      "dups": 0,
+      "hang": 0,
+      "hang_rate": 0.0,
+      "identical_rate": 0.95,
+      "p50_s": 0.7569,
+      "p99_s": 2.6095,
+      "wrong": 0
+    },
+    "original": {
+      "amplification": 1.8297872340425532,
+      "availability": 0.5,
+      "crash_rate": 0.4,
+      "dups": 0,
+      "hang": 2,
+      "hang_rate": 0.1,
+      "identical_rate": 0.5,
+      "p50_s": 0.6043,
+      "p99_s": 2.1041,
+      "wrong": 0
+    },
+    "rate": 0.1,
+    "seeds": 20
+  },
+  "generated_at": "2026-11-23T17:49:57+0800",
+  "kind": "bench",
+  "lang": "python",
+  "project": "support-ai",
+  "schema_version": "1.0.0"
+}

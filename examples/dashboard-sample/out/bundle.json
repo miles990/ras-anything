@@ -1,0 +1,4483 @@
+{
+  "flags_hot": {
+    "dropped_or_failed": 0,
+    "max_s": 0.00018770899987430312,
+    "n": 80,
+    "observed": 80,
+    "p50_s": 8.636099937575636e-05,
+    "p99_s": 0.00017884099997900194
+  },
+  "generated_at": "2026-11-23T17:49:57+0800",
+  "kind": "bundle",
+  "patterns": [
+    {
+      "amplification": 1.918,
+      "name": "fallback",
+      "off_availability": 0.9953,
+      "on_availability": 1.0,
+      "verdict": "adopted"
+    },
+    {
+      "amplification": 1.918,
+      "name": "deadline",
+      "off_availability": 0.9969,
+      "on_availability": 1.0,
+      "verdict": "adopted"
+    },
+    {
+      "amplification": 1.918,
+      "name": "bulkhead",
+      "off_availability": 1.0,
+      "on_availability": 1.0,
+      "verdict": "opt-in"
+    },
+    {
+      "amplification": 1.918,
+      "name": "idempotency",
+      "off_availability": 1.0,
+      "on_availability": 1.0,
+      "verdict": "adopted"
+    },
+    {
+      "amplification": 1.918,
+      "name": "retry_budget",
+      "off_availability": 1.0,
+      "on_availability": 1.0,
+      "verdict": "adopted"
+    },
+    {
+      "amplification": 1.918,
+      "name": "retry_after",
+      "off_availability": 1.0,
+      "on_availability": 1.0,
+      "verdict": "adopted"
+    },
+    {
+      "amplification": 1.918,
+      "name": "retry",
+      "off_availability": 0.8229,
+      "on_availability": 1.0,
+      "verdict": "adopted"
+    },
+    {
+      "amplification": 1.918,
+      "name": "circuit_breaker",
+      "off_availability": 1.0,
+      "on_availability": 1.0,
+      "verdict": "adopted"
+    },
+    {
+      "amplification": 1.387,
+      "name": "adaptive_throttle",
+      "off_availability": 1.0,
+      "on_availability": 0.9,
+      "verdict": "opt-in"
+    },
+    {
+      "amplification": 1.918,
+      "name": "adaptive_concurrency",
+      "off_availability": 1.0,
+      "on_availability": 1.0,
+      "verdict": "opt-in"
+    },
+    {
+      "amplification": 1.978,
+      "name": "hedge",
+      "off_availability": 1.0,
+      "on_availability": 1.0,
+      "verdict": "opt-in"
+    },
+    {
+      "amplification": 1.918,
+      "name": "attempt_timeout",
+      "off_availability": 0.9667,
+      "on_availability": 1.0,
+      "verdict": "adopted"
+    },
+    {
+      "amplification": 1.918,
+      "name": "jitter",
+      "off_availability": 1.0,
+      "on_availability": 1.0,
+      "verdict": "adopted"
+    }
+  ],
+  "project": "dashboard-sample",
+  "projects": {
+    "inventory-go": {
+      "events": [
+        {
+          "data": {
+            "functions": 4
+          },
+          "dependency": null,
+          "event_type": "scan.completed",
+          "function_id": null,
+          "kind": "event",
+          "schema_version": "1.0.0",
+          "seq": 1,
+          "severity": "INFO",
+          "trace_id": null,
+          "ts": "2026-11-23T17:49:44+0800"
+        },
+        {
+          "data": {
+            "availability_hardened": 1.0,
+            "availability_original": 0.31666666666666665
+          },
+          "dependency": null,
+          "event_type": "verify.passed",
+          "function_id": "warehouse.AuditTag",
+          "kind": "event",
+          "schema_version": "1.0.0",
+          "seq": 2,
+          "severity": "INFO",
+          "trace_id": null,
+          "ts": "2026-11-23T17:49:44+0800"
+        },
+        {
+          "data": {
+            "availability_hardened": 1.0,
+            "availability_original": 0.2833333333333333
+          },
+          "dependency": null,
+          "event_type": "verify.passed",
+          "function_id": "warehouse.FetchStock",
+          "kind": "event",
+          "schema_version": "1.0.0",
+          "seq": 3,
+          "severity": "INFO",
+          "trace_id": null,
+          "ts": "2026-11-23T17:49:44+0800"
+        },
+        {
+          "data": {
+            "availability_hardened": 1.0,
+            "availability_original": 0.35
+          },
+          "dependency": null,
+          "event_type": "verify.passed",
+          "function_id": "warehouse.ReserveStock",
+          "kind": "event",
+          "schema_version": "1.0.0",
+          "seq": 4,
+          "severity": "INFO",
+          "trace_id": null,
+          "ts": "2026-11-23T17:49:44+0800"
+        },
+        {
+          "data": {
+            "availability_hardened": 1.0,
+            "availability_original": 0.05,
+            "seeds": 20
+          },
+          "dependency": null,
+          "event_type": "bench.completed",
+          "function_id": null,
+          "kind": "event",
+          "schema_version": "1.0.0",
+          "seq": 5,
+          "severity": "INFO",
+          "trace_id": null,
+          "ts": "2026-11-23T17:49:44+0800"
+        },
+        {
+          "data": {
+            "status": "met"
+          },
+          "dependency": null,
+          "event_type": "slo.evaluated",
+          "function_id": null,
+          "kind": "event",
+          "schema_version": "1.0.0",
+          "seq": 6,
+          "severity": "INFO",
+          "trace_id": null,
+          "ts": "2026-11-23T17:49:44+0800"
+        }
+      ],
+      "generated_at": "2026-11-23T17:49:57+0800",
+      "kind": "bundle",
+      "project": "inventory-go",
+      "schema_version": "1.0.0",
+      "snapshots": {
+        "bench": {
+          "bench": {
+            "hardened": {
+              "amplification": 0.8388888888888889,
+              "availability": 1.0,
+              "crash_rate": 0.0,
+              "dups": 0,
+              "hang": 0,
+              "hang_rate": 0.0,
+              "identical_rate": 0.95,
+              "p50_s": 0.4113,
+              "p99_s": 2.3903,
+              "wrong": 0
+            },
+            "original": {
+              "amplification": 0.7153846153846154,
+              "availability": 0.05,
+              "crash_rate": 0.8,
+              "dups": 0,
+              "hang": 3,
+              "hang_rate": 0.15,
+              "identical_rate": 0.05,
+              "p50_s": 0.006,
+              "p99_s": 2.0101,
+              "wrong": 0
+            },
+            "rate": 0.1,
+            "seeds": 20
+          },
+          "generated_at": "2026-11-23T17:49:57+0800",
+          "kind": "bench",
+          "lang": "go",
+          "project": "inventory-go",
+          "schema_version": "1.0.0"
+        },
+        "coverage": {
+          "coverage": {
+            "adapters": [
+              {
+                "ax": true,
+                "boundary": "urllib / requests / httpx / aiohttp / socket / subprocess",
+                "lang": "python",
+                "status": "complete",
+                "verify": true
+              },
+              {
+                "ax": true,
+                "boundary": "fetch / http / https / child_process (CJS + ESM + TS)",
+                "lang": "node",
+                "status": "complete",
+                "verify": true
+              },
+              {
+                "ax": true,
+                "boundary": "net/http / os/exec: AST + rasagent + rasruntime",
+                "lang": "go",
+                "status": "complete",
+                "verify": true
+              },
+              {
+                "ax": false,
+                "boundary": "HttpClient / HttpURLConnection / ProcessBuilder",
+                "lang": "java",
+                "status": "planned",
+                "verify": false
+              },
+              {
+                "ax": false,
+                "boundary": "HttpClient / Process",
+                "lang": "csharp",
+                "status": "planned",
+                "verify": false
+              },
+              {
+                "ax": false,
+                "boundary": "curl / file_get_contents / proc_open",
+                "lang": "php",
+                "status": "planned",
+                "verify": false
+              },
+              {
+                "ax": false,
+                "boundary": "Net::HTTP / Open3",
+                "lang": "ruby",
+                "status": "planned",
+                "verify": false
+              },
+              {
+                "ax": false,
+                "boundary": "HttpClient / OkHttp / ProcessBuilder",
+                "lang": "kotlin",
+                "status": "planned",
+                "verify": false
+              },
+              {
+                "ax": false,
+                "boundary": "fetch / Bun.spawn",
+                "lang": "bun",
+                "status": "planned",
+                "verify": false
+              },
+              {
+                "ax": false,
+                "boundary": "fetch / Deno.Command",
+                "lang": "deno",
+                "status": "planned",
+                "verify": false
+              },
+              {
+                "ax": false,
+                "boundary": "libcurl / popen",
+                "lang": "c_cpp",
+                "status": "planned",
+                "verify": false
+              }
+            ]
+          },
+          "generated_at": "2026-11-23T17:49:57+0800",
+          "kind": "coverage",
+          "project": "inventory-go",
+          "schema_version": "1.0.0"
+        },
+        "report": {
+          "ax": {
+            "hardened_accuracy": 1.0,
+            "leaks": 0,
+            "original_accuracy": 0.3,
+            "records": []
+          },
+          "bench": {
+            "hardened": {
+              "amplification": 0.8388888888888889,
+              "availability": 1.0,
+              "crash_rate": 0.0,
+              "dups": 0,
+              "hang": 0,
+              "hang_rate": 0.0,
+              "identical_rate": 0.95,
+              "p50_s": 0.4113,
+              "p99_s": 2.3903,
+              "wrong": 0
+            },
+            "original": {
+              "amplification": 0.7153846153846154,
+              "availability": 0.05,
+              "crash_rate": 0.8,
+              "dups": 0,
+              "hang": 3,
+              "hang_rate": 0.15,
+              "identical_rate": 0.05,
+              "p50_s": 0.006,
+              "p99_s": 2.0101,
+              "wrong": 0
+            },
+            "rate": 0.1,
+            "seeds": 20
+          },
+          "coverage": {
+            "adapters": [
+              {
+                "ax": true,
+                "boundary": "urllib / requests / httpx / aiohttp / socket / subprocess",
+                "lang": "python",
+                "status": "complete",
+                "verify": true
+              },
+              {
+                "ax": true,
+                "boundary": "fetch / http / https / child_process (CJS + ESM + TS)",
+                "lang": "node",
+                "status": "complete",
+                "verify": true
+              },
+              {
+                "ax": true,
+                "boundary": "net/http / os/exec: AST + rasagent + rasruntime",
+                "lang": "go",
+                "status": "complete",
+                "verify": true
+              },
+              {
+                "ax": false,
+                "boundary": "HttpClient / HttpURLConnection / ProcessBuilder",
+                "lang": "java",
+                "status": "planned",
+                "verify": false
+              },
+              {
+                "ax": false,
+                "boundary": "HttpClient / Process",
+                "lang": "csharp",
+                "status": "planned",
+                "verify": false
+              },
+              {
+                "ax": false,
+                "boundary": "curl / file_get_contents / proc_open",
+                "lang": "php",
+                "status": "planned",
+                "verify": false
+              },
+              {
+                "ax": false,
+                "boundary": "Net::HTTP / Open3",
+                "lang": "ruby",
+                "status": "planned",
+                "verify": false
+              },
+              {
+                "ax": false,
+                "boundary": "HttpClient / OkHttp / ProcessBuilder",
+                "lang": "kotlin",
+                "status": "planned",
+                "verify": false
+              },
+              {
+                "ax": false,
+                "boundary": "fetch / Bun.spawn",
+                "lang": "bun",
+                "status": "planned",
+                "verify": false
+              },
+              {
+                "ax": false,
+                "boundary": "fetch / Deno.Command",
+                "lang": "deno",
+                "status": "planned",
+                "verify": false
+              },
+              {
+                "ax": false,
+                "boundary": "libcurl / popen",
+                "lang": "c_cpp",
+                "status": "planned",
+                "verify": false
+              }
+            ]
+          },
+          "functions": [
+            {
+              "budget_s": 5.0,
+              "gates": {
+                "availability": true,
+                "dups": true,
+                "happy": true,
+                "no_hang": true,
+                "no_new_crashes": true,
+                "no_wrong": true,
+                "p99": true
+              },
+              "happy": {
+                "equal": 6,
+                "total": 6
+              },
+              "hardened": {
+                "amplification": 1.75,
+                "availability": 1.0,
+                "crash_rate": null,
+                "dups": 0,
+                "hang": 0,
+                "hang_rate": null,
+                "identical_rate": null,
+                "p50_s": 0.024,
+                "p99_s": 3.4478,
+                "wrong": 0
+              },
+              "id": "warehouse.AuditTag",
+              "lang": "go",
+              "original": {
+                "amplification": 1.0,
+                "availability": 0.31666666666666665,
+                "crash_rate": null,
+                "dups": 0,
+                "hang": 6,
+                "hang_rate": null,
+                "identical_rate": null,
+                "p50_s": 0,
+                "p99_s": 3.0011,
+                "wrong": 0
+              },
+              "passed": true
+            },
+            {
+              "budget_s": 5.0,
+              "gates": {
+                "availability": true,
+                "dups": true,
+                "happy": true,
+                "no_hang": true,
+                "no_new_crashes": true,
+                "no_wrong": true,
+                "p99": true
+              },
+              "happy": {
+                "equal": 6,
+                "total": 6
+              },
+              "hardened": {
+                "amplification": 1.95,
+                "availability": 1.0,
+                "crash_rate": null,
+                "dups": 0,
+                "hang": 0,
+                "hang_rate": null,
+                "identical_rate": null,
+                "p50_s": 0.1619,
+                "p99_s": 3.6079,
+                "wrong": 0
+              },
+              "id": "warehouse.FetchStock",
+              "lang": "go",
+              "original": {
+                "amplification": 1.0,
+                "availability": 0.2833333333333333,
+                "crash_rate": null,
+                "dups": 0,
+                "hang": 7,
+                "hang_rate": null,
+                "identical_rate": null,
+                "p50_s": 0,
+                "p99_s": 3.0004,
+                "wrong": 0
+              },
+              "passed": true
+            },
+            {
+              "budget_s": 5.0,
+              "gates": {
+                "availability": true,
+                "dups": true,
+                "happy": true,
+                "no_hang": true,
+                "no_new_crashes": true,
+                "no_wrong": true,
+                "p99": true
+              },
+              "happy": {
+                "equal": 6,
+                "total": 6
+              },
+              "hardened": {
+                "amplification": 1.85,
+                "availability": 1.0,
+                "crash_rate": null,
+                "dups": 0,
+                "hang": 0,
+                "hang_rate": null,
+                "identical_rate": null,
+                "p50_s": 0.0416,
+                "p99_s": 3.4427,
+                "wrong": 0
+              },
+              "id": "warehouse.ReserveStock",
+              "lang": "go",
+              "original": {
+                "amplification": 1.0,
+                "availability": 0.35,
+                "crash_rate": null,
+                "dups": 0,
+                "hang": 6,
+                "hang_rate": null,
+                "identical_rate": null,
+                "p50_s": 0,
+                "p99_s": 3.0002,
+                "wrong": 0
+              },
+              "passed": true
+            }
+          ],
+          "generated_at": "2026-11-23T17:49:57+0800",
+          "kind": "report",
+          "lang": "go",
+          "project": "inventory-go",
+          "resilience_state": {
+            "breakers": {},
+            "bulkheads": {},
+            "flags": {}
+          },
+          "rollout": {
+            "blast_radius_functions": 0,
+            "canary_pct": 0.0,
+            "enabled": {},
+            "shadow": false
+          },
+          "schema_version": "1.0.0",
+          "serviceability": {
+            "hard_detection_rate": 0.2127659574468085,
+            "hard_diagnosis_accuracy": 0.0,
+            "mttd_s": null,
+            "mttr_s": null,
+            "orig_detection_rate": 0.0,
+            "restore_s": null
+          },
+          "slo": {
+            "hardened": {
+              "availability": 1.0,
+              "checks": {
+                "availability": true,
+                "error_rate": true,
+                "p99_s": true
+              },
+              "error_budget": 0.05,
+              "error_budget_burn_pct": 0.0,
+              "error_budget_burn_ratio": 0.0,
+              "error_rate": 0.0,
+              "p50_s": 0.4113,
+              "p99_s": 2.3903,
+              "status": "met"
+            },
+            "original": {
+              "availability": 0.05,
+              "checks": {
+                "availability": false,
+                "error_rate": false,
+                "p99_s": true
+              },
+              "error_budget": 0.05,
+              "error_budget_burn_pct": 1900.0,
+              "error_budget_burn_ratio": 19.0,
+              "error_rate": 0.95,
+              "p50_s": 0.006,
+              "p99_s": 2.0101,
+              "status": "missed"
+            },
+            "source": "bench",
+            "targets": {
+              "availability": 0.95,
+              "error_rate": 0.05,
+              "p99_s": 3.0
+            }
+          }
+        },
+        "scan": {
+          "functions": [
+            {
+              "exposure": 0.3333,
+              "id": "warehouse.ReserveStock",
+              "lang": "go",
+              "risk": 0.8368,
+              "score": 27.9,
+              "signals": {
+                "no_retry": "no retry on transient errors",
+                "no_timeout": "outbound call without timeout",
+                "write_no_key": "non-idempotent request without Idempotency-Key"
+              }
+            },
+            {
+              "exposure": 0.3333,
+              "id": "warehouse.AuditTag",
+              "lang": "go",
+              "risk": 0.808,
+              "score": 26.9,
+              "signals": {
+                "no_retry": "no retry on transient errors",
+                "no_timeout": "outbound call without timeout"
+              }
+            },
+            {
+              "exposure": 0.3333,
+              "id": "warehouse.FetchStock",
+              "lang": "go",
+              "risk": 0.808,
+              "score": 26.9,
+              "signals": {
+                "no_retry": "no retry on transient errors",
+                "no_timeout": "outbound call without timeout"
+              }
+            },
+            {
+              "exposure": 0.0,
+              "id": "main.startWarehouseServer",
+              "lang": "go",
+              "risk": 0.0,
+              "score": 0.0,
+              "signals": []
+            }
+          ],
+          "generated_at": "2026-11-23T17:49:57+0800",
+          "kind": "scan",
+          "lang": "go",
+          "project": "inventory-go",
+          "schema_version": "1.0.0"
+        },
+        "slo": {
+          "generated_at": "2026-11-23T17:49:57+0800",
+          "kind": "slo",
+          "project": "inventory-go",
+          "schema_version": "1.0.0",
+          "slo": {
+            "hardened": {
+              "availability": 1.0,
+              "checks": {
+                "availability": true,
+                "error_rate": true,
+                "p99_s": true
+              },
+              "error_budget": 0.05,
+              "error_budget_burn_pct": 0.0,
+              "error_budget_burn_ratio": 0.0,
+              "error_rate": 0.0,
+              "p50_s": 0.4113,
+              "p99_s": 2.3903,
+              "status": "met"
+            },
+            "original": {
+              "availability": 0.05,
+              "checks": {
+                "availability": false,
+                "error_rate": false,
+                "p99_s": true
+              },
+              "error_budget": 0.05,
+              "error_budget_burn_pct": 1900.0,
+              "error_budget_burn_ratio": 19.0,
+              "error_rate": 0.95,
+              "p50_s": 0.006,
+              "p99_s": 2.0101,
+              "status": "missed"
+            },
+            "series": [
+              {
+                "availability": 1.0,
+                "burn_pct": 0.0,
+                "error_rate": 0.0,
+                "p99_s": 2.3903,
+                "ts": "2026-11-23T17:49:57+0800"
+              }
+            ],
+            "source": "bench",
+            "targets": {
+              "availability": 0.95,
+              "error_rate": 0.05,
+              "p99_s": 3.0
+            }
+          }
+        },
+        "status": {
+          "functions": [
+            {
+              "budget_s": 5.0,
+              "gates": {
+                "availability": true,
+                "dups": true,
+                "happy": true,
+                "no_hang": true,
+                "no_new_crashes": true,
+                "no_wrong": true,
+                "p99": true
+              },
+              "happy": {
+                "equal": 6,
+                "total": 6
+              },
+              "hardened": {
+                "amplification": 1.75,
+                "availability": 1.0,
+                "crash_rate": null,
+                "dups": 0,
+                "hang": 0,
+                "hang_rate": null,
+                "identical_rate": null,
+                "p50_s": 0.024,
+                "p99_s": 3.4478,
+                "wrong": 0
+              },
+              "id": "warehouse.AuditTag",
+              "lang": "go",
+              "original": {
+                "amplification": 1.0,
+                "availability": 0.31666666666666665,
+                "crash_rate": null,
+                "dups": 0,
+                "hang": 6,
+                "hang_rate": null,
+                "identical_rate": null,
+                "p50_s": 0,
+                "p99_s": 3.0011,
+                "wrong": 0
+              },
+              "passed": true
+            },
+            {
+              "budget_s": 5.0,
+              "gates": {
+                "availability": true,
+                "dups": true,
+                "happy": true,
+                "no_hang": true,
+                "no_new_crashes": true,
+                "no_wrong": true,
+                "p99": true
+              },
+              "happy": {
+                "equal": 6,
+                "total": 6
+              },
+              "hardened": {
+                "amplification": 1.95,
+                "availability": 1.0,
+                "crash_rate": null,
+                "dups": 0,
+                "hang": 0,
+                "hang_rate": null,
+                "identical_rate": null,
+                "p50_s": 0.1619,
+                "p99_s": 3.6079,
+                "wrong": 0
+              },
+              "id": "warehouse.FetchStock",
+              "lang": "go",
+              "original": {
+                "amplification": 1.0,
+                "availability": 0.2833333333333333,
+                "crash_rate": null,
+                "dups": 0,
+                "hang": 7,
+                "hang_rate": null,
+                "identical_rate": null,
+                "p50_s": 0,
+                "p99_s": 3.0004,
+                "wrong": 0
+              },
+              "passed": true
+            },
+            {
+              "budget_s": 5.0,
+              "gates": {
+                "availability": true,
+                "dups": true,
+                "happy": true,
+                "no_hang": true,
+                "no_new_crashes": true,
+                "no_wrong": true,
+                "p99": true
+              },
+              "happy": {
+                "equal": 6,
+                "total": 6
+              },
+              "hardened": {
+                "amplification": 1.85,
+                "availability": 1.0,
+                "crash_rate": null,
+                "dups": 0,
+                "hang": 0,
+                "hang_rate": null,
+                "identical_rate": null,
+                "p50_s": 0.0416,
+                "p99_s": 3.4427,
+                "wrong": 0
+              },
+              "id": "warehouse.ReserveStock",
+              "lang": "go",
+              "original": {
+                "amplification": 1.0,
+                "availability": 0.35,
+                "crash_rate": null,
+                "dups": 0,
+                "hang": 6,
+                "hang_rate": null,
+                "identical_rate": null,
+                "p50_s": 0,
+                "p99_s": 3.0002,
+                "wrong": 0
+              },
+              "passed": true
+            }
+          ],
+          "generated_at": "2026-11-23T17:49:57+0800",
+          "kind": "status",
+          "lang": "go",
+          "project": "inventory-go",
+          "resilience_state": {
+            "breakers": {},
+            "bulkheads": {},
+            "flags": {}
+          },
+          "rollout": {
+            "blast_radius_functions": 0,
+            "canary_pct": 0.0,
+            "enabled": {},
+            "shadow": false
+          },
+          "schema_version": "1.0.0"
+        },
+        "verify-warehouse.AuditTag": {
+          "functions": [
+            {
+              "budget_s": 5.0,
+              "gates": {
+                "availability": true,
+                "dups": true,
+                "happy": true,
+                "no_hang": true,
+                "no_new_crashes": true,
+                "no_wrong": true,
+                "p99": true
+              },
+              "happy": {
+                "equal": 6,
+                "total": 6
+              },
+              "hardened": {
+                "amplification": 1.75,
+                "availability": 1.0,
+                "crash_rate": null,
+                "dups": 0,
+                "hang": 0,
+                "hang_rate": null,
+                "identical_rate": null,
+                "p50_s": 0.024,
+                "p99_s": 3.4478,
+                "wrong": 0
+              },
+              "id": "warehouse.AuditTag",
+              "lang": "go",
+              "original": {
+                "amplification": 1.0,
+                "availability": 0.31666666666666665,
+                "crash_rate": null,
+                "dups": 0,
+                "hang": 6,
+                "hang_rate": null,
+                "identical_rate": null,
+                "p50_s": 0,
+                "p99_s": 3.0011,
+                "wrong": 0
+              },
+              "passed": true
+            }
+          ],
+          "generated_at": "2026-11-23T17:49:57+0800",
+          "kind": "verify",
+          "lang": "go",
+          "project": "inventory-go",
+          "schema_version": "1.0.0",
+          "serviceability": {
+            "hard_detection_rate": 0.2127659574468085,
+            "hard_diagnosis_accuracy": 0.0,
+            "orig_detection_rate": 0.0
+          }
+        },
+        "verify-warehouse.FetchStock": {
+          "functions": [
+            {
+              "budget_s": 5.0,
+              "gates": {
+                "availability": true,
+                "dups": true,
+                "happy": true,
+                "no_hang": true,
+                "no_new_crashes": true,
+                "no_wrong": true,
+                "p99": true
+              },
+              "happy": {
+                "equal": 6,
+                "total": 6
+              },
+              "hardened": {
+                "amplification": 1.95,
+                "availability": 1.0,
+                "crash_rate": null,
+                "dups": 0,
+                "hang": 0,
+                "hang_rate": null,
+                "identical_rate": null,
+                "p50_s": 0.1619,
+                "p99_s": 3.6079,
+                "wrong": 0
+              },
+              "id": "warehouse.FetchStock",
+              "lang": "go",
+              "original": {
+                "amplification": 1.0,
+                "availability": 0.2833333333333333,
+                "crash_rate": null,
+                "dups": 0,
+                "hang": 7,
+                "hang_rate": null,
+                "identical_rate": null,
+                "p50_s": 0,
+                "p99_s": 3.0004,
+                "wrong": 0
+              },
+              "passed": true
+            }
+          ],
+          "generated_at": "2026-11-23T17:49:57+0800",
+          "kind": "verify",
+          "lang": "go",
+          "project": "inventory-go",
+          "schema_version": "1.0.0",
+          "serviceability": {
+            "hard_detection_rate": 0.0,
+            "hard_diagnosis_accuracy": 0.0,
+            "orig_detection_rate": 0.0
+          }
+        },
+        "verify-warehouse.ReserveStock": {
+          "functions": [
+            {
+              "budget_s": 5.0,
+              "gates": {
+                "availability": true,
+                "dups": true,
+                "happy": true,
+                "no_hang": true,
+                "no_new_crashes": true,
+                "no_wrong": true,
+                "p99": true
+              },
+              "happy": {
+                "equal": 6,
+                "total": 6
+              },
+              "hardened": {
+                "amplification": 1.85,
+                "availability": 1.0,
+                "crash_rate": null,
+                "dups": 0,
+                "hang": 0,
+                "hang_rate": null,
+                "identical_rate": null,
+                "p50_s": 0.0416,
+                "p99_s": 3.4427,
+                "wrong": 0
+              },
+              "id": "warehouse.ReserveStock",
+              "lang": "go",
+              "original": {
+                "amplification": 1.0,
+                "availability": 0.35,
+                "crash_rate": null,
+                "dups": 0,
+                "hang": 6,
+                "hang_rate": null,
+                "identical_rate": null,
+                "p50_s": 0,
+                "p99_s": 3.0002,
+                "wrong": 0
+              },
+              "passed": true
+            }
+          ],
+          "generated_at": "2026-11-23T17:49:57+0800",
+          "kind": "verify",
+          "lang": "go",
+          "project": "inventory-go",
+          "schema_version": "1.0.0",
+          "serviceability": {
+            "hard_detection_rate": 0.0,
+            "hard_diagnosis_accuracy": 0.0,
+            "orig_detection_rate": 0.0
+          }
+        }
+      }
+    },
+    "orders-node": {
+      "events": [
+        {
+          "data": {
+            "functions": 7
+          },
+          "dependency": null,
+          "event_type": "scan.completed",
+          "function_id": null,
+          "kind": "event",
+          "schema_version": "1.0.0",
+          "seq": 1,
+          "severity": "INFO",
+          "trace_id": null,
+          "ts": "2026-11-23T17:49:57+0800"
+        },
+        {
+          "data": {
+            "availability_hardened": 1.0,
+            "availability_original": 0.7833333333333333
+          },
+          "dependency": null,
+          "event_type": "verify.passed",
+          "function_id": "orders.charge",
+          "kind": "event",
+          "schema_version": "1.0.0",
+          "seq": 2,
+          "severity": "INFO",
+          "trace_id": null,
+          "ts": "2026-11-23T17:49:57+0800"
+        },
+        {
+          "data": {
+            "availability_hardened": 1.0,
+            "availability_original": 0.2916666666666667
+          },
+          "dependency": null,
+          "event_type": "verify.passed",
+          "function_id": "orders.getItem",
+          "kind": "event",
+          "schema_version": "1.0.0",
+          "seq": 3,
+          "severity": "INFO",
+          "trace_id": null,
+          "ts": "2026-11-23T17:49:57+0800"
+        },
+        {
+          "data": {
+            "availability_hardened": 1.0,
+            "availability_original": 0.325
+          },
+          "dependency": null,
+          "event_type": "verify.passed",
+          "function_id": "orders.printLabel",
+          "kind": "event",
+          "schema_version": "1.0.0",
+          "seq": 4,
+          "severity": "INFO",
+          "trace_id": null,
+          "ts": "2026-11-23T17:49:57+0800"
+        },
+        {
+          "data": {
+            "availability_hardened": 1.0,
+            "availability_original": 0.39166666666666666
+          },
+          "dependency": null,
+          "event_type": "verify.passed",
+          "function_id": "orders.shippingQuote",
+          "kind": "event",
+          "schema_version": "1.0.0",
+          "seq": 5,
+          "severity": "INFO",
+          "trace_id": null,
+          "ts": "2026-11-23T17:49:57+0800"
+        },
+        {
+          "data": {
+            "availability_hardened": 0.9,
+            "availability_original": 0.0,
+            "seeds": 20
+          },
+          "dependency": null,
+          "event_type": "bench.completed",
+          "function_id": null,
+          "kind": "event",
+          "schema_version": "1.0.0",
+          "seq": 6,
+          "severity": "INFO",
+          "trace_id": null,
+          "ts": "2026-11-23T17:49:57+0800"
+        },
+        {
+          "data": {
+            "status": "missed"
+          },
+          "dependency": null,
+          "event_type": "slo.evaluated",
+          "function_id": null,
+          "kind": "event",
+          "schema_version": "1.0.0",
+          "seq": 7,
+          "severity": "ERROR",
+          "trace_id": null,
+          "ts": "2026-11-23T17:49:57+0800"
+        }
+      ],
+      "generated_at": "2026-11-23T17:49:57+0800",
+      "kind": "bundle",
+      "project": "orders-node",
+      "schema_version": "1.0.0",
+      "snapshots": {
+        "bench": {
+          "bench": {
+            "hardened": {
+              "amplification": 1.225,
+              "availability": 0.9,
+              "crash_rate": 0.1,
+              "dups": 0,
+              "hang": 0,
+              "hang_rate": 0.0,
+              "identical_rate": 0.9,
+              "p50_s": 2.7274,
+              "p99_s": 4.9689,
+              "wrong": 0
+            },
+            "original": {
+              "amplification": 1.0610169491525423,
+              "availability": 0.0,
+              "crash_rate": 0.75,
+              "dups": 6,
+              "hang": 3,
+              "hang_rate": 0.15,
+              "identical_rate": 0.0,
+              "p50_s": 0.3574,
+              "p99_s": 4.1795,
+              "wrong": 2
+            },
+            "rate": 0.1,
+            "seeds": 20
+          },
+          "generated_at": "2026-11-23T17:49:57+0800",
+          "kind": "bench",
+          "lang": "node",
+          "project": "orders-node",
+          "schema_version": "1.0.0"
+        },
+        "coverage": {
+          "coverage": {
+            "adapters": [
+              {
+                "ax": true,
+                "boundary": "urllib / requests / httpx / aiohttp / socket / subprocess",
+                "lang": "python",
+                "status": "complete",
+                "verify": true
+              },
+              {
+                "ax": true,
+                "boundary": "fetch / http / https / child_process (CJS + ESM + TS)",
+                "lang": "node",
+                "status": "complete",
+                "verify": true
+              },
+              {
+                "ax": true,
+                "boundary": "net/http / os/exec: AST + rasagent + rasruntime",
+                "lang": "go",
+                "status": "complete",
+                "verify": true
+              },
+              {
+                "ax": false,
+                "boundary": "HttpClient / HttpURLConnection / ProcessBuilder",
+                "lang": "java",
+                "status": "planned",
+                "verify": false
+              },
+              {
+                "ax": false,
+                "boundary": "HttpClient / Process",
+                "lang": "csharp",
+                "status": "planned",
+                "verify": false
+              },
+              {
+                "ax": false,
+                "boundary": "curl / file_get_contents / proc_open",
+                "lang": "php",
+                "status": "planned",
+                "verify": false
+              },
+              {
+                "ax": false,
+                "boundary": "Net::HTTP / Open3",
+                "lang": "ruby",
+                "status": "planned",
+                "verify": false
+              },
+              {
+                "ax": false,
+                "boundary": "HttpClient / OkHttp / ProcessBuilder",
+                "lang": "kotlin",
+                "status": "planned",
+                "verify": false
+              },
+              {
+                "ax": false,
+                "boundary": "fetch / Bun.spawn",
+                "lang": "bun",
+                "status": "planned",
+                "verify": false
+              },
+              {
+                "ax": false,
+                "boundary": "fetch / Deno.Command",
+                "lang": "deno",
+                "status": "planned",
+                "verify": false
+              },
+              {
+                "ax": false,
+                "boundary": "libcurl / popen",
+                "lang": "c_cpp",
+                "status": "planned",
+                "verify": false
+              }
+            ]
+          },
+          "generated_at": "2026-11-23T17:49:57+0800",
+          "kind": "coverage",
+          "project": "orders-node",
+          "schema_version": "1.0.0"
+        },
+        "report": {
+          "ax": {
+            "hardened_accuracy": 1.0,
+            "leaks": 0,
+            "original_accuracy": 0.3,
+            "records": []
+          },
+          "bench": {
+            "hardened": {
+              "amplification": 1.225,
+              "availability": 0.9,
+              "crash_rate": 0.1,
+              "dups": 0,
+              "hang": 0,
+              "hang_rate": 0.0,
+              "identical_rate": 0.9,
+              "p50_s": 2.7274,
+              "p99_s": 4.9689,
+              "wrong": 0
+            },
+            "original": {
+              "amplification": 1.0610169491525423,
+              "availability": 0.0,
+              "crash_rate": 0.75,
+              "dups": 6,
+              "hang": 3,
+              "hang_rate": 0.15,
+              "identical_rate": 0.0,
+              "p50_s": 0.3574,
+              "p99_s": 4.1795,
+              "wrong": 2
+            },
+            "rate": 0.1,
+            "seeds": 20
+          },
+          "coverage": {
+            "adapters": [
+              {
+                "ax": true,
+                "boundary": "urllib / requests / httpx / aiohttp / socket / subprocess",
+                "lang": "python",
+                "status": "complete",
+                "verify": true
+              },
+              {
+                "ax": true,
+                "boundary": "fetch / http / https / child_process (CJS + ESM + TS)",
+                "lang": "node",
+                "status": "complete",
+                "verify": true
+              },
+              {
+                "ax": true,
+                "boundary": "net/http / os/exec: AST + rasagent + rasruntime",
+                "lang": "go",
+                "status": "complete",
+                "verify": true
+              },
+              {
+                "ax": false,
+                "boundary": "HttpClient / HttpURLConnection / ProcessBuilder",
+                "lang": "java",
+                "status": "planned",
+                "verify": false
+              },
+              {
+                "ax": false,
+                "boundary": "HttpClient / Process",
+                "lang": "csharp",
+                "status": "planned",
+                "verify": false
+              },
+              {
+                "ax": false,
+                "boundary": "curl / file_get_contents / proc_open",
+                "lang": "php",
+                "status": "planned",
+                "verify": false
+              },
+              {
+                "ax": false,
+                "boundary": "Net::HTTP / Open3",
+                "lang": "ruby",
+                "status": "planned",
+                "verify": false
+              },
+              {
+                "ax": false,
+                "boundary": "HttpClient / OkHttp / ProcessBuilder",
+                "lang": "kotlin",
+                "status": "planned",
+                "verify": false
+              },
+              {
+                "ax": false,
+                "boundary": "fetch / Bun.spawn",
+                "lang": "bun",
+                "status": "planned",
+                "verify": false
+              },
+              {
+                "ax": false,
+                "boundary": "fetch / Deno.Command",
+                "lang": "deno",
+                "status": "planned",
+                "verify": false
+              },
+              {
+                "ax": false,
+                "boundary": "libcurl / popen",
+                "lang": "c_cpp",
+                "status": "planned",
+                "verify": false
+              }
+            ]
+          },
+          "functions": [
+            {
+              "budget_s": 5.0,
+              "gates": {
+                "availability": true,
+                "dups": true,
+                "happy": true,
+                "no_hang": true,
+                "no_new_crashes": true,
+                "no_wrong": true,
+                "p99": true
+              },
+              "happy": {
+                "equal": 12,
+                "total": 12
+              },
+              "hardened": {
+                "amplification": 1.95,
+                "availability": 1.0,
+                "crash_rate": null,
+                "dups": 0,
+                "hang": 0,
+                "hang_rate": null,
+                "identical_rate": null,
+                "p50_s": 0.09846,
+                "p99_s": 3.59154,
+                "wrong": 0
+              },
+              "id": "orders.charge",
+              "lang": "node",
+              "original": {
+                "amplification": 1.85,
+                "availability": 0.7833333333333333,
+                "crash_rate": null,
+                "dups": 28,
+                "hang": 14,
+                "hang_rate": null,
+                "identical_rate": null,
+                "p50_s": 0.3011,
+                "p99_s": 10.30254,
+                "wrong": 12
+              },
+              "passed": true
+            },
+            {
+              "budget_s": 5.0,
+              "gates": {
+                "availability": true,
+                "dups": true,
+                "happy": true,
+                "no_hang": true,
+                "no_new_crashes": true,
+                "no_wrong": true,
+                "p99": true
+              },
+              "happy": {
+                "equal": 12,
+                "total": 12
+              },
+              "hardened": {
+                "amplification": 1.925,
+                "availability": 1.0,
+                "crash_rate": null,
+                "dups": 0,
+                "hang": 0,
+                "hang_rate": null,
+                "identical_rate": null,
+                "p50_s": 0.143796,
+                "p99_s": 4.000671,
+                "wrong": 0
+              },
+              "id": "orders.getItem",
+              "lang": "node",
+              "original": {
+                "amplification": 1.0,
+                "availability": 0.2916666666666667,
+                "crash_rate": null,
+                "dups": 0,
+                "hang": 16,
+                "hang_rate": null,
+                "identical_rate": null,
+                "p50_s": 0.00056,
+                "p99_s": 60,
+                "wrong": 30
+              },
+              "passed": true
+            },
+            {
+              "budget_s": 5.0,
+              "gates": {
+                "availability": true,
+                "dups": true,
+                "happy": true,
+                "no_hang": true,
+                "no_new_crashes": true,
+                "no_wrong": true,
+                "p99": true
+              },
+              "happy": {
+                "equal": 12,
+                "total": 12
+              },
+              "hardened": {
+                "amplification": 1.9333333333333333,
+                "availability": 1.0,
+                "crash_rate": null,
+                "dups": 0,
+                "hang": 0,
+                "hang_rate": null,
+                "identical_rate": null,
+                "p50_s": 0.096096,
+                "p99_s": 3.519264,
+                "wrong": 0
+              },
+              "id": "orders.printLabel",
+              "lang": "node",
+              "original": {
+                "amplification": 1.0,
+                "availability": 0.325,
+                "crash_rate": null,
+                "dups": 0,
+                "hang": 13,
+                "hang_rate": null,
+                "identical_rate": null,
+                "p50_s": 0.025762,
+                "p99_s": 60,
+                "wrong": 0
+              },
+              "passed": true
+            },
+            {
+              "budget_s": 5.0,
+              "gates": {
+                "availability": true,
+                "dups": true,
+                "happy": true,
+                "no_hang": true,
+                "no_new_crashes": true,
+                "no_wrong": true,
+                "p99": true
+              },
+              "happy": {
+                "equal": 12,
+                "total": 12
+              },
+              "hardened": {
+                "amplification": 1.875,
+                "availability": 1.0,
+                "crash_rate": null,
+                "dups": 0,
+                "hang": 0,
+                "hang_rate": null,
+                "identical_rate": null,
+                "p50_s": 0.087473,
+                "p99_s": 3.65089,
+                "wrong": 0
+              },
+              "id": "orders.shippingQuote",
+              "lang": "node",
+              "original": {
+                "amplification": 1.0,
+                "availability": 0.39166666666666666,
+                "crash_rate": null,
+                "dups": 0,
+                "hang": 14,
+                "hang_rate": null,
+                "identical_rate": null,
+                "p50_s": 0.000459,
+                "p99_s": 60,
+                "wrong": 23
+              },
+              "passed": true
+            }
+          ],
+          "generated_at": "2026-11-23T17:49:57+0800",
+          "kind": "report",
+          "lang": "node",
+          "project": "orders-node",
+          "resilience_state": {
+            "breakers": {},
+            "bulkheads": {},
+            "flags": {}
+          },
+          "rollout": {
+            "blast_radius_functions": 0,
+            "canary_pct": 0.0,
+            "enabled": {},
+            "shadow": false
+          },
+          "schema_version": "1.0.0",
+          "serviceability": {
+            "hard_detection_rate": 1.0,
+            "hard_diagnosis_accuracy": 0.68,
+            "mttd_s": null,
+            "mttr_s": null,
+            "orig_detection_rate": 0.0,
+            "restore_s": null
+          },
+          "slo": {
+            "hardened": {
+              "availability": 0.9,
+              "checks": {
+                "availability": false,
+                "error_rate": false,
+                "p99_s": true
+              },
+              "error_budget": 0.01,
+              "error_budget_burn_pct": 1000.0,
+              "error_budget_burn_ratio": 10.0,
+              "error_rate": 0.1,
+              "p50_s": 2.7274,
+              "p99_s": 4.9689,
+              "status": "missed"
+            },
+            "original": {
+              "availability": 0.0,
+              "checks": {
+                "availability": false,
+                "error_rate": false,
+                "p99_s": true
+              },
+              "error_budget": 0.01,
+              "error_budget_burn_pct": 10000.0,
+              "error_budget_burn_ratio": 100.0,
+              "error_rate": 1.0,
+              "p50_s": 0.3574,
+              "p99_s": 4.1795,
+              "status": "missed"
+            },
+            "source": "bench",
+            "targets": {
+              "availability": 0.99,
+              "error_rate": 0.01,
+              "p99_s": 5.0
+            }
+          }
+        },
+        "scan": {
+          "functions": [
+            {
+              "exposure": 0.2449,
+              "id": "orders.charge",
+              "lang": "node",
+              "risk": 0.8404,
+              "score": 20.6,
+              "signals": {
+                "no_logging": "no logging on the failure path",
+                "swallow": "`catch {}` swallows errors",
+                "unsafe_retry": "retries a POST with no Idempotency-Key"
+              }
+            },
+            {
+              "exposure": 0.2449,
+              "id": "orders.getItem",
+              "lang": "node",
+              "risk": 0.8176,
+              "score": 20.0,
+              "signals": {
+                "no_logging": "no logging on the failure path",
+                "no_retry": "no retry on transient errors",
+                "no_timeout": "fetch() without a timeout (signal)"
+              }
+            },
+            {
+              "exposure": 0.2449,
+              "id": "orders.printLabel",
+              "lang": "node",
+              "risk": 0.8176,
+              "score": 20.0,
+              "signals": {
+                "no_logging": "no logging on the failure path",
+                "no_retry": "no retry on transient errors",
+                "no_timeout": "execFile() without timeout"
+              }
+            },
+            {
+              "exposure": 0.2449,
+              "id": "orders.shippingQuote",
+              "lang": "node",
+              "risk": 0.8176,
+              "score": 20.0,
+              "signals": {
+                "no_logging": "no logging on the failure path",
+                "no_retry": "no retry on transient errors",
+                "no_timeout": "http.get() without timeout"
+              }
+            },
+            {
+              "exposure": 0.0,
+              "id": "app.eur",
+              "lang": "node",
+              "risk": 0.0,
+              "score": 0.0,
+              "signals": []
+            },
+            {
+              "exposure": 0.0,
+              "id": "orders.api",
+              "lang": "node",
+              "risk": 0.0,
+              "score": 0.0,
+              "signals": []
+            },
+            {
+              "exposure": 0.0,
+              "id": "upstream.start",
+              "lang": "node",
+              "risk": 0.0,
+              "score": 0.0,
+              "signals": []
+            }
+          ],
+          "generated_at": "2026-11-23T17:49:57+0800",
+          "kind": "scan",
+          "lang": "node",
+          "project": "orders-node",
+          "schema_version": "1.0.0"
+        },
+        "slo": {
+          "generated_at": "2026-11-23T17:49:57+0800",
+          "kind": "slo",
+          "project": "orders-node",
+          "schema_version": "1.0.0",
+          "slo": {
+            "hardened": {
+              "availability": 0.9,
+              "checks": {
+                "availability": false,
+                "error_rate": false,
+                "p99_s": true
+              },
+              "error_budget": 0.01,
+              "error_budget_burn_pct": 1000.0,
+              "error_budget_burn_ratio": 10.0,
+              "error_rate": 0.1,
+              "p50_s": 2.7274,
+              "p99_s": 4.9689,
+              "status": "missed"
+            },
+            "original": {
+              "availability": 0.0,
+              "checks": {
+                "availability": false,
+                "error_rate": false,
+                "p99_s": true
+              },
+              "error_budget": 0.01,
+              "error_budget_burn_pct": 10000.0,
+              "error_budget_burn_ratio": 100.0,
+              "error_rate": 1.0,
+              "p50_s": 0.3574,
+              "p99_s": 4.1795,
+              "status": "missed"
+            },
+            "series": [
+              {
+                "availability": 0.9,
+                "burn_pct": 1000.0,
+                "error_rate": 0.1,
+                "p99_s": 4.9689,
+                "ts": "2026-11-23T17:49:57+0800"
+              }
+            ],
+            "source": "bench",
+            "targets": {
+              "availability": 0.99,
+              "error_rate": 0.01,
+              "p99_s": 5.0
+            }
+          }
+        },
+        "status": {
+          "functions": [
+            {
+              "budget_s": 5.0,
+              "gates": {
+                "availability": true,
+                "dups": true,
+                "happy": true,
+                "no_hang": true,
+                "no_new_crashes": true,
+                "no_wrong": true,
+                "p99": true
+              },
+              "happy": {
+                "equal": 12,
+                "total": 12
+              },
+              "hardened": {
+                "amplification": 1.95,
+                "availability": 1.0,
+                "crash_rate": null,
+                "dups": 0,
+                "hang": 0,
+                "hang_rate": null,
+                "identical_rate": null,
+                "p50_s": 0.09846,
+                "p99_s": 3.59154,
+                "wrong": 0
+              },
+              "id": "orders.charge",
+              "lang": "node",
+              "original": {
+                "amplification": 1.85,
+                "availability": 0.7833333333333333,
+                "crash_rate": null,
+                "dups": 28,
+                "hang": 14,
+                "hang_rate": null,
+                "identical_rate": null,
+                "p50_s": 0.3011,
+                "p99_s": 10.30254,
+                "wrong": 12
+              },
+              "passed": true
+            },
+            {
+              "budget_s": 5.0,
+              "gates": {
+                "availability": true,
+                "dups": true,
+                "happy": true,
+                "no_hang": true,
+                "no_new_crashes": true,
+                "no_wrong": true,
+                "p99": true
+              },
+              "happy": {
+                "equal": 12,
+                "total": 12
+              },
+              "hardened": {
+                "amplification": 1.925,
+                "availability": 1.0,
+                "crash_rate": null,
+                "dups": 0,
+                "hang": 0,
+                "hang_rate": null,
+                "identical_rate": null,
+                "p50_s": 0.143796,
+                "p99_s": 4.000671,
+                "wrong": 0
+              },
+              "id": "orders.getItem",
+              "lang": "node",
+              "original": {
+                "amplification": 1.0,
+                "availability": 0.2916666666666667,
+                "crash_rate": null,
+                "dups": 0,
+                "hang": 16,
+                "hang_rate": null,
+                "identical_rate": null,
+                "p50_s": 0.00056,
+                "p99_s": 60,
+                "wrong": 30
+              },
+              "passed": true
+            },
+            {
+              "budget_s": 5.0,
+              "gates": {
+                "availability": true,
+                "dups": true,
+                "happy": true,
+                "no_hang": true,
+                "no_new_crashes": true,
+                "no_wrong": true,
+                "p99": true
+              },
+              "happy": {
+                "equal": 12,
+                "total": 12
+              },
+              "hardened": {
+                "amplification": 1.9333333333333333,
+                "availability": 1.0,
+                "crash_rate": null,
+                "dups": 0,
+                "hang": 0,
+                "hang_rate": null,
+                "identical_rate": null,
+                "p50_s": 0.096096,
+                "p99_s": 3.519264,
+                "wrong": 0
+              },
+              "id": "orders.printLabel",
+              "lang": "node",
+              "original": {
+                "amplification": 1.0,
+                "availability": 0.325,
+                "crash_rate": null,
+                "dups": 0,
+                "hang": 13,
+                "hang_rate": null,
+                "identical_rate": null,
+                "p50_s": 0.025762,
+                "p99_s": 60,
+                "wrong": 0
+              },
+              "passed": true
+            },
+            {
+              "budget_s": 5.0,
+              "gates": {
+                "availability": true,
+                "dups": true,
+                "happy": true,
+                "no_hang": true,
+                "no_new_crashes": true,
+                "no_wrong": true,
+                "p99": true
+              },
+              "happy": {
+                "equal": 12,
+                "total": 12
+              },
+              "hardened": {
+                "amplification": 1.875,
+                "availability": 1.0,
+                "crash_rate": null,
+                "dups": 0,
+                "hang": 0,
+                "hang_rate": null,
+                "identical_rate": null,
+                "p50_s": 0.087473,
+                "p99_s": 3.65089,
+                "wrong": 0
+              },
+              "id": "orders.shippingQuote",
+              "lang": "node",
+              "original": {
+                "amplification": 1.0,
+                "availability": 0.39166666666666666,
+                "crash_rate": null,
+                "dups": 0,
+                "hang": 14,
+                "hang_rate": null,
+                "identical_rate": null,
+                "p50_s": 0.000459,
+                "p99_s": 60,
+                "wrong": 23
+              },
+              "passed": true
+            }
+          ],
+          "generated_at": "2026-11-23T17:49:57+0800",
+          "kind": "status",
+          "lang": "node",
+          "project": "orders-node",
+          "resilience_state": {
+            "breakers": {},
+            "bulkheads": {},
+            "flags": {}
+          },
+          "rollout": {
+            "blast_radius_functions": 0,
+            "canary_pct": 0.0,
+            "enabled": {},
+            "shadow": false
+          },
+          "schema_version": "1.0.0"
+        },
+        "verify-orders.charge": {
+          "functions": [
+            {
+              "budget_s": 5.0,
+              "gates": {
+                "availability": true,
+                "dups": true,
+                "happy": true,
+                "no_hang": true,
+                "no_new_crashes": true,
+                "no_wrong": true,
+                "p99": true
+              },
+              "happy": {
+                "equal": 12,
+                "total": 12
+              },
+              "hardened": {
+                "amplification": 1.95,
+                "availability": 1.0,
+                "crash_rate": null,
+                "dups": 0,
+                "hang": 0,
+                "hang_rate": null,
+                "identical_rate": null,
+                "p50_s": 0.09846,
+                "p99_s": 3.59154,
+                "wrong": 0
+              },
+              "id": "orders.charge",
+              "lang": "node",
+              "original": {
+                "amplification": 1.85,
+                "availability": 0.7833333333333333,
+                "crash_rate": null,
+                "dups": 28,
+                "hang": 14,
+                "hang_rate": null,
+                "identical_rate": null,
+                "p50_s": 0.3011,
+                "p99_s": 10.30254,
+                "wrong": 12
+              },
+              "passed": true
+            }
+          ],
+          "generated_at": "2026-11-23T17:49:57+0800",
+          "kind": "verify",
+          "lang": "node",
+          "project": "orders-node",
+          "schema_version": "1.0.0",
+          "serviceability": {
+            "hard_detection_rate": 1.0,
+            "hard_diagnosis_accuracy": 0.68,
+            "orig_detection_rate": 0.0
+          }
+        },
+        "verify-orders.getItem": {
+          "functions": [
+            {
+              "budget_s": 5.0,
+              "gates": {
+                "availability": true,
+                "dups": true,
+                "happy": true,
+                "no_hang": true,
+                "no_new_crashes": true,
+                "no_wrong": true,
+                "p99": true
+              },
+              "happy": {
+                "equal": 12,
+                "total": 12
+              },
+              "hardened": {
+                "amplification": 1.925,
+                "availability": 1.0,
+                "crash_rate": null,
+                "dups": 0,
+                "hang": 0,
+                "hang_rate": null,
+                "identical_rate": null,
+                "p50_s": 0.143796,
+                "p99_s": 4.000671,
+                "wrong": 0
+              },
+              "id": "orders.getItem",
+              "lang": "node",
+              "original": {
+                "amplification": 1.0,
+                "availability": 0.2916666666666667,
+                "crash_rate": null,
+                "dups": 0,
+                "hang": 16,
+                "hang_rate": null,
+                "identical_rate": null,
+                "p50_s": 0.00056,
+                "p99_s": 60,
+                "wrong": 30
+              },
+              "passed": true
+            }
+          ],
+          "generated_at": "2026-11-23T17:49:57+0800",
+          "kind": "verify",
+          "lang": "node",
+          "project": "orders-node",
+          "schema_version": "1.0.0",
+          "serviceability": {
+            "hard_detection_rate": 1.0,
+            "hard_diagnosis_accuracy": 0.696969696969697,
+            "orig_detection_rate": 0.0
+          }
+        },
+        "verify-orders.printLabel": {
+          "functions": [
+            {
+              "budget_s": 5.0,
+              "gates": {
+                "availability": true,
+                "dups": true,
+                "happy": true,
+                "no_hang": true,
+                "no_new_crashes": true,
+                "no_wrong": true,
+                "p99": true
+              },
+              "happy": {
+                "equal": 12,
+                "total": 12
+              },
+              "hardened": {
+                "amplification": 1.9333333333333333,
+                "availability": 1.0,
+                "crash_rate": null,
+                "dups": 0,
+                "hang": 0,
+                "hang_rate": null,
+                "identical_rate": null,
+                "p50_s": 0.096096,
+                "p99_s": 3.519264,
+                "wrong": 0
+              },
+              "id": "orders.printLabel",
+              "lang": "node",
+              "original": {
+                "amplification": 1.0,
+                "availability": 0.325,
+                "crash_rate": null,
+                "dups": 0,
+                "hang": 13,
+                "hang_rate": null,
+                "identical_rate": null,
+                "p50_s": 0.025762,
+                "p99_s": 60,
+                "wrong": 0
+              },
+              "passed": true
+            }
+          ],
+          "generated_at": "2026-11-23T17:49:57+0800",
+          "kind": "verify",
+          "lang": "node",
+          "project": "orders-node",
+          "schema_version": "1.0.0",
+          "serviceability": {
+            "hard_detection_rate": 1.0,
+            "hard_diagnosis_accuracy": 0.6774193548387096,
+            "orig_detection_rate": 0.0
+          }
+        },
+        "verify-orders.shippingQuote": {
+          "functions": [
+            {
+              "budget_s": 5.0,
+              "gates": {
+                "availability": true,
+                "dups": true,
+                "happy": true,
+                "no_hang": true,
+                "no_new_crashes": true,
+                "no_wrong": true,
+                "p99": true
+              },
+              "happy": {
+                "equal": 12,
+                "total": 12
+              },
+              "hardened": {
+                "amplification": 1.875,
+                "availability": 1.0,
+                "crash_rate": null,
+                "dups": 0,
+                "hang": 0,
+                "hang_rate": null,
+                "identical_rate": null,
+                "p50_s": 0.087473,
+                "p99_s": 3.65089,
+                "wrong": 0
+              },
+              "id": "orders.shippingQuote",
+              "lang": "node",
+              "original": {
+                "amplification": 1.0,
+                "availability": 0.39166666666666666,
+                "crash_rate": null,
+                "dups": 0,
+                "hang": 14,
+                "hang_rate": null,
+                "identical_rate": null,
+                "p50_s": 0.000459,
+                "p99_s": 60,
+                "wrong": 23
+              },
+              "passed": true
+            }
+          ],
+          "generated_at": "2026-11-23T17:49:57+0800",
+          "kind": "verify",
+          "lang": "node",
+          "project": "orders-node",
+          "schema_version": "1.0.0",
+          "serviceability": {
+            "hard_detection_rate": 0.9787234042553191,
+            "hard_diagnosis_accuracy": 0.6808510638297872,
+            "orig_detection_rate": 0.0
+          }
+        }
+      }
+    },
+    "payments": {
+      "events": [
+        {
+          "data": {
+            "functions": 10
+          },
+          "dependency": null,
+          "event_type": "scan.completed",
+          "function_id": null,
+          "kind": "event",
+          "schema_version": "1.0.0",
+          "seq": 1,
+          "severity": "INFO",
+          "trace_id": null,
+          "ts": "2026-11-23T17:49:57+0800"
+        },
+        {
+          "data": {
+            "availability_hardened": 1.0,
+            "availability_original": 0.76875
+          },
+          "dependency": null,
+          "event_type": "verify.passed",
+          "function_id": "billing.charge",
+          "kind": "event",
+          "schema_version": "1.0.0",
+          "seq": 2,
+          "severity": "INFO",
+          "trace_id": null,
+          "ts": "2026-11-23T17:49:57+0800"
+        },
+        {
+          "data": {
+            "availability_hardened": 1.0,
+            "availability_original": 0.33125
+          },
+          "dependency": null,
+          "event_type": "verify.passed",
+          "function_id": "billing.render_receipt",
+          "kind": "event",
+          "schema_version": "1.0.0",
+          "seq": 3,
+          "severity": "INFO",
+          "trace_id": null,
+          "ts": "2026-11-23T17:49:57+0800"
+        },
+        {
+          "data": {
+            "availability_hardened": 0.9,
+            "availability_original": 0.0,
+            "seeds": 20
+          },
+          "dependency": null,
+          "event_type": "bench.completed",
+          "function_id": null,
+          "kind": "event",
+          "schema_version": "1.0.0",
+          "seq": 4,
+          "severity": "INFO",
+          "trace_id": null,
+          "ts": "2026-11-23T17:49:57+0800"
+        },
+        {
+          "data": {
+            "status": "missed"
+          },
+          "dependency": null,
+          "event_type": "slo.evaluated",
+          "function_id": null,
+          "kind": "event",
+          "schema_version": "1.0.0",
+          "seq": 5,
+          "severity": "ERROR",
+          "trace_id": null,
+          "ts": "2026-11-23T17:49:57+0800"
+        }
+      ],
+      "generated_at": "2026-11-23T17:49:57+0800",
+      "kind": "bundle",
+      "project": "payments",
+      "schema_version": "1.0.0",
+      "snapshots": {
+        "bench": {
+          "bench": {
+            "hardened": {
+              "amplification": 1.2015873015873015,
+              "availability": 0.9,
+              "crash_rate": 0.1,
+              "dups": 0,
+              "hang": 0,
+              "hang_rate": 0.0,
+              "identical_rate": 0.45,
+              "p50_s": 1.4353,
+              "p99_s": 4.2391,
+              "wrong": 0
+            },
+            "original": {
+              "amplification": 1.0893617021276596,
+              "availability": 0.0,
+              "crash_rate": 0.6,
+              "dups": 5,
+              "hang": 5,
+              "hang_rate": 0.25,
+              "identical_rate": 0.0,
+              "p50_s": 1.8277,
+              "p99_s": 4.0303,
+              "wrong": 3
+            },
+            "rate": 0.1,
+            "seeds": 20
+          },
+          "generated_at": "2026-11-23T17:49:57+0800",
+          "kind": "bench",
+          "lang": "python",
+          "project": "payments",
+          "schema_version": "1.0.0"
+        },
+        "coverage": {
+          "coverage": {
+            "adapters": [
+              {
+                "ax": true,
+                "boundary": "urllib / requests / httpx / aiohttp / socket / subprocess",
+                "lang": "python",
+                "status": "complete",
+                "verify": true
+              },
+              {
+                "ax": true,
+                "boundary": "fetch / http / https / child_process (CJS + ESM + TS)",
+                "lang": "node",
+                "status": "complete",
+                "verify": true
+              },
+              {
+                "ax": true,
+                "boundary": "net/http / os/exec: AST + rasagent + rasruntime",
+                "lang": "go",
+                "status": "complete",
+                "verify": true
+              },
+              {
+                "ax": false,
+                "boundary": "HttpClient / HttpURLConnection / ProcessBuilder",
+                "lang": "java",
+                "status": "planned",
+                "verify": false
+              },
+              {
+                "ax": false,
+                "boundary": "HttpClient / Process",
+                "lang": "csharp",
+                "status": "planned",
+                "verify": false
+              },
+              {
+                "ax": false,
+                "boundary": "curl / file_get_contents / proc_open",
+                "lang": "php",
+                "status": "planned",
+                "verify": false
+              },
+              {
+                "ax": false,
+                "boundary": "Net::HTTP / Open3",
+                "lang": "ruby",
+                "status": "planned",
+                "verify": false
+              },
+              {
+                "ax": false,
+                "boundary": "HttpClient / OkHttp / ProcessBuilder",
+                "lang": "kotlin",
+                "status": "planned",
+                "verify": false
+              },
+              {
+                "ax": false,
+                "boundary": "fetch / Bun.spawn",
+                "lang": "bun",
+                "status": "planned",
+                "verify": false
+              },
+              {
+                "ax": false,
+                "boundary": "fetch / Deno.Command",
+                "lang": "deno",
+                "status": "planned",
+                "verify": false
+              },
+              {
+                "ax": false,
+                "boundary": "libcurl / popen",
+                "lang": "c_cpp",
+                "status": "planned",
+                "verify": false
+              }
+            ]
+          },
+          "generated_at": "2026-11-23T17:49:57+0800",
+          "kind": "coverage",
+          "project": "payments",
+          "schema_version": "1.0.0"
+        },
+        "report": {
+          "ax": {
+            "hardened_accuracy": 1.0,
+            "leaks": 0,
+            "original_accuracy": 0.3,
+            "records": []
+          },
+          "bench": {
+            "hardened": {
+              "amplification": 1.2015873015873015,
+              "availability": 0.9,
+              "crash_rate": 0.1,
+              "dups": 0,
+              "hang": 0,
+              "hang_rate": 0.0,
+              "identical_rate": 0.45,
+              "p50_s": 1.4353,
+              "p99_s": 4.2391,
+              "wrong": 0
+            },
+            "original": {
+              "amplification": 1.0893617021276596,
+              "availability": 0.0,
+              "crash_rate": 0.6,
+              "dups": 5,
+              "hang": 5,
+              "hang_rate": 0.25,
+              "identical_rate": 0.0,
+              "p50_s": 1.8277,
+              "p99_s": 4.0303,
+              "wrong": 3
+            },
+            "rate": 0.1,
+            "seeds": 20
+          },
+          "coverage": {
+            "adapters": [
+              {
+                "ax": true,
+                "boundary": "urllib / requests / httpx / aiohttp / socket / subprocess",
+                "lang": "python",
+                "status": "complete",
+                "verify": true
+              },
+              {
+                "ax": true,
+                "boundary": "fetch / http / https / child_process (CJS + ESM + TS)",
+                "lang": "node",
+                "status": "complete",
+                "verify": true
+              },
+              {
+                "ax": true,
+                "boundary": "net/http / os/exec: AST + rasagent + rasruntime",
+                "lang": "go",
+                "status": "complete",
+                "verify": true
+              },
+              {
+                "ax": false,
+                "boundary": "HttpClient / HttpURLConnection / ProcessBuilder",
+                "lang": "java",
+                "status": "planned",
+                "verify": false
+              },
+              {
+                "ax": false,
+                "boundary": "HttpClient / Process",
+                "lang": "csharp",
+                "status": "planned",
+                "verify": false
+              },
+              {
+                "ax": false,
+                "boundary": "curl / file_get_contents / proc_open",
+                "lang": "php",
+                "status": "planned",
+                "verify": false
+              },
+              {
+                "ax": false,
+                "boundary": "Net::HTTP / Open3",
+                "lang": "ruby",
+                "status": "planned",
+                "verify": false
+              },
+              {
+                "ax": false,
+                "boundary": "HttpClient / OkHttp / ProcessBuilder",
+                "lang": "kotlin",
+                "status": "planned",
+                "verify": false
+              },
+              {
+                "ax": false,
+                "boundary": "fetch / Bun.spawn",
+                "lang": "bun",
+                "status": "planned",
+                "verify": false
+              },
+              {
+                "ax": false,
+                "boundary": "fetch / Deno.Command",
+                "lang": "deno",
+                "status": "planned",
+                "verify": false
+              },
+              {
+                "ax": false,
+                "boundary": "libcurl / popen",
+                "lang": "c_cpp",
+                "status": "planned",
+                "verify": false
+              }
+            ]
+          },
+          "functions": [
+            {
+              "budget_s": 5.0,
+              "gates": {
+                "availability": true,
+                "dups": true,
+                "happy": true,
+                "no_hang": true,
+                "no_new_crashes": true,
+                "no_wrong": true,
+                "p99": true
+              },
+              "happy": {
+                "equal": 16,
+                "total": 16
+              },
+              "hardened": {
+                "amplification": 1.8,
+                "availability": 1.0,
+                "crash_rate": null,
+                "dups": 0,
+                "hang": 0,
+                "hang_rate": null,
+                "identical_rate": null,
+                "p50_s": 0.195867,
+                "p99_s": 4.5,
+                "wrong": 0
+              },
+              "id": "billing.charge",
+              "lang": "python",
+              "original": {
+                "amplification": 1.80625,
+                "availability": 0.76875,
+                "crash_rate": null,
+                "dups": 38,
+                "hang": 20,
+                "hang_rate": null,
+                "identical_rate": null,
+                "p50_s": 0.506062,
+                "p99_s": 13.502909,
+                "wrong": 17
+              },
+              "passed": true
+            },
+            {
+              "budget_s": 5.0,
+              "gates": {
+                "availability": true,
+                "dups": true,
+                "happy": true,
+                "no_hang": true,
+                "no_new_crashes": true,
+                "no_wrong": true,
+                "p99": true
+              },
+              "happy": {
+                "equal": 16,
+                "total": 16
+              },
+              "hardened": {
+                "amplification": 2.04375,
+                "availability": 1.0,
+                "crash_rate": null,
+                "dups": 0,
+                "hang": 0,
+                "hang_rate": null,
+                "identical_rate": null,
+                "p50_s": 0.09347,
+                "p99_s": 1.125221,
+                "wrong": 0
+              },
+              "id": "billing.render_receipt",
+              "lang": "python",
+              "original": {
+                "amplification": 1.0,
+                "availability": 0.33125,
+                "crash_rate": null,
+                "dups": 0,
+                "hang": 18,
+                "hang_rate": null,
+                "identical_rate": null,
+                "p50_s": 0.020482,
+                "p99_s": 60.0,
+                "wrong": 0
+              },
+              "passed": true
+            }
+          ],
+          "generated_at": "2026-11-23T17:49:57+0800",
+          "kind": "report",
+          "lang": "python",
+          "project": "payments",
+          "resilience_state": {
+            "breakers": {},
+            "bulkheads": {},
+            "flags": {}
+          },
+          "rollout": {
+            "blast_radius_functions": 0,
+            "canary_pct": 0.0,
+            "enabled": {},
+            "shadow": false
+          },
+          "schema_version": "1.0.0",
+          "serviceability": {
+            "hard_detection_rate": 1.0,
+            "hard_diagnosis_accuracy": 0.6976744186046512,
+            "mttd_s": null,
+            "mttr_s": null,
+            "orig_detection_rate": 0.0,
+            "restore_s": null
+          },
+          "slo": {
+            "hardened": {
+              "availability": 0.9,
+              "checks": {
+                "availability": false,
+                "error_rate": false,
+                "p99_s": true
+              },
+              "error_budget": 0.01,
+              "error_budget_burn_pct": 1000.0,
+              "error_budget_burn_ratio": 10.0,
+              "error_rate": 0.1,
+              "p50_s": 1.4353,
+              "p99_s": 4.2391,
+              "status": "missed"
+            },
+            "original": {
+              "availability": 0.0,
+              "checks": {
+                "availability": false,
+                "error_rate": false,
+                "p99_s": true
+              },
+              "error_budget": 0.01,
+              "error_budget_burn_pct": 10000.0,
+              "error_budget_burn_ratio": 100.0,
+              "error_rate": 1.0,
+              "p50_s": 1.8277,
+              "p99_s": 4.0303,
+              "status": "missed"
+            },
+            "source": "bench",
+            "targets": {
+              "availability": 0.99,
+              "error_rate": 0.01,
+              "p99_s": 5.0
+            }
+          }
+        },
+        "scan": {
+          "functions": [
+            {
+              "exposure": 0.4848,
+              "id": "billing.charge",
+              "lang": "python",
+              "risk": 0.8404,
+              "score": 40.7,
+              "signals": {
+                "no_logging": "no logging on the failure path",
+                "swallow": "`except Exception: time.sleep(0.5)` swallows errors",
+                "unsafe_retry": "retries a POST with no Idempotency-Key"
+              }
+            },
+            {
+              "exposure": 0.4848,
+              "id": "billing.render_receipt",
+              "lang": "python",
+              "risk": 0.8176,
+              "score": 39.6,
+              "signals": {
+                "no_logging": "no logging on the failure path",
+                "no_retry": "no retry on transient errors",
+                "no_timeout": "subprocess.run() without timeout"
+              }
+            },
+            {
+              "exposure": 0.0303,
+              "id": "app.main",
+              "lang": "python",
+              "risk": 0.24,
+              "score": 0.7,
+              "signals": {
+                "no_logging": "no logging on the failure path",
+                "no_retry": "no retry on transient errors"
+              }
+            },
+            {
+              "exposure": 0.0,
+              "id": "app.invoices",
+              "lang": "python",
+              "risk": 0.0,
+              "score": 0.0,
+              "signals": []
+            },
+            {
+              "exposure": 0.0,
+              "id": "upstream.Handler._send",
+              "lang": "python",
+              "risk": 0.0,
+              "score": 0.0,
+              "signals": []
+            },
+            {
+              "exposure": 0.0,
+              "id": "upstream.Handler.do_GET",
+              "lang": "python",
+              "risk": 0.0,
+              "score": 0.0,
+              "signals": []
+            },
+            {
+              "exposure": 0.0,
+              "id": "upstream.Handler.do_POST",
+              "lang": "python",
+              "risk": 0.0,
+              "score": 0.0,
+              "signals": []
+            },
+            {
+              "exposure": 0.0,
+              "id": "upstream.Handler.log_message",
+              "lang": "python",
+              "risk": 0.0,
+              "score": 0.0,
+              "signals": []
+            },
+            {
+              "exposure": 0.0,
+              "id": "upstream.Ledger.__init__",
+              "lang": "python",
+              "risk": 0.0,
+              "score": 0.0,
+              "signals": []
+            },
+            {
+              "exposure": 0.0,
+              "id": "upstream.start",
+              "lang": "python",
+              "risk": 0.0,
+              "score": 0.0,
+              "signals": []
+            }
+          ],
+          "generated_at": "2026-11-23T17:49:57+0800",
+          "kind": "scan",
+          "lang": "python",
+          "project": "payments",
+          "schema_version": "1.0.0"
+        },
+        "slo": {
+          "generated_at": "2026-11-23T17:49:57+0800",
+          "kind": "slo",
+          "project": "payments",
+          "schema_version": "1.0.0",
+          "slo": {
+            "hardened": {
+              "availability": 0.9,
+              "checks": {
+                "availability": false,
+                "error_rate": false,
+                "p99_s": true
+              },
+              "error_budget": 0.01,
+              "error_budget_burn_pct": 1000.0,
+              "error_budget_burn_ratio": 10.0,
+              "error_rate": 0.1,
+              "p50_s": 1.4353,
+              "p99_s": 4.2391,
+              "status": "missed"
+            },
+            "original": {
+              "availability": 0.0,
+              "checks": {
+                "availability": false,
+                "error_rate": false,
+                "p99_s": true
+              },
+              "error_budget": 0.01,
+              "error_budget_burn_pct": 10000.0,
+              "error_budget_burn_ratio": 100.0,
+              "error_rate": 1.0,
+              "p50_s": 1.8277,
+              "p99_s": 4.0303,
+              "status": "missed"
+            },
+            "series": [
+              {
+                "availability": 0.9,
+                "burn_pct": 1000.0,
+                "error_rate": 0.1,
+                "p99_s": 4.2391,
+                "ts": "2026-11-23T17:49:57+0800"
+              }
+            ],
+            "source": "bench",
+            "targets": {
+              "availability": 0.99,
+              "error_rate": 0.01,
+              "p99_s": 5.0
+            }
+          }
+        },
+        "status": {
+          "functions": [
+            {
+              "budget_s": 5.0,
+              "gates": {
+                "availability": true,
+                "dups": true,
+                "happy": true,
+                "no_hang": true,
+                "no_new_crashes": true,
+                "no_wrong": true,
+                "p99": true
+              },
+              "happy": {
+                "equal": 16,
+                "total": 16
+              },
+              "hardened": {
+                "amplification": 1.8,
+                "availability": 1.0,
+                "crash_rate": null,
+                "dups": 0,
+                "hang": 0,
+                "hang_rate": null,
+                "identical_rate": null,
+                "p50_s": 0.195867,
+                "p99_s": 4.5,
+                "wrong": 0
+              },
+              "id": "billing.charge",
+              "lang": "python",
+              "original": {
+                "amplification": 1.80625,
+                "availability": 0.76875,
+                "crash_rate": null,
+                "dups": 38,
+                "hang": 20,
+                "hang_rate": null,
+                "identical_rate": null,
+                "p50_s": 0.506062,
+                "p99_s": 13.502909,
+                "wrong": 17
+              },
+              "passed": true
+            },
+            {
+              "budget_s": 5.0,
+              "gates": {
+                "availability": true,
+                "dups": true,
+                "happy": true,
+                "no_hang": true,
+                "no_new_crashes": true,
+                "no_wrong": true,
+                "p99": true
+              },
+              "happy": {
+                "equal": 16,
+                "total": 16
+              },
+              "hardened": {
+                "amplification": 2.04375,
+                "availability": 1.0,
+                "crash_rate": null,
+                "dups": 0,
+                "hang": 0,
+                "hang_rate": null,
+                "identical_rate": null,
+                "p50_s": 0.09347,
+                "p99_s": 1.125221,
+                "wrong": 0
+              },
+              "id": "billing.render_receipt",
+              "lang": "python",
+              "original": {
+                "amplification": 1.0,
+                "availability": 0.33125,
+                "crash_rate": null,
+                "dups": 0,
+                "hang": 18,
+                "hang_rate": null,
+                "identical_rate": null,
+                "p50_s": 0.020482,
+                "p99_s": 60.0,
+                "wrong": 0
+              },
+              "passed": true
+            }
+          ],
+          "generated_at": "2026-11-23T17:49:57+0800",
+          "kind": "status",
+          "lang": "python",
+          "project": "payments",
+          "resilience_state": {
+            "breakers": {},
+            "bulkheads": {},
+            "flags": {}
+          },
+          "rollout": {
+            "blast_radius_functions": 0,
+            "canary_pct": 0.0,
+            "enabled": {},
+            "shadow": false
+          },
+          "schema_version": "1.0.0"
+        },
+        "verify-billing.charge": {
+          "functions": [
+            {
+              "budget_s": 5.0,
+              "gates": {
+                "availability": true,
+                "dups": true,
+                "happy": true,
+                "no_hang": true,
+                "no_new_crashes": true,
+                "no_wrong": true,
+                "p99": true
+              },
+              "happy": {
+                "equal": 16,
+                "total": 16
+              },
+              "hardened": {
+                "amplification": 1.8,
+                "availability": 1.0,
+                "crash_rate": null,
+                "dups": 0,
+                "hang": 0,
+                "hang_rate": null,
+                "identical_rate": null,
+                "p50_s": 0.195867,
+                "p99_s": 4.5,
+                "wrong": 0
+              },
+              "id": "billing.charge",
+              "lang": "python",
+              "original": {
+                "amplification": 1.80625,
+                "availability": 0.76875,
+                "crash_rate": null,
+                "dups": 38,
+                "hang": 20,
+                "hang_rate": null,
+                "identical_rate": null,
+                "p50_s": 0.506062,
+                "p99_s": 13.502909,
+                "wrong": 17
+              },
+              "passed": true
+            }
+          ],
+          "generated_at": "2026-11-23T17:49:57+0800",
+          "kind": "verify",
+          "lang": "python",
+          "project": "payments",
+          "schema_version": "1.0.0",
+          "serviceability": {
+            "hard_detection_rate": 1.0,
+            "hard_diagnosis_accuracy": 0.6976744186046512,
+            "orig_detection_rate": 0.0
+          }
+        },
+        "verify-billing.render_receipt": {
+          "functions": [
+            {
+              "budget_s": 5.0,
+              "gates": {
+                "availability": true,
+                "dups": true,
+                "happy": true,
+                "no_hang": true,
+                "no_new_crashes": true,
+                "no_wrong": true,
+                "p99": true
+              },
+              "happy": {
+                "equal": 16,
+                "total": 16
+              },
+              "hardened": {
+                "amplification": 2.04375,
+                "availability": 1.0,
+                "crash_rate": null,
+                "dups": 0,
+                "hang": 0,
+                "hang_rate": null,
+                "identical_rate": null,
+                "p50_s": 0.09347,
+                "p99_s": 1.125221,
+                "wrong": 0
+              },
+              "id": "billing.render_receipt",
+              "lang": "python",
+              "original": {
+                "amplification": 1.0,
+                "availability": 0.33125,
+                "crash_rate": null,
+                "dups": 0,
+                "hang": 18,
+                "hang_rate": null,
+                "identical_rate": null,
+                "p50_s": 0.020482,
+                "p99_s": 60.0,
+                "wrong": 0
+              },
+              "passed": true
+            }
+          ],
+          "generated_at": "2026-11-23T17:49:57+0800",
+          "kind": "verify",
+          "lang": "python",
+          "project": "payments",
+          "schema_version": "1.0.0",
+          "serviceability": {
+            "hard_detection_rate": 1.0,
+            "hard_diagnosis_accuracy": 0.712,
+            "orig_detection_rate": 0.0
+          }
+        }
+      }
+    },
+    "support-ai": {
+      "events": [
+        {
+          "data": {
+            "functions": 6
+          },
+          "dependency": null,
+          "event_type": "scan.completed",
+          "function_id": null,
+          "kind": "event",
+          "schema_version": "1.0.0",
+          "seq": 1,
+          "severity": "INFO",
+          "trace_id": null,
+          "ts": "2026-11-23T17:49:44+0800"
+        },
+        {
+          "data": {
+            "availability_hardened": 1.0,
+            "availability_original": 0.0990990990990991
+          },
+          "dependency": null,
+          "event_type": "verify.passed",
+          "function_id": "support.triage_ticket",
+          "kind": "event",
+          "schema_version": "1.0.0",
+          "seq": 2,
+          "severity": "INFO",
+          "trace_id": null,
+          "ts": "2026-11-23T17:49:44+0800"
+        },
+        {
+          "data": {
+            "availability_hardened": 1.0,
+            "availability_original": 0.5,
+            "seeds": 20
+          },
+          "dependency": null,
+          "event_type": "bench.completed",
+          "function_id": null,
+          "kind": "event",
+          "schema_version": "1.0.0",
+          "seq": 3,
+          "severity": "INFO",
+          "trace_id": null,
+          "ts": "2026-11-23T17:49:44+0800"
+        },
+        {
+          "data": {
+            "status": "met"
+          },
+          "dependency": null,
+          "event_type": "slo.evaluated",
+          "function_id": null,
+          "kind": "event",
+          "schema_version": "1.0.0",
+          "seq": 4,
+          "severity": "INFO",
+          "trace_id": null,
+          "ts": "2026-11-23T17:49:44+0800"
+        }
+      ],
+      "generated_at": "2026-11-23T17:49:57+0800",
+      "kind": "bundle",
+      "project": "support-ai",
+      "schema_version": "1.0.0",
+      "snapshots": {
+        "bench": {
+          "bench": {
+            "hardened": {
+              "amplification": 2.4833333333333334,
+              "availability": 1.0,
+              "crash_rate": 0.0,
+              "dups": 0,
+              "hang": 0,
+              "hang_rate": 0.0,
+              "identical_rate": 0.95,
+              "p50_s": 0.7569,
+              "p99_s": 2.6095,
+              "wrong": 0
+            },
+            "original": {
+              "amplification": 1.8297872340425532,
+              "availability": 0.5,
+              "crash_rate": 0.4,
+              "dups": 0,
+              "hang": 2,
+              "hang_rate": 0.1,
+              "identical_rate": 0.5,
+              "p50_s": 0.6043,
+              "p99_s": 2.1041,
+              "wrong": 0
+            },
+            "rate": 0.1,
+            "seeds": 20
+          },
+          "generated_at": "2026-11-23T17:49:57+0800",
+          "kind": "bench",
+          "lang": "python",
+          "project": "support-ai",
+          "schema_version": "1.0.0"
+        },
+        "coverage": {
+          "coverage": {
+            "adapters": [
+              {
+                "ax": true,
+                "boundary": "urllib / requests / httpx / aiohttp / socket / subprocess",
+                "lang": "python",
+                "status": "complete",
+                "verify": true
+              },
+              {
+                "ax": true,
+                "boundary": "fetch / http / https / child_process (CJS + ESM + TS)",
+                "lang": "node",
+                "status": "complete",
+                "verify": true
+              },
+              {
+                "ax": true,
+                "boundary": "net/http / os/exec: AST + rasagent + rasruntime",
+                "lang": "go",
+                "status": "complete",
+                "verify": true
+              },
+              {
+                "ax": false,
+                "boundary": "HttpClient / HttpURLConnection / ProcessBuilder",
+                "lang": "java",
+                "status": "planned",
+                "verify": false
+              },
+              {
+                "ax": false,
+                "boundary": "HttpClient / Process",
+                "lang": "csharp",
+                "status": "planned",
+                "verify": false
+              },
+              {
+                "ax": false,
+                "boundary": "curl / file_get_contents / proc_open",
+                "lang": "php",
+                "status": "planned",
+                "verify": false
+              },
+              {
+                "ax": false,
+                "boundary": "Net::HTTP / Open3",
+                "lang": "ruby",
+                "status": "planned",
+                "verify": false
+              },
+              {
+                "ax": false,
+                "boundary": "HttpClient / OkHttp / ProcessBuilder",
+                "lang": "kotlin",
+                "status": "planned",
+                "verify": false
+              },
+              {
+                "ax": false,
+                "boundary": "fetch / Bun.spawn",
+                "lang": "bun",
+                "status": "planned",
+                "verify": false
+              },
+              {
+                "ax": false,
+                "boundary": "fetch / Deno.Command",
+                "lang": "deno",
+                "status": "planned",
+                "verify": false
+              },
+              {
+                "ax": false,
+                "boundary": "libcurl / popen",
+                "lang": "c_cpp",
+                "status": "planned",
+                "verify": false
+              }
+            ]
+          },
+          "generated_at": "2026-11-23T17:49:57+0800",
+          "kind": "coverage",
+          "project": "support-ai",
+          "schema_version": "1.0.0"
+        },
+        "report": {
+          "ai": {
+            "hardened": {
+              "calls": 111,
+              "cost_per_success_usd": 5.5e-05,
+              "injection_resistance": 1.0,
+              "loop_guard_trips": 0,
+              "retry_cost_amplification": 1.732,
+              "semantic_success_rate": 1.0,
+              "total_cost_usd": 0.006074,
+              "total_tokens": 25374
+            },
+            "max_attempts_per_trial": 4,
+            "original": {
+              "calls": 111,
+              "cost_per_success_usd": 0.000188,
+              "injection_resistance": 1.0,
+              "loop_guard_trips": 0,
+              "retry_cost_amplification": 0.682,
+              "semantic_success_rate": 0.0991,
+              "total_cost_usd": 0.002063,
+              "total_tokens": 9997
+            }
+          },
+          "ax": {
+            "hardened_accuracy": 1.0,
+            "leaks": 0,
+            "original_accuracy": 0.3,
+            "records": []
+          },
+          "bench": {
+            "hardened": {
+              "amplification": 2.4833333333333334,
+              "availability": 1.0,
+              "crash_rate": 0.0,
+              "dups": 0,
+              "hang": 0,
+              "hang_rate": 0.0,
+              "identical_rate": 0.95,
+              "p50_s": 0.7569,
+              "p99_s": 2.6095,
+              "wrong": 0
+            },
+            "original": {
+              "amplification": 1.8297872340425532,
+              "availability": 0.5,
+              "crash_rate": 0.4,
+              "dups": 0,
+              "hang": 2,
+              "hang_rate": 0.1,
+              "identical_rate": 0.5,
+              "p50_s": 0.6043,
+              "p99_s": 2.1041,
+              "wrong": 0
+            },
+            "rate": 0.1,
+            "seeds": 20
+          },
+          "coverage": {
+            "adapters": [
+              {
+                "ax": true,
+                "boundary": "urllib / requests / httpx / aiohttp / socket / subprocess",
+                "lang": "python",
+                "status": "complete",
+                "verify": true
+              },
+              {
+                "ax": true,
+                "boundary": "fetch / http / https / child_process (CJS + ESM + TS)",
+                "lang": "node",
+                "status": "complete",
+                "verify": true
+              },
+              {
+                "ax": true,
+                "boundary": "net/http / os/exec: AST + rasagent + rasruntime",
+                "lang": "go",
+                "status": "complete",
+                "verify": true
+              },
+              {
+                "ax": false,
+                "boundary": "HttpClient / HttpURLConnection / ProcessBuilder",
+                "lang": "java",
+                "status": "planned",
+                "verify": false
+              },
+              {
+                "ax": false,
+                "boundary": "HttpClient / Process",
+                "lang": "csharp",
+                "status": "planned",
+                "verify": false
+              },
+              {
+                "ax": false,
+                "boundary": "curl / file_get_contents / proc_open",
+                "lang": "php",
+                "status": "planned",
+                "verify": false
+              },
+              {
+                "ax": false,
+                "boundary": "Net::HTTP / Open3",
+                "lang": "ruby",
+                "status": "planned",
+                "verify": false
+              },
+              {
+                "ax": false,
+                "boundary": "HttpClient / OkHttp / ProcessBuilder",
+                "lang": "kotlin",
+                "status": "planned",
+                "verify": false
+              },
+              {
+                "ax": false,
+                "boundary": "fetch / Bun.spawn",
+                "lang": "bun",
+                "status": "planned",
+                "verify": false
+              },
+              {
+                "ax": false,
+                "boundary": "fetch / Deno.Command",
+                "lang": "deno",
+                "status": "planned",
+                "verify": false
+              },
+              {
+                "ax": false,
+                "boundary": "libcurl / popen",
+                "lang": "c_cpp",
+                "status": "planned",
+                "verify": false
+              }
+            ]
+          },
+          "functions": [
+            {
+              "ai": {
+                "hardened": {
+                  "calls": 111,
+                  "cost_per_success_usd": 5.5e-05,
+                  "injection_resistance": 1.0,
+                  "loop_guard_trips": 0,
+                  "retry_cost_amplification": 1.732,
+                  "semantic_success_rate": 1.0,
+                  "total_cost_usd": 0.006074,
+                  "total_tokens": 25374
+                },
+                "max_attempts_per_trial": 4,
+                "original": {
+                  "calls": 111,
+                  "cost_per_success_usd": 0.000188,
+                  "injection_resistance": 1.0,
+                  "loop_guard_trips": 0,
+                  "retry_cost_amplification": 0.682,
+                  "semantic_success_rate": 0.0991,
+                  "total_cost_usd": 0.002063,
+                  "total_tokens": 9997
+                }
+              },
+              "budget_s": 5.0,
+              "gates": {
+                "ai_budget": true,
+                "ai_injection": true,
+                "availability": true,
+                "dups": true,
+                "happy": true,
+                "no_hang": true,
+                "no_new_crashes": true,
+                "no_wrong": true,
+                "p99": true
+              },
+              "happy": {
+                "equal": 3,
+                "total": 3
+              },
+              "hardened": {
+                "amplification": 2.72972972972973,
+                "availability": 1.0,
+                "crash_rate": null,
+                "dups": 0,
+                "hang": 0,
+                "hang_rate": null,
+                "identical_rate": null,
+                "p50_s": 0.008827,
+                "p99_s": 3.719763,
+                "wrong": 0
+              },
+              "id": "support.triage_ticket",
+              "lang": "python",
+              "original": {
+                "amplification": 1.2882882882882882,
+                "availability": 0.0990990990990991,
+                "crash_rate": null,
+                "dups": 0,
+                "hang": 12,
+                "hang_rate": null,
+                "identical_rate": null,
+                "p50_s": 0.0,
+                "p99_s": 60.004472,
+                "wrong": 0
+              },
+              "passed": true
+            }
+          ],
+          "generated_at": "2026-11-23T17:49:57+0800",
+          "kind": "report",
+          "lang": "python",
+          "project": "support-ai",
+          "resilience_state": {
+            "breakers": {},
+            "bulkheads": {},
+            "flags": {}
+          },
+          "rollout": {
+            "blast_radius_functions": 0,
+            "canary_pct": 0.0,
+            "enabled": {},
+            "shadow": false
+          },
+          "schema_version": "1.0.0",
+          "serviceability": {
+            "hard_detection_rate": 1.0,
+            "hard_diagnosis_accuracy": 0.0,
+            "mttd_s": null,
+            "mttr_s": null,
+            "orig_detection_rate": 0.0,
+            "restore_s": null
+          },
+          "slo": {
+            "hardened": {
+              "availability": 1.0,
+              "checks": {
+                "availability": true,
+                "error_rate": true,
+                "p99_s": true
+              },
+              "error_budget": 0.01,
+              "error_budget_burn_pct": 0.0,
+              "error_budget_burn_ratio": 0.0,
+              "error_rate": 0.0,
+              "p50_s": 0.7569,
+              "p99_s": 2.6095,
+              "status": "met"
+            },
+            "original": {
+              "availability": 0.5,
+              "checks": {
+                "availability": false,
+                "error_rate": false,
+                "p99_s": true
+              },
+              "error_budget": 0.01,
+              "error_budget_burn_pct": 5000.0,
+              "error_budget_burn_ratio": 50.0,
+              "error_rate": 0.5,
+              "p50_s": 0.6043,
+              "p99_s": 2.1041,
+              "status": "missed"
+            },
+            "source": "bench",
+            "targets": {
+              "availability": 0.99,
+              "error_rate": 0.01,
+              "p99_s": 5.0
+            }
+          }
+        },
+        "scan": {
+          "functions": [
+            {
+              "exposure": 1.0,
+              "id": "support.triage_ticket",
+              "lang": "python",
+              "risk": 0.8632,
+              "score": 86.3,
+              "signals": {
+                "no_logging": "no logging on the failure path",
+                "no_timeout": "urlopen() without timeout",
+                "unsafe_retry": "retries a POST with no Idempotency-Key"
+              }
+            },
+            {
+              "exposure": 0.0,
+              "id": "app.main",
+              "lang": "python",
+              "risk": 0.0,
+              "score": 0.0,
+              "signals": []
+            },
+            {
+              "exposure": 0.0,
+              "id": "mock_provider.MockProviderHandler.do_POST",
+              "lang": "python",
+              "risk": 0.0,
+              "score": 0.0,
+              "signals": []
+            },
+            {
+              "exposure": 0.0,
+              "id": "mock_provider.MockProviderHandler.log_message",
+              "lang": "python",
+              "risk": 0.0,
+              "score": 0.0,
+              "signals": []
+            },
+            {
+              "exposure": 0.0,
+              "id": "mock_provider.start_server",
+              "lang": "python",
+              "risk": 0.0,
+              "score": 0.0,
+              "signals": []
+            },
+            {
+              "exposure": 0.0,
+              "id": "support.read_optional_note",
+              "lang": "python",
+              "risk": 0.335,
+              "score": 0.0,
+              "signals": {
+                "no_logging": "no logging on the failure path",
+                "swallow": "`except OSError: return None` swallows errors"
+              }
+            }
+          ],
+          "generated_at": "2026-11-23T17:49:57+0800",
+          "kind": "scan",
+          "lang": "python",
+          "project": "support-ai",
+          "schema_version": "1.0.0"
+        },
+        "slo": {
+          "generated_at": "2026-11-23T17:49:57+0800",
+          "kind": "slo",
+          "project": "support-ai",
+          "schema_version": "1.0.0",
+          "slo": {
+            "hardened": {
+              "availability": 1.0,
+              "checks": {
+                "availability": true,
+                "error_rate": true,
+                "p99_s": true
+              },
+              "error_budget": 0.01,
+              "error_budget_burn_pct": 0.0,
+              "error_budget_burn_ratio": 0.0,
+              "error_rate": 0.0,
+              "p50_s": 0.7569,
+              "p99_s": 2.6095,
+              "status": "met"
+            },
+            "original": {
+              "availability": 0.5,
+              "checks": {
+                "availability": false,
+                "error_rate": false,
+                "p99_s": true
+              },
+              "error_budget": 0.01,
+              "error_budget_burn_pct": 5000.0,
+              "error_budget_burn_ratio": 50.0,
+              "error_rate": 0.5,
+              "p50_s": 0.6043,
+              "p99_s": 2.1041,
+              "status": "missed"
+            },
+            "series": [
+              {
+                "availability": 1.0,
+                "burn_pct": 0.0,
+                "error_rate": 0.0,
+                "p99_s": 2.6095,
+                "ts": "2026-11-23T17:49:57+0800"
+              }
+            ],
+            "source": "bench",
+            "targets": {
+              "availability": 0.99,
+              "error_rate": 0.01,
+              "p99_s": 5.0
+            }
+          }
+        },
+        "status": {
+          "functions": [
+            {
+              "ai": {
+                "hardened": {
+                  "calls": 111,
+                  "cost_per_success_usd": 5.5e-05,
+                  "injection_resistance": 1.0,
+                  "loop_guard_trips": 0,
+                  "retry_cost_amplification": 1.732,
+                  "semantic_success_rate": 1.0,
+                  "total_cost_usd": 0.006074,
+                  "total_tokens": 25374
+                },
+                "max_attempts_per_trial": 4,
+                "original": {
+                  "calls": 111,
+                  "cost_per_success_usd": 0.000188,
+                  "injection_resistance": 1.0,
+                  "loop_guard_trips": 0,
+                  "retry_cost_amplification": 0.682,
+                  "semantic_success_rate": 0.0991,
+                  "total_cost_usd": 0.002063,
+                  "total_tokens": 9997
+                }
+              },
+              "budget_s": 5.0,
+              "gates": {
+                "ai_budget": true,
+                "ai_injection": true,
+                "availability": true,
+                "dups": true,
+                "happy": true,
+                "no_hang": true,
+                "no_new_crashes": true,
+                "no_wrong": true,
+                "p99": true
+              },
+              "happy": {
+                "equal": 3,
+                "total": 3
+              },
+              "hardened": {
+                "amplification": 2.72972972972973,
+                "availability": 1.0,
+                "crash_rate": null,
+                "dups": 0,
+                "hang": 0,
+                "hang_rate": null,
+                "identical_rate": null,
+                "p50_s": 0.008827,
+                "p99_s": 3.719763,
+                "wrong": 0
+              },
+              "id": "support.triage_ticket",
+              "lang": "python",
+              "original": {
+                "amplification": 1.2882882882882882,
+                "availability": 0.0990990990990991,
+                "crash_rate": null,
+                "dups": 0,
+                "hang": 12,
+                "hang_rate": null,
+                "identical_rate": null,
+                "p50_s": 0.0,
+                "p99_s": 60.004472,
+                "wrong": 0
+              },
+              "passed": true
+            }
+          ],
+          "generated_at": "2026-11-23T17:49:57+0800",
+          "kind": "status",
+          "lang": "python",
+          "project": "support-ai",
+          "resilience_state": {
+            "breakers": {},
+            "bulkheads": {},
+            "flags": {}
+          },
+          "rollout": {
+            "blast_radius_functions": 0,
+            "canary_pct": 0.0,
+            "enabled": {},
+            "shadow": false
+          },
+          "schema_version": "1.0.0"
+        },
+        "verify-support.triage_ticket": {
+          "ai": {
+            "hardened": {
+              "calls": 111,
+              "cost_per_success_usd": 5.5e-05,
+              "injection_resistance": 1.0,
+              "loop_guard_trips": 0,
+              "retry_cost_amplification": 1.732,
+              "semantic_success_rate": 1.0,
+              "total_cost_usd": 0.006074,
+              "total_tokens": 25374
+            },
+            "max_attempts_per_trial": 4,
+            "original": {
+              "calls": 111,
+              "cost_per_success_usd": 0.000188,
+              "injection_resistance": 1.0,
+              "loop_guard_trips": 0,
+              "retry_cost_amplification": 0.682,
+              "semantic_success_rate": 0.0991,
+              "total_cost_usd": 0.002063,
+              "total_tokens": 9997
+            }
+          },
+          "functions": [
+            {
+              "ai": {
+                "hardened": {
+                  "calls": 111,
+                  "cost_per_success_usd": 5.5e-05,
+                  "injection_resistance": 1.0,
+                  "loop_guard_trips": 0,
+                  "retry_cost_amplification": 1.732,
+                  "semantic_success_rate": 1.0,
+                  "total_cost_usd": 0.006074,
+                  "total_tokens": 25374
+                },
+                "max_attempts_per_trial": 4,
+                "original": {
+                  "calls": 111,
+                  "cost_per_success_usd": 0.000188,
+                  "injection_resistance": 1.0,
+                  "loop_guard_trips": 0,
+                  "retry_cost_amplification": 0.682,
+                  "semantic_success_rate": 0.0991,
+                  "total_cost_usd": 0.002063,
+                  "total_tokens": 9997
+                }
+              },
+              "budget_s": 5.0,
+              "gates": {
+                "ai_budget": true,
+                "ai_injection": true,
+                "availability": true,
+                "dups": true,
+                "happy": true,
+                "no_hang": true,
+                "no_new_crashes": true,
+                "no_wrong": true,
+                "p99": true
+              },
+              "happy": {
+                "equal": 3,
+                "total": 3
+              },
+              "hardened": {
+                "amplification": 2.72972972972973,
+                "availability": 1.0,
+                "crash_rate": null,
+                "dups": 0,
+                "hang": 0,
+                "hang_rate": null,
+                "identical_rate": null,
+                "p50_s": 0.008827,
+                "p99_s": 3.719763,
+                "wrong": 0
+              },
+              "id": "support.triage_ticket",
+              "lang": "python",
+              "original": {
+                "amplification": 1.2882882882882882,
+                "availability": 0.0990990990990991,
+                "crash_rate": null,
+                "dups": 0,
+                "hang": 12,
+                "hang_rate": null,
+                "identical_rate": null,
+                "p50_s": 0.0,
+                "p99_s": 60.004472,
+                "wrong": 0
+              },
+              "passed": true
+            }
+          ],
+          "generated_at": "2026-11-23T17:49:57+0800",
+          "kind": "verify",
+          "lang": "python",
+          "project": "support-ai",
+          "schema_version": "1.0.0",
+          "serviceability": {
+            "hard_detection_rate": 1.0,
+            "hard_diagnosis_accuracy": 0.0,
+            "orig_detection_rate": 0.0
+          }
+        }
+      }
+    },
+    "weather": {
+      "events": [
+        {
+          "data": {
+            "functions": 7
+          },
+          "dependency": null,
+          "event_type": "scan.completed",
+          "function_id": null,
+          "kind": "event",
+          "schema_version": "1.0.0",
+          "seq": 1,
+          "severity": "INFO",
+          "trace_id": null,
+          "ts": "2026-11-23T17:49:57+0800"
+        },
+        {
+          "data": {
+            "availability_hardened": 1.0,
+            "availability_original": 0.325
+          },
+          "dependency": null,
+          "event_type": "verify.passed",
+          "function_id": "weather.fetch_forecast",
+          "kind": "event",
+          "schema_version": "1.0.0",
+          "seq": 2,
+          "severity": "INFO",
+          "trace_id": null,
+          "ts": "2026-11-23T17:49:57+0800"
+        },
+        {
+          "data": {
+            "availability_hardened": 1.0,
+            "availability_original": 0.4,
+            "seeds": 20
+          },
+          "dependency": null,
+          "event_type": "bench.completed",
+          "function_id": null,
+          "kind": "event",
+          "schema_version": "1.0.0",
+          "seq": 3,
+          "severity": "INFO",
+          "trace_id": null,
+          "ts": "2026-11-23T17:49:57+0800"
+        },
+        {
+          "data": {
+            "status": "met"
+          },
+          "dependency": null,
+          "event_type": "slo.evaluated",
+          "function_id": null,
+          "kind": "event",
+          "schema_version": "1.0.0",
+          "seq": 4,
+          "severity": "INFO",
+          "trace_id": null,
+          "ts": "2026-11-23T17:49:57+0800"
+        }
+      ],
+      "generated_at": "2026-11-23T17:49:57+0800",
+      "kind": "bundle",
+      "project": "weather",
+      "schema_version": "1.0.0",
+      "snapshots": {
+        "bench": {
+          "bench": {
+            "hardened": {
+              "amplification": 1.1916666666666667,
+              "availability": 1.0,
+              "crash_rate": 0.0,
+              "dups": 0,
+              "hang": 0,
+              "hang_rate": 0.0,
+              "identical_rate": 1.0,
+              "p50_s": 0.3301,
+              "p99_s": 1.2549,
+              "wrong": 0
+            },
+            "original": {
+              "amplification": 1.0,
+              "availability": 0.4,
+              "crash_rate": 0.45,
+              "dups": 0,
+              "hang": 3,
+              "hang_rate": 0.15,
+              "identical_rate": 0.4,
+              "p50_s": 0.1014,
+              "p99_s": 2.1071,
+              "wrong": 0
+            },
+            "rate": 0.1,
+            "seeds": 20
+          },
+          "generated_at": "2026-11-23T17:49:57+0800",
+          "kind": "bench",
+          "lang": "python",
+          "project": "weather",
+          "schema_version": "1.0.0"
+        },
+        "coverage": {
+          "coverage": {
+            "adapters": [
+              {
+                "ax": true,
+                "boundary": "urllib / requests / httpx / aiohttp / socket / subprocess",
+                "lang": "python",
+                "status": "complete",
+                "verify": true
+              },
+              {
+                "ax": true,
+                "boundary": "fetch / http / https / child_process (CJS + ESM + TS)",
+                "lang": "node",
+                "status": "complete",
+                "verify": true
+              },
+              {
+                "ax": true,
+                "boundary": "net/http / os/exec: AST + rasagent + rasruntime",
+                "lang": "go",
+                "status": "complete",
+                "verify": true
+              },
+              {
+                "ax": false,
+                "boundary": "HttpClient / HttpURLConnection / ProcessBuilder",
+                "lang": "java",
+                "status": "planned",
+                "verify": false
+              },
+              {
+                "ax": false,
+                "boundary": "HttpClient / Process",
+                "lang": "csharp",
+                "status": "planned",
+                "verify": false
+              },
+              {
+                "ax": false,
+                "boundary": "curl / file_get_contents / proc_open",
+                "lang": "php",
+                "status": "planned",
+                "verify": false
+              },
+              {
+                "ax": false,
+                "boundary": "Net::HTTP / Open3",
+                "lang": "ruby",
+                "status": "planned",
+                "verify": false
+              },
+              {
+                "ax": false,
+                "boundary": "HttpClient / OkHttp / ProcessBuilder",
+                "lang": "kotlin",
+                "status": "planned",
+                "verify": false
+              },
+              {
+                "ax": false,
+                "boundary": "fetch / Bun.spawn",
+                "lang": "bun",
+                "status": "planned",
+                "verify": false
+              },
+              {
+                "ax": false,
+                "boundary": "fetch / Deno.Command",
+                "lang": "deno",
+                "status": "planned",
+                "verify": false
+              },
+              {
+                "ax": false,
+                "boundary": "libcurl / popen",
+                "lang": "c_cpp",
+                "status": "planned",
+                "verify": false
+              }
+            ]
+          },
+          "generated_at": "2026-11-23T17:49:57+0800",
+          "kind": "coverage",
+          "project": "weather",
+          "schema_version": "1.0.0"
+        },
+        "report": {
+          "ax": {
+            "hardened_accuracy": 1.0,
+            "leaks": 0,
+            "original_accuracy": 0.3,
+            "records": []
+          },
+          "bench": {
+            "hardened": {
+              "amplification": 1.1916666666666667,
+              "availability": 1.0,
+              "crash_rate": 0.0,
+              "dups": 0,
+              "hang": 0,
+              "hang_rate": 0.0,
+              "identical_rate": 1.0,
+              "p50_s": 0.3301,
+              "p99_s": 1.2549,
+              "wrong": 0
+            },
+            "original": {
+              "amplification": 1.0,
+              "availability": 0.4,
+              "crash_rate": 0.45,
+              "dups": 0,
+              "hang": 3,
+              "hang_rate": 0.15,
+              "identical_rate": 0.4,
+              "p50_s": 0.1014,
+              "p99_s": 2.1071,
+              "wrong": 0
+            },
+            "rate": 0.1,
+            "seeds": 20
+          },
+          "coverage": {
+            "adapters": [
+              {
+                "ax": true,
+                "boundary": "urllib / requests / httpx / aiohttp / socket / subprocess",
+                "lang": "python",
+                "status": "complete",
+                "verify": true
+              },
+              {
+                "ax": true,
+                "boundary": "fetch / http / https / child_process (CJS + ESM + TS)",
+                "lang": "node",
+                "status": "complete",
+                "verify": true
+              },
+              {
+                "ax": true,
+                "boundary": "net/http / os/exec: AST + rasagent + rasruntime",
+                "lang": "go",
+                "status": "complete",
+                "verify": true
+              },
+              {
+                "ax": false,
+                "boundary": "HttpClient / HttpURLConnection / ProcessBuilder",
+                "lang": "java",
+                "status": "planned",
+                "verify": false
+              },
+              {
+                "ax": false,
+                "boundary": "HttpClient / Process",
+                "lang": "csharp",
+                "status": "planned",
+                "verify": false
+              },
+              {
+                "ax": false,
+                "boundary": "curl / file_get_contents / proc_open",
+                "lang": "php",
+                "status": "planned",
+                "verify": false
+              },
+              {
+                "ax": false,
+                "boundary": "Net::HTTP / Open3",
+                "lang": "ruby",
+                "status": "planned",
+                "verify": false
+              },
+              {
+                "ax": false,
+                "boundary": "HttpClient / OkHttp / ProcessBuilder",
+                "lang": "kotlin",
+                "status": "planned",
+                "verify": false
+              },
+              {
+                "ax": false,
+                "boundary": "fetch / Bun.spawn",
+                "lang": "bun",
+                "status": "planned",
+                "verify": false
+              },
+              {
+                "ax": false,
+                "boundary": "fetch / Deno.Command",
+                "lang": "deno",
+                "status": "planned",
+                "verify": false
+              },
+              {
+                "ax": false,
+                "boundary": "libcurl / popen",
+                "lang": "c_cpp",
+                "status": "planned",
+                "verify": false
+              }
+            ]
+          },
+          "functions": [
+            {
+              "budget_s": 5.0,
+              "gates": {
+                "availability": true,
+                "dups": true,
+                "happy": true,
+                "no_hang": true,
+                "no_new_crashes": true,
+                "no_wrong": true,
+                "p99": true
+              },
+              "happy": {
+                "equal": 12,
+                "total": 12
+              },
+              "hardened": {
+                "amplification": 1.8833333333333333,
+                "availability": 1.0,
+                "crash_rate": null,
+                "dups": 0,
+                "hang": 0,
+                "hang_rate": null,
+                "identical_rate": null,
+                "p50_s": 0.088043,
+                "p99_s": 3.598089,
+                "wrong": 0
+              },
+              "id": "weather.fetch_forecast",
+              "lang": "python",
+              "original": {
+                "amplification": 1.0,
+                "availability": 0.325,
+                "crash_rate": null,
+                "dups": 0,
+                "hang": 15,
+                "hang_rate": null,
+                "identical_rate": null,
+                "p50_s": 0.003125,
+                "p99_s": 60.0,
+                "wrong": 0
+              },
+              "passed": true
+            }
+          ],
+          "generated_at": "2026-11-23T17:49:57+0800",
+          "kind": "report",
+          "lang": "python",
+          "project": "weather",
+          "resilience_state": {
+            "breakers": {},
+            "bulkheads": {},
+            "flags": {}
+          },
+          "rollout": {
+            "blast_radius_functions": 0,
+            "canary_pct": 0.0,
+            "enabled": {},
+            "shadow": false
+          },
+          "schema_version": "1.0.0",
+          "serviceability": {
+            "hard_detection_rate": 1.0,
+            "hard_diagnosis_accuracy": 0.7127659574468085,
+            "mttd_s": null,
+            "mttr_s": null,
+            "orig_detection_rate": 0.0,
+            "restore_s": null
+          },
+          "slo": {
+            "hardened": {
+              "availability": 1.0,
+              "checks": {
+                "availability": true,
+                "error_rate": true,
+                "p99_s": true
+              },
+              "error_budget": 0.01,
+              "error_budget_burn_pct": 0.0,
+              "error_budget_burn_ratio": 0.0,
+              "error_rate": 0.0,
+              "p50_s": 0.3301,
+              "p99_s": 1.2549,
+              "status": "met"
+            },
+            "original": {
+              "availability": 0.4,
+              "checks": {
+                "availability": false,
+                "error_rate": false,
+                "p99_s": true
+              },
+              "error_budget": 0.01,
+              "error_budget_burn_pct": 6000.0,
+              "error_budget_burn_ratio": 60.0,
+              "error_rate": 0.6,
+              "p50_s": 0.1014,
+              "p99_s": 2.1071,
+              "status": "missed"
+            },
+            "source": "bench",
+            "targets": {
+              "availability": 0.99,
+              "error_rate": 0.01,
+              "p99_s": 5.0
+            }
+          }
+        },
+        "scan": {
+          "functions": [
+            {
+              "exposure": 1.0,
+              "id": "weather.fetch_forecast",
+              "lang": "python",
+              "risk": 0.8176,
+              "score": 81.8,
+              "signals": {
+                "no_logging": "no logging on the failure path",
+                "no_retry": "no retry on transient errors",
+                "no_timeout": "urlopen() without timeout"
+              }
+            },
+            {
+              "exposure": 0.0,
+              "id": "app.main",
+              "lang": "python",
+              "risk": 0.0,
+              "score": 0.0,
+              "signals": []
+            },
+            {
+              "exposure": 0.0,
+              "id": "upstream.Handler.do_GET",
+              "lang": "python",
+              "risk": 0.0,
+              "score": 0.0,
+              "signals": []
+            },
+            {
+              "exposure": 0.0,
+              "id": "upstream.Handler.log_message",
+              "lang": "python",
+              "risk": 0.0,
+              "score": 0.0,
+              "signals": []
+            },
+            {
+              "exposure": 0.0,
+              "id": "upstream.forecast_for",
+              "lang": "python",
+              "risk": 0.0,
+              "score": 0.0,
+              "signals": []
+            },
+            {
+              "exposure": 0.0,
+              "id": "upstream.start",
+              "lang": "python",
+              "risk": 0.0,
+              "score": 0.0,
+              "signals": []
+            },
+            {
+              "exposure": 0.0,
+              "id": "weather.summarize",
+              "lang": "python",
+              "risk": 0.0,
+              "score": 0.0,
+              "signals": []
+            }
+          ],
+          "generated_at": "2026-11-23T17:49:57+0800",
+          "kind": "scan",
+          "lang": "python",
+          "project": "weather",
+          "schema_version": "1.0.0"
+        },
+        "slo": {
+          "generated_at": "2026-11-23T17:49:57+0800",
+          "kind": "slo",
+          "project": "weather",
+          "schema_version": "1.0.0",
+          "slo": {
+            "hardened": {
+              "availability": 1.0,
+              "checks": {
+                "availability": true,
+                "error_rate": true,
+                "p99_s": true
+              },
+              "error_budget": 0.01,
+              "error_budget_burn_pct": 0.0,
+              "error_budget_burn_ratio": 0.0,
+              "error_rate": 0.0,
+              "p50_s": 0.3301,
+              "p99_s": 1.2549,
+              "status": "met"
+            },
+            "original": {
+              "availability": 0.4,
+              "checks": {
+                "availability": false,
+                "error_rate": false,
+                "p99_s": true
+              },
+              "error_budget": 0.01,
+              "error_budget_burn_pct": 6000.0,
+              "error_budget_burn_ratio": 60.0,
+              "error_rate": 0.6,
+              "p50_s": 0.1014,
+              "p99_s": 2.1071,
+              "status": "missed"
+            },
+            "series": [
+              {
+                "availability": 1.0,
+                "burn_pct": 0.0,
+                "error_rate": 0.0,
+                "p99_s": 1.2549,
+                "ts": "2026-11-23T17:49:57+0800"
+              }
+            ],
+            "source": "bench",
+            "targets": {
+              "availability": 0.99,
+              "error_rate": 0.01,
+              "p99_s": 5.0
+            }
+          }
+        },
+        "status": {
+          "functions": [
+            {
+              "budget_s": 5.0,
+              "gates": {
+                "availability": true,
+                "dups": true,
+                "happy": true,
+                "no_hang": true,
+                "no_new_crashes": true,
+                "no_wrong": true,
+                "p99": true
+              },
+              "happy": {
+                "equal": 12,
+                "total": 12
+              },
+              "hardened": {
+                "amplification": 1.8833333333333333,
+                "availability": 1.0,
+                "crash_rate": null,
+                "dups": 0,
+                "hang": 0,
+                "hang_rate": null,
+                "identical_rate": null,
+                "p50_s": 0.088043,
+                "p99_s": 3.598089,
+                "wrong": 0
+              },
+              "id": "weather.fetch_forecast",
+              "lang": "python",
+              "original": {
+                "amplification": 1.0,
+                "availability": 0.325,
+                "crash_rate": null,
+                "dups": 0,
+                "hang": 15,
+                "hang_rate": null,
+                "identical_rate": null,
+                "p50_s": 0.003125,
+                "p99_s": 60.0,
+                "wrong": 0
+              },
+              "passed": true
+            }
+          ],
+          "generated_at": "2026-11-23T17:49:57+0800",
+          "kind": "status",
+          "lang": "python",
+          "project": "weather",
+          "resilience_state": {
+            "breakers": {},
+            "bulkheads": {},
+            "flags": {}
+          },
+          "rollout": {
+            "blast_radius_functions": 0,
+            "canary_pct": 0.0,
+            "enabled": {},
+            "shadow": false
+          },
+          "schema_version": "1.0.0"
+        },
+        "verify-weather.fetch_forecast": {
+          "functions": [
+            {
+              "budget_s": 5.0,
+              "gates": {
+                "availability": true,
+                "dups": true,
+                "happy": true,
+                "no_hang": true,
+                "no_new_crashes": true,
+                "no_wrong": true,
+                "p99": true
+              },
+              "happy": {
+                "equal": 12,
+                "total": 12
+              },
+              "hardened": {
+                "amplification": 1.8833333333333333,
+                "availability": 1.0,
+                "crash_rate": null,
+                "dups": 0,
+                "hang": 0,
+                "hang_rate": null,
+                "identical_rate": null,
+                "p50_s": 0.088043,
+                "p99_s": 3.598089,
+                "wrong": 0
+              },
+              "id": "weather.fetch_forecast",
+              "lang": "python",
+              "original": {
+                "amplification": 1.0,
+                "availability": 0.325,
+                "crash_rate": null,
+                "dups": 0,
+                "hang": 15,
+                "hang_rate": null,
+                "identical_rate": null,
+                "p50_s": 0.003125,
+                "p99_s": 60.0,
+                "wrong": 0
+              },
+              "passed": true
+            }
+          ],
+          "generated_at": "2026-11-23T17:49:57+0800",
+          "kind": "verify",
+          "lang": "python",
+          "project": "weather",
+          "schema_version": "1.0.0",
+          "serviceability": {
+            "hard_detection_rate": 1.0,
+            "hard_diagnosis_accuracy": 0.7127659574468085,
+            "orig_detection_rate": 0.0
+          }
+        }
+      }
+    }
+  },
+  "schema_version": "1.0.0"
+}

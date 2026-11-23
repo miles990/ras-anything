@@ -1,0 +1,353 @@
+{
+  "schema_version": "1.0.0",
+  "kind": "report",
+  "generated_at": "2026-11-23T17:49:57+0800",
+  "project": "orders-node",
+  "lang": "node",
+  "functions": [
+    {
+      "id": "orders.charge",
+      "lang": "node",
+      "passed": true,
+      "budget_s": 5.0,
+      "happy": {
+        "equal": 12,
+        "total": 12
+      },
+      "original": {
+        "availability": 0.7833333333333333,
+        "identical_rate": null,
+        "crash_rate": null,
+        "hang_rate": null,
+        "wrong": 12,
+        "hang": 14,
+        "dups": 28,
+        "p50_s": 0.3011,
+        "p99_s": 10.30254,
+        "amplification": 1.85
+      },
+      "hardened": {
+        "availability": 1.0,
+        "identical_rate": null,
+        "crash_rate": null,
+        "hang_rate": null,
+        "wrong": 0,
+        "hang": 0,
+        "dups": 0,
+        "p50_s": 0.09846,
+        "p99_s": 3.59154,
+        "amplification": 1.95
+      },
+      "gates": {
+        "happy": true,
+        "no_wrong": true,
+        "no_hang": true,
+        "no_new_crashes": true,
+        "p99": true,
+        "dups": true,
+        "availability": true
+      }
+    },
+    {
+      "id": "orders.getItem",
+      "lang": "node",
+      "passed": true,
+      "budget_s": 5.0,
+      "happy": {
+        "equal": 12,
+        "total": 12
+      },
+      "original": {
+        "availability": 0.2916666666666667,
+        "identical_rate": null,
+        "crash_rate": null,
+        "hang_rate": null,
+        "wrong": 30,
+        "hang": 16,
+        "dups": 0,
+        "p50_s": 0.00056,
+        "p99_s": 60,
+        "amplification": 1.0
+      },
+      "hardened": {
+        "availability": 1.0,
+        "identical_rate": null,
+        "crash_rate": null,
+        "hang_rate": null,
+        "wrong": 0,
+        "hang": 0,
+        "dups": 0,
+        "p50_s": 0.143796,
+        "p99_s": 4.000671,
+        "amplification": 1.925
+      },
+      "gates": {
+        "happy": true,
+        "no_wrong": true,
+        "no_hang": true,
+        "no_new_crashes": true,
+        "p99": true,
+        "dups": true,
+        "availability": true
+      }
+    },
+    {
+      "id": "orders.printLabel",
+      "lang": "node",
+      "passed": true,
+      "budget_s": 5.0,
+      "happy": {
+        "equal": 12,
+        "total": 12
+      },
+      "original": {
+        "availability": 0.325,
+        "identical_rate": null,
+        "crash_rate": null,
+        "hang_rate": null,
+        "wrong": 0,
+        "hang": 13,
+        "dups": 0,
+        "p50_s": 0.025762,
+        "p99_s": 60,
+        "amplification": 1.0
+      },
+      "hardened": {
+        "availability": 1.0,
+        "identical_rate": null,
+        "crash_rate": null,
+        "hang_rate": null,
+        "wrong": 0,
+        "hang": 0,
+        "dups": 0,
+        "p50_s": 0.096096,
+        "p99_s": 3.519264,
+        "amplification": 1.9333333333333333
+      },
+      "gates": {
+        "happy": true,
+        "no_wrong": true,
+        "no_hang": true,
+        "no_new_crashes": true,
+        "p99": true,
+        "dups": true,
+        "availability": true
+      }
+    },
+    {
+      "id": "orders.shippingQuote",
+      "lang": "node",
+      "passed": true,
+      "budget_s": 5.0,
+      "happy": {
+        "equal": 12,
+        "total": 12
+      },
+      "original": {
+        "availability": 0.39166666666666666,
+        "identical_rate": null,
+        "crash_rate": null,
+        "hang_rate": null,
+        "wrong": 23,
+        "hang": 14,
+        "dups": 0,
+        "p50_s": 0.000459,
+        "p99_s": 60,
+        "amplification": 1.0
+      },
+      "hardened": {
+        "availability": 1.0,
+        "identical_rate": null,
+        "crash_rate": null,
+        "hang_rate": null,
+        "wrong": 0,
+        "hang": 0,
+        "dups": 0,
+        "p50_s": 0.087473,
+        "p99_s": 3.65089,
+        "amplification": 1.875
+      },
+      "gates": {
+        "happy": true,
+        "no_wrong": true,
+        "no_hang": true,
+        "no_new_crashes": true,
+        "p99": true,
+        "dups": true,
+        "availability": true
+      }
+    }
+  ],
+  "rollout": {
+    "enabled": {},
+    "canary_pct": 0.0,
+    "shadow": false,
+    "blast_radius_functions": 0
+  },
+  "resilience_state": {
+    "breakers": {},
+    "bulkheads": {},
+    "flags": {}
+  },
+  "coverage": {
+    "adapters": [
+      {
+        "lang": "python",
+        "status": "complete",
+        "boundary": "urllib / requests / httpx / aiohttp / socket / subprocess",
+        "verify": true,
+        "ax": true
+      },
+      {
+        "lang": "node",
+        "status": "complete",
+        "boundary": "fetch / http / https / child_process (CJS + ESM + TS)",
+        "verify": true,
+        "ax": true
+      },
+      {
+        "lang": "go",
+        "status": "complete",
+        "boundary": "net/http / os/exec (AST + rasagent + rasruntime)",
+        "verify": true,
+        "ax": true
+      },
+      {
+        "lang": "java",
+        "status": "planned",
+        "boundary": "HttpClient / HttpURLConnection / ProcessBuilder",
+        "verify": false,
+        "ax": false
+      },
+      {
+        "lang": "csharp",
+        "status": "planned",
+        "boundary": "HttpClient / Process",
+        "verify": false,
+        "ax": false
+      },
+      {
+        "lang": "php",
+        "status": "planned",
+        "boundary": "curl / file_get_contents / proc_open",
+        "verify": false,
+        "ax": false
+      },
+      {
+        "lang": "ruby",
+        "status": "planned",
+        "boundary": "Net::HTTP / Open3",
+        "verify": false,
+        "ax": false
+      },
+      {
+        "lang": "kotlin",
+        "status": "planned",
+        "boundary": "HttpClient / OkHttp / ProcessBuilder",
+        "verify": false,
+        "ax": false
+      },
+      {
+        "lang": "bun",
+        "status": "planned",
+        "boundary": "fetch / Bun.spawn",
+        "verify": false,
+        "ax": false
+      },
+      {
+        "lang": "deno",
+        "status": "planned",
+        "boundary": "fetch / Deno.Command",
+        "verify": false,
+        "ax": false
+      },
+      {
+        "lang": "c_cpp",
+        "status": "planned",
+        "boundary": "libcurl / popen",
+        "verify": false,
+        "ax": false
+      }
+    ]
+  },
+  "bench": {
+    "seeds": 20,
+    "rate": 0.1,
+    "original": {
+      "availability": 0.0,
+      "identical_rate": 0.0,
+      "crash_rate": 0.75,
+      "hang_rate": 0.15,
+      "wrong": 2,
+      "hang": 3,
+      "dups": 6,
+      "p50_s": 0.3574,
+      "p99_s": 4.1795,
+      "amplification": 1.0610169491525423
+    },
+    "hardened": {
+      "availability": 0.9,
+      "identical_rate": 0.9,
+      "crash_rate": 0.1,
+      "hang_rate": 0.0,
+      "wrong": 0,
+      "hang": 0,
+      "dups": 0,
+      "p50_s": 2.7274,
+      "p99_s": 4.9689,
+      "amplification": 1.225
+    }
+  },
+  "slo": {
+    "source": "bench",
+    "targets": {
+      "availability": 0.99,
+      "p99_s": 5.0,
+      "error_rate": 0.01
+    },
+    "original": {
+      "availability": 0.0,
+      "error_rate": 1.0,
+      "p50_s": 0.3574,
+      "p99_s": 4.1795,
+      "error_budget": 0.01,
+      "error_budget_burn_ratio": 100.0,
+      "error_budget_burn_pct": 10000.0,
+      "checks": {
+        "availability": false,
+        "p99_s": true,
+        "error_rate": false
+      },
+      "status": "missed"
+    },
+    "hardened": {
+      "availability": 0.9,
+      "error_rate": 0.1,
+      "p50_s": 2.7274,
+      "p99_s": 4.9689,
+      "error_budget": 0.01,
+      "error_budget_burn_ratio": 10.0,
+      "error_budget_burn_pct": 1000.0,
+      "checks": {
+        "availability": false,
+        "p99_s": true,
+        "error_rate": false
+      },
+      "status": "missed"
+    }
+  },
+  "ax": {
+    "original_accuracy": 0.3,
+    "hardened_accuracy": 1.0,
+    "leaks": 0,
+    "records": []
+  },
+  "serviceability": {
+    "mttd_s": null,
+    "mttr_s": null,
+    "restore_s": null,
+    "orig_detection_rate": 0.0,
+    "hard_detection_rate": 1.0,
+    "hard_diagnosis_accuracy": 0.68
+  }
+}

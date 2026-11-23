@@ -1,0 +1,268 @@
+{
+  "resourceLogs": [
+    {
+      "resource": {
+        "attributes": [
+          {
+            "key": "service.name",
+            "value": {
+              "stringValue": "orders-node"
+            }
+          }
+        ]
+      },
+      "scopeLogs": [
+        {
+          "logRecords": [
+            {
+              "attributes": [
+                {
+                  "key": "ras.seq",
+                  "value": {
+                    "intValue": "1"
+                  }
+                },
+                {
+                  "key": "ras.data",
+                  "value": {
+                    "stringValue": "{\"functions\": 7}"
+                  }
+                }
+              ],
+              "body": {
+                "stringValue": "scan.completed"
+              },
+              "severityText": "INFO",
+              "timeUnixNano": "1795427397472848384",
+              "traceId": ""
+            },
+            {
+              "attributes": [
+                {
+                  "key": "ras.seq",
+                  "value": {
+                    "intValue": "2"
+                  }
+                },
+                {
+                  "key": "ras.data",
+                  "value": {
+                    "stringValue": "{\"availability_hardened\": 1.0, \"availability_original\": 0.7833333333333333}"
+                  }
+                }
+              ],
+              "body": {
+                "stringValue": "verify.passed"
+              },
+              "severityText": "INFO",
+              "timeUnixNano": "1795427397472848384",
+              "traceId": ""
+            },
+            {
+              "attributes": [
+                {
+                  "key": "ras.seq",
+                  "value": {
+                    "intValue": "3"
+                  }
+                },
+                {
+                  "key": "ras.data",
+                  "value": {
+                    "stringValue": "{\"availability_hardened\": 1.0, \"availability_original\": 0.2916666666666667}"
+                  }
+                }
+              ],
+              "body": {
+                "stringValue": "verify.passed"
+              },
+              "severityText": "INFO",
+              "timeUnixNano": "1795427397472848384",
+              "traceId": ""
+            },
+            {
+              "attributes": [
+                {
+                  "key": "ras.seq",
+                  "value": {
+                    "intValue": "4"
+                  }
+                },
+                {
+                  "key": "ras.data",
+                  "value": {
+                    "stringValue": "{\"availability_hardened\": 1.0, \"availability_original\": 0.325}"
+                  }
+                }
+              ],
+              "body": {
+                "stringValue": "verify.passed"
+              },
+              "severityText": "INFO",
+              "timeUnixNano": "1795427397472848384",
+              "traceId": ""
+            },
+            {
+              "attributes": [
+                {
+                  "key": "ras.seq",
+                  "value": {
+                    "intValue": "5"
+                  }
+                },
+                {
+                  "key": "ras.data",
+                  "value": {
+                    "stringValue": "{\"availability_hardened\": 1.0, \"availability_original\": 0.39166666666666666}"
+                  }
+                }
+              ],
+              "body": {
+                "stringValue": "verify.passed"
+              },
+              "severityText": "INFO",
+              "timeUnixNano": "1795427397472848384",
+              "traceId": ""
+            },
+            {
+              "attributes": [
+                {
+                  "key": "ras.seq",
+                  "value": {
+                    "intValue": "6"
+                  }
+                },
+                {
+                  "key": "ras.data",
+                  "value": {
+                    "stringValue": "{\"availability_hardened\": 0.9, \"availability_original\": 0.0, \"seeds\": 20}"
+                  }
+                }
+              ],
+              "body": {
+                "stringValue": "bench.completed"
+              },
+              "severityText": "INFO",
+              "timeUnixNano": "1795427397472848384",
+              "traceId": ""
+            },
+            {
+              "attributes": [
+                {
+                  "key": "ras.seq",
+                  "value": {
+                    "intValue": "7"
+                  }
+                },
+                {
+                  "key": "ras.data",
+                  "value": {
+                    "stringValue": "{\"status\": \"missed\"}"
+                  }
+                }
+              ],
+              "body": {
+                "stringValue": "slo.evaluated"
+              },
+              "severityText": "ERROR",
+              "timeUnixNano": "1795427397472848384",
+              "traceId": ""
+            }
+          ],
+          "scope": {
+            "name": "ras-anything",
+            "version": "1.0.0"
+          }
+        }
+      ]
+    }
+  ],
+  "resourceMetrics": [
+    {
+      "resource": {
+        "attributes": [
+          {
+            "key": "service.name",
+            "value": {
+              "stringValue": "orders-node"
+            }
+          }
+        ]
+      },
+      "scopeMetrics": [
+        {
+          "metrics": [
+            {
+              "gauge": {
+                "dataPoints": [
+                  {
+                    "asDouble": 0.0,
+                    "attributes": [
+                      {
+                        "key": "variant",
+                        "value": {
+                          "stringValue": "original"
+                        }
+                      }
+                    ],
+                    "timeUnixNano": "1795427397472848384"
+                  },
+                  {
+                    "asDouble": 0.9,
+                    "attributes": [
+                      {
+                        "key": "variant",
+                        "value": {
+                          "stringValue": "hardened"
+                        }
+                      }
+                    ],
+                    "timeUnixNano": "1795427397472848384"
+                  }
+                ]
+              },
+              "name": "ras.availability.ratio",
+              "unit": "1"
+            },
+            {
+              "gauge": {
+                "dataPoints": [
+                  {
+                    "asDouble": 4.1795,
+                    "attributes": [
+                      {
+                        "key": "variant",
+                        "value": {
+                          "stringValue": "original"
+                        }
+                      }
+                    ],
+                    "timeUnixNano": "1795427397472848384"
+                  },
+                  {
+                    "asDouble": 4.9689,
+                    "attributes": [
+                      {
+                        "key": "variant",
+                        "value": {
+                          "stringValue": "hardened"
+                        }
+                      }
+                    ],
+                    "timeUnixNano": "1795427397472848384"
+                  }
+                ]
+              },
+              "name": "ras.p99.seconds",
+              "unit": "s"
+            }
+          ],
+          "scope": {
+            "name": "ras-anything",
+            "version": "1.0.0"
+          }
+        }
+      ]
+    }
+  ]
+}

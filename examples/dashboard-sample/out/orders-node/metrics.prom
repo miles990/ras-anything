@@ -1,0 +1,60 @@
+# HELP ras_availability_ratio Availability ratio (0..1) under injected faults
+# TYPE ras_availability_ratio gauge
+ras_availability_ratio{project="orders-node",scope="bench",variant="original"} 0.0
+ras_availability_ratio{project="orders-node",scope="bench",variant="hardened"} 0.9
+ras_availability_ratio{project="orders-node",scope="verify",function="orders.charge",variant="original"} 0.7833333333333333
+ras_availability_ratio{project="orders-node",scope="verify",function="orders.charge",variant="hardened"} 1.0
+ras_availability_ratio{project="orders-node",scope="verify",function="orders.getItem",variant="original"} 0.2916666666666667
+ras_availability_ratio{project="orders-node",scope="verify",function="orders.getItem",variant="hardened"} 1.0
+ras_availability_ratio{project="orders-node",scope="verify",function="orders.printLabel",variant="original"} 0.325
+ras_availability_ratio{project="orders-node",scope="verify",function="orders.printLabel",variant="hardened"} 1.0
+ras_availability_ratio{project="orders-node",scope="verify",function="orders.shippingQuote",variant="original"} 0.39166666666666666
+ras_availability_ratio{project="orders-node",scope="verify",function="orders.shippingQuote",variant="hardened"} 1.0
+# HELP ras_identical_ratio Strict byte-identical output ratio (0..1)
+# TYPE ras_identical_ratio gauge
+ras_identical_ratio{project="orders-node",scope="bench",variant="original"} 0.0
+ras_identical_ratio{project="orders-node",scope="bench",variant="hardened"} 0.9
+# HELP ras_crash_rate Whole-app crash rate (0..1)
+# TYPE ras_crash_rate gauge
+ras_crash_rate{project="orders-node",scope="bench",variant="original"} 0.75
+ras_crash_rate{project="orders-node",scope="bench",variant="hardened"} 0.1
+# HELP ras_hang_rate Whole-app hang rate (0..1)
+# TYPE ras_hang_rate gauge
+ras_hang_rate{project="orders-node",scope="bench",variant="original"} 0.15
+ras_hang_rate{project="orders-node",scope="bench",variant="hardened"} 0.0
+# HELP ras_p99_seconds p99 latency in seconds
+# TYPE ras_p99_seconds gauge
+ras_p99_seconds{project="orders-node",scope="bench",variant="original"} 4.1795
+ras_p99_seconds{project="orders-node",scope="bench",variant="hardened"} 4.9689
+ras_p99_seconds{project="orders-node",scope="verify",function="orders.charge",variant="original"} 10.30254
+ras_p99_seconds{project="orders-node",scope="verify",function="orders.charge",variant="hardened"} 3.59154
+ras_p99_seconds{project="orders-node",scope="verify",function="orders.getItem",variant="original"} 60
+ras_p99_seconds{project="orders-node",scope="verify",function="orders.getItem",variant="hardened"} 4.000671
+ras_p99_seconds{project="orders-node",scope="verify",function="orders.printLabel",variant="original"} 60
+ras_p99_seconds{project="orders-node",scope="verify",function="orders.printLabel",variant="hardened"} 3.519264
+ras_p99_seconds{project="orders-node",scope="verify",function="orders.shippingQuote",variant="original"} 60
+ras_p99_seconds{project="orders-node",scope="verify",function="orders.shippingQuote",variant="hardened"} 3.65089
+# HELP ras_duplicates_total Duplicate non-idempotent side effects
+# TYPE ras_duplicates_total gauge
+ras_duplicates_total{project="orders-node",scope="bench",variant="original"} 6
+ras_duplicates_total{project="orders-node",scope="bench",variant="hardened"} 0
+ras_duplicates_total{project="orders-node",scope="verify",function="orders.charge",variant="original"} 28
+ras_duplicates_total{project="orders-node",scope="verify",function="orders.charge",variant="hardened"} 0
+ras_duplicates_total{project="orders-node",scope="verify",function="orders.getItem",variant="original"} 0
+ras_duplicates_total{project="orders-node",scope="verify",function="orders.getItem",variant="hardened"} 0
+ras_duplicates_total{project="orders-node",scope="verify",function="orders.printLabel",variant="original"} 0
+ras_duplicates_total{project="orders-node",scope="verify",function="orders.printLabel",variant="hardened"} 0
+ras_duplicates_total{project="orders-node",scope="verify",function="orders.shippingQuote",variant="original"} 0
+ras_duplicates_total{project="orders-node",scope="verify",function="orders.shippingQuote",variant="hardened"} 0
+# HELP ras_error_budget_burn_ratio Error budget burn ratio (1.0 = 100%)
+# TYPE ras_error_budget_burn_ratio gauge
+ras_error_budget_burn_ratio{project="orders-node",variant="original"} 100.0
+ras_error_budget_burn_ratio{project="orders-node",variant="hardened"} 10.0
+# HELP ras_ax_accuracy_ratio AX policy agent next-action accuracy (0..1)
+# TYPE ras_ax_accuracy_ratio gauge
+ras_ax_accuracy_ratio{project="orders-node",variant="original"} 0.3
+ras_ax_accuracy_ratio{project="orders-node",variant="hardened"} 1.0
+# HELP ras_serviceability_detection_ratio Fault detection rate from logs (0..1)
+# TYPE ras_serviceability_detection_ratio gauge
+ras_serviceability_detection_ratio{project="orders-node",variant="original"} 0.0
+ras_serviceability_detection_ratio{project="orders-node",variant="hardened"} 1.0

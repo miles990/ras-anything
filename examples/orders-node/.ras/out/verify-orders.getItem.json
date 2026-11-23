@@ -1,0 +1,57 @@
+{
+  "schema_version": "1.0.0",
+  "kind": "verify",
+  "generated_at": "2026-11-23T17:49:57+0800",
+  "project": "orders-node",
+  "lang": "node",
+  "functions": [
+    {
+      "id": "orders.getItem",
+      "lang": "node",
+      "passed": true,
+      "budget_s": 5.0,
+      "happy": {
+        "equal": 12,
+        "total": 12
+      },
+      "original": {
+        "availability": 0.2916666666666667,
+        "identical_rate": null,
+        "crash_rate": null,
+        "hang_rate": null,
+        "wrong": 30,
+        "hang": 16,
+        "dups": 0,
+        "p50_s": 0.00056,
+        "p99_s": 60,
+        "amplification": 1.0
+      },
+      "hardened": {
+        "availability": 1.0,
+        "identical_rate": null,
+        "crash_rate": null,
+        "hang_rate": null,
+        "wrong": 0,
+        "hang": 0,
+        "dups": 0,
+        "p50_s": 0.143796,
+        "p99_s": 4.000671,
+        "amplification": 1.925
+      },
+      "gates": {
+        "happy": true,
+        "no_wrong": true,
+        "no_hang": true,
+        "no_new_crashes": true,
+        "p99": true,
+        "dups": true,
+        "availability": true
+      }
+    }
+  ],
+  "serviceability": {
+    "orig_detection_rate": 0.0,
+    "hard_detection_rate": 1.0,
+    "hard_diagnosis_accuracy": 0.696969696969697
+  }
+}

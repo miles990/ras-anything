@@ -1,0 +1,87 @@
+{
+  "schema_version": "1.0.0",
+  "kind": "coverage",
+  "generated_at": "2026-11-23T17:49:57+0800",
+  "project": "weather",
+  "coverage": {
+    "adapters": [
+      {
+        "lang": "python",
+        "status": "complete",
+        "boundary": "urllib / requests / httpx / aiohttp / socket / subprocess",
+        "verify": true,
+        "ax": true
+      },
+      {
+        "lang": "node",
+        "status": "complete",
+        "boundary": "fetch / http / https / child_process (CJS + ESM + TS)",
+        "verify": true,
+        "ax": true
+      },
+      {
+        "lang": "go",
+        "status": "complete",
+        "boundary": "net/http / os/exec (AST + rasagent + rasruntime)",
+        "verify": true,
+        "ax": true
+      },
+      {
+        "lang": "java",
+        "status": "planned",
+        "boundary": "HttpClient / HttpURLConnection / ProcessBuilder",
+        "verify": false,
+        "ax": false
+      },
+      {
+        "lang": "csharp",
+        "status": "planned",
+        "boundary": "HttpClient / Process",
+        "verify": false,
+        "ax": false
+      },
+      {
+        "lang": "php",
+        "status": "planned",
+        "boundary": "curl / file_get_contents / proc_open",
+        "verify": false,
+        "ax": false
+      },
+      {
+        "lang": "ruby",
+        "status": "planned",
+        "boundary": "Net::HTTP / Open3",
+        "verify": false,
+        "ax": false
+      },
+      {
+        "lang": "kotlin",
+        "status": "planned",
+        "boundary": "HttpClient / OkHttp / ProcessBuilder",
+        "verify": false,
+        "ax": false
+      },
+      {
+        "lang": "bun",
+        "status": "planned",
+        "boundary": "fetch / Bun.spawn",
+        "verify": false,
+        "ax": false
+      },
+      {
+        "lang": "deno",
+        "status": "planned",
+        "boundary": "fetch / Deno.Command",
+        "verify": false,
+        "ax": false
+      },
+      {
+        "lang": "c_cpp",
+        "status": "planned",
+        "boundary": "libcurl / popen",
+        "verify": false,
+        "ax": false
+      }
+    ]
+  }
+}

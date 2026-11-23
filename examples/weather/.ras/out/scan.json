@@ -1,0 +1,69 @@
+{
+  "schema_version": "1.0.0",
+  "kind": "scan",
+  "generated_at": "2026-11-23T17:49:57+0800",
+  "project": "weather",
+  "lang": "python",
+  "functions": [
+    {
+      "id": "weather.fetch_forecast",
+      "lang": "python",
+      "risk": 0.8176,
+      "exposure": 1.0,
+      "score": 81.8,
+      "signals": {
+        "no_timeout": "urlopen() without timeout",
+        "no_retry": "no retry on transient errors",
+        "no_logging": "no logging on the failure path"
+      }
+    },
+    {
+      "id": "app.main",
+      "lang": "python",
+      "risk": 0.0,
+      "exposure": 0.0,
+      "score": 0.0,
+      "signals": []
+    },
+    {
+      "id": "upstream.Handler.do_GET",
+      "lang": "python",
+      "risk": 0.0,
+      "exposure": 0.0,
+      "score": 0.0,
+      "signals": []
+    },
+    {
+      "id": "upstream.Handler.log_message",
+      "lang": "python",
+      "risk": 0.0,
+      "exposure": 0.0,
+      "score": 0.0,
+      "signals": []
+    },
+    {
+      "id": "upstream.forecast_for",
+      "lang": "python",
+      "risk": 0.0,
+      "exposure": 0.0,
+      "score": 0.0,
+      "signals": []
+    },
+    {
+      "id": "upstream.start",
+      "lang": "python",
+      "risk": 0.0,
+      "exposure": 0.0,
+      "score": 0.0,
+      "signals": []
+    },
+    {
+      "id": "weather.summarize",
+      "lang": "python",
+      "risk": 0.0,
+      "exposure": 0.0,
+      "score": 0.0,
+      "signals": []
+    }
+  ]
+}

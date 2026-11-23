@@ -1,0 +1,100 @@
+{
+  "functions": [
+    {
+      "exposure": 0.4848,
+      "id": "billing.charge",
+      "lang": "python",
+      "risk": 0.8404,
+      "score": 40.7,
+      "signals": {
+        "no_logging": "no logging on the failure path",
+        "swallow": "`except Exception: time.sleep(0.5)` swallows errors",
+        "unsafe_retry": "retries a POST with no Idempotency-Key"
+      }
+    },
+    {
+      "exposure": 0.4848,
+      "id": "billing.render_receipt",
+      "lang": "python",
+      "risk": 0.8176,
+      "score": 39.6,
+      "signals": {
+        "no_logging": "no logging on the failure path",
+        "no_retry": "no retry on transient errors",
+        "no_timeout": "subprocess.run() without timeout"
+      }
+    },
+    {
+      "exposure": 0.0303,
+      "id": "app.main",
+      "lang": "python",
+      "risk": 0.24,
+      "score": 0.7,
+      "signals": {
+        "no_logging": "no logging on the failure path",
+        "no_retry": "no retry on transient errors"
+      }
+    },
+    {
+      "exposure": 0.0,
+      "id": "app.invoices",
+      "lang": "python",
+      "risk": 0.0,
+      "score": 0.0,
+      "signals": []
+    },
+    {
+      "exposure": 0.0,
+      "id": "upstream.Handler._send",
+      "lang": "python",
+      "risk": 0.0,
+      "score": 0.0,
+      "signals": []
+    },
+    {
+      "exposure": 0.0,
+      "id": "upstream.Handler.do_GET",
+      "lang": "python",
+      "risk": 0.0,
+      "score": 0.0,
+      "signals": []
+    },
+    {
+      "exposure": 0.0,
+      "id": "upstream.Handler.do_POST",
+      "lang": "python",
+      "risk": 0.0,
+      "score": 0.0,
+      "signals": []
+    },
+    {
+      "exposure": 0.0,
+      "id": "upstream.Handler.log_message",
+      "lang": "python",
+      "risk": 0.0,
+      "score": 0.0,
+      "signals": []
+    },
+    {
+      "exposure": 0.0,
+      "id": "upstream.Ledger.__init__",
+      "lang": "python",
+      "risk": 0.0,
+      "score": 0.0,
+      "signals": []
+    },
+    {
+      "exposure": 0.0,
+      "id": "upstream.start",
+      "lang": "python",
+      "risk": 0.0,
+      "score": 0.0,
+      "signals": []
+    }
+  ],
+  "generated_at": "2026-11-23T17:49:57+0800",
+  "kind": "scan",
+  "lang": "python",
+  "project": "payments",
+  "schema_version": "1.0.0"
+}

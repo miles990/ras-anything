@@ -1,0 +1,63 @@
+{
+  "schema_version": "1.0.0",
+  "kind": "status",
+  "generated_at": "2026-11-23T17:49:57+0800",
+  "project": "weather",
+  "lang": "python",
+  "rollout": {
+    "enabled": {},
+    "canary_pct": 0.0,
+    "shadow": false,
+    "blast_radius_functions": 0
+  },
+  "resilience_state": {
+    "breakers": {},
+    "bulkheads": {},
+    "flags": {}
+  },
+  "functions": [
+    {
+      "id": "weather.fetch_forecast",
+      "lang": "python",
+      "passed": true,
+      "budget_s": 5.0,
+      "happy": {
+        "equal": 12,
+        "total": 12
+      },
+      "original": {
+        "availability": 0.325,
+        "identical_rate": null,
+        "crash_rate": null,
+        "hang_rate": null,
+        "wrong": 0,
+        "hang": 15,
+        "dups": 0,
+        "p50_s": 0.003125,
+        "p99_s": 60.0,
+        "amplification": 1.0
+      },
+      "hardened": {
+        "availability": 1.0,
+        "identical_rate": null,
+        "crash_rate": null,
+        "hang_rate": null,
+        "wrong": 0,
+        "hang": 0,
+        "dups": 0,
+        "p50_s": 0.088043,
+        "p99_s": 3.598089,
+        "amplification": 1.8833333333333333
+      },
+      "gates": {
+        "happy": true,
+        "no_wrong": true,
+        "no_hang": true,
+        "no_new_crashes": true,
+        "p99": true,
+        "dups": true,
+        "availability": true
+      }
+    }
+  ]
+}

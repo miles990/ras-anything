@@ -1,0 +1,657 @@
+{
+  "events": [
+    {
+      "data": {
+        "functions": 7
+      },
+      "dependency": null,
+      "event_type": "scan.completed",
+      "function_id": null,
+      "kind": "event",
+      "schema_version": "1.0.0",
+      "seq": 1,
+      "severity": "INFO",
+      "trace_id": null,
+      "ts": "2026-11-23T17:49:57+0800"
+    },
+    {
+      "data": {
+        "availability_hardened": 1.0,
+        "availability_original": 0.325
+      },
+      "dependency": null,
+      "event_type": "verify.passed",
+      "function_id": "weather.fetch_forecast",
+      "kind": "event",
+      "schema_version": "1.0.0",
+      "seq": 2,
+      "severity": "INFO",
+      "trace_id": null,
+      "ts": "2026-11-23T17:49:57+0800"
+    },
+    {
+      "data": {
+        "availability_hardened": 1.0,
+        "availability_original": 0.4,
+        "seeds": 20
+      },
+      "dependency": null,
+      "event_type": "bench.completed",
+      "function_id": null,
+      "kind": "event",
+      "schema_version": "1.0.0",
+      "seq": 3,
+      "severity": "INFO",
+      "trace_id": null,
+      "ts": "2026-11-23T17:49:57+0800"
+    },
+    {
+      "data": {
+        "status": "met"
+      },
+      "dependency": null,
+      "event_type": "slo.evaluated",
+      "function_id": null,
+      "kind": "event",
+      "schema_version": "1.0.0",
+      "seq": 4,
+      "severity": "INFO",
+      "trace_id": null,
+      "ts": "2026-11-23T17:49:57+0800"
+    }
+  ],
+  "generated_at": "2026-11-23T17:49:57+0800",
+  "kind": "bundle",
+  "project": "weather",
+  "schema_version": "1.0.0",
+  "snapshots": {
+    "bench": {
+      "bench": {
+        "hardened": {
+          "amplification": 1.1916666666666667,
+          "availability": 1.0,
+          "crash_rate": 0.0,
+          "dups": 0,
+          "hang": 0,
+          "hang_rate": 0.0,
+          "identical_rate": 1.0,
+          "p50_s": 0.3301,
+          "p99_s": 1.2549,
+          "wrong": 0
+        },
+        "original": {
+          "amplification": 1.0,
+          "availability": 0.4,
+          "crash_rate": 0.45,
+          "dups": 0,
+          "hang": 3,
+          "hang_rate": 0.15,
+          "identical_rate": 0.4,
+          "p50_s": 0.1014,
+          "p99_s": 2.1071,
+          "wrong": 0
+        },
+        "rate": 0.1,
+        "seeds": 20
+      },
+      "generated_at": "2026-11-23T17:49:57+0800",
+      "kind": "bench",
+      "lang": "python",
+      "project": "weather",
+      "schema_version": "1.0.0"
+    },
+    "coverage": {
+      "coverage": {
+        "adapters": [
+          {
+            "ax": true,
+            "boundary": "urllib / requests / httpx / aiohttp / socket / subprocess",
+            "lang": "python",
+            "status": "complete",
+            "verify": true
+          },
+          {
+            "ax": true,
+            "boundary": "fetch / http / https / child_process (CJS + ESM + TS)",
+            "lang": "node",
+            "status": "complete",
+            "verify": true
+          },
+          {
+            "ax": true,
+            "boundary": "net/http / os/exec: AST + rasagent + rasruntime",
+            "lang": "go",
+            "status": "complete",
+            "verify": true
+          },
+          {
+            "ax": false,
+            "boundary": "HttpClient / HttpURLConnection / ProcessBuilder",
+            "lang": "java",
+            "status": "planned",
+            "verify": false
+          },
+          {
+            "ax": false,
+            "boundary": "HttpClient / Process",
+            "lang": "csharp",
+            "status": "planned",
+            "verify": false
+          },
+          {
+            "ax": false,
+            "boundary": "curl / file_get_contents / proc_open",
+            "lang": "php",
+            "status": "planned",
+            "verify": false
+          },
+          {
+            "ax": false,
+            "boundary": "Net::HTTP / Open3",
+            "lang": "ruby",
+            "status": "planned",
+            "verify": false
+          },
+          {
+            "ax": false,
+            "boundary": "HttpClient / OkHttp / ProcessBuilder",
+            "lang": "kotlin",
+            "status": "planned",
+            "verify": false
+          },
+          {
+            "ax": false,
+            "boundary": "fetch / Bun.spawn",
+            "lang": "bun",
+            "status": "planned",
+            "verify": false
+          },
+          {
+            "ax": false,
+            "boundary": "fetch / Deno.Command",
+            "lang": "deno",
+            "status": "planned",
+            "verify": false
+          },
+          {
+            "ax": false,
+            "boundary": "libcurl / popen",
+            "lang": "c_cpp",
+            "status": "planned",
+            "verify": false
+          }
+        ]
+      },
+      "generated_at": "2026-11-23T17:49:57+0800",
+      "kind": "coverage",
+      "project": "weather",
+      "schema_version": "1.0.0"
+    },
+    "report": {
+      "ax": {
+        "hardened_accuracy": 1.0,
+        "leaks": 0,
+        "original_accuracy": 0.3,
+        "records": []
+      },
+      "bench": {
+        "hardened": {
+          "amplification": 1.1916666666666667,
+          "availability": 1.0,
+          "crash_rate": 0.0,
+          "dups": 0,
+          "hang": 0,
+          "hang_rate": 0.0,
+          "identical_rate": 1.0,
+          "p50_s": 0.3301,
+          "p99_s": 1.2549,
+          "wrong": 0
+        },
+        "original": {
+          "amplification": 1.0,
+          "availability": 0.4,
+          "crash_rate": 0.45,
+          "dups": 0,
+          "hang": 3,
+          "hang_rate": 0.15,
+          "identical_rate": 0.4,
+          "p50_s": 0.1014,
+          "p99_s": 2.1071,
+          "wrong": 0
+        },
+        "rate": 0.1,
+        "seeds": 20
+      },
+      "coverage": {
+        "adapters": [
+          {
+            "ax": true,
+            "boundary": "urllib / requests / httpx / aiohttp / socket / subprocess",
+            "lang": "python",
+            "status": "complete",
+            "verify": true
+          },
+          {
+            "ax": true,
+            "boundary": "fetch / http / https / child_process (CJS + ESM + TS)",
+            "lang": "node",
+            "status": "complete",
+            "verify": true
+          },
+          {
+            "ax": true,
+            "boundary": "net/http / os/exec: AST + rasagent + rasruntime",
+            "lang": "go",
+            "status": "complete",
+            "verify": true
+          },
+          {
+            "ax": false,
+            "boundary": "HttpClient / HttpURLConnection / ProcessBuilder",
+            "lang": "java",
+            "status": "planned",
+            "verify": false
+          },
+          {
+            "ax": false,
+            "boundary": "HttpClient / Process",
+            "lang": "csharp",
+            "status": "planned",
+            "verify": false
+          },
+          {
+            "ax": false,
+            "boundary": "curl / file_get_contents / proc_open",
+            "lang": "php",
+            "status": "planned",
+            "verify": false
+          },
+          {
+            "ax": false,
+            "boundary": "Net::HTTP / Open3",
+            "lang": "ruby",
+            "status": "planned",
+            "verify": false
+          },
+          {
+            "ax": false,
+            "boundary": "HttpClient / OkHttp / ProcessBuilder",
+            "lang": "kotlin",
+            "status": "planned",
+            "verify": false
+          },
+          {
+            "ax": false,
+            "boundary": "fetch / Bun.spawn",
+            "lang": "bun",
+            "status": "planned",
+            "verify": false
+          },
+          {
+            "ax": false,
+            "boundary": "fetch / Deno.Command",
+            "lang": "deno",
+            "status": "planned",
+            "verify": false
+          },
+          {
+            "ax": false,
+            "boundary": "libcurl / popen",
+            "lang": "c_cpp",
+            "status": "planned",
+            "verify": false
+          }
+        ]
+      },
+      "functions": [
+        {
+          "budget_s": 5.0,
+          "gates": {
+            "availability": true,
+            "dups": true,
+            "happy": true,
+            "no_hang": true,
+            "no_new_crashes": true,
+            "no_wrong": true,
+            "p99": true
+          },
+          "happy": {
+            "equal": 12,
+            "total": 12
+          },
+          "hardened": {
+            "amplification": 1.8833333333333333,
+            "availability": 1.0,
+            "crash_rate": null,
+            "dups": 0,
+            "hang": 0,
+            "hang_rate": null,
+            "identical_rate": null,
+            "p50_s": 0.088043,
+            "p99_s": 3.598089,
+            "wrong": 0
+          },
+          "id": "weather.fetch_forecast",
+          "lang": "python",
+          "original": {
+            "amplification": 1.0,
+            "availability": 0.325,
+            "crash_rate": null,
+            "dups": 0,
+            "hang": 15,
+            "hang_rate": null,
+            "identical_rate": null,
+            "p50_s": 0.003125,
+            "p99_s": 60.0,
+            "wrong": 0
+          },
+          "passed": true
+        }
+      ],
+      "generated_at": "2026-11-23T17:49:57+0800",
+      "kind": "report",
+      "lang": "python",
+      "project": "weather",
+      "resilience_state": {
+        "breakers": {},
+        "bulkheads": {},
+        "flags": {}
+      },
+      "rollout": {
+        "blast_radius_functions": 0,
+        "canary_pct": 0.0,
+        "enabled": {},
+        "shadow": false
+      },
+      "schema_version": "1.0.0",
+      "serviceability": {
+        "hard_detection_rate": 1.0,
+        "hard_diagnosis_accuracy": 0.7127659574468085,
+        "mttd_s": null,
+        "mttr_s": null,
+        "orig_detection_rate": 0.0,
+        "restore_s": null
+      },
+      "slo": {
+        "hardened": {
+          "availability": 1.0,
+          "checks": {
+            "availability": true,
+            "error_rate": true,
+            "p99_s": true
+          },
+          "error_budget": 0.01,
+          "error_budget_burn_pct": 0.0,
+          "error_budget_burn_ratio": 0.0,
+          "error_rate": 0.0,
+          "p50_s": 0.3301,
+          "p99_s": 1.2549,
+          "status": "met"
+        },
+        "original": {
+          "availability": 0.4,
+          "checks": {
+            "availability": false,
+            "error_rate": false,
+            "p99_s": true
+          },
+          "error_budget": 0.01,
+          "error_budget_burn_pct": 6000.0,
+          "error_budget_burn_ratio": 60.0,
+          "error_rate": 0.6,
+          "p50_s": 0.1014,
+          "p99_s": 2.1071,
+          "status": "missed"
+        },
+        "source": "bench",
+        "targets": {
+          "availability": 0.99,
+          "error_rate": 0.01,
+          "p99_s": 5.0
+        }
+      }
+    },
+    "scan": {
+      "functions": [
+        {
+          "exposure": 1.0,
+          "id": "weather.fetch_forecast",
+          "lang": "python",
+          "risk": 0.8176,
+          "score": 81.8,
+          "signals": {
+            "no_logging": "no logging on the failure path",
+            "no_retry": "no retry on transient errors",
+            "no_timeout": "urlopen() without timeout"
+          }
+        },
+        {
+          "exposure": 0.0,
+          "id": "app.main",
+          "lang": "python",
+          "risk": 0.0,
+          "score": 0.0,
+          "signals": []
+        },
+        {
+          "exposure": 0.0,
+          "id": "upstream.Handler.do_GET",
+          "lang": "python",
+          "risk": 0.0,
+          "score": 0.0,
+          "signals": []
+        },
+        {
+          "exposure": 0.0,
+          "id": "upstream.Handler.log_message",
+          "lang": "python",
+          "risk": 0.0,
+          "score": 0.0,
+          "signals": []
+        },
+        {
+          "exposure": 0.0,
+          "id": "upstream.forecast_for",
+          "lang": "python",
+          "risk": 0.0,
+          "score": 0.0,
+          "signals": []
+        },
+        {
+          "exposure": 0.0,
+          "id": "upstream.start",
+          "lang": "python",
+          "risk": 0.0,
+          "score": 0.0,
+          "signals": []
+        },
+        {
+          "exposure": 0.0,
+          "id": "weather.summarize",
+          "lang": "python",
+          "risk": 0.0,
+          "score": 0.0,
+          "signals": []
+        }
+      ],
+      "generated_at": "2026-11-23T17:49:57+0800",
+      "kind": "scan",
+      "lang": "python",
+      "project": "weather",
+      "schema_version": "1.0.0"
+    },
+    "slo": {
+      "generated_at": "2026-11-23T17:49:57+0800",
+      "kind": "slo",
+      "project": "weather",
+      "schema_version": "1.0.0",
+      "slo": {
+        "hardened": {
+          "availability": 1.0,
+          "checks": {
+            "availability": true,
+            "error_rate": true,
+            "p99_s": true
+          },
+          "error_budget": 0.01,
+          "error_budget_burn_pct": 0.0,
+          "error_budget_burn_ratio": 0.0,
+          "error_rate": 0.0,
+          "p50_s": 0.3301,
+          "p99_s": 1.2549,
+          "status": "met"
+        },
+        "original": {
+          "availability": 0.4,
+          "checks": {
+            "availability": false,
+            "error_rate": false,
+            "p99_s": true
+          },
+          "error_budget": 0.01,
+          "error_budget_burn_pct": 6000.0,
+          "error_budget_burn_ratio": 60.0,
+          "error_rate": 0.6,
+          "p50_s": 0.1014,
+          "p99_s": 2.1071,
+          "status": "missed"
+        },
+        "series": [
+          {
+            "availability": 1.0,
+            "burn_pct": 0.0,
+            "error_rate": 0.0,
+            "p99_s": 1.2549,
+            "ts": "2026-11-23T17:49:57+0800"
+          }
+        ],
+        "source": "bench",
+        "targets": {
+          "availability": 0.99,
+          "error_rate": 0.01,
+          "p99_s": 5.0
+        }
+      }
+    },
+    "status": {
+      "functions": [
+        {
+          "budget_s": 5.0,
+          "gates": {
+            "availability": true,
+            "dups": true,
+            "happy": true,
+            "no_hang": true,
+            "no_new_crashes": true,
+            "no_wrong": true,
+            "p99": true
+          },
+          "happy": {
+            "equal": 12,
+            "total": 12
+          },
+          "hardened": {
+            "amplification": 1.8833333333333333,
+            "availability": 1.0,
+            "crash_rate": null,
+            "dups": 0,
+            "hang": 0,
+            "hang_rate": null,
+            "identical_rate": null,
+            "p50_s": 0.088043,
+            "p99_s": 3.598089,
+            "wrong": 0
+          },
+          "id": "weather.fetch_forecast",
+          "lang": "python",
+          "original": {
+            "amplification": 1.0,
+            "availability": 0.325,
+            "crash_rate": null,
+            "dups": 0,
+            "hang": 15,
+            "hang_rate": null,
+            "identical_rate": null,
+            "p50_s": 0.003125,
+            "p99_s": 60.0,
+            "wrong": 0
+          },
+          "passed": true
+        }
+      ],
+      "generated_at": "2026-11-23T17:49:57+0800",
+      "kind": "status",
+      "lang": "python",
+      "project": "weather",
+      "resilience_state": {
+        "breakers": {},
+        "bulkheads": {},
+        "flags": {}
+      },
+      "rollout": {
+        "blast_radius_functions": 0,
+        "canary_pct": 0.0,
+        "enabled": {},
+        "shadow": false
+      },
+      "schema_version": "1.0.0"
+    },
+    "verify-weather.fetch_forecast": {
+      "functions": [
+        {
+          "budget_s": 5.0,
+          "gates": {
+            "availability": true,
+            "dups": true,
+            "happy": true,
+            "no_hang": true,
+            "no_new_crashes": true,
+            "no_wrong": true,
+            "p99": true
+          },
+          "happy": {
+            "equal": 12,
+            "total": 12
+          },
+          "hardened": {
+            "amplification": 1.8833333333333333,
+            "availability": 1.0,
+            "crash_rate": null,
+            "dups": 0,
+            "hang": 0,
+            "hang_rate": null,
+            "identical_rate": null,
+            "p50_s": 0.088043,
+            "p99_s": 3.598089,
+            "wrong": 0
+          },
+          "id": "weather.fetch_forecast",
+          "lang": "python",
+          "original": {
+            "amplification": 1.0,
+            "availability": 0.325,
+            "crash_rate": null,
+            "dups": 0,
+            "hang": 15,
+            "hang_rate": null,
+            "identical_rate": null,
+            "p50_s": 0.003125,
+            "p99_s": 60.0,
+            "wrong": 0
+          },
+          "passed": true
+        }
+      ],
+      "generated_at": "2026-11-23T17:49:57+0800",
+      "kind": "verify",
+      "lang": "python",
+      "project": "weather",
+      "schema_version": "1.0.0",
+      "serviceability": {
+        "hard_detection_rate": 1.0,
+        "hard_diagnosis_accuracy": 0.7127659574468085,
+        "orig_detection_rate": 0.0
+      }
+    }
+  }
+}

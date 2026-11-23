@@ -1,0 +1,35 @@
+{
+  "schema_version": "1.0.0",
+  "kind": "bench",
+  "generated_at": "2026-11-23T17:49:57+0800",
+  "project": "payments",
+  "lang": "python",
+  "bench": {
+    "seeds": 20,
+    "rate": 0.1,
+    "original": {
+      "availability": 0.0,
+      "identical_rate": 0.0,
+      "crash_rate": 0.6,
+      "hang_rate": 0.25,
+      "wrong": 3,
+      "hang": 5,
+      "dups": 5,
+      "p50_s": 1.8277,
+      "p99_s": 4.0303,
+      "amplification": 1.0893617021276596
+    },
+    "hardened": {
+      "availability": 0.9,
+      "identical_rate": 0.45,
+      "crash_rate": 0.1,
+      "hang_rate": 0.0,
+      "wrong": 0,
+      "hang": 0,
+      "dups": 0,
+      "p50_s": 1.4353,
+      "p99_s": 4.2391,
+      "amplification": 1.2015873015873015
+    }
+  }
+}

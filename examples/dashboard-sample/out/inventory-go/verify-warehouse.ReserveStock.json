@@ -1,0 +1,57 @@
+{
+  "functions": [
+    {
+      "budget_s": 5.0,
+      "gates": {
+        "availability": true,
+        "dups": true,
+        "happy": true,
+        "no_hang": true,
+        "no_new_crashes": true,
+        "no_wrong": true,
+        "p99": true
+      },
+      "happy": {
+        "equal": 6,
+        "total": 6
+      },
+      "hardened": {
+        "amplification": 1.85,
+        "availability": 1.0,
+        "crash_rate": null,
+        "dups": 0,
+        "hang": 0,
+        "hang_rate": null,
+        "identical_rate": null,
+        "p50_s": 0.0416,
+        "p99_s": 3.4427,
+        "wrong": 0
+      },
+      "id": "warehouse.ReserveStock",
+      "lang": "go",
+      "original": {
+        "amplification": 1.0,
+        "availability": 0.35,
+        "crash_rate": null,
+        "dups": 0,
+        "hang": 6,
+        "hang_rate": null,
+        "identical_rate": null,
+        "p50_s": 0,
+        "p99_s": 3.0002,
+        "wrong": 0
+      },
+      "passed": true
+    }
+  ],
+  "generated_at": "2026-11-23T17:49:57+0800",
+  "kind": "verify",
+  "lang": "go",
+  "project": "inventory-go",
+  "schema_version": "1.0.0",
+  "serviceability": {
+    "hard_detection_rate": 0.0,
+    "hard_diagnosis_accuracy": 0.0,
+    "orig_detection_rate": 0.0
+  }
+}

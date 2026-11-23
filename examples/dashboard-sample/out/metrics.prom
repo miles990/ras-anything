@@ -1,0 +1,267 @@
+# --- support-ai ---
+# HELP ras_availability_ratio Availability ratio (0..1) under injected faults
+# TYPE ras_availability_ratio gauge
+ras_availability_ratio{project="support-ai",scope="bench",variant="original"} 0.5
+ras_availability_ratio{project="support-ai",scope="bench",variant="hardened"} 1.0
+ras_availability_ratio{project="support-ai",scope="verify",function="support.triage_ticket",variant="original"} 0.0990990990990991
+ras_availability_ratio{project="support-ai",scope="verify",function="support.triage_ticket",variant="hardened"} 1.0
+# HELP ras_identical_ratio Strict byte-identical output ratio (0..1)
+# TYPE ras_identical_ratio gauge
+ras_identical_ratio{project="support-ai",scope="bench",variant="original"} 0.5
+ras_identical_ratio{project="support-ai",scope="bench",variant="hardened"} 0.95
+# HELP ras_crash_rate Whole-app crash rate (0..1)
+# TYPE ras_crash_rate gauge
+ras_crash_rate{project="support-ai",scope="bench",variant="original"} 0.4
+ras_crash_rate{project="support-ai",scope="bench",variant="hardened"} 0.0
+# HELP ras_hang_rate Whole-app hang rate (0..1)
+# TYPE ras_hang_rate gauge
+ras_hang_rate{project="support-ai",scope="bench",variant="original"} 0.1
+ras_hang_rate{project="support-ai",scope="bench",variant="hardened"} 0.0
+# HELP ras_p99_seconds p99 latency in seconds
+# TYPE ras_p99_seconds gauge
+ras_p99_seconds{project="support-ai",scope="bench",variant="original"} 2.1041
+ras_p99_seconds{project="support-ai",scope="bench",variant="hardened"} 2.6095
+ras_p99_seconds{project="support-ai",scope="verify",function="support.triage_ticket",variant="original"} 60.004472
+ras_p99_seconds{project="support-ai",scope="verify",function="support.triage_ticket",variant="hardened"} 3.719763
+# HELP ras_duplicates_total Duplicate non-idempotent side effects
+# TYPE ras_duplicates_total gauge
+ras_duplicates_total{project="support-ai",scope="bench",variant="original"} 0
+ras_duplicates_total{project="support-ai",scope="bench",variant="hardened"} 0
+ras_duplicates_total{project="support-ai",scope="verify",function="support.triage_ticket",variant="original"} 0
+ras_duplicates_total{project="support-ai",scope="verify",function="support.triage_ticket",variant="hardened"} 0
+# HELP ras_error_budget_burn_ratio Error budget burn ratio (1.0 = 100%)
+# TYPE ras_error_budget_burn_ratio gauge
+ras_error_budget_burn_ratio{project="support-ai",variant="original"} 50.0
+ras_error_budget_burn_ratio{project="support-ai",variant="hardened"} 0.0
+# HELP ras_ai_semantic_success_ratio AI semantic success rate (0..1)
+# TYPE ras_ai_semantic_success_ratio gauge
+ras_ai_semantic_success_ratio{project="support-ai",variant="original"} 0.0991
+ras_ai_semantic_success_ratio{project="support-ai",variant="hardened"} 1.0
+# HELP ras_ai_injection_resistance_ratio Prompt-injection resistance rate (0..1)
+# TYPE ras_ai_injection_resistance_ratio gauge
+ras_ai_injection_resistance_ratio{project="support-ai",variant="original"} 1.0
+ras_ai_injection_resistance_ratio{project="support-ai",variant="hardened"} 1.0
+# HELP ras_ai_cost_per_success_usd AI USD cost per semantic success
+# TYPE ras_ai_cost_per_success_usd gauge
+ras_ai_cost_per_success_usd{project="support-ai",variant="original"} 0.000188
+ras_ai_cost_per_success_usd{project="support-ai",variant="hardened"} 5.5e-05
+# HELP ras_ax_accuracy_ratio AX policy agent next-action accuracy (0..1)
+# TYPE ras_ax_accuracy_ratio gauge
+ras_ax_accuracy_ratio{project="support-ai",variant="original"} 0.3
+ras_ax_accuracy_ratio{project="support-ai",variant="hardened"} 1.0
+# HELP ras_serviceability_detection_ratio Fault detection rate from logs (0..1)
+# TYPE ras_serviceability_detection_ratio gauge
+ras_serviceability_detection_ratio{project="support-ai",variant="original"} 0.0
+ras_serviceability_detection_ratio{project="support-ai",variant="hardened"} 1.0
+
+# --- inventory-go ---
+# HELP ras_availability_ratio Availability ratio (0..1) under injected faults
+# TYPE ras_availability_ratio gauge
+ras_availability_ratio{project="inventory-go",scope="bench",variant="original"} 0.05
+ras_availability_ratio{project="inventory-go",scope="bench",variant="hardened"} 1.0
+ras_availability_ratio{project="inventory-go",scope="verify",function="warehouse.AuditTag",variant="original"} 0.31666666666666665
+ras_availability_ratio{project="inventory-go",scope="verify",function="warehouse.AuditTag",variant="hardened"} 1.0
+ras_availability_ratio{project="inventory-go",scope="verify",function="warehouse.FetchStock",variant="original"} 0.2833333333333333
+ras_availability_ratio{project="inventory-go",scope="verify",function="warehouse.FetchStock",variant="hardened"} 1.0
+ras_availability_ratio{project="inventory-go",scope="verify",function="warehouse.ReserveStock",variant="original"} 0.35
+ras_availability_ratio{project="inventory-go",scope="verify",function="warehouse.ReserveStock",variant="hardened"} 1.0
+# HELP ras_identical_ratio Strict byte-identical output ratio (0..1)
+# TYPE ras_identical_ratio gauge
+ras_identical_ratio{project="inventory-go",scope="bench",variant="original"} 0.05
+ras_identical_ratio{project="inventory-go",scope="bench",variant="hardened"} 0.95
+# HELP ras_crash_rate Whole-app crash rate (0..1)
+# TYPE ras_crash_rate gauge
+ras_crash_rate{project="inventory-go",scope="bench",variant="original"} 0.8
+ras_crash_rate{project="inventory-go",scope="bench",variant="hardened"} 0.0
+# HELP ras_hang_rate Whole-app hang rate (0..1)
+# TYPE ras_hang_rate gauge
+ras_hang_rate{project="inventory-go",scope="bench",variant="original"} 0.15
+ras_hang_rate{project="inventory-go",scope="bench",variant="hardened"} 0.0
+# HELP ras_p99_seconds p99 latency in seconds
+# TYPE ras_p99_seconds gauge
+ras_p99_seconds{project="inventory-go",scope="bench",variant="original"} 2.0101
+ras_p99_seconds{project="inventory-go",scope="bench",variant="hardened"} 2.3903
+ras_p99_seconds{project="inventory-go",scope="verify",function="warehouse.AuditTag",variant="original"} 3.0011
+ras_p99_seconds{project="inventory-go",scope="verify",function="warehouse.AuditTag",variant="hardened"} 3.4478
+ras_p99_seconds{project="inventory-go",scope="verify",function="warehouse.FetchStock",variant="original"} 3.0004
+ras_p99_seconds{project="inventory-go",scope="verify",function="warehouse.FetchStock",variant="hardened"} 3.6079
+ras_p99_seconds{project="inventory-go",scope="verify",function="warehouse.ReserveStock",variant="original"} 3.0002
+ras_p99_seconds{project="inventory-go",scope="verify",function="warehouse.ReserveStock",variant="hardened"} 3.4427
+# HELP ras_duplicates_total Duplicate non-idempotent side effects
+# TYPE ras_duplicates_total gauge
+ras_duplicates_total{project="inventory-go",scope="bench",variant="original"} 0
+ras_duplicates_total{project="inventory-go",scope="bench",variant="hardened"} 0
+ras_duplicates_total{project="inventory-go",scope="verify",function="warehouse.AuditTag",variant="original"} 0
+ras_duplicates_total{project="inventory-go",scope="verify",function="warehouse.AuditTag",variant="hardened"} 0
+ras_duplicates_total{project="inventory-go",scope="verify",function="warehouse.FetchStock",variant="original"} 0
+ras_duplicates_total{project="inventory-go",scope="verify",function="warehouse.FetchStock",variant="hardened"} 0
+ras_duplicates_total{project="inventory-go",scope="verify",function="warehouse.ReserveStock",variant="original"} 0
+ras_duplicates_total{project="inventory-go",scope="verify",function="warehouse.ReserveStock",variant="hardened"} 0
+# HELP ras_error_budget_burn_ratio Error budget burn ratio (1.0 = 100%)
+# TYPE ras_error_budget_burn_ratio gauge
+ras_error_budget_burn_ratio{project="inventory-go",variant="original"} 19.0
+ras_error_budget_burn_ratio{project="inventory-go",variant="hardened"} 0.0
+# HELP ras_ax_accuracy_ratio AX policy agent next-action accuracy (0..1)
+# TYPE ras_ax_accuracy_ratio gauge
+ras_ax_accuracy_ratio{project="inventory-go",variant="original"} 0.3
+ras_ax_accuracy_ratio{project="inventory-go",variant="hardened"} 1.0
+# HELP ras_serviceability_detection_ratio Fault detection rate from logs (0..1)
+# TYPE ras_serviceability_detection_ratio gauge
+ras_serviceability_detection_ratio{project="inventory-go",variant="original"} 0.0
+ras_serviceability_detection_ratio{project="inventory-go",variant="hardened"} 0.2127659574468085
+
+# --- orders-node ---
+# HELP ras_availability_ratio Availability ratio (0..1) under injected faults
+# TYPE ras_availability_ratio gauge
+ras_availability_ratio{project="orders-node",scope="bench",variant="original"} 0.0
+ras_availability_ratio{project="orders-node",scope="bench",variant="hardened"} 0.9
+ras_availability_ratio{project="orders-node",scope="verify",function="orders.charge",variant="original"} 0.7833333333333333
+ras_availability_ratio{project="orders-node",scope="verify",function="orders.charge",variant="hardened"} 1.0
+ras_availability_ratio{project="orders-node",scope="verify",function="orders.getItem",variant="original"} 0.2916666666666667
+ras_availability_ratio{project="orders-node",scope="verify",function="orders.getItem",variant="hardened"} 1.0
+ras_availability_ratio{project="orders-node",scope="verify",function="orders.printLabel",variant="original"} 0.325
+ras_availability_ratio{project="orders-node",scope="verify",function="orders.printLabel",variant="hardened"} 1.0
+ras_availability_ratio{project="orders-node",scope="verify",function="orders.shippingQuote",variant="original"} 0.39166666666666666
+ras_availability_ratio{project="orders-node",scope="verify",function="orders.shippingQuote",variant="hardened"} 1.0
+# HELP ras_identical_ratio Strict byte-identical output ratio (0..1)
+# TYPE ras_identical_ratio gauge
+ras_identical_ratio{project="orders-node",scope="bench",variant="original"} 0.0
+ras_identical_ratio{project="orders-node",scope="bench",variant="hardened"} 0.9
+# HELP ras_crash_rate Whole-app crash rate (0..1)
+# TYPE ras_crash_rate gauge
+ras_crash_rate{project="orders-node",scope="bench",variant="original"} 0.75
+ras_crash_rate{project="orders-node",scope="bench",variant="hardened"} 0.1
+# HELP ras_hang_rate Whole-app hang rate (0..1)
+# TYPE ras_hang_rate gauge
+ras_hang_rate{project="orders-node",scope="bench",variant="original"} 0.15
+ras_hang_rate{project="orders-node",scope="bench",variant="hardened"} 0.0
+# HELP ras_p99_seconds p99 latency in seconds
+# TYPE ras_p99_seconds gauge
+ras_p99_seconds{project="orders-node",scope="bench",variant="original"} 4.1795
+ras_p99_seconds{project="orders-node",scope="bench",variant="hardened"} 4.9689
+ras_p99_seconds{project="orders-node",scope="verify",function="orders.charge",variant="original"} 10.30254
+ras_p99_seconds{project="orders-node",scope="verify",function="orders.charge",variant="hardened"} 3.59154
+ras_p99_seconds{project="orders-node",scope="verify",function="orders.getItem",variant="original"} 60
+ras_p99_seconds{project="orders-node",scope="verify",function="orders.getItem",variant="hardened"} 4.000671
+ras_p99_seconds{project="orders-node",scope="verify",function="orders.printLabel",variant="original"} 60
+ras_p99_seconds{project="orders-node",scope="verify",function="orders.printLabel",variant="hardened"} 3.519264
+ras_p99_seconds{project="orders-node",scope="verify",function="orders.shippingQuote",variant="original"} 60
+ras_p99_seconds{project="orders-node",scope="verify",function="orders.shippingQuote",variant="hardened"} 3.65089
+# HELP ras_duplicates_total Duplicate non-idempotent side effects
+# TYPE ras_duplicates_total gauge
+ras_duplicates_total{project="orders-node",scope="bench",variant="original"} 6
+ras_duplicates_total{project="orders-node",scope="bench",variant="hardened"} 0
+ras_duplicates_total{project="orders-node",scope="verify",function="orders.charge",variant="original"} 28
+ras_duplicates_total{project="orders-node",scope="verify",function="orders.charge",variant="hardened"} 0
+ras_duplicates_total{project="orders-node",scope="verify",function="orders.getItem",variant="original"} 0
+ras_duplicates_total{project="orders-node",scope="verify",function="orders.getItem",variant="hardened"} 0
+ras_duplicates_total{project="orders-node",scope="verify",function="orders.printLabel",variant="original"} 0
+ras_duplicates_total{project="orders-node",scope="verify",function="orders.printLabel",variant="hardened"} 0
+ras_duplicates_total{project="orders-node",scope="verify",function="orders.shippingQuote",variant="original"} 0
+ras_duplicates_total{project="orders-node",scope="verify",function="orders.shippingQuote",variant="hardened"} 0
+# HELP ras_error_budget_burn_ratio Error budget burn ratio (1.0 = 100%)
+# TYPE ras_error_budget_burn_ratio gauge
+ras_error_budget_burn_ratio{project="orders-node",variant="original"} 100.0
+ras_error_budget_burn_ratio{project="orders-node",variant="hardened"} 10.0
+# HELP ras_ax_accuracy_ratio AX policy agent next-action accuracy (0..1)
+# TYPE ras_ax_accuracy_ratio gauge
+ras_ax_accuracy_ratio{project="orders-node",variant="original"} 0.3
+ras_ax_accuracy_ratio{project="orders-node",variant="hardened"} 1.0
+# HELP ras_serviceability_detection_ratio Fault detection rate from logs (0..1)
+# TYPE ras_serviceability_detection_ratio gauge
+ras_serviceability_detection_ratio{project="orders-node",variant="original"} 0.0
+ras_serviceability_detection_ratio{project="orders-node",variant="hardened"} 1.0
+
+# --- payments ---
+# HELP ras_availability_ratio Availability ratio (0..1) under injected faults
+# TYPE ras_availability_ratio gauge
+ras_availability_ratio{project="payments",scope="bench",variant="original"} 0.0
+ras_availability_ratio{project="payments",scope="bench",variant="hardened"} 0.9
+ras_availability_ratio{project="payments",scope="verify",function="billing.charge",variant="original"} 0.76875
+ras_availability_ratio{project="payments",scope="verify",function="billing.charge",variant="hardened"} 1.0
+ras_availability_ratio{project="payments",scope="verify",function="billing.render_receipt",variant="original"} 0.33125
+ras_availability_ratio{project="payments",scope="verify",function="billing.render_receipt",variant="hardened"} 1.0
+# HELP ras_identical_ratio Strict byte-identical output ratio (0..1)
+# TYPE ras_identical_ratio gauge
+ras_identical_ratio{project="payments",scope="bench",variant="original"} 0.0
+ras_identical_ratio{project="payments",scope="bench",variant="hardened"} 0.45
+# HELP ras_crash_rate Whole-app crash rate (0..1)
+# TYPE ras_crash_rate gauge
+ras_crash_rate{project="payments",scope="bench",variant="original"} 0.6
+ras_crash_rate{project="payments",scope="bench",variant="hardened"} 0.1
+# HELP ras_hang_rate Whole-app hang rate (0..1)
+# TYPE ras_hang_rate gauge
+ras_hang_rate{project="payments",scope="bench",variant="original"} 0.25
+ras_hang_rate{project="payments",scope="bench",variant="hardened"} 0.0
+# HELP ras_p99_seconds p99 latency in seconds
+# TYPE ras_p99_seconds gauge
+ras_p99_seconds{project="payments",scope="bench",variant="original"} 4.0303
+ras_p99_seconds{project="payments",scope="bench",variant="hardened"} 4.2391
+ras_p99_seconds{project="payments",scope="verify",function="billing.charge",variant="original"} 13.502909
+ras_p99_seconds{project="payments",scope="verify",function="billing.charge",variant="hardened"} 4.5
+ras_p99_seconds{project="payments",scope="verify",function="billing.render_receipt",variant="original"} 60.0
+ras_p99_seconds{project="payments",scope="verify",function="billing.render_receipt",variant="hardened"} 1.125221
+# HELP ras_duplicates_total Duplicate non-idempotent side effects
+# TYPE ras_duplicates_total gauge
+ras_duplicates_total{project="payments",scope="bench",variant="original"} 5
+ras_duplicates_total{project="payments",scope="bench",variant="hardened"} 0
+ras_duplicates_total{project="payments",scope="verify",function="billing.charge",variant="original"} 38
+ras_duplicates_total{project="payments",scope="verify",function="billing.charge",variant="hardened"} 0
+ras_duplicates_total{project="payments",scope="verify",function="billing.render_receipt",variant="original"} 0
+ras_duplicates_total{project="payments",scope="verify",function="billing.render_receipt",variant="hardened"} 0
+# HELP ras_error_budget_burn_ratio Error budget burn ratio (1.0 = 100%)
+# TYPE ras_error_budget_burn_ratio gauge
+ras_error_budget_burn_ratio{project="payments",variant="original"} 100.0
+ras_error_budget_burn_ratio{project="payments",variant="hardened"} 10.0
+# HELP ras_ax_accuracy_ratio AX policy agent next-action accuracy (0..1)
+# TYPE ras_ax_accuracy_ratio gauge
+ras_ax_accuracy_ratio{project="payments",variant="original"} 0.3
+ras_ax_accuracy_ratio{project="payments",variant="hardened"} 1.0
+# HELP ras_serviceability_detection_ratio Fault detection rate from logs (0..1)
+# TYPE ras_serviceability_detection_ratio gauge
+ras_serviceability_detection_ratio{project="payments",variant="original"} 0.0
+ras_serviceability_detection_ratio{project="payments",variant="hardened"} 1.0
+
+# --- weather ---
+# HELP ras_availability_ratio Availability ratio (0..1) under injected faults
+# TYPE ras_availability_ratio gauge
+ras_availability_ratio{project="weather",scope="bench",variant="original"} 0.4
+ras_availability_ratio{project="weather",scope="bench",variant="hardened"} 1.0
+ras_availability_ratio{project="weather",scope="verify",function="weather.fetch_forecast",variant="original"} 0.325
+ras_availability_ratio{project="weather",scope="verify",function="weather.fetch_forecast",variant="hardened"} 1.0
+# HELP ras_identical_ratio Strict byte-identical output ratio (0..1)
+# TYPE ras_identical_ratio gauge
+ras_identical_ratio{project="weather",scope="bench",variant="original"} 0.4
+ras_identical_ratio{project="weather",scope="bench",variant="hardened"} 1.0
+# HELP ras_crash_rate Whole-app crash rate (0..1)
+# TYPE ras_crash_rate gauge
+ras_crash_rate{project="weather",scope="bench",variant="original"} 0.45
+ras_crash_rate{project="weather",scope="bench",variant="hardened"} 0.0
+# HELP ras_hang_rate Whole-app hang rate (0..1)
+# TYPE ras_hang_rate gauge
+ras_hang_rate{project="weather",scope="bench",variant="original"} 0.15
+ras_hang_rate{project="weather",scope="bench",variant="hardened"} 0.0
+# HELP ras_p99_seconds p99 latency in seconds
+# TYPE ras_p99_seconds gauge
+ras_p99_seconds{project="weather",scope="bench",variant="original"} 2.1071
+ras_p99_seconds{project="weather",scope="bench",variant="hardened"} 1.2549
+ras_p99_seconds{project="weather",scope="verify",function="weather.fetch_forecast",variant="original"} 60.0
+ras_p99_seconds{project="weather",scope="verify",function="weather.fetch_forecast",variant="hardened"} 3.598089
+# HELP ras_duplicates_total Duplicate non-idempotent side effects
+# TYPE ras_duplicates_total gauge
+ras_duplicates_total{project="weather",scope="bench",variant="original"} 0
+ras_duplicates_total{project="weather",scope="bench",variant="hardened"} 0
+ras_duplicates_total{project="weather",scope="verify",function="weather.fetch_forecast",variant="original"} 0
+ras_duplicates_total{project="weather",scope="verify",function="weather.fetch_forecast",variant="hardened"} 0
+# HELP ras_error_budget_burn_ratio Error budget burn ratio (1.0 = 100%)
+# TYPE ras_error_budget_burn_ratio gauge
+ras_error_budget_burn_ratio{project="weather",variant="original"} 60.0
+ras_error_budget_burn_ratio{project="weather",variant="hardened"} 0.0
+# HELP ras_ax_accuracy_ratio AX policy agent next-action accuracy (0..1)
+# TYPE ras_ax_accuracy_ratio gauge
+ras_ax_accuracy_ratio{project="weather",variant="original"} 0.3
+ras_ax_accuracy_ratio{project="weather",variant="hardened"} 1.0
+# HELP ras_serviceability_detection_ratio Fault detection rate from logs (0..1)
+# TYPE ras_serviceability_detection_ratio gauge
+ras_serviceability_detection_ratio{project="weather",variant="original"} 0.0
+ras_serviceability_detection_ratio{project="weather",variant="hardened"} 1.0

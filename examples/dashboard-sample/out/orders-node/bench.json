@@ -1,0 +1,35 @@
+{
+  "bench": {
+    "hardened": {
+      "amplification": 1.225,
+      "availability": 0.9,
+      "crash_rate": 0.1,
+      "dups": 0,
+      "hang": 0,
+      "hang_rate": 0.0,
+      "identical_rate": 0.9,
+      "p50_s": 2.7274,
+      "p99_s": 4.9689,
+      "wrong": 0
+    },
+    "original": {
+      "amplification": 1.0610169491525423,
+      "availability": 0.0,
+      "crash_rate": 0.75,
+      "dups": 6,
+      "hang": 3,
+      "hang_rate": 0.15,
+      "identical_rate": 0.0,
+      "p50_s": 0.3574,
+      "p99_s": 4.1795,
+      "wrong": 2
+    },
+    "rate": 0.1,
+    "seeds": 20
+  },
+  "generated_at": "2026-11-23T17:49:57+0800",
+  "kind": "bench",
+  "lang": "node",
+  "project": "orders-node",
+  "schema_version": "1.0.0"
+}

@@ -1,0 +1,35 @@
+{
+  "schema_version": "1.0.0",
+  "kind": "bench",
+  "generated_at": "2026-11-23T17:49:57+0800",
+  "project": "weather",
+  "lang": "python",
+  "bench": {
+    "seeds": 20,
+    "rate": 0.1,
+    "original": {
+      "availability": 0.4,
+      "identical_rate": 0.4,
+      "crash_rate": 0.45,
+      "hang_rate": 0.15,
+      "wrong": 0,
+      "hang": 3,
+      "dups": 0,
+      "p50_s": 0.1014,
+      "p99_s": 2.1071,
+      "amplification": 1.0
+    },
+    "hardened": {
+      "availability": 1.0,
+      "identical_rate": 1.0,
+      "crash_rate": 0.0,
+      "hang_rate": 0.0,
+      "wrong": 0,
+      "hang": 0,
+      "dups": 0,
+      "p50_s": 0.3301,
+      "p99_s": 1.2549,
+      "amplification": 1.1916666666666667
+    }
+  }
+}

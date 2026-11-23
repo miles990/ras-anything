@@ -1,0 +1,57 @@
+{
+  "functions": [
+    {
+      "budget_s": 5.0,
+      "gates": {
+        "availability": true,
+        "dups": true,
+        "happy": true,
+        "no_hang": true,
+        "no_new_crashes": true,
+        "no_wrong": true,
+        "p99": true
+      },
+      "happy": {
+        "equal": 12,
+        "total": 12
+      },
+      "hardened": {
+        "amplification": 1.95,
+        "availability": 1.0,
+        "crash_rate": null,
+        "dups": 0,
+        "hang": 0,
+        "hang_rate": null,
+        "identical_rate": null,
+        "p50_s": 0.09846,
+        "p99_s": 3.59154,
+        "wrong": 0
+      },
+      "id": "orders.charge",
+      "lang": "node",
+      "original": {
+        "amplification": 1.85,
+        "availability": 0.7833333333333333,
+        "crash_rate": null,
+        "dups": 28,
+        "hang": 14,
+        "hang_rate": null,
+        "identical_rate": null,
+        "p50_s": 0.3011,
+        "p99_s": 10.30254,
+        "wrong": 12
+      },
+      "passed": true
+    }
+  ],
+  "generated_at": "2026-11-23T17:49:57+0800",
+  "kind": "verify",
+  "lang": "node",
+  "project": "orders-node",
+  "schema_version": "1.0.0",
+  "serviceability": {
+    "hard_detection_rate": 1.0,
+    "hard_diagnosis_accuracy": 0.68,
+    "orig_detection_rate": 0.0
+  }
+}

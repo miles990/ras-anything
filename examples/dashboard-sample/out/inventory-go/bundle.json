@@ -1,0 +1,955 @@
+{
+  "events": [
+    {
+      "data": {
+        "functions": 4
+      },
+      "dependency": null,
+      "event_type": "scan.completed",
+      "function_id": null,
+      "kind": "event",
+      "schema_version": "1.0.0",
+      "seq": 1,
+      "severity": "INFO",
+      "trace_id": null,
+      "ts": "2026-11-23T17:49:44+0800"
+    },
+    {
+      "data": {
+        "availability_hardened": 1.0,
+        "availability_original": 0.31666666666666665
+      },
+      "dependency": null,
+      "event_type": "verify.passed",
+      "function_id": "warehouse.AuditTag",
+      "kind": "event",
+      "schema_version": "1.0.0",
+      "seq": 2,
+      "severity": "INFO",
+      "trace_id": null,
+      "ts": "2026-11-23T17:49:44+0800"
+    },
+    {
+      "data": {
+        "availability_hardened": 1.0,
+        "availability_original": 0.2833333333333333
+      },
+      "dependency": null,
+      "event_type": "verify.passed",
+      "function_id": "warehouse.FetchStock",
+      "kind": "event",
+      "schema_version": "1.0.0",
+      "seq": 3,
+      "severity": "INFO",
+      "trace_id": null,
+      "ts": "2026-11-23T17:49:44+0800"
+    },
+    {
+      "data": {
+        "availability_hardened": 1.0,
+        "availability_original": 0.35
+      },
+      "dependency": null,
+      "event_type": "verify.passed",
+      "function_id": "warehouse.ReserveStock",
+      "kind": "event",
+      "schema_version": "1.0.0",
+      "seq": 4,
+      "severity": "INFO",
+      "trace_id": null,
+      "ts": "2026-11-23T17:49:44+0800"
+    },
+    {
+      "data": {
+        "availability_hardened": 1.0,
+        "availability_original": 0.05,
+        "seeds": 20
+      },
+      "dependency": null,
+      "event_type": "bench.completed",
+      "function_id": null,
+      "kind": "event",
+      "schema_version": "1.0.0",
+      "seq": 5,
+      "severity": "INFO",
+      "trace_id": null,
+      "ts": "2026-11-23T17:49:44+0800"
+    },
+    {
+      "data": {
+        "status": "met"
+      },
+      "dependency": null,
+      "event_type": "slo.evaluated",
+      "function_id": null,
+      "kind": "event",
+      "schema_version": "1.0.0",
+      "seq": 6,
+      "severity": "INFO",
+      "trace_id": null,
+      "ts": "2026-11-23T17:49:44+0800"
+    }
+  ],
+  "generated_at": "2026-11-23T17:49:57+0800",
+  "kind": "bundle",
+  "project": "inventory-go",
+  "schema_version": "1.0.0",
+  "snapshots": {
+    "bench": {
+      "bench": {
+        "hardened": {
+          "amplification": 0.8388888888888889,
+          "availability": 1.0,
+          "crash_rate": 0.0,
+          "dups": 0,
+          "hang": 0,
+          "hang_rate": 0.0,
+          "identical_rate": 0.95,
+          "p50_s": 0.4113,
+          "p99_s": 2.3903,
+          "wrong": 0
+        },
+        "original": {
+          "amplification": 0.7153846153846154,
+          "availability": 0.05,
+          "crash_rate": 0.8,
+          "dups": 0,
+          "hang": 3,
+          "hang_rate": 0.15,
+          "identical_rate": 0.05,
+          "p50_s": 0.006,
+          "p99_s": 2.0101,
+          "wrong": 0
+        },
+        "rate": 0.1,
+        "seeds": 20
+      },
+      "generated_at": "2026-11-23T17:49:57+0800",
+      "kind": "bench",
+      "lang": "go",
+      "project": "inventory-go",
+      "schema_version": "1.0.0"
+    },
+    "coverage": {
+      "coverage": {
+        "adapters": [
+          {
+            "ax": true,
+            "boundary": "urllib / requests / httpx / aiohttp / socket / subprocess",
+            "lang": "python",
+            "status": "complete",
+            "verify": true
+          },
+          {
+            "ax": true,
+            "boundary": "fetch / http / https / child_process (CJS + ESM + TS)",
+            "lang": "node",
+            "status": "complete",
+            "verify": true
+          },
+          {
+            "ax": true,
+            "boundary": "net/http / os/exec: AST + rasagent + rasruntime",
+            "lang": "go",
+            "status": "complete",
+            "verify": true
+          },
+          {
+            "ax": false,
+            "boundary": "HttpClient / HttpURLConnection / ProcessBuilder",
+            "lang": "java",
+            "status": "planned",
+            "verify": false
+          },
+          {
+            "ax": false,
+            "boundary": "HttpClient / Process",
+            "lang": "csharp",
+            "status": "planned",
+            "verify": false
+          },
+          {
+            "ax": false,
+            "boundary": "curl / file_get_contents / proc_open",
+            "lang": "php",
+            "status": "planned",
+            "verify": false
+          },
+          {
+            "ax": false,
+            "boundary": "Net::HTTP / Open3",
+            "lang": "ruby",
+            "status": "planned",
+            "verify": false
+          },
+          {
+            "ax": false,
+            "boundary": "HttpClient / OkHttp / ProcessBuilder",
+            "lang": "kotlin",
+            "status": "planned",
+            "verify": false
+          },
+          {
+            "ax": false,
+            "boundary": "fetch / Bun.spawn",
+            "lang": "bun",
+            "status": "planned",
+            "verify": false
+          },
+          {
+            "ax": false,
+            "boundary": "fetch / Deno.Command",
+            "lang": "deno",
+            "status": "planned",
+            "verify": false
+          },
+          {
+            "ax": false,
+            "boundary": "libcurl / popen",
+            "lang": "c_cpp",
+            "status": "planned",
+            "verify": false
+          }
+        ]
+      },
+      "generated_at": "2026-11-23T17:49:57+0800",
+      "kind": "coverage",
+      "project": "inventory-go",
+      "schema_version": "1.0.0"
+    },
+    "report": {
+      "ax": {
+        "hardened_accuracy": 1.0,
+        "leaks": 0,
+        "original_accuracy": 0.3,
+        "records": []
+      },
+      "bench": {
+        "hardened": {
+          "amplification": 0.8388888888888889,
+          "availability": 1.0,
+          "crash_rate": 0.0,
+          "dups": 0,
+          "hang": 0,
+          "hang_rate": 0.0,
+          "identical_rate": 0.95,
+          "p50_s": 0.4113,
+          "p99_s": 2.3903,
+          "wrong": 0
+        },
+        "original": {
+          "amplification": 0.7153846153846154,
+          "availability": 0.05,
+          "crash_rate": 0.8,
+          "dups": 0,
+          "hang": 3,
+          "hang_rate": 0.15,
+          "identical_rate": 0.05,
+          "p50_s": 0.006,
+          "p99_s": 2.0101,
+          "wrong": 0
+        },
+        "rate": 0.1,
+        "seeds": 20
+      },
+      "coverage": {
+        "adapters": [
+          {
+            "ax": true,
+            "boundary": "urllib / requests / httpx / aiohttp / socket / subprocess",
+            "lang": "python",
+            "status": "complete",
+            "verify": true
+          },
+          {
+            "ax": true,
+            "boundary": "fetch / http / https / child_process (CJS + ESM + TS)",
+            "lang": "node",
+            "status": "complete",
+            "verify": true
+          },
+          {
+            "ax": true,
+            "boundary": "net/http / os/exec: AST + rasagent + rasruntime",
+            "lang": "go",
+            "status": "complete",
+            "verify": true
+          },
+          {
+            "ax": false,
+            "boundary": "HttpClient / HttpURLConnection / ProcessBuilder",
+            "lang": "java",
+            "status": "planned",
+            "verify": false
+          },
+          {
+            "ax": false,
+            "boundary": "HttpClient / Process",
+            "lang": "csharp",
+            "status": "planned",
+            "verify": false
+          },
+          {
+            "ax": false,
+            "boundary": "curl / file_get_contents / proc_open",
+            "lang": "php",
+            "status": "planned",
+            "verify": false
+          },
+          {
+            "ax": false,
+            "boundary": "Net::HTTP / Open3",
+            "lang": "ruby",
+            "status": "planned",
+            "verify": false
+          },
+          {
+            "ax": false,
+            "boundary": "HttpClient / OkHttp / ProcessBuilder",
+            "lang": "kotlin",
+            "status": "planned",
+            "verify": false
+          },
+          {
+            "ax": false,
+            "boundary": "fetch / Bun.spawn",
+            "lang": "bun",
+            "status": "planned",
+            "verify": false
+          },
+          {
+            "ax": false,
+            "boundary": "fetch / Deno.Command",
+            "lang": "deno",
+            "status": "planned",
+            "verify": false
+          },
+          {
+            "ax": false,
+            "boundary": "libcurl / popen",
+            "lang": "c_cpp",
+            "status": "planned",
+            "verify": false
+          }
+        ]
+      },
+      "functions": [
+        {
+          "budget_s": 5.0,
+          "gates": {
+            "availability": true,
+            "dups": true,
+            "happy": true,
+            "no_hang": true,
+            "no_new_crashes": true,
+            "no_wrong": true,
+            "p99": true
+          },
+          "happy": {
+            "equal": 6,
+            "total": 6
+          },
+          "hardened": {
+            "amplification": 1.75,
+            "availability": 1.0,
+            "crash_rate": null,
+            "dups": 0,
+            "hang": 0,
+            "hang_rate": null,
+            "identical_rate": null,
+            "p50_s": 0.024,
+            "p99_s": 3.4478,
+            "wrong": 0
+          },
+          "id": "warehouse.AuditTag",
+          "lang": "go",
+          "original": {
+            "amplification": 1.0,
+            "availability": 0.31666666666666665,
+            "crash_rate": null,
+            "dups": 0,
+            "hang": 6,
+            "hang_rate": null,
+            "identical_rate": null,
+            "p50_s": 0,
+            "p99_s": 3.0011,
+            "wrong": 0
+          },
+          "passed": true
+        },
+        {
+          "budget_s": 5.0,
+          "gates": {
+            "availability": true,
+            "dups": true,
+            "happy": true,
+            "no_hang": true,
+            "no_new_crashes": true,
+            "no_wrong": true,
+            "p99": true
+          },
+          "happy": {
+            "equal": 6,
+            "total": 6
+          },
+          "hardened": {
+            "amplification": 1.95,
+            "availability": 1.0,
+            "crash_rate": null,
+            "dups": 0,
+            "hang": 0,
+            "hang_rate": null,
+            "identical_rate": null,
+            "p50_s": 0.1619,
+            "p99_s": 3.6079,
+            "wrong": 0
+          },
+          "id": "warehouse.FetchStock",
+          "lang": "go",
+          "original": {
+            "amplification": 1.0,
+            "availability": 0.2833333333333333,
+            "crash_rate": null,
+            "dups": 0,
+            "hang": 7,
+            "hang_rate": null,
+            "identical_rate": null,
+            "p50_s": 0,
+            "p99_s": 3.0004,
+            "wrong": 0
+          },
+          "passed": true
+        },
+        {
+          "budget_s": 5.0,
+          "gates": {
+            "availability": true,
+            "dups": true,
+            "happy": true,
+            "no_hang": true,
+            "no_new_crashes": true,
+            "no_wrong": true,
+            "p99": true
+          },
+          "happy": {
+            "equal": 6,
+            "total": 6
+          },
+          "hardened": {
+            "amplification": 1.85,
+            "availability": 1.0,
+            "crash_rate": null,
+            "dups": 0,
+            "hang": 0,
+            "hang_rate": null,
+            "identical_rate": null,
+            "p50_s": 0.0416,
+            "p99_s": 3.4427,
+            "wrong": 0
+          },
+          "id": "warehouse.ReserveStock",
+          "lang": "go",
+          "original": {
+            "amplification": 1.0,
+            "availability": 0.35,
+            "crash_rate": null,
+            "dups": 0,
+            "hang": 6,
+            "hang_rate": null,
+            "identical_rate": null,
+            "p50_s": 0,
+            "p99_s": 3.0002,
+            "wrong": 0
+          },
+          "passed": true
+        }
+      ],
+      "generated_at": "2026-11-23T17:49:57+0800",
+      "kind": "report",
+      "lang": "go",
+      "project": "inventory-go",
+      "resilience_state": {
+        "breakers": {},
+        "bulkheads": {},
+        "flags": {}
+      },
+      "rollout": {
+        "blast_radius_functions": 0,
+        "canary_pct": 0.0,
+        "enabled": {},
+        "shadow": false
+      },
+      "schema_version": "1.0.0",
+      "serviceability": {
+        "hard_detection_rate": 0.2127659574468085,
+        "hard_diagnosis_accuracy": 0.0,
+        "mttd_s": null,
+        "mttr_s": null,
+        "orig_detection_rate": 0.0,
+        "restore_s": null
+      },
+      "slo": {
+        "hardened": {
+          "availability": 1.0,
+          "checks": {
+            "availability": true,
+            "error_rate": true,
+            "p99_s": true
+          },
+          "error_budget": 0.05,
+          "error_budget_burn_pct": 0.0,
+          "error_budget_burn_ratio": 0.0,
+          "error_rate": 0.0,
+          "p50_s": 0.4113,
+          "p99_s": 2.3903,
+          "status": "met"
+        },
+        "original": {
+          "availability": 0.05,
+          "checks": {
+            "availability": false,
+            "error_rate": false,
+            "p99_s": true
+          },
+          "error_budget": 0.05,
+          "error_budget_burn_pct": 1900.0,
+          "error_budget_burn_ratio": 19.0,
+          "error_rate": 0.95,
+          "p50_s": 0.006,
+          "p99_s": 2.0101,
+          "status": "missed"
+        },
+        "source": "bench",
+        "targets": {
+          "availability": 0.95,
+          "error_rate": 0.05,
+          "p99_s": 3.0
+        }
+      }
+    },
+    "scan": {
+      "functions": [
+        {
+          "exposure": 0.3333,
+          "id": "warehouse.ReserveStock",
+          "lang": "go",
+          "risk": 0.8368,
+          "score": 27.9,
+          "signals": {
+            "no_retry": "no retry on transient errors",
+            "no_timeout": "outbound call without timeout",
+            "write_no_key": "non-idempotent request without Idempotency-Key"
+          }
+        },
+        {
+          "exposure": 0.3333,
+          "id": "warehouse.AuditTag",
+          "lang": "go",
+          "risk": 0.808,
+          "score": 26.9,
+          "signals": {
+            "no_retry": "no retry on transient errors",
+            "no_timeout": "outbound call without timeout"
+          }
+        },
+        {
+          "exposure": 0.3333,
+          "id": "warehouse.FetchStock",
+          "lang": "go",
+          "risk": 0.808,
+          "score": 26.9,
+          "signals": {
+            "no_retry": "no retry on transient errors",
+            "no_timeout": "outbound call without timeout"
+          }
+        },
+        {
+          "exposure": 0.0,
+          "id": "main.startWarehouseServer",
+          "lang": "go",
+          "risk": 0.0,
+          "score": 0.0,
+          "signals": []
+        }
+      ],
+      "generated_at": "2026-11-23T17:49:57+0800",
+      "kind": "scan",
+      "lang": "go",
+      "project": "inventory-go",
+      "schema_version": "1.0.0"
+    },
+    "slo": {
+      "generated_at": "2026-11-23T17:49:57+0800",
+      "kind": "slo",
+      "project": "inventory-go",
+      "schema_version": "1.0.0",
+      "slo": {
+        "hardened": {
+          "availability": 1.0,
+          "checks": {
+            "availability": true,
+            "error_rate": true,
+            "p99_s": true
+          },
+          "error_budget": 0.05,
+          "error_budget_burn_pct": 0.0,
+          "error_budget_burn_ratio": 0.0,
+          "error_rate": 0.0,
+          "p50_s": 0.4113,
+          "p99_s": 2.3903,
+          "status": "met"
+        },
+        "original": {
+          "availability": 0.05,
+          "checks": {
+            "availability": false,
+            "error_rate": false,
+            "p99_s": true
+          },
+          "error_budget": 0.05,
+          "error_budget_burn_pct": 1900.0,
+          "error_budget_burn_ratio": 19.0,
+          "error_rate": 0.95,
+          "p50_s": 0.006,
+          "p99_s": 2.0101,
+          "status": "missed"
+        },
+        "series": [
+          {
+            "availability": 1.0,
+            "burn_pct": 0.0,
+            "error_rate": 0.0,
+            "p99_s": 2.3903,
+            "ts": "2026-11-23T17:49:57+0800"
+          }
+        ],
+        "source": "bench",
+        "targets": {
+          "availability": 0.95,
+          "error_rate": 0.05,
+          "p99_s": 3.0
+        }
+      }
+    },
+    "status": {
+      "functions": [
+        {
+          "budget_s": 5.0,
+          "gates": {
+            "availability": true,
+            "dups": true,
+            "happy": true,
+            "no_hang": true,
+            "no_new_crashes": true,
+            "no_wrong": true,
+            "p99": true
+          },
+          "happy": {
+            "equal": 6,
+            "total": 6
+          },
+          "hardened": {
+            "amplification": 1.75,
+            "availability": 1.0,
+            "crash_rate": null,
+            "dups": 0,
+            "hang": 0,
+            "hang_rate": null,
+            "identical_rate": null,
+            "p50_s": 0.024,
+            "p99_s": 3.4478,
+            "wrong": 0
+          },
+          "id": "warehouse.AuditTag",
+          "lang": "go",
+          "original": {
+            "amplification": 1.0,
+            "availability": 0.31666666666666665,
+            "crash_rate": null,
+            "dups": 0,
+            "hang": 6,
+            "hang_rate": null,
+            "identical_rate": null,
+            "p50_s": 0,
+            "p99_s": 3.0011,
+            "wrong": 0
+          },
+          "passed": true
+        },
+        {
+          "budget_s": 5.0,
+          "gates": {
+            "availability": true,
+            "dups": true,
+            "happy": true,
+            "no_hang": true,
+            "no_new_crashes": true,
+            "no_wrong": true,
+            "p99": true
+          },
+          "happy": {
+            "equal": 6,
+            "total": 6
+          },
+          "hardened": {
+            "amplification": 1.95,
+            "availability": 1.0,
+            "crash_rate": null,
+            "dups": 0,
+            "hang": 0,
+            "hang_rate": null,
+            "identical_rate": null,
+            "p50_s": 0.1619,
+            "p99_s": 3.6079,
+            "wrong": 0
+          },
+          "id": "warehouse.FetchStock",
+          "lang": "go",
+          "original": {
+            "amplification": 1.0,
+            "availability": 0.2833333333333333,
+            "crash_rate": null,
+            "dups": 0,
+            "hang": 7,
+            "hang_rate": null,
+            "identical_rate": null,
+            "p50_s": 0,
+            "p99_s": 3.0004,
+            "wrong": 0
+          },
+          "passed": true
+        },
+        {
+          "budget_s": 5.0,
+          "gates": {
+            "availability": true,
+            "dups": true,
+            "happy": true,
+            "no_hang": true,
+            "no_new_crashes": true,
+            "no_wrong": true,
+            "p99": true
+          },
+          "happy": {
+            "equal": 6,
+            "total": 6
+          },
+          "hardened": {
+            "amplification": 1.85,
+            "availability": 1.0,
+            "crash_rate": null,
+            "dups": 0,
+            "hang": 0,
+            "hang_rate": null,
+            "identical_rate": null,
+            "p50_s": 0.0416,
+            "p99_s": 3.4427,
+            "wrong": 0
+          },
+          "id": "warehouse.ReserveStock",
+          "lang": "go",
+          "original": {
+            "amplification": 1.0,
+            "availability": 0.35,
+            "crash_rate": null,
+            "dups": 0,
+            "hang": 6,
+            "hang_rate": null,
+            "identical_rate": null,
+            "p50_s": 0,
+            "p99_s": 3.0002,
+            "wrong": 0
+          },
+          "passed": true
+        }
+      ],
+      "generated_at": "2026-11-23T17:49:57+0800",
+      "kind": "status",
+      "lang": "go",
+      "project": "inventory-go",
+      "resilience_state": {
+        "breakers": {},
+        "bulkheads": {},
+        "flags": {}
+      },
+      "rollout": {
+        "blast_radius_functions": 0,
+        "canary_pct": 0.0,
+        "enabled": {},
+        "shadow": false
+      },
+      "schema_version": "1.0.0"
+    },
+    "verify-warehouse.AuditTag": {
+      "functions": [
+        {
+          "budget_s": 5.0,
+          "gates": {
+            "availability": true,
+            "dups": true,
+            "happy": true,
+            "no_hang": true,
+            "no_new_crashes": true,
+            "no_wrong": true,
+            "p99": true
+          },
+          "happy": {
+            "equal": 6,
+            "total": 6
+          },
+          "hardened": {
+            "amplification": 1.75,
+            "availability": 1.0,
+            "crash_rate": null,
+            "dups": 0,
+            "hang": 0,
+            "hang_rate": null,
+            "identical_rate": null,
+            "p50_s": 0.024,
+            "p99_s": 3.4478,
+            "wrong": 0
+          },
+          "id": "warehouse.AuditTag",
+          "lang": "go",
+          "original": {
+            "amplification": 1.0,
+            "availability": 0.31666666666666665,
+            "crash_rate": null,
+            "dups": 0,
+            "hang": 6,
+            "hang_rate": null,
+            "identical_rate": null,
+            "p50_s": 0,
+            "p99_s": 3.0011,
+            "wrong": 0
+          },
+          "passed": true
+        }
+      ],
+      "generated_at": "2026-11-23T17:49:57+0800",
+      "kind": "verify",
+      "lang": "go",
+      "project": "inventory-go",
+      "schema_version": "1.0.0",
+      "serviceability": {
+        "hard_detection_rate": 0.2127659574468085,
+        "hard_diagnosis_accuracy": 0.0,
+        "orig_detection_rate": 0.0
+      }
+    },
+    "verify-warehouse.FetchStock": {
+      "functions": [
+        {
+          "budget_s": 5.0,
+          "gates": {
+            "availability": true,
+            "dups": true,
+            "happy": true,
+            "no_hang": true,
+            "no_new_crashes": true,
+            "no_wrong": true,
+            "p99": true
+          },
+          "happy": {
+            "equal": 6,
+            "total": 6
+          },
+          "hardened": {
+            "amplification": 1.95,
+            "availability": 1.0,
+            "crash_rate": null,
+            "dups": 0,
+            "hang": 0,
+            "hang_rate": null,
+            "identical_rate": null,
+            "p50_s": 0.1619,
+            "p99_s": 3.6079,
+            "wrong": 0
+          },
+          "id": "warehouse.FetchStock",
+          "lang": "go",
+          "original": {
+            "amplification": 1.0,
+            "availability": 0.2833333333333333,
+            "crash_rate": null,
+            "dups": 0,
+            "hang": 7,
+            "hang_rate": null,
+            "identical_rate": null,
+            "p50_s": 0,
+            "p99_s": 3.0004,
+            "wrong": 0
+          },
+          "passed": true
+        }
+      ],
+      "generated_at": "2026-11-23T17:49:57+0800",
+      "kind": "verify",
+      "lang": "go",
+      "project": "inventory-go",
+      "schema_version": "1.0.0",
+      "serviceability": {
+        "hard_detection_rate": 0.0,
+        "hard_diagnosis_accuracy": 0.0,
+        "orig_detection_rate": 0.0
+      }
+    },
+    "verify-warehouse.ReserveStock": {
+      "functions": [
+        {
+          "budget_s": 5.0,
+          "gates": {
+            "availability": true,
+            "dups": true,
+            "happy": true,
+            "no_hang": true,
+            "no_new_crashes": true,
+            "no_wrong": true,
+            "p99": true
+          },
+          "happy": {
+            "equal": 6,
+            "total": 6
+          },
+          "hardened": {
+            "amplification": 1.85,
+            "availability": 1.0,
+            "crash_rate": null,
+            "dups": 0,
+            "hang": 0,
+            "hang_rate": null,
+            "identical_rate": null,
+            "p50_s": 0.0416,
+            "p99_s": 3.4427,
+            "wrong": 0
+          },
+          "id": "warehouse.ReserveStock",
+          "lang": "go",
+          "original": {
+            "amplification": 1.0,
+            "availability": 0.35,
+            "crash_rate": null,
+            "dups": 0,
+            "hang": 6,
+            "hang_rate": null,
+            "identical_rate": null,
+            "p50_s": 0,
+            "p99_s": 3.0002,
+            "wrong": 0
+          },
+          "passed": true
+        }
+      ],
+      "generated_at": "2026-11-23T17:49:57+0800",
+      "kind": "verify",
+      "lang": "go",
+      "project": "inventory-go",
+      "schema_version": "1.0.0",
+      "serviceability": {
+        "hard_detection_rate": 0.0,
+        "hard_diagnosis_accuracy": 0.0,
+        "orig_detection_rate": 0.0
+      }
+    }
+  }
+}

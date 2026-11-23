@@ -1,0 +1,35 @@
+{
+  "bench": {
+    "hardened": {
+      "amplification": 0.8388888888888889,
+      "availability": 1.0,
+      "crash_rate": 0.0,
+      "dups": 0,
+      "hang": 0,
+      "hang_rate": 0.0,
+      "identical_rate": 0.95,
+      "p50_s": 0.4113,
+      "p99_s": 2.3903,
+      "wrong": 0
+    },
+    "original": {
+      "amplification": 0.7153846153846154,
+      "availability": 0.05,
+      "crash_rate": 0.8,
+      "dups": 0,
+      "hang": 3,
+      "hang_rate": 0.15,
+      "identical_rate": 0.05,
+      "p50_s": 0.006,
+      "p99_s": 2.0101,
+      "wrong": 0
+    },
+    "rate": 0.1,
+    "seeds": 20
+  },
+  "generated_at": "2026-11-23T17:49:57+0800",
+  "kind": "bench",
+  "lang": "go",
+  "project": "inventory-go",
+  "schema_version": "1.0.0"
+}

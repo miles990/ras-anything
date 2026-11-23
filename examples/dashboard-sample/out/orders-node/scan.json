@@ -1,0 +1,81 @@
+{
+  "functions": [
+    {
+      "exposure": 0.2449,
+      "id": "orders.charge",
+      "lang": "node",
+      "risk": 0.8404,
+      "score": 20.6,
+      "signals": {
+        "no_logging": "no logging on the failure path",
+        "swallow": "`catch {}` swallows errors",
+        "unsafe_retry": "retries a POST with no Idempotency-Key"
+      }
+    },
+    {
+      "exposure": 0.2449,
+      "id": "orders.getItem",
+      "lang": "node",
+      "risk": 0.8176,
+      "score": 20.0,
+      "signals": {
+        "no_logging": "no logging on the failure path",
+        "no_retry": "no retry on transient errors",
+        "no_timeout": "fetch() without a timeout (signal)"
+      }
+    },
+    {
+      "exposure": 0.2449,
+      "id": "orders.printLabel",
+      "lang": "node",
+      "risk": 0.8176,
+      "score": 20.0,
+      "signals": {
+        "no_logging": "no logging on the failure path",
+        "no_retry": "no retry on transient errors",
+        "no_timeout": "execFile() without timeout"
+      }
+    },
+    {
+      "exposure": 0.2449,
+      "id": "orders.shippingQuote",
+      "lang": "node",
+      "risk": 0.8176,
+      "score": 20.0,
+      "signals": {
+        "no_logging": "no logging on the failure path",
+        "no_retry": "no retry on transient errors",
+        "no_timeout": "http.get() without timeout"
+      }
+    },
+    {
+      "exposure": 0.0,
+      "id": "app.eur",
+      "lang": "node",
+      "risk": 0.0,
+      "score": 0.0,
+      "signals": []
+    },
+    {
+      "exposure": 0.0,
+      "id": "orders.api",
+      "lang": "node",
+      "risk": 0.0,
+      "score": 0.0,
+      "signals": []
+    },
+    {
+      "exposure": 0.0,
+      "id": "upstream.start",
+      "lang": "node",
+      "risk": 0.0,
+      "score": 0.0,
+      "signals": []
+    }
+  ],
+  "generated_at": "2026-11-23T17:49:57+0800",
+  "kind": "scan",
+  "lang": "node",
+  "project": "orders-node",
+  "schema_version": "1.0.0"
+}

@@ -1,0 +1,246 @@
+{
+  "resourceLogs": [
+    {
+      "resource": {
+        "attributes": [
+          {
+            "key": "service.name",
+            "value": {
+              "stringValue": "inventory-go"
+            }
+          }
+        ]
+      },
+      "scopeLogs": [
+        {
+          "logRecords": [
+            {
+              "attributes": [
+                {
+                  "key": "ras.seq",
+                  "value": {
+                    "intValue": "1"
+                  }
+                },
+                {
+                  "key": "ras.data",
+                  "value": {
+                    "stringValue": "{\"functions\": 4}"
+                  }
+                }
+              ],
+              "body": {
+                "stringValue": "scan.completed"
+              },
+              "severityText": "INFO",
+              "timeUnixNano": "1795427397457088512",
+              "traceId": ""
+            },
+            {
+              "attributes": [
+                {
+                  "key": "ras.seq",
+                  "value": {
+                    "intValue": "2"
+                  }
+                },
+                {
+                  "key": "ras.data",
+                  "value": {
+                    "stringValue": "{\"availability_hardened\": 1.0, \"availability_original\": 0.31666666666666665}"
+                  }
+                }
+              ],
+              "body": {
+                "stringValue": "verify.passed"
+              },
+              "severityText": "INFO",
+              "timeUnixNano": "1795427397457088512",
+              "traceId": ""
+            },
+            {
+              "attributes": [
+                {
+                  "key": "ras.seq",
+                  "value": {
+                    "intValue": "3"
+                  }
+                },
+                {
+                  "key": "ras.data",
+                  "value": {
+                    "stringValue": "{\"availability_hardened\": 1.0, \"availability_original\": 0.2833333333333333}"
+                  }
+                }
+              ],
+              "body": {
+                "stringValue": "verify.passed"
+              },
+              "severityText": "INFO",
+              "timeUnixNano": "1795427397457088512",
+              "traceId": ""
+            },
+            {
+              "attributes": [
+                {
+                  "key": "ras.seq",
+                  "value": {
+                    "intValue": "4"
+                  }
+                },
+                {
+                  "key": "ras.data",
+                  "value": {
+                    "stringValue": "{\"availability_hardened\": 1.0, \"availability_original\": 0.35}"
+                  }
+                }
+              ],
+              "body": {
+                "stringValue": "verify.passed"
+              },
+              "severityText": "INFO",
+              "timeUnixNano": "1795427397457088512",
+              "traceId": ""
+            },
+            {
+              "attributes": [
+                {
+                  "key": "ras.seq",
+                  "value": {
+                    "intValue": "5"
+                  }
+                },
+                {
+                  "key": "ras.data",
+                  "value": {
+                    "stringValue": "{\"availability_hardened\": 1.0, \"availability_original\": 0.05, \"seeds\": 20}"
+                  }
+                }
+              ],
+              "body": {
+                "stringValue": "bench.completed"
+              },
+              "severityText": "INFO",
+              "timeUnixNano": "1795427397457088512",
+              "traceId": ""
+            },
+            {
+              "attributes": [
+                {
+                  "key": "ras.seq",
+                  "value": {
+                    "intValue": "6"
+                  }
+                },
+                {
+                  "key": "ras.data",
+                  "value": {
+                    "stringValue": "{\"status\": \"met\"}"
+                  }
+                }
+              ],
+              "body": {
+                "stringValue": "slo.evaluated"
+              },
+              "severityText": "INFO",
+              "timeUnixNano": "1795427397457088512",
+              "traceId": ""
+            }
+          ],
+          "scope": {
+            "name": "ras-anything",
+            "version": "1.0.0"
+          }
+        }
+      ]
+    }
+  ],
+  "resourceMetrics": [
+    {
+      "resource": {
+        "attributes": [
+          {
+            "key": "service.name",
+            "value": {
+              "stringValue": "inventory-go"
+            }
+          }
+        ]
+      },
+      "scopeMetrics": [
+        {
+          "metrics": [
+            {
+              "gauge": {
+                "dataPoints": [
+                  {
+                    "asDouble": 0.05,
+                    "attributes": [
+                      {
+                        "key": "variant",
+                        "value": {
+                          "stringValue": "original"
+                        }
+                      }
+                    ],
+                    "timeUnixNano": "1795427397457088512"
+                  },
+                  {
+                    "asDouble": 1.0,
+                    "attributes": [
+                      {
+                        "key": "variant",
+                        "value": {
+                          "stringValue": "hardened"
+                        }
+                      }
+                    ],
+                    "timeUnixNano": "1795427397457088512"
+                  }
+                ]
+              },
+              "name": "ras.availability.ratio",
+              "unit": "1"
+            },
+            {
+              "gauge": {
+                "dataPoints": [
+                  {
+                    "asDouble": 2.0101,
+                    "attributes": [
+                      {
+                        "key": "variant",
+                        "value": {
+                          "stringValue": "original"
+                        }
+                      }
+                    ],
+                    "timeUnixNano": "1795427397457088512"
+                  },
+                  {
+                    "asDouble": 2.3903,
+                    "attributes": [
+                      {
+                        "key": "variant",
+                        "value": {
+                          "stringValue": "hardened"
+                        }
+                      }
+                    ],
+                    "timeUnixNano": "1795427397457088512"
+                  }
+                ]
+              },
+              "name": "ras.p99.seconds",
+              "unit": "s"
+            }
+          ],
+          "scope": {
+            "name": "ras-anything",
+            "version": "1.0.0"
+          }
+        }
+      ]
+    }
+  ]
+}

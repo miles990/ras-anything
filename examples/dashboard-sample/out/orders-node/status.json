@@ -1,0 +1,192 @@
+{
+  "functions": [
+    {
+      "budget_s": 5.0,
+      "gates": {
+        "availability": true,
+        "dups": true,
+        "happy": true,
+        "no_hang": true,
+        "no_new_crashes": true,
+        "no_wrong": true,
+        "p99": true
+      },
+      "happy": {
+        "equal": 12,
+        "total": 12
+      },
+      "hardened": {
+        "amplification": 1.95,
+        "availability": 1.0,
+        "crash_rate": null,
+        "dups": 0,
+        "hang": 0,
+        "hang_rate": null,
+        "identical_rate": null,
+        "p50_s": 0.09846,
+        "p99_s": 3.59154,
+        "wrong": 0
+      },
+      "id": "orders.charge",
+      "lang": "node",
+      "original": {
+        "amplification": 1.85,
+        "availability": 0.7833333333333333,
+        "crash_rate": null,
+        "dups": 28,
+        "hang": 14,
+        "hang_rate": null,
+        "identical_rate": null,
+        "p50_s": 0.3011,
+        "p99_s": 10.30254,
+        "wrong": 12
+      },
+      "passed": true
+    },
+    {
+      "budget_s": 5.0,
+      "gates": {
+        "availability": true,
+        "dups": true,
+        "happy": true,
+        "no_hang": true,
+        "no_new_crashes": true,
+        "no_wrong": true,
+        "p99": true
+      },
+      "happy": {
+        "equal": 12,
+        "total": 12
+      },
+      "hardened": {
+        "amplification": 1.925,
+        "availability": 1.0,
+        "crash_rate": null,
+        "dups": 0,
+        "hang": 0,
+        "hang_rate": null,
+        "identical_rate": null,
+        "p50_s": 0.143796,
+        "p99_s": 4.000671,
+        "wrong": 0
+      },
+      "id": "orders.getItem",
+      "lang": "node",
+      "original": {
+        "amplification": 1.0,
+        "availability": 0.2916666666666667,
+        "crash_rate": null,
+        "dups": 0,
+        "hang": 16,
+        "hang_rate": null,
+        "identical_rate": null,
+        "p50_s": 0.00056,
+        "p99_s": 60,
+        "wrong": 30
+      },
+      "passed": true
+    },
+    {
+      "budget_s": 5.0,
+      "gates": {
+        "availability": true,
+        "dups": true,
+        "happy": true,
+        "no_hang": true,
+        "no_new_crashes": true,
+        "no_wrong": true,
+        "p99": true
+      },
+      "happy": {
+        "equal": 12,
+        "total": 12
+      },
+      "hardened": {
+        "amplification": 1.9333333333333333,
+        "availability": 1.0,
+        "crash_rate": null,
+        "dups": 0,
+        "hang": 0,
+        "hang_rate": null,
+        "identical_rate": null,
+        "p50_s": 0.096096,
+        "p99_s": 3.519264,
+        "wrong": 0
+      },
+      "id": "orders.printLabel",
+      "lang": "node",
+      "original": {
+        "amplification": 1.0,
+        "availability": 0.325,
+        "crash_rate": null,
+        "dups": 0,
+        "hang": 13,
+        "hang_rate": null,
+        "identical_rate": null,
+        "p50_s": 0.025762,
+        "p99_s": 60,
+        "wrong": 0
+      },
+      "passed": true
+    },
+    {
+      "budget_s": 5.0,
+      "gates": {
+        "availability": true,
+        "dups": true,
+        "happy": true,
+        "no_hang": true,
+        "no_new_crashes": true,
+        "no_wrong": true,
+        "p99": true
+      },
+      "happy": {
+        "equal": 12,
+        "total": 12
+      },
+      "hardened": {
+        "amplification": 1.875,
+        "availability": 1.0,
+        "crash_rate": null,
+        "dups": 0,
+        "hang": 0,
+        "hang_rate": null,
+        "identical_rate": null,
+        "p50_s": 0.087473,
+        "p99_s": 3.65089,
+        "wrong": 0
+      },
+      "id": "orders.shippingQuote",
+      "lang": "node",
+      "original": {
+        "amplification": 1.0,
+        "availability": 0.39166666666666666,
+        "crash_rate": null,
+        "dups": 0,
+        "hang": 14,
+        "hang_rate": null,
+        "identical_rate": null,
+        "p50_s": 0.000459,
+        "p99_s": 60,
+        "wrong": 23
+      },
+      "passed": true
+    }
+  ],
+  "generated_at": "2026-11-23T17:49:57+0800",
+  "kind": "status",
+  "lang": "node",
+  "project": "orders-node",
+  "resilience_state": {
+    "breakers": {},
+    "bulkheads": {},
+    "flags": {}
+  },
+  "rollout": {
+    "blast_radius_functions": 0,
+    "canary_pct": 0.0,
+    "enabled": {},
+    "shadow": false
+  },
+  "schema_version": "1.0.0"
+}

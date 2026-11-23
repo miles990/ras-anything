@@ -1,0 +1,81 @@
+{
+  "schema_version": "1.0.0",
+  "kind": "scan",
+  "generated_at": "2026-11-23T17:49:57+0800",
+  "project": "orders-node",
+  "lang": "node",
+  "functions": [
+    {
+      "id": "orders.charge",
+      "lang": "node",
+      "risk": 0.8404,
+      "exposure": 0.2449,
+      "score": 20.6,
+      "signals": {
+        "swallow": "`catch {}` swallows errors",
+        "unsafe_retry": "retries a POST with no Idempotency-Key",
+        "no_logging": "no logging on the failure path"
+      }
+    },
+    {
+      "id": "orders.getItem",
+      "lang": "node",
+      "risk": 0.8176,
+      "exposure": 0.2449,
+      "score": 20.0,
+      "signals": {
+        "no_timeout": "fetch() without a timeout (signal)",
+        "no_retry": "no retry on transient errors",
+        "no_logging": "no logging on the failure path"
+      }
+    },
+    {
+      "id": "orders.printLabel",
+      "lang": "node",
+      "risk": 0.8176,
+      "exposure": 0.2449,
+      "score": 20.0,
+      "signals": {
+        "no_timeout": "execFile() without timeout",
+        "no_retry": "no retry on transient errors",
+        "no_logging": "no logging on the failure path"
+      }
+    },
+    {
+      "id": "orders.shippingQuote",
+      "lang": "node",
+      "risk": 0.8176,
+      "exposure": 0.2449,
+      "score": 20.0,
+      "signals": {
+        "no_timeout": "http.get() without timeout",
+        "no_retry": "no retry on transient errors",
+        "no_logging": "no logging on the failure path"
+      }
+    },
+    {
+      "id": "app.eur",
+      "lang": "node",
+      "risk": 0.0,
+      "exposure": 0.0,
+      "score": 0.0,
+      "signals": []
+    },
+    {
+      "id": "orders.api",
+      "lang": "node",
+      "risk": 0.0,
+      "exposure": 0.0,
+      "score": 0.0,
+      "signals": []
+    },
+    {
+      "id": "upstream.start",
+      "lang": "node",
+      "risk": 0.0,
+      "exposure": 0.0,
+      "score": 0.0,
+      "signals": []
+    }
+  ]
+}

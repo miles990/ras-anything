@@ -99,7 +99,7 @@
 | **S** `build2s` | V-8 可服務性（OTel 日誌、health、RUNBOOK、diagnoser、MTTD/診斷/還原）、V-9 SLI/SLO、V-16.4 飛航記錄器+replay+RCA、V-18 AX 結構化錯誤+人類閘門 | **完成** | 355 tests OK（`adba2d1`、`f80aaa6`＋範例/文件收尾）；weather/payments/orders-node `.ras/slo.json`＋`RUNBOOK.md` 已重生成；`payments`/`orders-node` 舊範例 `logEvent` 仍印原始 `err` URL/路徑待 C/I 後一併清 |
 | **C** `build2c` | Go adapter + `examples/inventory-go/` 實測＋holdout 拒壞加固 | **完成** | `examples/inventory-go/` verify（FetchStock 28.3%→100.0%、ReserveStock 35.0%→100.0%、AuditTag 31.7%→100.0%，0 leaks）、bench 20 seeds **5.0% → 100.0%**（identical 5%→95%、crashes 80%→0%、hangs 15%→0%、dups 0→0、SLO 4/4 met）、holdout 4/4 壞加固全拒、360 tests OK |
 | **E** `build2e` | V-14 AI 依賴 adapter + `examples/support-ai/`（本機 mock，API $0）、V-15 生態決策寫入 docs/AI.md | **完成** | `examples/support-ai/` verify（`support.triage_ticket` 9.9%→100.0%，semantic 9.9%→100.0%，injection 100.0%，cost/ok $0.000188→$0.000055，0 leaks）、bench 20 seeds **50.0% → 100.0%**（crashes 40%→0%、hangs 10%→0%、SLO 4/4 met）、`drift` `small→backup` PASS（100%）、`docs/AI.md`（V-14/V-15）、Node parity、holdout 5/5 壞加固全拒、367 tests OK |
-| **V** `build2v` | V-19 視覺化資料契約（docs/schema、`.ras/out`、export、MCP、dashboard-sample） | 未開始 | |
+| **V** `build2v` | V-19 視覺化資料契約（docs/schema、`.ras/out`、export、MCP、dashboard-sample） | **完成** | `docs/schema/`（draft 2020-12 `ras-run`/`ras-event` + `README.md`）、`.ras/out/` 全命令寫出、`ras-anything export`（`json`/`ndjson`/`prom`/`otlp-json`）、MCP `ras_export` + `ras_events`、`examples/dashboard-sample/`（5 專案實測 bundle + `patterns-lab` 13 模式 + 單檔 HTML + `docs/cards/dashboard-sample.png` 截圖）、373 tests OK |
 | **I** `build2i` | V-6 `./install.sh`+`make install`、雙用途 README、skill 複製到 ~/.claude 與 ~/.codex、MCP/plugin 驗證、V-11 `docs/RELEASE.md`（不公開、不上架） | 未開始 | |
 | **D** `build2d` | 其餘 fast-anything 語言：Java、C#、PHP、Ruby、Kotlin、bun/deno、C/C++（各 adapter+範例+測試+holdout；做不完要在覆蓋表寫原因與下一步） | 未開始 | |
 | **W3** V-10 | 新手 30 秒／首次結果計時（只給 README 的盲測 agent） | 未開始 | 放在 I 之後、評審之前 |
@@ -108,4 +108,4 @@
 
 HEAD：見最新 main。工作樹應保持可推。中間產物在 `wow/work/`。
 
-接續備註（2026-11-23 17:45 台北時間）：E（`build2e`：V-14 AI 依賴 adapter + `examples/support-ai/` + V-15 `docs/AI.md` + Node parity + `drift` + holdout 5/5 壞加固全拒）已完成並推上 `main`（367 tests OK，`phases.done` 已記 `build2e 367`）。`wow/work/orchestrate.sh` 仍暫停（`wow/work/STOP` 保留）。下一個：V（`build2v` 視覺化資料契約）、然後 I/D、Codex、Fable。
+接續備註（2026-11-23 18:00 台北時間）：E 缺口 1（`f3370d9`，Node `boundary.cjs` 13 種 AI L7 故障＋loop guard＋parity 測試）與 V（`build2v`：V-19 視覺化資料契約——`docs/schema/`、`.ras/out/`、`ras-anything export`、MCP `ras_export`／`ras_events`、`examples/dashboard-sample/` + `docs/cards/dashboard-sample.png`）已完成並推上 `main`（373 tests OK，`phases.done` 已記 `build2v 373`）。`wow/work/orchestrate.sh` 仍暫停（`wow/work/STOP` 保留）。下一個：I（`build2i`）／D（`build2d`）、Codex、Fable。

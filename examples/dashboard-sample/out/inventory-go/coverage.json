@@ -1,0 +1,87 @@
+{
+  "coverage": {
+    "adapters": [
+      {
+        "ax": true,
+        "boundary": "urllib / requests / httpx / aiohttp / socket / subprocess",
+        "lang": "python",
+        "status": "complete",
+        "verify": true
+      },
+      {
+        "ax": true,
+        "boundary": "fetch / http / https / child_process (CJS + ESM + TS)",
+        "lang": "node",
+        "status": "complete",
+        "verify": true
+      },
+      {
+        "ax": true,
+        "boundary": "net/http / os/exec: AST + rasagent + rasruntime",
+        "lang": "go",
+        "status": "complete",
+        "verify": true
+      },
+      {
+        "ax": false,
+        "boundary": "HttpClient / HttpURLConnection / ProcessBuilder",
+        "lang": "java",
+        "status": "planned",
+        "verify": false
+      },
+      {
+        "ax": false,
+        "boundary": "HttpClient / Process",
+        "lang": "csharp",
+        "status": "planned",
+        "verify": false
+      },
+      {
+        "ax": false,
+        "boundary": "curl / file_get_contents / proc_open",
+        "lang": "php",
+        "status": "planned",
+        "verify": false
+      },
+      {
+        "ax": false,
+        "boundary": "Net::HTTP / Open3",
+        "lang": "ruby",
+        "status": "planned",
+        "verify": false
+      },
+      {
+        "ax": false,
+        "boundary": "HttpClient / OkHttp / ProcessBuilder",
+        "lang": "kotlin",
+        "status": "planned",
+        "verify": false
+      },
+      {
+        "ax": false,
+        "boundary": "fetch / Bun.spawn",
+        "lang": "bun",
+        "status": "planned",
+        "verify": false
+      },
+      {
+        "ax": false,
+        "boundary": "fetch / Deno.Command",
+        "lang": "deno",
+        "status": "planned",
+        "verify": false
+      },
+      {
+        "ax": false,
+        "boundary": "libcurl / popen",
+        "lang": "c_cpp",
+        "status": "planned",
+        "verify": false
+      }
+    ]
+  },
+  "generated_at": "2026-11-23T17:49:57+0800",
+  "kind": "coverage",
+  "project": "inventory-go",
+  "schema_version": "1.0.0"
+}

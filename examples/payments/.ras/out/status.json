@@ -1,0 +1,106 @@
+{
+  "schema_version": "1.0.0",
+  "kind": "status",
+  "generated_at": "2026-11-23T17:49:57+0800",
+  "project": "payments",
+  "lang": "python",
+  "rollout": {
+    "enabled": {},
+    "canary_pct": 0.0,
+    "shadow": false,
+    "blast_radius_functions": 0
+  },
+  "resilience_state": {
+    "breakers": {},
+    "bulkheads": {},
+    "flags": {}
+  },
+  "functions": [
+    {
+      "id": "billing.charge",
+      "lang": "python",
+      "passed": true,
+      "budget_s": 5.0,
+      "happy": {
+        "equal": 16,
+        "total": 16
+      },
+      "original": {
+        "availability": 0.76875,
+        "identical_rate": null,
+        "crash_rate": null,
+        "hang_rate": null,
+        "wrong": 17,
+        "hang": 20,
+        "dups": 38,
+        "p50_s": 0.506062,
+        "p99_s": 13.502909,
+        "amplification": 1.80625
+      },
+      "hardened": {
+        "availability": 1.0,
+        "identical_rate": null,
+        "crash_rate": null,
+        "hang_rate": null,
+        "wrong": 0,
+        "hang": 0,
+        "dups": 0,
+        "p50_s": 0.195867,
+        "p99_s": 4.5,
+        "amplification": 1.8
+      },
+      "gates": {
+        "happy": true,
+        "no_wrong": true,
+        "no_hang": true,
+        "no_new_crashes": true,
+        "p99": true,
+        "dups": true,
+        "availability": true
+      }
+    },
+    {
+      "id": "billing.render_receipt",
+      "lang": "python",
+      "passed": true,
+      "budget_s": 5.0,
+      "happy": {
+        "equal": 16,
+        "total": 16
+      },
+      "original": {
+        "availability": 0.33125,
+        "identical_rate": null,
+        "crash_rate": null,
+        "hang_rate": null,
+        "wrong": 0,
+        "hang": 18,
+        "dups": 0,
+        "p50_s": 0.020482,
+        "p99_s": 60.0,
+        "amplification": 1.0
+      },
+      "hardened": {
+        "availability": 1.0,
+        "identical_rate": null,
+        "crash_rate": null,
+        "hang_rate": null,
+        "wrong": 0,
+        "hang": 0,
+        "dups": 0,
+        "p50_s": 0.09347,
+        "p99_s": 1.125221,
+        "amplification": 2.04375
+      },
+      "gates": {
+        "happy": true,
+        "no_wrong": true,
+        "no_hang": true,
+        "no_new_crashes": true,
+        "p99": true,
+        "dups": true,
+        "availability": true
+      }
+    }
+  ]
+}

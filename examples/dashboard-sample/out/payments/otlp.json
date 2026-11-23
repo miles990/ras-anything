@@ -1,0 +1,224 @@
+{
+  "resourceLogs": [
+    {
+      "resource": {
+        "attributes": [
+          {
+            "key": "service.name",
+            "value": {
+              "stringValue": "payments"
+            }
+          }
+        ]
+      },
+      "scopeLogs": [
+        {
+          "logRecords": [
+            {
+              "attributes": [
+                {
+                  "key": "ras.seq",
+                  "value": {
+                    "intValue": "1"
+                  }
+                },
+                {
+                  "key": "ras.data",
+                  "value": {
+                    "stringValue": "{\"functions\": 10}"
+                  }
+                }
+              ],
+              "body": {
+                "stringValue": "scan.completed"
+              },
+              "severityText": "INFO",
+              "timeUnixNano": "1795427397487770880",
+              "traceId": ""
+            },
+            {
+              "attributes": [
+                {
+                  "key": "ras.seq",
+                  "value": {
+                    "intValue": "2"
+                  }
+                },
+                {
+                  "key": "ras.data",
+                  "value": {
+                    "stringValue": "{\"availability_hardened\": 1.0, \"availability_original\": 0.76875}"
+                  }
+                }
+              ],
+              "body": {
+                "stringValue": "verify.passed"
+              },
+              "severityText": "INFO",
+              "timeUnixNano": "1795427397487770880",
+              "traceId": ""
+            },
+            {
+              "attributes": [
+                {
+                  "key": "ras.seq",
+                  "value": {
+                    "intValue": "3"
+                  }
+                },
+                {
+                  "key": "ras.data",
+                  "value": {
+                    "stringValue": "{\"availability_hardened\": 1.0, \"availability_original\": 0.33125}"
+                  }
+                }
+              ],
+              "body": {
+                "stringValue": "verify.passed"
+              },
+              "severityText": "INFO",
+              "timeUnixNano": "1795427397487770880",
+              "traceId": ""
+            },
+            {
+              "attributes": [
+                {
+                  "key": "ras.seq",
+                  "value": {
+                    "intValue": "4"
+                  }
+                },
+                {
+                  "key": "ras.data",
+                  "value": {
+                    "stringValue": "{\"availability_hardened\": 0.9, \"availability_original\": 0.0, \"seeds\": 20}"
+                  }
+                }
+              ],
+              "body": {
+                "stringValue": "bench.completed"
+              },
+              "severityText": "INFO",
+              "timeUnixNano": "1795427397487770880",
+              "traceId": ""
+            },
+            {
+              "attributes": [
+                {
+                  "key": "ras.seq",
+                  "value": {
+                    "intValue": "5"
+                  }
+                },
+                {
+                  "key": "ras.data",
+                  "value": {
+                    "stringValue": "{\"status\": \"missed\"}"
+                  }
+                }
+              ],
+              "body": {
+                "stringValue": "slo.evaluated"
+              },
+              "severityText": "ERROR",
+              "timeUnixNano": "1795427397487770880",
+              "traceId": ""
+            }
+          ],
+          "scope": {
+            "name": "ras-anything",
+            "version": "1.0.0"
+          }
+        }
+      ]
+    }
+  ],
+  "resourceMetrics": [
+    {
+      "resource": {
+        "attributes": [
+          {
+            "key": "service.name",
+            "value": {
+              "stringValue": "payments"
+            }
+          }
+        ]
+      },
+      "scopeMetrics": [
+        {
+          "metrics": [
+            {
+              "gauge": {
+                "dataPoints": [
+                  {
+                    "asDouble": 0.0,
+                    "attributes": [
+                      {
+                        "key": "variant",
+                        "value": {
+                          "stringValue": "original"
+                        }
+                      }
+                    ],
+                    "timeUnixNano": "1795427397487770880"
+                  },
+                  {
+                    "asDouble": 0.9,
+                    "attributes": [
+                      {
+                        "key": "variant",
+                        "value": {
+                          "stringValue": "hardened"
+                        }
+                      }
+                    ],
+                    "timeUnixNano": "1795427397487770880"
+                  }
+                ]
+              },
+              "name": "ras.availability.ratio",
+              "unit": "1"
+            },
+            {
+              "gauge": {
+                "dataPoints": [
+                  {
+                    "asDouble": 4.0303,
+                    "attributes": [
+                      {
+                        "key": "variant",
+                        "value": {
+                          "stringValue": "original"
+                        }
+                      }
+                    ],
+                    "timeUnixNano": "1795427397487770880"
+                  },
+                  {
+                    "asDouble": 4.2391,
+                    "attributes": [
+                      {
+                        "key": "variant",
+                        "value": {
+                          "stringValue": "hardened"
+                        }
+                      }
+                    ],
+                    "timeUnixNano": "1795427397487770880"
+                  }
+                ]
+              },
+              "name": "ras.p99.seconds",
+              "unit": "s"
+            }
+          ],
+          "scope": {
+            "name": "ras-anything",
+            "version": "1.0.0"
+          }
+        }
+      ]
+    }
+  ]
+}

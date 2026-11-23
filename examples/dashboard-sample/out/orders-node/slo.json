@@ -1,0 +1,53 @@
+{
+  "generated_at": "2026-11-23T17:49:57+0800",
+  "kind": "slo",
+  "project": "orders-node",
+  "schema_version": "1.0.0",
+  "slo": {
+    "hardened": {
+      "availability": 0.9,
+      "checks": {
+        "availability": false,
+        "error_rate": false,
+        "p99_s": true
+      },
+      "error_budget": 0.01,
+      "error_budget_burn_pct": 1000.0,
+      "error_budget_burn_ratio": 10.0,
+      "error_rate": 0.1,
+      "p50_s": 2.7274,
+      "p99_s": 4.9689,
+      "status": "missed"
+    },
+    "original": {
+      "availability": 0.0,
+      "checks": {
+        "availability": false,
+        "error_rate": false,
+        "p99_s": true
+      },
+      "error_budget": 0.01,
+      "error_budget_burn_pct": 10000.0,
+      "error_budget_burn_ratio": 100.0,
+      "error_rate": 1.0,
+      "p50_s": 0.3574,
+      "p99_s": 4.1795,
+      "status": "missed"
+    },
+    "series": [
+      {
+        "availability": 0.9,
+        "burn_pct": 1000.0,
+        "error_rate": 0.1,
+        "p99_s": 4.9689,
+        "ts": "2026-11-23T17:49:57+0800"
+      }
+    ],
+    "source": "bench",
+    "targets": {
+      "availability": 0.99,
+      "error_rate": 0.01,
+      "p99_s": 5.0
+    }
+  }
+}

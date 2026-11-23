@@ -1,0 +1,773 @@
+{
+  "events": [
+    {
+      "data": {
+        "functions": 6
+      },
+      "dependency": null,
+      "event_type": "scan.completed",
+      "function_id": null,
+      "kind": "event",
+      "schema_version": "1.0.0",
+      "seq": 1,
+      "severity": "INFO",
+      "trace_id": null,
+      "ts": "2026-11-23T17:49:44+0800"
+    },
+    {
+      "data": {
+        "availability_hardened": 1.0,
+        "availability_original": 0.0990990990990991
+      },
+      "dependency": null,
+      "event_type": "verify.passed",
+      "function_id": "support.triage_ticket",
+      "kind": "event",
+      "schema_version": "1.0.0",
+      "seq": 2,
+      "severity": "INFO",
+      "trace_id": null,
+      "ts": "2026-11-23T17:49:44+0800"
+    },
+    {
+      "data": {
+        "availability_hardened": 1.0,
+        "availability_original": 0.5,
+        "seeds": 20
+      },
+      "dependency": null,
+      "event_type": "bench.completed",
+      "function_id": null,
+      "kind": "event",
+      "schema_version": "1.0.0",
+      "seq": 3,
+      "severity": "INFO",
+      "trace_id": null,
+      "ts": "2026-11-23T17:49:44+0800"
+    },
+    {
+      "data": {
+        "status": "met"
+      },
+      "dependency": null,
+      "event_type": "slo.evaluated",
+      "function_id": null,
+      "kind": "event",
+      "schema_version": "1.0.0",
+      "seq": 4,
+      "severity": "INFO",
+      "trace_id": null,
+      "ts": "2026-11-23T17:49:44+0800"
+    }
+  ],
+  "generated_at": "2026-11-23T17:49:57+0800",
+  "kind": "bundle",
+  "project": "support-ai",
+  "schema_version": "1.0.0",
+  "snapshots": {
+    "bench": {
+      "bench": {
+        "hardened": {
+          "amplification": 2.4833333333333334,
+          "availability": 1.0,
+          "crash_rate": 0.0,
+          "dups": 0,
+          "hang": 0,
+          "hang_rate": 0.0,
+          "identical_rate": 0.95,
+          "p50_s": 0.7569,
+          "p99_s": 2.6095,
+          "wrong": 0
+        },
+        "original": {
+          "amplification": 1.8297872340425532,
+          "availability": 0.5,
+          "crash_rate": 0.4,
+          "dups": 0,
+          "hang": 2,
+          "hang_rate": 0.1,
+          "identical_rate": 0.5,
+          "p50_s": 0.6043,
+          "p99_s": 2.1041,
+          "wrong": 0
+        },
+        "rate": 0.1,
+        "seeds": 20
+      },
+      "generated_at": "2026-11-23T17:49:57+0800",
+      "kind": "bench",
+      "lang": "python",
+      "project": "support-ai",
+      "schema_version": "1.0.0"
+    },
+    "coverage": {
+      "coverage": {
+        "adapters": [
+          {
+            "ax": true,
+            "boundary": "urllib / requests / httpx / aiohttp / socket / subprocess",
+            "lang": "python",
+            "status": "complete",
+            "verify": true
+          },
+          {
+            "ax": true,
+            "boundary": "fetch / http / https / child_process (CJS + ESM + TS)",
+            "lang": "node",
+            "status": "complete",
+            "verify": true
+          },
+          {
+            "ax": true,
+            "boundary": "net/http / os/exec: AST + rasagent + rasruntime",
+            "lang": "go",
+            "status": "complete",
+            "verify": true
+          },
+          {
+            "ax": false,
+            "boundary": "HttpClient / HttpURLConnection / ProcessBuilder",
+            "lang": "java",
+            "status": "planned",
+            "verify": false
+          },
+          {
+            "ax": false,
+            "boundary": "HttpClient / Process",
+            "lang": "csharp",
+            "status": "planned",
+            "verify": false
+          },
+          {
+            "ax": false,
+            "boundary": "curl / file_get_contents / proc_open",
+            "lang": "php",
+            "status": "planned",
+            "verify": false
+          },
+          {
+            "ax": false,
+            "boundary": "Net::HTTP / Open3",
+            "lang": "ruby",
+            "status": "planned",
+            "verify": false
+          },
+          {
+            "ax": false,
+            "boundary": "HttpClient / OkHttp / ProcessBuilder",
+            "lang": "kotlin",
+            "status": "planned",
+            "verify": false
+          },
+          {
+            "ax": false,
+            "boundary": "fetch / Bun.spawn",
+            "lang": "bun",
+            "status": "planned",
+            "verify": false
+          },
+          {
+            "ax": false,
+            "boundary": "fetch / Deno.Command",
+            "lang": "deno",
+            "status": "planned",
+            "verify": false
+          },
+          {
+            "ax": false,
+            "boundary": "libcurl / popen",
+            "lang": "c_cpp",
+            "status": "planned",
+            "verify": false
+          }
+        ]
+      },
+      "generated_at": "2026-11-23T17:49:57+0800",
+      "kind": "coverage",
+      "project": "support-ai",
+      "schema_version": "1.0.0"
+    },
+    "report": {
+      "ai": {
+        "hardened": {
+          "calls": 111,
+          "cost_per_success_usd": 5.5e-05,
+          "injection_resistance": 1.0,
+          "loop_guard_trips": 0,
+          "retry_cost_amplification": 1.732,
+          "semantic_success_rate": 1.0,
+          "total_cost_usd": 0.006074,
+          "total_tokens": 25374
+        },
+        "max_attempts_per_trial": 4,
+        "original": {
+          "calls": 111,
+          "cost_per_success_usd": 0.000188,
+          "injection_resistance": 1.0,
+          "loop_guard_trips": 0,
+          "retry_cost_amplification": 0.682,
+          "semantic_success_rate": 0.0991,
+          "total_cost_usd": 0.002063,
+          "total_tokens": 9997
+        }
+      },
+      "ax": {
+        "hardened_accuracy": 1.0,
+        "leaks": 0,
+        "original_accuracy": 0.3,
+        "records": []
+      },
+      "bench": {
+        "hardened": {
+          "amplification": 2.4833333333333334,
+          "availability": 1.0,
+          "crash_rate": 0.0,
+          "dups": 0,
+          "hang": 0,
+          "hang_rate": 0.0,
+          "identical_rate": 0.95,
+          "p50_s": 0.7569,
+          "p99_s": 2.6095,
+          "wrong": 0
+        },
+        "original": {
+          "amplification": 1.8297872340425532,
+          "availability": 0.5,
+          "crash_rate": 0.4,
+          "dups": 0,
+          "hang": 2,
+          "hang_rate": 0.1,
+          "identical_rate": 0.5,
+          "p50_s": 0.6043,
+          "p99_s": 2.1041,
+          "wrong": 0
+        },
+        "rate": 0.1,
+        "seeds": 20
+      },
+      "coverage": {
+        "adapters": [
+          {
+            "ax": true,
+            "boundary": "urllib / requests / httpx / aiohttp / socket / subprocess",
+            "lang": "python",
+            "status": "complete",
+            "verify": true
+          },
+          {
+            "ax": true,
+            "boundary": "fetch / http / https / child_process (CJS + ESM + TS)",
+            "lang": "node",
+            "status": "complete",
+            "verify": true
+          },
+          {
+            "ax": true,
+            "boundary": "net/http / os/exec: AST + rasagent + rasruntime",
+            "lang": "go",
+            "status": "complete",
+            "verify": true
+          },
+          {
+            "ax": false,
+            "boundary": "HttpClient / HttpURLConnection / ProcessBuilder",
+            "lang": "java",
+            "status": "planned",
+            "verify": false
+          },
+          {
+            "ax": false,
+            "boundary": "HttpClient / Process",
+            "lang": "csharp",
+            "status": "planned",
+            "verify": false
+          },
+          {
+            "ax": false,
+            "boundary": "curl / file_get_contents / proc_open",
+            "lang": "php",
+            "status": "planned",
+            "verify": false
+          },
+          {
+            "ax": false,
+            "boundary": "Net::HTTP / Open3",
+            "lang": "ruby",
+            "status": "planned",
+            "verify": false
+          },
+          {
+            "ax": false,
+            "boundary": "HttpClient / OkHttp / ProcessBuilder",
+            "lang": "kotlin",
+            "status": "planned",
+            "verify": false
+          },
+          {
+            "ax": false,
+            "boundary": "fetch / Bun.spawn",
+            "lang": "bun",
+            "status": "planned",
+            "verify": false
+          },
+          {
+            "ax": false,
+            "boundary": "fetch / Deno.Command",
+            "lang": "deno",
+            "status": "planned",
+            "verify": false
+          },
+          {
+            "ax": false,
+            "boundary": "libcurl / popen",
+            "lang": "c_cpp",
+            "status": "planned",
+            "verify": false
+          }
+        ]
+      },
+      "functions": [
+        {
+          "ai": {
+            "hardened": {
+              "calls": 111,
+              "cost_per_success_usd": 5.5e-05,
+              "injection_resistance": 1.0,
+              "loop_guard_trips": 0,
+              "retry_cost_amplification": 1.732,
+              "semantic_success_rate": 1.0,
+              "total_cost_usd": 0.006074,
+              "total_tokens": 25374
+            },
+            "max_attempts_per_trial": 4,
+            "original": {
+              "calls": 111,
+              "cost_per_success_usd": 0.000188,
+              "injection_resistance": 1.0,
+              "loop_guard_trips": 0,
+              "retry_cost_amplification": 0.682,
+              "semantic_success_rate": 0.0991,
+              "total_cost_usd": 0.002063,
+              "total_tokens": 9997
+            }
+          },
+          "budget_s": 5.0,
+          "gates": {
+            "ai_budget": true,
+            "ai_injection": true,
+            "availability": true,
+            "dups": true,
+            "happy": true,
+            "no_hang": true,
+            "no_new_crashes": true,
+            "no_wrong": true,
+            "p99": true
+          },
+          "happy": {
+            "equal": 3,
+            "total": 3
+          },
+          "hardened": {
+            "amplification": 2.72972972972973,
+            "availability": 1.0,
+            "crash_rate": null,
+            "dups": 0,
+            "hang": 0,
+            "hang_rate": null,
+            "identical_rate": null,
+            "p50_s": 0.008827,
+            "p99_s": 3.719763,
+            "wrong": 0
+          },
+          "id": "support.triage_ticket",
+          "lang": "python",
+          "original": {
+            "amplification": 1.2882882882882882,
+            "availability": 0.0990990990990991,
+            "crash_rate": null,
+            "dups": 0,
+            "hang": 12,
+            "hang_rate": null,
+            "identical_rate": null,
+            "p50_s": 0.0,
+            "p99_s": 60.004472,
+            "wrong": 0
+          },
+          "passed": true
+        }
+      ],
+      "generated_at": "2026-11-23T17:49:57+0800",
+      "kind": "report",
+      "lang": "python",
+      "project": "support-ai",
+      "resilience_state": {
+        "breakers": {},
+        "bulkheads": {},
+        "flags": {}
+      },
+      "rollout": {
+        "blast_radius_functions": 0,
+        "canary_pct": 0.0,
+        "enabled": {},
+        "shadow": false
+      },
+      "schema_version": "1.0.0",
+      "serviceability": {
+        "hard_detection_rate": 1.0,
+        "hard_diagnosis_accuracy": 0.0,
+        "mttd_s": null,
+        "mttr_s": null,
+        "orig_detection_rate": 0.0,
+        "restore_s": null
+      },
+      "slo": {
+        "hardened": {
+          "availability": 1.0,
+          "checks": {
+            "availability": true,
+            "error_rate": true,
+            "p99_s": true
+          },
+          "error_budget": 0.01,
+          "error_budget_burn_pct": 0.0,
+          "error_budget_burn_ratio": 0.0,
+          "error_rate": 0.0,
+          "p50_s": 0.7569,
+          "p99_s": 2.6095,
+          "status": "met"
+        },
+        "original": {
+          "availability": 0.5,
+          "checks": {
+            "availability": false,
+            "error_rate": false,
+            "p99_s": true
+          },
+          "error_budget": 0.01,
+          "error_budget_burn_pct": 5000.0,
+          "error_budget_burn_ratio": 50.0,
+          "error_rate": 0.5,
+          "p50_s": 0.6043,
+          "p99_s": 2.1041,
+          "status": "missed"
+        },
+        "source": "bench",
+        "targets": {
+          "availability": 0.99,
+          "error_rate": 0.01,
+          "p99_s": 5.0
+        }
+      }
+    },
+    "scan": {
+      "functions": [
+        {
+          "exposure": 1.0,
+          "id": "support.triage_ticket",
+          "lang": "python",
+          "risk": 0.8632,
+          "score": 86.3,
+          "signals": {
+            "no_logging": "no logging on the failure path",
+            "no_timeout": "urlopen() without timeout",
+            "unsafe_retry": "retries a POST with no Idempotency-Key"
+          }
+        },
+        {
+          "exposure": 0.0,
+          "id": "app.main",
+          "lang": "python",
+          "risk": 0.0,
+          "score": 0.0,
+          "signals": []
+        },
+        {
+          "exposure": 0.0,
+          "id": "mock_provider.MockProviderHandler.do_POST",
+          "lang": "python",
+          "risk": 0.0,
+          "score": 0.0,
+          "signals": []
+        },
+        {
+          "exposure": 0.0,
+          "id": "mock_provider.MockProviderHandler.log_message",
+          "lang": "python",
+          "risk": 0.0,
+          "score": 0.0,
+          "signals": []
+        },
+        {
+          "exposure": 0.0,
+          "id": "mock_provider.start_server",
+          "lang": "python",
+          "risk": 0.0,
+          "score": 0.0,
+          "signals": []
+        },
+        {
+          "exposure": 0.0,
+          "id": "support.read_optional_note",
+          "lang": "python",
+          "risk": 0.335,
+          "score": 0.0,
+          "signals": {
+            "no_logging": "no logging on the failure path",
+            "swallow": "`except OSError: return None` swallows errors"
+          }
+        }
+      ],
+      "generated_at": "2026-11-23T17:49:57+0800",
+      "kind": "scan",
+      "lang": "python",
+      "project": "support-ai",
+      "schema_version": "1.0.0"
+    },
+    "slo": {
+      "generated_at": "2026-11-23T17:49:57+0800",
+      "kind": "slo",
+      "project": "support-ai",
+      "schema_version": "1.0.0",
+      "slo": {
+        "hardened": {
+          "availability": 1.0,
+          "checks": {
+            "availability": true,
+            "error_rate": true,
+            "p99_s": true
+          },
+          "error_budget": 0.01,
+          "error_budget_burn_pct": 0.0,
+          "error_budget_burn_ratio": 0.0,
+          "error_rate": 0.0,
+          "p50_s": 0.7569,
+          "p99_s": 2.6095,
+          "status": "met"
+        },
+        "original": {
+          "availability": 0.5,
+          "checks": {
+            "availability": false,
+            "error_rate": false,
+            "p99_s": true
+          },
+          "error_budget": 0.01,
+          "error_budget_burn_pct": 5000.0,
+          "error_budget_burn_ratio": 50.0,
+          "error_rate": 0.5,
+          "p50_s": 0.6043,
+          "p99_s": 2.1041,
+          "status": "missed"
+        },
+        "series": [
+          {
+            "availability": 1.0,
+            "burn_pct": 0.0,
+            "error_rate": 0.0,
+            "p99_s": 2.6095,
+            "ts": "2026-11-23T17:49:57+0800"
+          }
+        ],
+        "source": "bench",
+        "targets": {
+          "availability": 0.99,
+          "error_rate": 0.01,
+          "p99_s": 5.0
+        }
+      }
+    },
+    "status": {
+      "functions": [
+        {
+          "ai": {
+            "hardened": {
+              "calls": 111,
+              "cost_per_success_usd": 5.5e-05,
+              "injection_resistance": 1.0,
+              "loop_guard_trips": 0,
+              "retry_cost_amplification": 1.732,
+              "semantic_success_rate": 1.0,
+              "total_cost_usd": 0.006074,
+              "total_tokens": 25374
+            },
+            "max_attempts_per_trial": 4,
+            "original": {
+              "calls": 111,
+              "cost_per_success_usd": 0.000188,
+              "injection_resistance": 1.0,
+              "loop_guard_trips": 0,
+              "retry_cost_amplification": 0.682,
+              "semantic_success_rate": 0.0991,
+              "total_cost_usd": 0.002063,
+              "total_tokens": 9997
+            }
+          },
+          "budget_s": 5.0,
+          "gates": {
+            "ai_budget": true,
+            "ai_injection": true,
+            "availability": true,
+            "dups": true,
+            "happy": true,
+            "no_hang": true,
+            "no_new_crashes": true,
+            "no_wrong": true,
+            "p99": true
+          },
+          "happy": {
+            "equal": 3,
+            "total": 3
+          },
+          "hardened": {
+            "amplification": 2.72972972972973,
+            "availability": 1.0,
+            "crash_rate": null,
+            "dups": 0,
+            "hang": 0,
+            "hang_rate": null,
+            "identical_rate": null,
+            "p50_s": 0.008827,
+            "p99_s": 3.719763,
+            "wrong": 0
+          },
+          "id": "support.triage_ticket",
+          "lang": "python",
+          "original": {
+            "amplification": 1.2882882882882882,
+            "availability": 0.0990990990990991,
+            "crash_rate": null,
+            "dups": 0,
+            "hang": 12,
+            "hang_rate": null,
+            "identical_rate": null,
+            "p50_s": 0.0,
+            "p99_s": 60.004472,
+            "wrong": 0
+          },
+          "passed": true
+        }
+      ],
+      "generated_at": "2026-11-23T17:49:57+0800",
+      "kind": "status",
+      "lang": "python",
+      "project": "support-ai",
+      "resilience_state": {
+        "breakers": {},
+        "bulkheads": {},
+        "flags": {}
+      },
+      "rollout": {
+        "blast_radius_functions": 0,
+        "canary_pct": 0.0,
+        "enabled": {},
+        "shadow": false
+      },
+      "schema_version": "1.0.0"
+    },
+    "verify-support.triage_ticket": {
+      "ai": {
+        "hardened": {
+          "calls": 111,
+          "cost_per_success_usd": 5.5e-05,
+          "injection_resistance": 1.0,
+          "loop_guard_trips": 0,
+          "retry_cost_amplification": 1.732,
+          "semantic_success_rate": 1.0,
+          "total_cost_usd": 0.006074,
+          "total_tokens": 25374
+        },
+        "max_attempts_per_trial": 4,
+        "original": {
+          "calls": 111,
+          "cost_per_success_usd": 0.000188,
+          "injection_resistance": 1.0,
+          "loop_guard_trips": 0,
+          "retry_cost_amplification": 0.682,
+          "semantic_success_rate": 0.0991,
+          "total_cost_usd": 0.002063,
+          "total_tokens": 9997
+        }
+      },
+      "functions": [
+        {
+          "ai": {
+            "hardened": {
+              "calls": 111,
+              "cost_per_success_usd": 5.5e-05,
+              "injection_resistance": 1.0,
+              "loop_guard_trips": 0,
+              "retry_cost_amplification": 1.732,
+              "semantic_success_rate": 1.0,
+              "total_cost_usd": 0.006074,
+              "total_tokens": 25374
+            },
+            "max_attempts_per_trial": 4,
+            "original": {
+              "calls": 111,
+              "cost_per_success_usd": 0.000188,
+              "injection_resistance": 1.0,
+              "loop_guard_trips": 0,
+              "retry_cost_amplification": 0.682,
+              "semantic_success_rate": 0.0991,
+              "total_cost_usd": 0.002063,
+              "total_tokens": 9997
+            }
+          },
+          "budget_s": 5.0,
+          "gates": {
+            "ai_budget": true,
+            "ai_injection": true,
+            "availability": true,
+            "dups": true,
+            "happy": true,
+            "no_hang": true,
+            "no_new_crashes": true,
+            "no_wrong": true,
+            "p99": true
+          },
+          "happy": {
+            "equal": 3,
+            "total": 3
+          },
+          "hardened": {
+            "amplification": 2.72972972972973,
+            "availability": 1.0,
+            "crash_rate": null,
+            "dups": 0,
+            "hang": 0,
+            "hang_rate": null,
+            "identical_rate": null,
+            "p50_s": 0.008827,
+            "p99_s": 3.719763,
+            "wrong": 0
+          },
+          "id": "support.triage_ticket",
+          "lang": "python",
+          "original": {
+            "amplification": 1.2882882882882882,
+            "availability": 0.0990990990990991,
+            "crash_rate": null,
+            "dups": 0,
+            "hang": 12,
+            "hang_rate": null,
+            "identical_rate": null,
+            "p50_s": 0.0,
+            "p99_s": 60.004472,
+            "wrong": 0
+          },
+          "passed": true
+        }
+      ],
+      "generated_at": "2026-11-23T17:49:57+0800",
+      "kind": "verify",
+      "lang": "python",
+      "project": "support-ai",
+      "schema_version": "1.0.0",
+      "serviceability": {
+        "hard_detection_rate": 1.0,
+        "hard_diagnosis_accuracy": 0.0,
+        "orig_detection_rate": 0.0
+      }
+    }
+  }
+}

@@ -1,0 +1,202 @@
+{
+  "resourceLogs": [
+    {
+      "resource": {
+        "attributes": [
+          {
+            "key": "service.name",
+            "value": {
+              "stringValue": "weather"
+            }
+          }
+        ]
+      },
+      "scopeLogs": [
+        {
+          "logRecords": [
+            {
+              "attributes": [
+                {
+                  "key": "ras.seq",
+                  "value": {
+                    "intValue": "1"
+                  }
+                },
+                {
+                  "key": "ras.data",
+                  "value": {
+                    "stringValue": "{\"functions\": 7}"
+                  }
+                }
+              ],
+              "body": {
+                "stringValue": "scan.completed"
+              },
+              "severityText": "INFO",
+              "timeUnixNano": "1795427397499428096",
+              "traceId": ""
+            },
+            {
+              "attributes": [
+                {
+                  "key": "ras.seq",
+                  "value": {
+                    "intValue": "2"
+                  }
+                },
+                {
+                  "key": "ras.data",
+                  "value": {
+                    "stringValue": "{\"availability_hardened\": 1.0, \"availability_original\": 0.325}"
+                  }
+                }
+              ],
+              "body": {
+                "stringValue": "verify.passed"
+              },
+              "severityText": "INFO",
+              "timeUnixNano": "1795427397499428096",
+              "traceId": ""
+            },
+            {
+              "attributes": [
+                {
+                  "key": "ras.seq",
+                  "value": {
+                    "intValue": "3"
+                  }
+                },
+                {
+                  "key": "ras.data",
+                  "value": {
+                    "stringValue": "{\"availability_hardened\": 1.0, \"availability_original\": 0.4, \"seeds\": 20}"
+                  }
+                }
+              ],
+              "body": {
+                "stringValue": "bench.completed"
+              },
+              "severityText": "INFO",
+              "timeUnixNano": "1795427397499428096",
+              "traceId": ""
+            },
+            {
+              "attributes": [
+                {
+                  "key": "ras.seq",
+                  "value": {
+                    "intValue": "4"
+                  }
+                },
+                {
+                  "key": "ras.data",
+                  "value": {
+                    "stringValue": "{\"status\": \"met\"}"
+                  }
+                }
+              ],
+              "body": {
+                "stringValue": "slo.evaluated"
+              },
+              "severityText": "INFO",
+              "timeUnixNano": "1795427397499428096",
+              "traceId": ""
+            }
+          ],
+          "scope": {
+            "name": "ras-anything",
+            "version": "1.0.0"
+          }
+        }
+      ]
+    }
+  ],
+  "resourceMetrics": [
+    {
+      "resource": {
+        "attributes": [
+          {
+            "key": "service.name",
+            "value": {
+              "stringValue": "weather"
+            }
+          }
+        ]
+      },
+      "scopeMetrics": [
+        {
+          "metrics": [
+            {
+              "gauge": {
+                "dataPoints": [
+                  {
+                    "asDouble": 0.4,
+                    "attributes": [
+                      {
+                        "key": "variant",
+                        "value": {
+                          "stringValue": "original"
+                        }
+                      }
+                    ],
+                    "timeUnixNano": "1795427397499428096"
+                  },
+                  {
+                    "asDouble": 1.0,
+                    "attributes": [
+                      {
+                        "key": "variant",
+                        "value": {
+                          "stringValue": "hardened"
+                        }
+                      }
+                    ],
+                    "timeUnixNano": "1795427397499428096"
+                  }
+                ]
+              },
+              "name": "ras.availability.ratio",
+              "unit": "1"
+            },
+            {
+              "gauge": {
+                "dataPoints": [
+                  {
+                    "asDouble": 2.1071,
+                    "attributes": [
+                      {
+                        "key": "variant",
+                        "value": {
+                          "stringValue": "original"
+                        }
+                      }
+                    ],
+                    "timeUnixNano": "1795427397499428096"
+                  },
+                  {
+                    "asDouble": 1.2549,
+                    "attributes": [
+                      {
+                        "key": "variant",
+                        "value": {
+                          "stringValue": "hardened"
+                        }
+                      }
+                    ],
+                    "timeUnixNano": "1795427397499428096"
+                  }
+                ]
+              },
+              "name": "ras.p99.seconds",
+              "unit": "s"
+            }
+          ],
+          "scope": {
+            "name": "ras-anything",
+            "version": "1.0.0"
+          }
+        }
+      ]
+    }
+  ]
+}

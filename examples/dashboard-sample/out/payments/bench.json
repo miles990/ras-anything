@@ -1,0 +1,35 @@
+{
+  "bench": {
+    "hardened": {
+      "amplification": 1.2015873015873015,
+      "availability": 0.9,
+      "crash_rate": 0.1,
+      "dups": 0,
+      "hang": 0,
+      "hang_rate": 0.0,
+      "identical_rate": 0.45,
+      "p50_s": 1.4353,
+      "p99_s": 4.2391,
+      "wrong": 0
+    },
+    "original": {
+      "amplification": 1.0893617021276596,
+      "availability": 0.0,
+      "crash_rate": 0.6,
+      "dups": 5,
+      "hang": 5,
+      "hang_rate": 0.25,
+      "identical_rate": 0.0,
+      "p50_s": 1.8277,
+      "p99_s": 4.0303,
+      "wrong": 3
+    },
+    "rate": 0.1,
+    "seeds": 20
+  },
+  "generated_at": "2026-11-23T17:49:57+0800",
+  "kind": "bench",
+  "lang": "python",
+  "project": "payments",
+  "schema_version": "1.0.0"
+}

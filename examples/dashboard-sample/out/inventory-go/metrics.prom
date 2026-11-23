@@ -1,0 +1,54 @@
+# HELP ras_availability_ratio Availability ratio (0..1) under injected faults
+# TYPE ras_availability_ratio gauge
+ras_availability_ratio{project="inventory-go",scope="bench",variant="original"} 0.05
+ras_availability_ratio{project="inventory-go",scope="bench",variant="hardened"} 1.0
+ras_availability_ratio{project="inventory-go",scope="verify",function="warehouse.AuditTag",variant="original"} 0.31666666666666665
+ras_availability_ratio{project="inventory-go",scope="verify",function="warehouse.AuditTag",variant="hardened"} 1.0
+ras_availability_ratio{project="inventory-go",scope="verify",function="warehouse.FetchStock",variant="original"} 0.2833333333333333
+ras_availability_ratio{project="inventory-go",scope="verify",function="warehouse.FetchStock",variant="hardened"} 1.0
+ras_availability_ratio{project="inventory-go",scope="verify",function="warehouse.ReserveStock",variant="original"} 0.35
+ras_availability_ratio{project="inventory-go",scope="verify",function="warehouse.ReserveStock",variant="hardened"} 1.0
+# HELP ras_identical_ratio Strict byte-identical output ratio (0..1)
+# TYPE ras_identical_ratio gauge
+ras_identical_ratio{project="inventory-go",scope="bench",variant="original"} 0.05
+ras_identical_ratio{project="inventory-go",scope="bench",variant="hardened"} 0.95
+# HELP ras_crash_rate Whole-app crash rate (0..1)
+# TYPE ras_crash_rate gauge
+ras_crash_rate{project="inventory-go",scope="bench",variant="original"} 0.8
+ras_crash_rate{project="inventory-go",scope="bench",variant="hardened"} 0.0
+# HELP ras_hang_rate Whole-app hang rate (0..1)
+# TYPE ras_hang_rate gauge
+ras_hang_rate{project="inventory-go",scope="bench",variant="original"} 0.15
+ras_hang_rate{project="inventory-go",scope="bench",variant="hardened"} 0.0
+# HELP ras_p99_seconds p99 latency in seconds
+# TYPE ras_p99_seconds gauge
+ras_p99_seconds{project="inventory-go",scope="bench",variant="original"} 2.0101
+ras_p99_seconds{project="inventory-go",scope="bench",variant="hardened"} 2.3903
+ras_p99_seconds{project="inventory-go",scope="verify",function="warehouse.AuditTag",variant="original"} 3.0011
+ras_p99_seconds{project="inventory-go",scope="verify",function="warehouse.AuditTag",variant="hardened"} 3.4478
+ras_p99_seconds{project="inventory-go",scope="verify",function="warehouse.FetchStock",variant="original"} 3.0004
+ras_p99_seconds{project="inventory-go",scope="verify",function="warehouse.FetchStock",variant="hardened"} 3.6079
+ras_p99_seconds{project="inventory-go",scope="verify",function="warehouse.ReserveStock",variant="original"} 3.0002
+ras_p99_seconds{project="inventory-go",scope="verify",function="warehouse.ReserveStock",variant="hardened"} 3.4427
+# HELP ras_duplicates_total Duplicate non-idempotent side effects
+# TYPE ras_duplicates_total gauge
+ras_duplicates_total{project="inventory-go",scope="bench",variant="original"} 0
+ras_duplicates_total{project="inventory-go",scope="bench",variant="hardened"} 0
+ras_duplicates_total{project="inventory-go",scope="verify",function="warehouse.AuditTag",variant="original"} 0
+ras_duplicates_total{project="inventory-go",scope="verify",function="warehouse.AuditTag",variant="hardened"} 0
+ras_duplicates_total{project="inventory-go",scope="verify",function="warehouse.FetchStock",variant="original"} 0
+ras_duplicates_total{project="inventory-go",scope="verify",function="warehouse.FetchStock",variant="hardened"} 0
+ras_duplicates_total{project="inventory-go",scope="verify",function="warehouse.ReserveStock",variant="original"} 0
+ras_duplicates_total{project="inventory-go",scope="verify",function="warehouse.ReserveStock",variant="hardened"} 0
+# HELP ras_error_budget_burn_ratio Error budget burn ratio (1.0 = 100%)
+# TYPE ras_error_budget_burn_ratio gauge
+ras_error_budget_burn_ratio{project="inventory-go",variant="original"} 19.0
+ras_error_budget_burn_ratio{project="inventory-go",variant="hardened"} 0.0
+# HELP ras_ax_accuracy_ratio AX policy agent next-action accuracy (0..1)
+# TYPE ras_ax_accuracy_ratio gauge
+ras_ax_accuracy_ratio{project="inventory-go",variant="original"} 0.3
+ras_ax_accuracy_ratio{project="inventory-go",variant="hardened"} 1.0
+# HELP ras_serviceability_detection_ratio Fault detection rate from logs (0..1)
+# TYPE ras_serviceability_detection_ratio gauge
+ras_serviceability_detection_ratio{project="inventory-go",variant="original"} 0.0
+ras_serviceability_detection_ratio{project="inventory-go",variant="hardened"} 0.2127659574468085
