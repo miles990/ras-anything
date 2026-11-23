@@ -14,7 +14,7 @@
 | duplicate non-idempotent side effects | 6 | 0 |
 | retry amplification (dependency attempts per call of the enabled functions; no faults: 1.00) | 1.06 | 1.23 |
 | … for calls that met an outage (16 / 42 calls) | 1.88 | 4.05 |
-| p50 / p99 run time | 351ms / 4.15s | 2.64s / 4.92s |
+| p50 / p99 run time | 357ms / 4.18s | 2.73s / 4.97s |
 | faults injected (total) | 52 | 240 |
 
 A run counts as *degraded* when its output differs only where a hardened function returned its declared `RAS_FALLBACK` in that run (and symmetrically for the original if its output matches a declared-degraded output) or on lines containing `PENDING`.
@@ -51,7 +51,7 @@ Configured targets (`.ras/slo.json`, source: `bench`): availability ≥ **99.0%*
 | SLI / SLO metric | original | hardened | target |
 |---|---:|---:|---:|
 | availability | 0.0% | 90.0% | ≥ 99.0% |
-| p99 latency | 4.15s | 4.92s | ≤ 5.00s |
+| p99 latency | 4.18s | 4.97s | ≤ 5.00s |
 | error rate | 100.0% | 10.0% | ≤ 1.0% |
 | error-budget burn | 10000% | 1000% | ≤ 100% |
 | SLO verdict | ✗ missed | **✗ missed** | met |
@@ -63,7 +63,7 @@ Measured by running the log-only diagnoser over captured faulted-run `stderr` (O
 | serviceability metric | original | hardened |
 |---|---:|---:|
 | fault detection rate (from logs) | 0.0% | 99.5% |
-| root-cause diagnosis accuracy (dep + fault) | 0.0% | 57.5% |
+| root-cause diagnosis accuracy (dep + fault) | 0.0% | 68.4% |
 | median lines to diagnosis | unavailable | 1 |
 | time to restore (bad-enable rollback fixture) | unavailable | unavailable |
 
@@ -76,7 +76,7 @@ Measured with the deterministic policy agent against plain exception text vs RFC
 | next-action accuracy | 30.0% | **100.0%** |
 | mean tokens to decide | 42.20 | 105.80 |
 | mean decision steps | 2.90 | 1.00 |
-| PII / secret leaks scanned | — | **4** |
+| PII / secret leaks scanned | — | **3** |
 
 ## Fault model
 
@@ -93,7 +93,7 @@ Measured with the deterministic policy agent against plain exception text vs RFC
 
 Whole-app bench: each dependency attempt draws its fault from a hash of (seed, request, attempt number), so original and hardened see the same fault on the same attempt. Outages hit 5% of requests. Injected waits are scaled ×0.05 in real time and a call with no timeout is declared hung after 2s; the real local upstream answers everything else.
 
-Host: Linux 6.12.113+ x86_64, 8 CPUs, Node.js 24.22.1 · 2026-11-23T16:50:51+0800
+Host: Linux 6.12.113+ x86_64, 8 CPUs, Node.js 24.22.1 · 2026-11-23T17:00:03+0800
 
 Undo: `ras-anything disable <id>` removes the swap byte for byte; `RAS_ANYTHING_DISABLE=1` runs the originals.
 

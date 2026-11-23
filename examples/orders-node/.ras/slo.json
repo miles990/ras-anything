@@ -10,8 +10,8 @@
   "original": {
     "availability": 0.0,
     "error_rate": 1.0,
-    "p50_s": 0.3512,
-    "p99_s": 4.1503,
+    "p50_s": 0.3574,
+    "p99_s": 4.1795,
     "error_budget": 0.01,
     "error_budget_burn_ratio": 100.0,
     "error_budget_burn_pct": 10000.0,
@@ -25,8 +25,8 @@
   "hardened": {
     "availability": 0.9,
     "error_rate": 0.1,
-    "p50_s": 2.6425,
-    "p99_s": 4.92,
+    "p50_s": 2.7274,
+    "p99_s": 4.9689,
     "error_budget": 0.01,
     "error_budget_burn_ratio": 10.0,
     "error_budget_burn_pct": 1000.0,
@@ -42,17 +42,17 @@
       "cases": 20,
       "detected": 15,
       "detection_rate": 0.75,
-      "lines_to_diagnosis_p50": null,
+      "lines_to_diagnosis_p50": 4,
       "ttd_ms_p50": null
     },
     "hardened": {
       "cases": 20,
       "detected": 20,
       "detection_rate": 1.0,
-      "lines_to_diagnosis_p50": null,
+      "lines_to_diagnosis_p50": 1,
       "ttd_ms_p50": null
     }
   },
   "ax": null,
-  "created": "2026-11-23T16:50:51+0800"
+  "created": "2026-11-23T17:00:03+0800"
 }

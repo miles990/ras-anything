@@ -220,7 +220,7 @@ class DeadlineExceeded extends Error {
 class CallContext {
   constructor(fid, deps, trace, span, parent, args) {
     Object.assign(this, { fid, deps, traceId: trace, spanId: span, parent, args, events: [], dropped: 0, t0: nowMs(), ts: Date.now(), gaveUp: null,
-      lastDependency: null, health: tripped.size ? [...tripped.values()] : [] });
+      lastDependency: null, lastTarget: null, health: tripped.size ? [...tripped.values()] : [] });
     this.seed = Math.floor(randomFromProcess() * 2 ** 32);
     this.rng = this.seed;
   }
@@ -296,6 +296,14 @@ function logValue(v) {
   if (v === null || ["number", "boolean"].includes(typeof v)) return v;
   return mask(typeof v === "string" ? v : v instanceof Error ? `${v.name}: ${v.message}` : safeJson(v));
 }
+
+function noteTarget(target) {
+  const ctx = context();
+  if (!ctx || !target) return;
+  ctx.lastTarget = target;
+  where(null);
+}
+globalThis[Symbol.for("ras-anything.noteTarget")] = noteTarget;
 
 /** One log record in the OpenTelemetry log data model, as a JSON line on stderr. */
 function emit(event, severity = "INFO", body = null, attributes = {}, { legacy = false, trace = null } = {}) {
@@ -396,7 +404,8 @@ function targetOf(err) {
 function where(err, dependency) {
   const ctx = context();
   const deps = ctx?.deps ?? [];
-  const target = err ? targetOf(err) : {};
+  let target = err ? targetOf(err) : {};
+  if (!target.url && !target.argv && !target.address && ctx?.lastTarget) target = ctx.lastTarget;
   const out = {};
   let hit = deps.length === 1 ? deps[0] : null;
   if (target.url) {
@@ -404,7 +413,7 @@ function where(err, dependency) {
     Object.assign(out, { "server.address": u.hostname, "server.port": u.port ? Number(u.port) : undefined, "url.path": u.pathname });
     hit = deps.find((d) => d.route && u.pathname.startsWith(d.route)) ?? hit;
   } else if (target.argv) {
-    const words = target.argv.slice(0, 2).map((w) => path.basename(String(w)));
+    const words = target.argv.slice(0, 4).map((w) => path.basename(String(w)));
     out["process.command"] = words.join(" ");
     hit = deps.find((d) => d.program && words.includes(d.program)) ?? hit;
   } else if (target.address) Object.assign(out, { "server.address": target.address, "server.port": target.port });
@@ -425,7 +434,7 @@ function errorAttributes(err, dependency) {
   const root = err instanceof RasError && err.cause ? err.cause : err;
   const status = httpStatus(root);
   return { "error.type": status !== null ? String(status) : root?.cause?.code ?? root?.code ?? root?.name ?? typeof root,
-    "http.response.status_code": status ?? undefined, "ras.fault": faultClass(err), "exception.message": String(root?.message ?? root).slice(0, 200),
+    "http.response.status_code": status ?? undefined, "ras.fault": faultClass(err), "exception.message": plain(String(root?.message ?? root), 200),
     ...where(err, dependency) };
 }
 

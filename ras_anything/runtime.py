@@ -866,7 +866,7 @@ def _where(exc, dependency=None) -> dict:
         out.update({"server.address": u.hostname, "server.port": u.port, "url.path": u.path})
         hit = next((d for d in deps if d.get("route") and (u.path or "/").startswith(d["route"])), hit)
     elif target.get("argv"):
-        words = [os.path.basename(str(x)) for x in target["argv"][:2]]
+        words = [os.path.basename(str(x)) for x in target["argv"][:4]]
         out["process.command"] = " ".join(words)
         hit = next((d for d in deps if d.get("program") and d["program"] in words), hit)
     if hit:
@@ -885,7 +885,7 @@ def _error_attributes(exc, dependency=None) -> dict:
     status = _http_status(exc)
     name = type(exc).__name__ if not isinstance(exc, RasError) or exc.cause is None else type(exc.cause).__name__
     return {"error.type": str(status) if status else name, "http.response.status_code": status,
-            "ras.fault": fault_class(exc), "exception.message": str(exc)[:200], **_where(exc, dependency)}
+            "ras.fault": fault_class(exc), "exception.message": plain(str(exc), 200), **_where(exc, dependency)}
 
 
 def _advice(exc) -> dict:

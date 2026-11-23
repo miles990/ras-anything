@@ -9,7 +9,7 @@
 
 | name | kind | method | route |
 |---|---|---|---|
-| `python` | `subprocess` | `RUN` | `None` |
+| `render.py` | `subprocess` | `RUN` | `None` |
 
 ## Faults handled & patterns
 

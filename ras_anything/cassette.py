@@ -113,7 +113,12 @@ def dependencies(calls: list, project=None) -> list[dict]:
                 k = ("http", method, route)
                 seen.setdefault(k, {"name": name, "kind": "http", "method": method, "route": route, "program": None})
             elif req.get("argv"):
-                prog = os.path.basename(text(req["argv"][0], project) if project is not None else str(req["argv"][0]))
+                raw_argv = [text(a, project) if project is not None else str(a) for a in req["argv"]]
+                prog = os.path.basename(raw_argv[0])
+                if prog in ("node", "python", "python3", "pypy", "bun", "deno", "sh", "bash", "ruby", "php", "env"):
+                    script = next((os.path.basename(a) for a in raw_argv[1:4] if a and not a.startswith("-")), None)
+                    if script:
+                        prog = script
                 method = req.get("method") or "RUN"
                 k = ("subprocess", method, prog)
                 seen.setdefault(k, {"name": prog, "kind": "subprocess", "method": method, "route": None, "program": prog})

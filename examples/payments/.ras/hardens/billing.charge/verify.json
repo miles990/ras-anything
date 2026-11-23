@@ -163,7 +163,7 @@
         "cause_type": null,
         "structured": false,
         "problem": null,
-        "stderr": "{\"Timestamp\": \"1795423728210418944\", \"SeverityText\": \"WARN\", \"SeverityNumber\": 13, \"EventName\": \"ras.dependency.failure\", \"TraceId\": \"cd8ecccea90e8da05288239bfbd0159a\", \"SpanId\": \"ec09cdb46fa41b48\", \"Body\": \"charges failed: timeout (attempt 1)\", \"Resource\": {\"service.name\": \"worker.py\"}, \"Attributes\": {\"error.type\": \"URLError\", \"ras.fault\": \"timeout\", \"exception.message\": \"<urlopen error timed out>\", \"server.address\": \"127.0.0.1\", \"server.port\": 43085, \"url.path\": \"/v1/charges\", \"url.template\": \"/v1/charges\", \"http.request.method\": \"POST\", \"ras.dependency\": \"charges\", \"http.request.resend_count\": 0, \"ras.duration_s\": 3.5, \"code.function\": \"billing.charge\"}}\n{\"Timestamp\": \"1795423728210418944\", \"SeverityText\": \"INFO\", \"SeverityNumber\": 9, \"EventName\": \"ras.retry\", \"TraceId\": \"cd8ecccea90e8da05288239bfbd0159a\", \"SpanId\": \"ec09cdb46fa41b48\", \"Body\": \"retry 1 in 0.168s\", \"Resource\": {\"service.name\": \"worker.py\"}, \"Attributes\": {\"http.request.resend_count\": 1, \"ras.retry.delay_s\": 0.168, \"ras.dependency\": \"charges\", \"code.function\": \"billing.charge\"}}\n{\"Timestamp\": \"1795423728390060544\", \"SeverityText\": \"INFO\", \"SeverityNumber\": 9, \"EventName\": \"ras.dependency.recovered\", \"TraceId\": \"cd8ecccea90e8da05288239bfbd0159a\", \"SpanId\": \"ec09cdb46fa41b48\", \"Body\": \"answered on attempt 2\", \"Resource\": {\"service.name\": \"worker.py\"}, \"Attributes\": {\"url.template\": \"/v1/charges\", \"http.request.method\": \"POST\", \"ras.dependency\": \"charges\", \"http.request.resend_count\": 1, \"code.function\": \"billing.charge\"}}\n",
+        "stderr": "{\"Timestamp\": \"1795424274352203776\", \"SeverityText\": \"WARN\", \"SeverityNumber\": 13, \"EventName\": \"ras.dependency.failure\", \"TraceId\": \"cd8ecccea90e8da05288239bfbd0159a\", \"SpanId\": \"ec09cdb46fa41b48\", \"Body\": \"charges failed: timeout (attempt 1)\", \"Resource\": {\"service.name\": \"worker.py\"}, \"Attributes\": {\"error.type\": \"URLError\", \"ras.fault\": \"timeout\", \"exception.message\": \"<urlopen error timed out>\", \"server.address\": \"127.0.0.1\", \"server.port\": 43085, \"url.path\": \"/v1/charges\", \"url.template\": \"/v1/charges\", \"http.request.method\": \"POST\", \"ras.dependency\": \"charges\", \"http.request.resend_count\": 0, \"ras.duration_s\": 3.5, \"code.function\": \"billing.charge\"}}\n{\"Timestamp\": \"1795424274352203776\", \"SeverityText\": \"INFO\", \"SeverityNumber\": 9, \"EventName\": \"ras.retry\", \"TraceId\": \"cd8ecccea90e8da05288239bfbd0159a\", \"SpanId\": \"ec09cdb46fa41b48\", \"Body\": \"retry 1 in 0.168s\", \"Resource\": {\"service.name\": \"worker.py\"}, \"Attributes\": {\"http.request.resend_count\": 1, \"ras.retry.delay_s\": 0.168, \"ras.dependency\": \"charges\", \"code.function\": \"billing.charge\"}}\n{\"Timestamp\": \"1795424274531845632\", \"SeverityText\": \"INFO\", \"SeverityNumber\": 9, \"EventName\": \"ras.dependency.recovered\", \"TraceId\": \"cd8ecccea90e8da05288239bfbd0159a\", \"SpanId\": \"ec09cdb46fa41b48\", \"Body\": \"answered on attempt 2\", \"Resource\": {\"service.name\": \"worker.py\"}, \"Attributes\": {\"url.template\": \"/v1/charges\", \"http.request.method\": \"POST\", \"ras.dependency\": \"charges\", \"http.request.resend_count\": 1, \"code.function\": \"billing.charge\"}}\n",
         "state": null,
         "attempts": [
           {
@@ -316,10 +316,7 @@
         "leaks": 0
       }
     },
-    "leaks": [
-      "ip",
-      "url"
-    ]
+    "leaks": []
   },
   "gates": {
     "happy": true,
@@ -332,10 +329,10 @@
   },
   "passed": true,
   "fallback": "callable",
-  "elapsed_s": 0.64,
-  "hardened_sha256": "bf773e849ada07b84d650a91238e0acd7d435b75faae4643d38c09f7cc523de0",
-  "verified_at": "2026-11-23T16:48:34+0800",
-  "wall_s": 0.64,
+  "elapsed_s": 1.14,
+  "hardened_sha256": "94a658fafd19458db75e499d09d7c5755c9ac167a6fdeba5919cea4f4f19a255",
+  "verified_at": "2026-11-23T16:57:41+0800",
+  "wall_s": 1.14,
   "fault_model": {
     "timeout": "no answer: caller's timeout fires; with no timeout it hangs (POST/PUT still reach the server)",
     "refused": "connection refused",

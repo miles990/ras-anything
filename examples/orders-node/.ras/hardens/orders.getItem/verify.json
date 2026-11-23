@@ -196,7 +196,7 @@
     "hardened": {
       "runs": 99,
       "detection_rate": 1.0,
-      "diagnosis_accuracy": 0.26262626262626265,
+      "diagnosis_accuracy": 0.696969696969697,
       "ttd_ms_p50": null,
       "lines_to_diagnosis_p50": 1,
       "restore_s": null
@@ -240,10 +240,7 @@
         "leaks": 0
       }
     },
-    "leaks": [
-      "ip",
-      "url"
-    ]
+    "leaks": []
   },
   "gates": {
     "happy": true,
@@ -256,10 +253,10 @@
   },
   "passed": true,
   "fallback": null,
-  "elapsed_s": 0.63,
-  "hardened_sha256": "f5feadf62b4a2213ecb22c08c55f29fa29d4aff734629c56d26524afdd0ea9b3",
-  "verified_at": "2026-11-23T16:49:37+0800",
-  "wall_s": 0.63,
+  "elapsed_s": 0.67,
+  "hardened_sha256": "0536316b3e398013ebab0d188a2982af39e02ae2d39b7ca2695c04dd0cd7b1b1",
+  "verified_at": "2026-11-23T16:58:46+0800",
+  "wall_s": 0.67,
   "fault_model": {
     "timeout": "no answer: caller's timeout fires; with no timeout it hangs (POST/PUT still reach the server)",
     "refused": "connection refused",

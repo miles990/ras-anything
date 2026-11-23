@@ -239,9 +239,7 @@
         "leaks": 0
       }
     },
-    "leaks": [
-      "path"
-    ]
+    "leaks": []
   },
   "gates": {
     "happy": true,
@@ -254,10 +252,10 @@
   },
   "passed": true,
   "fallback": null,
-  "elapsed_s": 0.64,
-  "hardened_sha256": "fa08736d1c692b98adefe85f2e191c3a01f0ffb8638198767fd12eefef92de1e",
-  "verified_at": "2026-11-23T16:49:38+0800",
-  "wall_s": 0.64,
+  "elapsed_s": 0.72,
+  "hardened_sha256": "dd7c8839156293f5456b7af4c0a586c40d17628b005b8e916554159dcbbbf7ac",
+  "verified_at": "2026-11-23T16:58:47+0800",
+  "wall_s": 0.72,
   "fault_model": {
     "timeout": "no answer: caller's timeout fires; with no timeout it hangs (POST/PUT still reach the server)",
     "refused": "connection refused",

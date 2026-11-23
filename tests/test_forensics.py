@@ -99,6 +99,43 @@ class ReplayPythonAndNodeTest(unittest.TestCase):
             p.close()
 
 
+    @unittest.skipUnless(NODE, "node not installed")
+    def test_node_subprocess_dependency_attribution(self):
+        p = Project(REPO / "examples" / "orders-node")
+        try:
+            shutil.copytree(REPO / "examples" / "orders-node" / ".ras", p.dir / ".ras",
+                            ignore=shutil.ignore_patterns("incidents", "out"))
+            for f in ("orders.getItem", "orders.shippingQuote", "orders.charge", "orders.printLabel"):
+                with quiet():
+                    enable(f, quiet=True)
+            # Trigger an outage directly on printLabel so subprocess dependency attribution is exercised
+            runner_script = (
+                "import { printLabel } from './orders.mjs';\n"
+                "try { await printLabel({ id: 'ORD-2001', name: 'A. Kaya', country: 'DE' }, 'chg-1'); } catch {}\n"
+            )
+            (p.dir / "run_label.mjs").write_text(runner_script)
+            meta = load_json(harden_dir(p.dir, "orders.printLabel") / "meta.json")
+            target = {"id": "orders.printLabel", "module": meta["module"], "qualname": meta["qualname"],
+                      "in_main": meta["in_main"], "file": str(p.dir / meta["file"])}
+            ad = lang.by_name("node")
+            resolved = ad.resolve(["node", "run_label.mjs"], p.dir)
+            root = ad.project_root(resolved, p.dir)
+            runner.run(ad, resolved,
+                       {"mode": "bench", "seed": 1, "rate": 1.0, "outage_rate": 1.0, "scale": 0.01, "hang_s": 1.0, "targets": [target]},
+                       p.dir, env_extra={"RAS_ANYTHING_DISABLE": "0", "RAS_ANYTHING_INCIDENTS": str(p.dir / ".ras" / "incidents")},
+                       root=root, timeout=60)
+            incs = sorted((p.dir / ".ras" / "incidents").glob("*printLabel*.json"))
+            self.assertGreater(len(incs), 0, "expected printLabel incident")
+            doc = json.loads(incs[0].read_text())
+            self.assertEqual(doc["dependency"], "label.mjs")
+            with quiet():
+                rca = replay.replay(doc["id"], project=p.dir, quiet=True)
+            self.assertEqual(rca["failing_dependency"], "label.mjs")
+            self.assertTrue(rca["reproduced"])
+        finally:
+            p.close()
+
+
 class BlindIncidentBenchmarkTest(unittest.TestCase):
     """Blind incident eval: incidents carry hidden truth in an external truth map; replay + diagnoser never see it."""
 

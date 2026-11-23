@@ -161,7 +161,7 @@
         "cause_type": null,
         "structured": false,
         "problem": null,
-        "stderr": "{\"Timestamp\":\"1795423800061000000\",\"SeverityText\":\"WARN\",\"SeverityNumber\":13,\"EventName\":\"ras.dependency.failure\",\"TraceId\":\"4f5c9a1d089b80e21c1b494f2a302ab2\",\"SpanId\":\"9561f0e92b17d7bd\",\"Body\":\"charges failed: timeout (attempt 1)\",\"Resource\":{\"service.name\":\"worker.cjs\"},\"Attributes\":{\"error.type\":23,\"ras.fault\":\"timeout\",\"exception.message\":\"The operation was aborted due to timeout\",\"url.template\":\"/v1/charges\",\"http.request.method\":\"POST\",\"ras.dependency\":\"charges\",\"http.request.resend_count\":0,\"ras.duration_s\":3.5,\"code.function\":\"orders.charge\"}}\n{\"Timestamp\":\"1795423800061000000\",\"SeverityText\":\"INFO\",\"SeverityNumber\":9,\"EventName\":\"ras.retry\",\"TraceId\":\"4f5c9a1d089b80e21c1b494f2a302ab2\",\"SpanId\":\"9561f0e92b17d7bd\",\"Body\":\"retry 1 in 0.089s\",\"Resource\":{\"service.name\":\"worker.cjs\"},\"Attributes\":{\"http.request.resend_count\":1,\"ras.retry.delay_s\":0.089,\"ras.dependency\":\"charges\",\"code.function\":\"orders.charge\"}}\n{\"Timestamp\":\"1795423800153000000\",\"SeverityText\":\"INFO\",\"SeverityNumber\":9,\"EventName\":\"ras.dependency.recovered\",\"TraceId\":\"4f5c9a1d089b80e21c1b494f2a302ab2\",\"SpanId\":\"9561f0e92b17d7bd\",\"Body\":\"answered on attempt 2\",\"Resource\":{\"service.name\":\"worker.cjs\"},\"Attributes\":{\"url.template\":\"/v1/charges\",\"http.request.method\":\"POST\",\"ras.dependency\":\"charges\",\"http.request.resend_count\":1,\"code.function\":\"orders.charge\"}}\n",
+        "stderr": "{\"Timestamp\":\"1795424349141000000\",\"SeverityText\":\"WARN\",\"SeverityNumber\":13,\"EventName\":\"ras.dependency.failure\",\"TraceId\":\"4f5c9a1d089b80e21c1b494f2a302ab2\",\"SpanId\":\"9561f0e92b17d7bd\",\"Body\":\"charges failed: timeout (attempt 1)\",\"Resource\":{\"service.name\":\"worker.cjs\"},\"Attributes\":{\"error.type\":23,\"ras.fault\":\"timeout\",\"exception.message\":\"The operation was aborted due to timeout\",\"server.address\":\"127.0.0.1\",\"server.port\":40393,\"url.path\":\"/v1/charges\",\"url.template\":\"/v1/charges\",\"http.request.method\":\"POST\",\"ras.dependency\":\"charges\",\"http.request.resend_count\":0,\"ras.duration_s\":3.5,\"code.function\":\"orders.charge\"}}\n{\"Timestamp\":\"1795424349141000000\",\"SeverityText\":\"INFO\",\"SeverityNumber\":9,\"EventName\":\"ras.retry\",\"TraceId\":\"4f5c9a1d089b80e21c1b494f2a302ab2\",\"SpanId\":\"9561f0e92b17d7bd\",\"Body\":\"retry 1 in 0.089s\",\"Resource\":{\"service.name\":\"worker.cjs\"},\"Attributes\":{\"http.request.resend_count\":1,\"ras.retry.delay_s\":0.089,\"ras.dependency\":\"charges\",\"code.function\":\"orders.charge\"}}\n{\"Timestamp\":\"1795424349233000000\",\"SeverityText\":\"INFO\",\"SeverityNumber\":9,\"EventName\":\"ras.dependency.recovered\",\"TraceId\":\"4f5c9a1d089b80e21c1b494f2a302ab2\",\"SpanId\":\"9561f0e92b17d7bd\",\"Body\":\"answered on attempt 2\",\"Resource\":{\"service.name\":\"worker.cjs\"},\"Attributes\":{\"server.address\":\"127.0.0.1\",\"server.port\":40393,\"url.path\":\"/v1/charges\",\"url.template\":\"/v1/charges\",\"http.request.method\":\"POST\",\"ras.dependency\":\"charges\",\"http.request.resend_count\":1,\"code.function\":\"orders.charge\"}}\n",
         "state": null,
         "attempts": [
           {
@@ -314,10 +314,7 @@
         "leaks": 0
       }
     },
-    "leaks": [
-      "ip",
-      "url"
-    ]
+    "leaks": []
   },
   "gates": {
     "happy": true,
@@ -330,10 +327,10 @@
   },
   "passed": true,
   "fallback": "callable",
-  "elapsed_s": 0.71,
-  "hardened_sha256": "005f32d54363a271037e148dc0c96bc370e1bf4d099e9d1845d8c04c41a65cad",
-  "verified_at": "2026-11-23T16:49:36+0800",
-  "wall_s": 0.71,
+  "elapsed_s": 0.73,
+  "hardened_sha256": "59f9b1a9057dcb74e0d9c23a30e622919e558d2192ebb09b98b6a9d561c567c7",
+  "verified_at": "2026-11-23T16:58:45+0800",
+  "wall_s": 0.74,
   "fault_model": {
     "timeout": "no answer: caller's timeout fires; with no timeout it hangs (POST/PUT still reach the server)",
     "refused": "connection refused",

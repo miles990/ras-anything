@@ -14,7 +14,7 @@
 | duplicate non-idempotent side effects | 5 | 0 |
 | retry amplification (dependency attempts per call of the enabled functions; no faults: 1.00) | 1.09 | 1.20 |
 | … for calls that met an outage (8 / 21 calls) | 2.25 | 3.52 |
-| p50 / p99 run time | 1.80s / 3.95s | 1.35s / 4.16s |
+| p50 / p99 run time | 1.83s / 4.03s | 1.44s / 4.24s |
 | faults injected (total) | 44 | 144 |
 
 A run counts as *degraded* when its output differs only where a hardened function returned its declared `RAS_FALLBACK` in that run (and symmetrically for the original if its output matches a declared-degraded output).
@@ -47,7 +47,7 @@ Configured targets (`.ras/slo.json`, source: `bench`): availability ≥ **99.0%*
 | SLI / SLO metric | original | hardened | target |
 |---|---:|---:|---:|
 | availability | 0.0% | 90.0% | ≥ 99.0% |
-| p99 latency | 3.95s | 4.16s | ≤ 5.00s |
+| p99 latency | 4.03s | 4.24s | ≤ 5.00s |
 | error rate | 100.0% | 10.0% | ≤ 1.0% |
 | error-budget burn | 10000% | 1000% | ≤ 100% |
 | SLO verdict | ✗ missed | **✗ missed** | met |
@@ -72,7 +72,7 @@ Measured with the deterministic policy agent against plain exception text vs RFC
 | next-action accuracy | 30.0% | **100.0%** |
 | mean tokens to decide | 42.20 | 105.80 |
 | mean decision steps | 2.90 | 1.00 |
-| PII / secret leaks scanned | — | **4** |
+| PII / secret leaks scanned | — | **2** |
 
 ## Fault model
 
@@ -89,7 +89,7 @@ Measured with the deterministic policy agent against plain exception text vs RFC
 
 Whole-app bench: each dependency attempt draws its fault from a hash of (seed, request, attempt number), so original and hardened see the same fault on the same attempt. Outages hit 5% of requests. Injected waits are scaled ×0.05 in real time and a call with no timeout is declared hung after 2s; the real local upstream answers everything else.
 
-Host: Linux 6.12.113+ x86_64, 8 CPUs, Python 3.13.5 · 2026-11-23T16:49:36+0800
+Host: Linux 6.12.113+ x86_64, 8 CPUs, Python 3.13.5 · 2026-11-23T16:58:45+0800
 
 Undo: `ras-anything disable <id>` removes the swap byte for byte; `RAS_ANYTHING_DISABLE=1` runs the originals.
 

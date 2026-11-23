@@ -55,7 +55,8 @@ def render_receipt(invoice, charge_record):
     except Exception as e:
         if not _is_retryable(e):
             raise  # programming errors and permanent failures surface unchanged
+        prob = RasError("receipt render failed", cause=e, dependency="render.py").problem
         context = {"invoice": invoice["id"], "charge_id": charge_record["id"],
-                   "error": type(e).__name__, "detail": str(e)[:200]}
+                   "error": type(e).__name__, "problem": prob}
         log_event("render_receipt.degraded", **context)
         return RAS_FALLBACK(invoice, charge_record)

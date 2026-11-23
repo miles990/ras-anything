@@ -9,7 +9,7 @@
 
 | name | kind | method | route |
 |---|---|---|---|
-| `node` | `subprocess` | `RUN` | `None` |
+| `label.mjs` | `subprocess` | `RUN` | `None` |
 
 ## Faults handled & patterns
 

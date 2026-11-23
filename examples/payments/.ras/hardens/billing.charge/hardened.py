@@ -8,7 +8,7 @@ import time
 import urllib.error
 import urllib.request
 
-from ras_anything.runtime import is_transient, log_event, retry
+from ras_anything.runtime import RasError, is_transient, log_event, retry
 
 # The caller (app.py) already treats None as "payment failed, retry tomorrow", so that is the
 # explicit degraded result when the provider stays down.
@@ -48,6 +48,7 @@ def charge(invoice):
                      retry_on=_retryable)
     except (urllib.error.URLError, OSError, ValueError) as e:
         # Includes HTTPError (4xx/5xx), timeouts, refused connections and bad bodies.
+        prob = RasError("billing charge failed", cause=e, dependency="charges").problem
         log_event("billing.charge.gave_up", invoice=invoice["id"], amount_cents=invoice["amount_cents"],
-                  url=f"{api}/v1/charges", error=type(e).__name__, detail=str(e)[:200])
+                  error=type(e).__name__, problem=prob)
         return RAS_FALLBACK(invoice)

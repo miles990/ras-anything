@@ -354,6 +354,7 @@ async function doFetch(input, init) {
   const headers = Object.fromEntries(new Headers(init?.headers ?? (isReq ? input.headers : undefined)));
   const where = handler.where?.();
   const ctl = new SignalCtl(init?.signal ?? (isReq ? input.signal : null));
+  globalThis[Symbol.for("ras-anything.noteTarget")]?.({ url });
   const req = httpReq("fetch", method, url, bytes, headers);
   req.timeout = ctl.timeoutS;
   const serve = async ({ whole }) => {
@@ -414,6 +415,7 @@ function httpPatch(protocol, name, getter) {
 
     function send(fake, body) {
       const headers = Object.fromEntries(Object.entries(fake.getHeaders()).map(([k, v]) => [k, String(v)]));
+      globalThis[Symbol.for("ras-anything.noteTarget")]?.({ url: url.href });
       const r = httpReq("http", fake.method, url.href, body, headers);
       const known = timeoutOf(options.signal);
       const ctl = {
@@ -543,7 +545,9 @@ function launch(file, args, options, req, live) {
   if (signal) {
     const abort = () => {
       if (child.done) return;
-      child.fail(abortError(signal));
+      const ae = abortError(signal);
+      if (ae && typeof ae === "object" && req.argv) ae.cmd = Array.isArray(req.argv) ? req.argv.join(" ") : req.argv;
+      child.fail(ae);
     };
     if (signal.aborted) process.nextTick(abort);
     else signal.addEventListener("abort", abort, { once: true });
@@ -585,6 +589,7 @@ function execLike(file, args, options, argv, callback) {
   const { encoding = "utf8", maxBuffer = 1024 * 1024 } = options;
   const where = handler.where?.();
   const { shell } = options;
+  globalThis[Symbol.for("ras-anything.noteTarget")]?.({ argv: Array.isArray(argv) ? argv : String(argv).split(" ") });
   const child = launch(file, args, { ...options, stdio: undefined }, cpReq(argv, options.timeout), () =>
     (Array.isArray(argv) ? orig.execFile : orig.spawn).call(cp, file, args, { ...options, encoding: "buffer", maxBuffer: Infinity, stdio: undefined, shell: Array.isArray(argv) ? shell : false }));
   const out = [];

@@ -32,8 +32,8 @@
       "crash_rate": 0.75,
       "hang_rate": 0.15,
       "wrong_rate": 0.1,
-      "p50_wall": 0.3512,
-      "p99_wall": 4.1503,
+      "p50_wall": 0.3574,
+      "p99_wall": 4.1795,
       "identical_rate": 0.0,
       "dups": 6,
       "faults": 52,
@@ -50,7 +50,7 @@
       "outage_amplification": 1.875,
       "outage_calls": 16,
       "clean_per_call": 1.0,
-      "clean_wall": 0.4752
+      "clean_wall": 0.5298
     },
     "hardened": {
       "runs": 20,
@@ -63,8 +63,8 @@
       "crash_rate": 0.1,
       "hang_rate": 0.0,
       "wrong_rate": 0.0,
-      "p50_wall": 2.6425,
-      "p99_wall": 4.92,
+      "p50_wall": 2.7274,
+      "p99_wall": 4.9689,
       "identical_rate": 0.9,
       "dups": 0,
       "faults": 240,
@@ -76,7 +76,7 @@
       "outage_amplification": 4.0476190476190474,
       "outage_calls": 42,
       "clean_per_call": 1.0,
-      "clean_wall": 0.509
+      "clean_wall": 0.5444
     }
   },
   "runs": {
@@ -85,14 +85,14 @@
         "seed": 1,
         "outcome": "crash",
         "exit": 1,
-        "wall_s": 0.0774,
+        "wall_s": 0.0877,
         "fallbacks": 0,
         "faults": 1,
         "attempts": 2,
         "dups": 0,
         "uncaught": {
           "type": "Error",
-          "msg": "connect ECONNREFUSED 127.0.0.1:34981",
+          "msg": "connect ECONNREFUSED 127.0.0.1:37517",
           "hang": false,
           "where": "orders.shippingQuote"
         }
@@ -101,7 +101,7 @@
         "seed": 2,
         "outcome": "hang",
         "exit": 70,
-        "wall_s": 2.1293,
+        "wall_s": 2.1376,
         "fallbacks": 0,
         "faults": 1,
         "attempts": 8,
@@ -117,7 +117,7 @@
         "seed": 3,
         "outcome": "crash",
         "exit": 1,
-        "wall_s": 0.1567,
+        "wall_s": 0.1706,
         "fallbacks": 0,
         "faults": 1,
         "attempts": 9,
@@ -133,7 +133,7 @@
         "seed": 4,
         "outcome": "wrong",
         "exit": 0,
-        "wall_s": 2.7092,
+        "wall_s": 2.7703,
         "fallbacks": 0,
         "faults": 7,
         "attempts": 52,
@@ -144,7 +144,7 @@
         "seed": 5,
         "outcome": "hang",
         "exit": 70,
-        "wall_s": 3.9056,
+        "wall_s": 3.9467,
         "fallbacks": 0,
         "faults": 5,
         "attempts": 20,
@@ -160,7 +160,7 @@
         "seed": 6,
         "outcome": "crash",
         "exit": 1,
-        "wall_s": 0.0597,
+        "wall_s": 0.0666,
         "fallbacks": 0,
         "faults": 1,
         "attempts": 1,
@@ -176,7 +176,7 @@
         "seed": 7,
         "outcome": "crash",
         "exit": 1,
-        "wall_s": 0.1508,
+        "wall_s": 0.1724,
         "fallbacks": 0,
         "faults": 1,
         "attempts": 5,
@@ -192,7 +192,7 @@
         "seed": 8,
         "outcome": "crash",
         "exit": 1,
-        "wall_s": 0.0745,
+        "wall_s": 0.0817,
         "fallbacks": 0,
         "faults": 1,
         "attempts": 1,
@@ -208,14 +208,14 @@
         "seed": 9,
         "outcome": "crash",
         "exit": 1,
-        "wall_s": 0.1857,
+        "wall_s": 0.2492,
         "fallbacks": 0,
         "faults": 1,
         "attempts": 14,
         "dups": 0,
         "uncaught": {
           "type": "Error",
-          "msg": "connect ECONNREFUSED 127.0.0.1:35969",
+          "msg": "connect ECONNREFUSED 127.0.0.1:46757",
           "hang": false,
           "where": "orders.shippingQuote"
         }
@@ -224,7 +224,7 @@
         "seed": 10,
         "outcome": "wrong",
         "exit": 0,
-        "wall_s": 4.1503,
+        "wall_s": 4.1795,
         "fallbacks": 0,
         "faults": 14,
         "attempts": 53,
@@ -235,7 +235,7 @@
         "seed": 11,
         "outcome": "crash",
         "exit": 1,
-        "wall_s": 0.165,
+        "wall_s": 0.173,
         "fallbacks": 0,
         "faults": 1,
         "attempts": 12,
@@ -251,7 +251,7 @@
         "seed": 12,
         "outcome": "hang",
         "exit": 70,
-        "wall_s": 2.228,
+        "wall_s": 2.2356,
         "fallbacks": 0,
         "faults": 1,
         "attempts": 17,
@@ -267,14 +267,14 @@
         "seed": 13,
         "outcome": "crash",
         "exit": 1,
-        "wall_s": 0.8381,
+        "wall_s": 0.8823,
         "fallbacks": 0,
         "faults": 3,
         "attempts": 35,
         "dups": 0,
         "uncaught": {
           "type": "Error",
-          "msg": "connect ECONNREFUSED 127.0.0.1:46589",
+          "msg": "connect ECONNREFUSED 127.0.0.1:34309",
           "hang": false,
           "where": "orders.shippingQuote"
         }
@@ -283,7 +283,7 @@
         "seed": 14,
         "outcome": "crash",
         "exit": 1,
-        "wall_s": 1.0401,
+        "wall_s": 1.0502,
         "fallbacks": 0,
         "faults": 5,
         "attempts": 10,
@@ -299,14 +299,14 @@
         "seed": 15,
         "outcome": "crash",
         "exit": 1,
-        "wall_s": 1.4179,
+        "wall_s": 1.4724,
         "fallbacks": 0,
         "faults": 3,
         "attempts": 28,
         "dups": 2,
         "uncaught": {
           "type": "Error",
-          "msg": "connect ECONNREFUSED 127.0.0.1:40879",
+          "msg": "connect ECONNREFUSED 127.0.0.1:39407",
           "hang": false,
           "where": "orders.shippingQuote"
         }
@@ -315,14 +315,14 @@
         "seed": 16,
         "outcome": "crash",
         "exit": 1,
-        "wall_s": 0.0818,
+        "wall_s": 0.0871,
         "fallbacks": 0,
         "faults": 1,
         "attempts": 2,
         "dups": 0,
         "uncaught": {
           "type": "Error",
-          "msg": "connect ECONNREFUSED 127.0.0.1:41067",
+          "msg": "connect ECONNREFUSED 127.0.0.1:45553",
           "hang": false,
           "where": "orders.shippingQuote"
         }
@@ -331,7 +331,7 @@
         "seed": 17,
         "outcome": "crash",
         "exit": 1,
-        "wall_s": 0.3512,
+        "wall_s": 0.3574,
         "fallbacks": 0,
         "faults": 2,
         "attempts": 16,
@@ -347,14 +347,14 @@
         "seed": 18,
         "outcome": "crash",
         "exit": 1,
-        "wall_s": 0.3568,
+        "wall_s": 0.3939,
         "fallbacks": 0,
         "faults": 1,
         "attempts": 30,
         "dups": 0,
         "uncaught": {
           "type": "Error",
-          "msg": "connect ECONNREFUSED 127.0.0.1:34723",
+          "msg": "connect ECONNREFUSED 127.0.0.1:44571",
           "hang": false,
           "where": "orders.shippingQuote"
         }
@@ -363,14 +363,14 @@
         "seed": 19,
         "outcome": "crash",
         "exit": 1,
-        "wall_s": 0.1003,
+        "wall_s": 0.0849,
         "fallbacks": 0,
         "faults": 1,
         "attempts": 2,
         "dups": 0,
         "uncaught": {
           "type": "Error",
-          "msg": "connect ECONNREFUSED 127.0.0.1:46007",
+          "msg": "connect ECONNREFUSED 127.0.0.1:42617",
           "hang": false,
           "where": "orders.shippingQuote"
         }
@@ -379,7 +379,7 @@
         "seed": 20,
         "outcome": "crash",
         "exit": 1,
-        "wall_s": 0.0633,
+        "wall_s": 0.0696,
         "fallbacks": 0,
         "faults": 1,
         "attempts": 1,
@@ -397,7 +397,7 @@
         "seed": 1,
         "outcome": "crash",
         "exit": 1,
-        "wall_s": 3.7946,
+        "wall_s": 3.8745,
         "fallbacks": 0,
         "faults": 27,
         "attempts": 74,
@@ -413,7 +413,7 @@
         "seed": 2,
         "outcome": "correct",
         "exit": 0,
-        "wall_s": 1.6155,
+        "wall_s": 1.7071,
         "fallbacks": 0,
         "faults": 8,
         "attempts": 57,
@@ -424,7 +424,7 @@
         "seed": 3,
         "outcome": "correct",
         "exit": 0,
-        "wall_s": 1.6977,
+        "wall_s": 1.8167,
         "fallbacks": 0,
         "faults": 12,
         "attempts": 59,
@@ -435,7 +435,7 @@
         "seed": 4,
         "outcome": "correct",
         "exit": 0,
-        "wall_s": 3.8736,
+        "wall_s": 3.9288,
         "fallbacks": 0,
         "faults": 13,
         "attempts": 61,
@@ -446,7 +446,7 @@
         "seed": 5,
         "outcome": "correct",
         "exit": 0,
-        "wall_s": 2.6425,
+        "wall_s": 2.7274,
         "fallbacks": 0,
         "faults": 18,
         "attempts": 64,
@@ -457,7 +457,7 @@
         "seed": 6,
         "outcome": "correct",
         "exit": 0,
-        "wall_s": 4.92,
+        "wall_s": 4.9689,
         "fallbacks": 0,
         "faults": 19,
         "attempts": 68,
@@ -468,7 +468,7 @@
         "seed": 7,
         "outcome": "correct",
         "exit": 0,
-        "wall_s": 0.9928,
+        "wall_s": 1.1068,
         "fallbacks": 0,
         "faults": 5,
         "attempts": 54,
@@ -479,7 +479,7 @@
         "seed": 8,
         "outcome": "correct",
         "exit": 0,
-        "wall_s": 2.3878,
+        "wall_s": 2.5014,
         "fallbacks": 0,
         "faults": 16,
         "attempts": 64,
@@ -490,7 +490,7 @@
         "seed": 9,
         "outcome": "correct",
         "exit": 0,
-        "wall_s": 1.0758,
+        "wall_s": 1.1603,
         "fallbacks": 0,
         "faults": 6,
         "attempts": 53,
@@ -501,7 +501,7 @@
         "seed": 10,
         "outcome": "correct",
         "exit": 0,
-        "wall_s": 3.2396,
+        "wall_s": 3.2939,
         "fallbacks": 0,
         "faults": 20,
         "attempts": 66,
@@ -512,7 +512,7 @@
         "seed": 11,
         "outcome": "correct",
         "exit": 0,
-        "wall_s": 1.9672,
+        "wall_s": 2.0704,
         "fallbacks": 0,
         "faults": 5,
         "attempts": 54,
@@ -523,7 +523,7 @@
         "seed": 12,
         "outcome": "correct",
         "exit": 0,
-        "wall_s": 3.1749,
+        "wall_s": 3.3495,
         "fallbacks": 0,
         "faults": 8,
         "attempts": 57,
@@ -534,7 +534,7 @@
         "seed": 13,
         "outcome": "correct",
         "exit": 0,
-        "wall_s": 1.573,
+        "wall_s": 1.6495,
         "fallbacks": 0,
         "faults": 7,
         "attempts": 53,
@@ -545,7 +545,7 @@
         "seed": 14,
         "outcome": "correct",
         "exit": 0,
-        "wall_s": 2.7726,
+        "wall_s": 2.8827,
         "fallbacks": 0,
         "faults": 9,
         "attempts": 57,
@@ -556,7 +556,7 @@
         "seed": 15,
         "outcome": "correct",
         "exit": 0,
-        "wall_s": 2.6077,
+        "wall_s": 2.6851,
         "fallbacks": 0,
         "faults": 10,
         "attempts": 59,
@@ -567,7 +567,7 @@
         "seed": 16,
         "outcome": "correct",
         "exit": 0,
-        "wall_s": 3.7646,
+        "wall_s": 3.8589,
         "fallbacks": 0,
         "faults": 19,
         "attempts": 66,
@@ -578,7 +578,7 @@
         "seed": 17,
         "outcome": "crash",
         "exit": 1,
-        "wall_s": 3.3896,
+        "wall_s": 3.4344,
         "fallbacks": 0,
         "faults": 16,
         "attempts": 62,
@@ -594,7 +594,7 @@
         "seed": 18,
         "outcome": "correct",
         "exit": 0,
-        "wall_s": 0.5571,
+        "wall_s": 0.5915,
         "fallbacks": 0,
         "faults": 1,
         "attempts": 50,
@@ -605,7 +605,7 @@
         "seed": 19,
         "outcome": "correct",
         "exit": 0,
-        "wall_s": 2.5591,
+        "wall_s": 2.5863,
         "fallbacks": 0,
         "faults": 10,
         "attempts": 59,
@@ -616,7 +616,7 @@
         "seed": 20,
         "outcome": "correct",
         "exit": 0,
-        "wall_s": 3.0108,
+        "wall_s": 3.1285,
         "fallbacks": 0,
         "faults": 11,
         "attempts": 59,
@@ -635,7 +635,7 @@
         "attempts": 84,
         "outage_calls": 4,
         "outage_attempts": 4,
-        "p99": 0.152124404
+        "p99": 0.15242791200000003
       },
       "orders.shippingQuote": {
         "calls": 78,
@@ -645,7 +645,7 @@
         "attempts": 77,
         "outage_calls": 4,
         "outage_attempts": 4,
-        "p99": 0.15240603699999997
+        "p99": 0.15296155500000003
       },
       "orders.charge": {
         "calls": 70,
@@ -655,7 +655,7 @@
         "attempts": 91,
         "outage_calls": 7,
         "outage_attempts": 21,
-        "p99": 0.9053021059999998
+        "p99": 0.9055217689999999
       },
       "orders.printLabel": {
         "calls": 62,
@@ -665,7 +665,7 @@
         "attempts": 61,
         "outage_calls": 1,
         "outage_attempts": 1,
-        "p99": 0.04138192099999999
+        "p99": 0.04905423200000007
       }
     },
     "hardened": {
@@ -677,7 +677,7 @@
         "attempts": 271,
         "outage_calls": 5,
         "outage_attempts": 20,
-        "p99": 1.003832164
+        "p99": 1.005001977
       },
       "orders.shippingQuote": {
         "calls": 240,
@@ -687,7 +687,7 @@
         "attempts": 309,
         "outage_calls": 16,
         "outage_attempts": 64,
-        "p99": 2.007679047
+        "p99": 2.006755188
       },
       "orders.charge": {
         "calls": 240,
@@ -697,7 +697,7 @@
         "attempts": 302,
         "outage_calls": 13,
         "outage_attempts": 54,
-        "p99": 1.9577920989999997
+        "p99": 1.95865994
       },
       "orders.printLabel": {
         "calls": 240,
@@ -707,7 +707,7 @@
         "attempts": 294,
         "outage_calls": 8,
         "outage_attempts": 32,
-        "p99": 0.6470559880000001
+        "p99": 0.650375985
       }
     }
   },
@@ -717,22 +717,21 @@
       "cases": 20,
       "detected": 15,
       "detection_rate": 0.75,
-      "lines_to_diagnosis_p50": null,
+      "lines_to_diagnosis_p50": 4,
       "ttd_ms_p50": null
     },
     "hardened": {
       "cases": 20,
       "detected": 20,
       "detection_rate": 1.0,
-      "lines_to_diagnosis_p50": null,
+      "lines_to_diagnosis_p50": 1,
       "ttd_ms_p50": null
     }
   },
   "leaks": [
     "ip",
     "path",
-    "traceback",
-    "url"
+    "traceback"
   ],
   "host": {
     "machine": "x86_64",
@@ -751,7 +750,7 @@
     "slow": "+3 s latency, then the correct answer",
     "truncated": "body (or stdout) cut in half"
   },
-  "created": "2026-11-23T16:50:51+0800",
+  "created": "2026-11-23T17:00:03+0800",
   "slo": {
     "schema_version": "1.0.0",
     "kind": "slo",
@@ -764,8 +763,8 @@
     "original": {
       "availability": 0.0,
       "error_rate": 1.0,
-      "p50_s": 0.3512,
-      "p99_s": 4.1503,
+      "p50_s": 0.3574,
+      "p99_s": 4.1795,
       "error_budget": 0.01,
       "error_budget_burn_ratio": 100.0,
       "error_budget_burn_pct": 10000.0,
@@ -779,8 +778,8 @@
     "hardened": {
       "availability": 0.9,
       "error_rate": 0.1,
-      "p50_s": 2.6425,
-      "p99_s": 4.92,
+      "p50_s": 2.7274,
+      "p99_s": 4.9689,
       "error_budget": 0.01,
       "error_budget_burn_ratio": 10.0,
       "error_budget_burn_pct": 1000.0,
@@ -796,18 +795,18 @@
         "cases": 20,
         "detected": 15,
         "detection_rate": 0.75,
-        "lines_to_diagnosis_p50": null,
+        "lines_to_diagnosis_p50": 4,
         "ttd_ms_p50": null
       },
       "hardened": {
         "cases": 20,
         "detected": 20,
         "detection_rate": 1.0,
-        "lines_to_diagnosis_p50": null,
+        "lines_to_diagnosis_p50": 1,
         "ttd_ms_p50": null
       }
     },
     "ax": null,
-    "created": "2026-11-23T16:50:51+0800"
+    "created": "2026-11-23T17:00:03+0800"
   }
 }

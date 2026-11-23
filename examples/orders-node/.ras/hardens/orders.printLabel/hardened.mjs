@@ -33,7 +33,8 @@ export async function printLabel(order, chargeId) {
   } catch (e) {
     const context = { order: order.id, charge: chargeId, attempts };
     // Not the message: execFile puts the whole command line in it, the customer's name included.
-    logEvent("print_label_failed", { ...context, transient: retryable(e), error: e?.name, code: e?.code ?? null, signal: e?.signal ?? null });
+    const problem = new RasError("label printer unavailable", { cause: e, dependency: "label.mjs" }).problem;
+    logEvent("print_label_failed", { ...context, transient: retryable(e), error: e?.name, code: e?.code ?? null, signal: e?.signal ?? null, problem });
     if (!retryable(e)) throw e; // a bad label job or a bug: the original error says it best
     throw new RasError("label printer unavailable", { cause: e, context });
   }

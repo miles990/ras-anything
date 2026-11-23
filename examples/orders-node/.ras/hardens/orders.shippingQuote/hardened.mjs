@@ -56,7 +56,8 @@ export async function shippingQuote(country, grams) {
     return await retry(({ signal }) => requestQuote(url, signal), RETRY);
   } catch (e) {
     const context = { country, grams, url };
-    logEvent("shipping_quote.failed", { ...context, error: String(e) });
+    const problem = new RasError("shipping quote failed", { cause: e, dependency: "rates" }).problem;
+    logEvent("shipping_quote.failed", { ...context, problem });
     throw new RasError("no shipping quote: the carrier API failed", { cause: e, context });
   }
 }

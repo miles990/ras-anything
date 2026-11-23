@@ -39,7 +39,8 @@ export const charge = async (order, amountCents) => {
       return await res.json();
     }, { ...RETRY, retryOn: isRetryable });
   } catch (err) {
-    const context = { order: order.id, amountCents, idempotencyKey, attempts, status: err?.status, error: String(err) };
+    const problem = new RasError("charging order failed", { cause: err, dependency: "charges" }).problem;
+    const context = { order: order.id, amountCents, idempotencyKey, attempts, status: err?.status, problem };
     // Provider down, too slow or refusing the charge: "didn't go through" is the null the caller handles.
     if (isRetryable(err) || err instanceof HttpError) {
       logEvent("charge_not_confirmed", context);

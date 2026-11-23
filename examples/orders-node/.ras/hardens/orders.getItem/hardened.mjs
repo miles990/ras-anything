@@ -30,7 +30,7 @@ export async function getItem(sku) {
     if (!retryOn(e) && !(e instanceof HttpError)) throw e; // a bug, not the catalog
     const context = { sku, url, attempts, status: e.status ?? null };
     const error = new RasError("catalog item unavailable", { cause: e, context });
-    logEvent("orders.getItem.give_up", { ...context, error: e, trace_id: error.traceId });
+    logEvent("orders.getItem.give_up", { ...context, problem: error.problem, trace_id: error.traceId });
     throw error;
   }
 }
