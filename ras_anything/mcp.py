@@ -48,33 +48,38 @@ TOOLS = {
 }
 
 
-def _argv(name: str, a: dict) -> list[str]:
-    cmd = name.split("_", 1)[1]
-    argv = [cmd]
+# MCP argument -> CLI flag, in CLI order: (argument, commands it applies to, flag or None for positional, how to render)
+_FLAGS = (
+    ("id", ("harden", "verify", "enable", "disable"), None, str),
+    ("canary", ("enable",), "--canary", str),
+    ("shadow", ("enable",), "--shadow", None),
+    ("agent", ("harden",), "--agent", str),
+    ("seeds", ("scan", "bench"), "--seeds", lambda v: str(int(v))),
+    ("degraded_marker", ("bench",), "--degraded-marker", str),
+)
+
+
+def _special(cmd: str, a: dict) -> list[str] | None:
     if cmd == "flag":
-        argv += list(a.get("argv") or ["list"])
-        return argv
+        return list(a.get("argv") or ["list"])
     if cmd == "export":
-        argv += ["--format", str(a.get("format") or "json")]
-        return argv
+        return ["--format", str(a.get("format") or "json")]
     if cmd == "replay":
-        if a.get("list"):
-            argv.append("--list")
-        elif a.get("id"):
-            argv.append(a["id"])
-        return argv
-    if a.get("id") and cmd in ("harden", "verify", "enable", "disable"):
-        argv.append(a["id"])
-    if a.get("canary") and cmd == "enable":
-        argv += ["--canary", str(a["canary"])]
-    if a.get("shadow") and cmd == "enable":
-        argv.append("--shadow")
-    if a.get("agent") and cmd == "harden":
-        argv += ["--agent", a["agent"]]
-    if a.get("seeds") and cmd in ("scan", "bench"):
-        argv += ["--seeds", str(int(a["seeds"]))]
-    if a.get("degraded_marker") and cmd == "bench":
-        argv += ["--degraded-marker", a["degraded_marker"]]
+        return ["--list"] if a.get("list") else [a["id"]] if a.get("id") else []
+    return None
+
+
+def _argv(name: str, a: dict) -> list[str]:
+    """The CLI argv an MCP tool call stands for (the MCP server is a shell over the CLI)."""
+    cmd = name.split("_", 1)[1]
+    special = _special(cmd, a)
+    if special is not None:
+        return [cmd] + special
+    argv = [cmd]
+    for key, cmds, flag, render in _FLAGS:
+        if not a.get(key) or cmd not in cmds:
+            continue
+        argv += ([flag] if flag else []) + ([render(a[key])] if render else [])
     if a.get("cmd"):
         argv += ["--"] + [str(x) for x in a["cmd"]]
     return argv

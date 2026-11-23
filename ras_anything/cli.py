@@ -129,11 +129,113 @@ class _UsageError(Exception):
     pass
 
 
-def main(argv=None) -> int:
-    argv = list(sys.argv[1:] if argv is None else argv)
-    head, cmd = _split(argv)
-    as_json = "--json" in head
-    p = parser()
+def _scan(a, cmd):
+    from .scan import scan
+
+    scan(cmd, seeds=a.seeds, rate=a.rate)
+
+
+def _harden(a, cmd):
+    from .harden import harden
+
+    harden(a.id, agent=a.agent, model=a.model, budget=a.budget, max_calls=a.calls, force=a.force)
+
+
+def _verify(a, cmd):
+    from .verify import verify
+
+    return 0 if verify(a.id, max_chaos=a.chaos_calls).get("passed") else 1
+
+
+def _enable(a, cmd):
+    from .enable import enable
+
+    enable(a.id, canary=a.canary, shadow=a.shadow)
+
+
+def _disable(a, cmd):
+    from .enable import disable
+
+    disable(a.id)
+
+
+def _bench(a, cmd):
+    if a.patterns:
+        from pathlib import Path
+
+        from . import lab
+
+        lab.run(a.seeds, Path(a.out) if a.out else None)
+        return 0
+    from .bench import bench
+
+    bench(cmd or None, seeds=a.seeds, rate=a.rate, markers=a.markers, slo_spec=a.slo)
+
+
+def _report(a, cmd):
+    from .report import report
+
+    report(a.title, slo_spec=a.slo)
+
+
+def _replay(a, cmd):
+    from . import replay as _r
+
+    _r.print_list() if a.list else _r.replay(a.id)
+
+
+def _flag(a, cmd):
+    from .flags import run as flag_run
+
+    return flag_run(a.rest)
+
+
+def _status(a, cmd):
+    from .doctor import status
+
+    status()
+
+
+def _doctor(a, cmd):
+    from .doctor import doctor
+
+    return doctor()
+
+
+def _mcp(a, cmd):
+    from .mcp import serve
+
+    return serve()
+
+
+def _drift(a, cmd):
+    from .drift import drift
+
+    return 0 if drift(a.model, eval_ref=a.eval_ref, provider_url=a.provider_url,
+                      export_promptfoo_path=a.export_promptfoo, threshold=a.threshold).get("passed") else 1
+
+
+def _export(a, cmd):
+    from .export import export_data
+
+    sys.stdout.write(export_data(fmt=a.format, out_path=a.out))
+
+
+def _go(a, cmd):
+    from .go import go
+
+    return go(cmd, a.agent, model=a.model, seeds=a.seeds, markers=a.markers, budget=a.budget)
+
+
+# One entry per subcommand: the shell only parses, calls the pipeline module, and returns its exit code.
+COMMANDS = {
+    "scan": _scan, "harden": _harden, "verify": _verify, "enable": _enable, "disable": _disable, "bench": _bench,
+    "report": _report, "replay": _replay, "flag": _flag, "status": _status, "doctor": _doctor, "mcp": _mcp,
+    "drift": _drift, "export": _export, "go": _go,
+}
+
+
+def _parse(p, head, as_json):
     if as_json:
         def _error(message):  # argparse would print usage and exit 2: say it as a problem instead
             raise _UsageError(message)
@@ -142,90 +244,34 @@ def main(argv=None) -> int:
             if isinstance(action, argparse._SubParsersAction):
                 for sp in action.choices.values():
                     sp.error = _error
+    return p.parse_args(head)
+
+
+def _run(p, a, cmd) -> int:
+    c = a.command
+    if c in ("scan", "go") and not cmd:
+        raise UserError("no command given", "%s runs your app: put its command after --" % c,
+                        "%s -- python app.py / node app.mjs" % ("scan" if c == "scan" else "go --agent claude"))
+    fn = COMMANDS.get(c)
+    if fn is None:
+        p.print_help()
+        return 2
+    rc = fn(a, cmd)
+    return 0 if rc is None else rc
+
+
+def main(argv=None) -> int:
+    argv = list(sys.argv[1:] if argv is None else argv)
+    head, cmd = _split(argv)
+    as_json = "--json" in head
+    p = parser()
     try:
-        a = p.parse_args(head)
+        a = _parse(p, head, as_json)
     except _UsageError as e:
         print(json.dumps(problem("usage", "invalid command line", str(e), "--help", 2)), file=sys.stderr)
         return 2
     try:
-        c = a.command
-        if c in ("scan", "go") and not cmd:
-            raise UserError("no command given", "%s runs your app: put its command after --" % c,
-                            "%s -- python app.py / node app.mjs" % ("scan" if c == "scan" else "go --agent claude"))
-        if c == "scan":
-            from .scan import scan
-
-            scan(cmd, seeds=a.seeds, rate=a.rate)
-        elif c == "harden":
-            from .harden import harden
-
-            harden(a.id, agent=a.agent, model=a.model, budget=a.budget, max_calls=a.calls, force=a.force)
-        elif c == "verify":
-            from .verify import verify
-
-            return 0 if verify(a.id, max_chaos=a.chaos_calls).get("passed") else 1
-        elif c == "enable":
-            from .enable import enable
-
-            enable(a.id, canary=a.canary, shadow=a.shadow)
-        elif c == "disable":
-            from .enable import disable
-
-            disable(a.id)
-        elif c == "bench":
-            if a.patterns:
-                from pathlib import Path
-
-                from . import lab
-
-                lab.run(a.seeds, Path(a.out) if a.out else None)
-                return 0
-            from .bench import bench
-
-            bench(cmd or None, seeds=a.seeds, rate=a.rate, markers=a.markers, slo_spec=a.slo)
-        elif c == "report":
-            from .report import report
-
-            report(a.title, slo_spec=a.slo)
-        elif c == "replay":
-            from . import replay as _replay
-
-            if a.list:
-                _replay.print_list()
-            else:
-                _replay.replay(a.id)
-        elif c == "flag":
-            from .flags import run as flag_run
-
-            return flag_run(a.rest)
-        elif c == "status":
-            from .doctor import status
-
-            status()
-        elif c == "doctor":
-            from .doctor import doctor
-
-            return doctor()
-        elif c == "mcp":
-            from .mcp import serve
-
-            return serve()
-        elif c == "drift":
-            from .drift import drift
-
-            return 0 if drift(a.model, eval_ref=a.eval_ref, provider_url=a.provider_url,
-                              export_promptfoo_path=a.export_promptfoo, threshold=a.threshold).get("passed") else 1
-        elif c == "export":
-            from .export import export_data
-
-            sys.stdout.write(export_data(fmt=a.format, out_path=a.out))
-        elif c == "go":
-            from .go import go
-
-            return go(cmd, a.agent, model=a.model, seeds=a.seeds, markers=a.markers, budget=a.budget)
-        else:
-            p.print_help()
-            return 2
+        return _run(p, a, cmd)
     except UserError as e:
         if as_json:
             print(json.dumps(problem("user-error", e.what, e.impact, e.nxt)), file=sys.stderr)
@@ -234,4 +280,3 @@ def main(argv=None) -> int:
         return 1
     except KeyboardInterrupt:
         return 130
-    return 0
