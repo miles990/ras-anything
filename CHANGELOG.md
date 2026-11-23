@@ -6,7 +6,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follo
 
 ### Added
 - mypy now checks the pipeline modules (scan, harden, verify, export, and the rest of that layer) as well as the original five files.
-- The Node pattern list (`lang/node_agent/patterns/names.json`) is generated from `ras_anything.patterns.NAMES`.
+- The Node pattern list (`lang/node_agent/patterns/names.cjs`) is generated from `ras_anything.patterns.NAMES`.
 - `--json` on every result-producing command writes a `cli-result` object to stdout (progress and logs go to stderr; `export --format json` stays a bundle). Errors remain RFC 9457 on stderr.
 - `schema_version` lives in `contracts.SCHEMA_VERSION` and is **1.1.0** (additive `coverage.adapters[].enabled`; see `docs/schema/README.md`).
 - Export formats are auto-discovered modules in `ras_anything/exporters/` (new format = new file, 0 core changes).
@@ -20,6 +20,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follo
 - `wow/eng.json` and `wow/eng-baseline.json`: W8 engineering measurements and the frozen baseline.
 
 ### Fixed
+- Vendored Node runtime now includes the generated pattern list (`names.cjs`); the vendored Python recorder no longer imports `contracts` (that import broke enabled copies).
 - W8: moved exporter complexity keys in `wow/eng-baseline.json` after the format split; export formats declared toggle-N/A; `cli.main` kept at CC ≤ 10 after `--json`.
 - `export` / `sync_out` leave versioned `.ras/out` snapshots (including SLO series timestamps) unchanged when the payload has not changed.
 - Holdout pipeline tests (`test_ai_pipeline`, `test_go_pipeline`, `test_java_pipeline`) skip with a clear reason when `wow/work/holdout/` is missing (fresh clone or CI).

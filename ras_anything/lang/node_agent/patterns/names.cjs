@@ -1,4 +1,5 @@
-[
+// Generated from ras_anything.patterns.NAMES by write_node_names(). Do not edit by hand.
+module.exports = [
  "fallback",
  "deadline",
  "bulkhead",
@@ -11,4 +12,4 @@
  "adaptive_concurrency",
  "hedge",
  "attempt_timeout"
-]
+];

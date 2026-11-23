@@ -224,3 +224,9 @@ class LanguageSwitchEdges(unittest.TestCase):
         self.assertFalse(rows["python"]["enabled"])
         self.assertFalse(rows["python"]["verify"])
         self.assertTrue(rows["node"]["enabled"])
+
+
+class SchemaVersionContract(unittest.TestCase):
+    def test_vendored_recorder_carries_the_same_schema_version(self):
+        from ras_anything.patterns import recorder
+        self.assertEqual(recorder.SCHEMA_VERSION, contracts.SCHEMA_VERSION)

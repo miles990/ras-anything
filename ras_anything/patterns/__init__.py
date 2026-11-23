@@ -44,11 +44,11 @@ def __getattr__(name):  # PEP 562: NAMES is computed on first use, so importing 
     raise AttributeError("module %r has no attribute %r" % (__name__, name))
 
 
-# The Node runtime reads this file (lang/node_agent/patterns/names.json); it is generated from NAMES, not handwritten.
+# The Node runtime reads this file (lang/node_agent/patterns/names.cjs); it is generated from NAMES, not handwritten.
 def node_names_path():
     from pathlib import Path
 
-    return Path(__file__).resolve().parents[1] / "lang" / "node_agent" / "patterns" / "names.json"
+    return Path(__file__).resolve().parents[1] / "lang" / "node_agent" / "patterns" / "names.cjs"
 
 
 def write_node_names(path=None):
@@ -57,7 +57,10 @@ def write_node_names(path=None):
     from pathlib import Path
 
     dest = Path(path) if path else node_names_path()
-    dest.write_text(json.dumps(list(_discover()), indent=1) + "\n", encoding="utf-8")
+    names = list(_discover())
+    body = "// Generated from ras_anything.patterns.NAMES by write_node_names(). Do not edit by hand.\n"
+    body += "module.exports = " + json.dumps(names, indent=1) + ";\n"
+    dest.write_text(body, encoding="utf-8")
     return dest
 
 ADOPTED, OPT_IN, REJECTED = "adopted", "opt-in", "rejected"

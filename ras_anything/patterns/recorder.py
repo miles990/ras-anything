@@ -20,7 +20,9 @@ import time
 from collections import deque
 
 from .. import runtime as rt
-from ..contracts import SCHEMA_VERSION
+
+# Keep in sync with contracts.SCHEMA_VERSION (this module is vendored without contracts).
+SCHEMA_VERSION = "1.1.0"
 
 RING, BEFORE, PER_KIND, PER_PROCESS, KEEP_FILES = 64, 20, 5, 100, 200
 _ring: deque = deque(maxlen=RING)

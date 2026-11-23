@@ -2,7 +2,7 @@
 // imports ./core.cjs only. With one switched off or missing, the others still work.
 "use strict";
 
-const NAMES = require("./names.json"); // generated from ras_anything.patterns.NAMES (patterns.write_node_names)
+const NAMES = require("./names.cjs"); // generated from ras_anything.patterns.NAMES (patterns.write_node_names)
 const camel = (s) => s.replace(/_(\w)/g, (_, c) => c.toUpperCase());
 const snake = (s) => s.replace(/[A-Z]/g, (c) => `_${c.toLowerCase()}`);
 
