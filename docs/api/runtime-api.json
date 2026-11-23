@@ -1,0 +1,220 @@
+{
+ "api": {
+  "AIPolicy": {
+   "kind": "class"
+  },
+  "AdaptiveConcurrency": {
+   "kind": "class"
+  },
+  "AdaptiveThrottle": {
+   "kind": "class"
+  },
+  "ApprovalRequired": {
+   "kind": "class"
+  },
+  "Attempt": {
+   "kind": "class"
+  },
+  "BudgetExceededError": {
+   "kind": "class"
+  },
+  "Bulkhead": {
+   "kind": "class"
+  },
+  "BulkheadFullError": {
+   "kind": "class"
+  },
+  "CircuitBreaker": {
+   "kind": "class"
+  },
+  "CircuitOpenError": {
+   "kind": "class"
+  },
+  "ConcurrencyLimitError": {
+   "kind": "class"
+  },
+  "DeadlineExceeded": {
+   "kind": "class"
+  },
+  "ExactCache": {
+   "kind": "class"
+  },
+  "LoopGuard": {
+   "kind": "class"
+  },
+  "LoopGuardError": {
+   "kind": "class"
+  },
+  "Policy": {
+   "kind": "class"
+  },
+  "RasError": {
+   "kind": "class"
+  },
+  "RejectedError": {
+   "kind": "class"
+  },
+  "RetryBudget": {
+   "kind": "class"
+  },
+  "SchemaValidationError": {
+   "kind": "class"
+  },
+  "StaleCache": {
+   "kind": "class"
+  },
+  "StepJournal": {
+   "kind": "class"
+  },
+  "TRANSIENT_HTTP": {
+   "kind": "constant"
+  },
+  "ThrottledError": {
+   "kind": "class"
+  },
+  "TokenBudget": {
+   "kind": "class"
+  },
+  "ToolAllowlist": {
+   "kind": "class"
+  },
+  "ToolNotAllowedError": {
+   "kind": "class"
+  },
+  "ahedge": {
+   "kind": "function",
+   "signature": "(fn, *, delay_s: 'float', max_hedges: 'int' = 1, method: 'str' = 'GET', retry_budget=None)"
+  },
+  "aretry": {
+   "kind": "function",
+   "signature": "(fn, *, attempts: 'int' = 3, base: 'float' = 0.1, cap: 'float' = 2.0, budget_s: 'float | None' = None, retry_on=<function is_transient>, on_retry=None, retry_budget=None, dependency: 'str | None' = None)"
+  },
+  "attempt_timeout": {
+   "kind": "function",
+   "signature": "(timeout_s: 'float | None' = None) -> 'float | None'"
+  },
+  "call_with_timeout": {
+   "kind": "function",
+   "signature": "(fn, timeout_s: 'float', *args, **kwargs)"
+  },
+  "check_injection_leaks": {
+   "kind": "function",
+   "signature": "(text: 'str', canary: 'str | None' = None) -> 'bool'"
+  },
+  "deadline": {
+   "kind": "function",
+   "signature": "(timeout_s: 'float')"
+  },
+  "dependency_failed": {
+   "kind": "function",
+   "signature": "(exc: 'BaseException') -> 'bool'"
+  },
+  "dump_incident": {
+   "kind": "function",
+   "signature": "(reason: 'str' = 'manual') -> 'str | None'"
+  },
+  "fault_class": {
+   "kind": "function",
+   "signature": "(exc: 'BaseException | None') -> 'str'"
+  },
+  "frame_untrusted": {
+   "kind": "function",
+   "signature": "(text: 'str', label: 'str' = 'UNTRUSTED_DOCUMENT') -> 'str'"
+  },
+  "health": {
+   "kind": "function",
+   "signature": "() -> 'dict'"
+  },
+  "hedge": {
+   "kind": "function",
+   "signature": "(fn, *, delay_s: 'float', max_hedges: 'int' = 1, method: 'str' = 'GET', retry_budget=None)"
+  },
+  "idempotency_key": {
+   "kind": "function",
+   "signature": "(operation: 'str', *parts) -> 'str'"
+  },
+  "is_idempotency_conflict": {
+   "kind": "function",
+   "signature": "(e: 'BaseException') -> 'bool'"
+  },
+  "is_idempotency_mismatch": {
+   "kind": "function",
+   "signature": "(e: 'BaseException') -> 'bool'"
+  },
+  "is_transient": {
+   "kind": "function",
+   "signature": "(exc: 'BaseException') -> 'bool'"
+  },
+  "log_event": {
+   "kind": "function",
+   "signature": "(event: 'str', **fields) -> 'None'"
+  },
+  "new_trace_id": {
+   "kind": "function",
+   "signature": "() -> 'str'"
+  },
+  "not_accepted": {
+   "kind": "function",
+   "signature": "(exc: 'BaseException') -> 'bool'"
+  },
+  "problem": {
+   "kind": "function",
+   "signature": "(exc: 'BaseException') -> 'dict'"
+  },
+  "remaining_s": {
+   "kind": "function",
+   "signature": "() -> 'float | None'"
+  },
+  "require_approval": {
+   "kind": "function",
+   "signature": "(op: 'str', details: 'dict | None' = None) -> 'bool'"
+  },
+  "reset_state": {
+   "kind": "function",
+   "signature": "() -> 'None'"
+  },
+  "retry": {
+   "kind": "function",
+   "signature": "(fn, *, attempts: 'int' = 3, base: 'float' = 0.1, cap: 'float' = 2.0, budget_s: 'float | None' = None, retry_on=<function is_transient>, sleep=None, on_retry=None, retry_budget=None, dependency: 'str | None' = None)"
+  },
+  "retry_after_s": {
+   "kind": "function",
+   "signature": "(exc: 'BaseException') -> 'float | None'"
+  },
+  "seed": {
+   "kind": "function",
+   "signature": "(n: 'int') -> 'None'"
+  },
+  "set_approver": {
+   "kind": "function",
+   "signature": "(fn)"
+  },
+  "swap": {
+   "kind": "function",
+   "signature": "(fid: 'str', original, hardened, dependencies=None)"
+  },
+  "trace": {
+   "kind": "function",
+   "signature": "(traceparent: 'str | None' = None)"
+  },
+  "trace_headers": {
+   "kind": "function",
+   "signature": "() -> 'dict'"
+  },
+  "trace_id": {
+   "kind": "function",
+   "signature": "() -> 'str'"
+  },
+  "traceparent": {
+   "kind": "function",
+   "signature": "() -> 'str'"
+  },
+  "validate_schema": {
+   "kind": "function",
+   "signature": "(obj, schema: 'dict') -> 'object'"
+  }
+ },
+ "module": "ras_anything.runtime",
+ "policy": "SemVer: removing or renaming a name, or removing a parameter, needs a major version; adding names is minor. Regenerate with: python -m tests.test_library_api --write",
+ "version": "0.1.0"
+}

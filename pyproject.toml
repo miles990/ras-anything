@@ -27,6 +27,7 @@ Homepage = "https://github.com/miles990/ras-anything"
 packages = ["ras_anything", "ras_anything.lang", "ras_anything.patterns", "ras_anything.agents", "ras_anything.agents.python", "ras_anything.agents.python._inject"]
 
 [tool.setuptools.package-data]
+"ras_anything" = ["py.typed"]
 "ras_anything.agents.python" = ["_inject/*.py"]
 "ras_anything.lang" = [
     # every language's in-app agent ships whole: a new lang/<name>_agent/ needs no edit here (docs/adr/0003)
@@ -51,6 +52,6 @@ select = ["F", "E9", "B006", "B008", "B012", "B015", "B018"]
 
 [tool.mypy]
 python_version = "3.10"
-files = ["ras_anything/contracts.py", "ras_anything/lang/base.py", "ras_anything/lang/__init__.py", "ras_anything/patterns/__init__.py", "ras_anything/arch.py"]
+files = ["ras_anything/contracts.py", "ras_anything/lang/base.py", "ras_anything/lang/__init__.py", "ras_anything/patterns/__init__.py", "ras_anything/hardens.py"]
 ignore_missing_imports = true
 follow_imports = "silent"
