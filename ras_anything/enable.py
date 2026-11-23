@@ -22,7 +22,7 @@ def places(adapter, project: Path, module_file: str, fid: str) -> tuple[Path, Pa
     to be plain files/folders inside the project."""
     src = plain_path(module_file, project, "the module")
     folder = plain_path(src.parent / COPY_DIR, project, "the folder for hardened copies", "dir", must_exist=False)
-    copy = plain_path(folder / adapter.copy_name(fid), project, "the hardened copy", must_exist=False)
+    copy = plain_path(folder / adapter.copy_name(fid, src), project, "the hardened copy", must_exist=False)
     rt = plain_path(folder / adapter.runtime_file()[1], project, "the runtime copy", must_exist=False)
     return src, folder, copy, rt
 
@@ -33,7 +33,7 @@ def enable(fid: str | None = None, quiet: bool = False) -> dict:
     d = harden_dir(project, fid)
     meta = load_json(plain_path(d / "meta.json", project, "the recording"))
     adapter = lang.by_name(meta.get("lang"))
-    hp = plain_path(d / adapter.hardened_name, project, "the hardened code")
+    hp = plain_path(d / adapter.hardened_file(meta), project, "the hardened code")
     vres = load_json(plain_path(d / "verify.json", project, "the verify result", must_exist=False))
     cur = sha256_file(hp)
     if not vres:
@@ -61,6 +61,9 @@ def enable(fid: str | None = None, quiet: bool = False) -> dict:
     blk = adapter.block(fid, meta, "%s/%s" % (COPY_DIR, copy_abs.name), vres)
     if eol == "\r\n":
         blk = blk.replace("\n", "\r\n")
+    patches = adapter.patches(src_path, text, meta)
+    for old, changed in patches:
+        text = text.replace(old, changed)
     at, insert = adapter.insertion(src_path, text, blk, eol)
     new = (text[:at] + insert + text[at:]).encode("utf-8")
     rel_src = rel_to_project(src_path, project)
@@ -68,7 +71,7 @@ def enable(fid: str | None = None, quiet: bool = False) -> dict:
                      if v["file"] == rel_src), sha_before)
     entry = {"lang": adapter.name, "file": rel_src, "offset": at, "inserted": insert, "sha_before": sha_before,
              "file_sha_before": orig_sha, "sha_after": hashlib.sha256(new).hexdigest(), "hardened_sha256": cur,
-             "copy": rel_to_project(copy_abs, project), "enabled_at": time.strftime("%Y-%m-%dT%H:%M:%S%z")}
+             "copy": rel_to_project(copy_abs, project), **({"patches": patches} if patches else {}), "enabled_at": time.strftime("%Y-%m-%dT%H:%M:%S%z")}
     state["enabled"][fid] = entry
     folder.mkdir(exist_ok=True)
     write_file(copy_abs, hp.read_bytes())
@@ -104,8 +107,12 @@ def check_entry(project: Path, fid: str, e: dict) -> dict:
     if exact < 0 and (i < 0 or j < i):
         raise UserError("can't find the ras-anything block for %s in %s" % (fid, e["file"]), "was it removed by hand? Nothing "
                         "was changed", "status")
+    patches = e.get("patches", [])
+    if not isinstance(patches, list) or not all(isinstance(p, (list, tuple)) and len(p) == 2 and all(isinstance(x, str) for x in p)
+                                                and adapter.valid_patch(*p) for p in patches):
+        raise broken
     return {"src": src, "folder": folder, "copy": copy, "text": text, "exact": exact, "i": i, "j": j, "end": end,
-            "runtime": rt.name}
+            "runtime": rt.name, "patches": patches}
 
 
 def disable(fid: str | None = None, quiet: bool = False) -> dict:
@@ -127,6 +134,9 @@ def disable(fid: str | None = None, quiet: bool = False) -> dict:
         new = text[:exact] + text[exact + len(e["inserted"]):]
     else:  # the file was edited around the block: remove the block between its markers
         new = text[:c["i"]] + text[c["j"] + len(c["end"]) + 1:]
+    for old, changed in c["patches"]:
+        if new.count(changed) == 1:  # (else the line was edited since: leave it)
+            new = new.replace(changed, old)
     others_same = [k for k, v in checked.items() if k != fid and v["src"] == p]
     orig_sha = e.get("file_sha_before") or e["sha_before"]
     data = new.encode("utf-8")

@@ -29,3 +29,4 @@ packages = ["ras_anything", "ras_anything.lang", "ras_anything.agents", "ras_any
 
 [tool.setuptools.package-data]
 "ras_anything.agents.python" = ["_inject/*.py"]
+"ras_anything.lang" = ["node_agent/*.cjs"]

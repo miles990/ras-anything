@@ -44,6 +44,11 @@ def load(path) -> list:
     return doc["calls"]
 
 
+def exc_name(e: dict) -> str:
+    """"urllib.error.URLError" for a recorded exception (languages without modules for them: "TypeError")."""
+    return e["type"] if e.get("module") in (None, "", "node", "thrown") else "%s.%s" % (e["module"], e["type"])
+
+
 _SHOW = {"$tuple": "(%s)", "$set": "{%s}", "$frozenset": "frozenset({%s})"}
 
 

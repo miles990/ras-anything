@@ -27,7 +27,7 @@ class LangAdapter(ABC):
     example = ""         # a command to show in hints, e.g. "python app.py"
     boundaries = ""      # for people: what is intercepted
     fence = ""           # Markdown code fence of the language
-    hardened_name = ""   # the file the agent edits, e.g. "hardened.py"
+    hardened_name = ""   # the file the coding agent edits, e.g. "hardened.py" (see hardened_file)
     private_env: tuple = ()  # environment variables `attach` sets: never part of a recording
     bug_exceptions: frozenset = frozenset()  # exception types that mean a programming error
 
@@ -49,6 +49,10 @@ class LangAdapter(ABC):
     def attach(self, cmd: list[str], env: dict) -> tuple[list[str], dict]:
         """Command and environment that start the app with the agent loaded. The agent's configuration
         is already in env["RAS_ANYTHING_CFG"]."""
+
+    def prepare(self, cfg: dict, scratch: Path) -> dict:
+        """Extra configuration for the agent of one run; files for it go in `scratch` (removed afterwards)."""
+        return {}
 
     @abstractmethod
     def interpreter(self, project: Path, meta: dict) -> str:
@@ -73,6 +77,10 @@ class LangAdapter(ABC):
     @abstractmethod
     def stub(self, fn: dict, project: Path) -> str:
         """The hardened file to start from."""
+
+    def hardened_file(self, fn: dict) -> str:
+        """Name of the hardened file of one function (its scan entry or meta.json)."""
+        return self.hardened_name
 
     @abstractmethod
     def callers(self, fn: dict, root: Path, limit: int = 4) -> list[str]:
@@ -114,9 +122,18 @@ class LangAdapter(ABC):
     def insertion(self, path: Path, text: str, block: str, eol: str) -> tuple[int, str]:
         """Where in the module's text the block goes, and exactly what is inserted there."""
 
+    def patches(self, path: Path, text: str, meta: dict) -> list[tuple[str, str]]:
+        """Changes to the module besides the block, each (line, its replacement), both unique in the module.
+        Only what rebinding the function needs; undone by disable."""
+        return []
+
+    def valid_patch(self, old: str, new: str) -> bool:
+        """Could `patches` have made this change? (disable checks what state.json says)"""
+        return False
+
     @abstractmethod
-    def copy_name(self, fid: str) -> str:
-        """File name of the hardened copy in _ras_hardened/."""
+    def copy_name(self, fid: str, file: Path) -> str:
+        """File name of the hardened copy in _ras_hardened/ for a function of module `file`."""
 
     @abstractmethod
     def runtime_file(self) -> tuple[Path, str]:

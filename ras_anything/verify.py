@@ -33,7 +33,7 @@ def resolve_id(project: Path, fid: str | None) -> str:
     if len(have) > 1:
         def changed(h):
             a = lang.by_name((load_json(base / h / "meta.json") or {}).get("lang"))
-            f = base / h / a.hardened_name
+            f = base / h / a.hardened_file(load_json(base / h / "meta.json") or {})
             return f.stat().st_mtime if f.exists() else 0
         return max(have, key=changed)
     return have[0]
@@ -51,7 +51,7 @@ def replay(adapter, project: Path, d: Path, meta: dict, trials: list[dict], dead
         job, out = Path(tmp) / "job.json", Path(tmp) / "out.json"
         job.write_text(json.dumps({
             "protocol": 1, "lang": adapter.name, "project": str(project), "meta": meta, "cassette": str(d / "calls.json"),
-            "hardened": str(d / adapter.hardened_name), "trials": trials, "out": str(out), "constants": faults.CONSTANTS}))
+            "hardened": str(d / adapter.hardened_file(meta)), "trials": trials, "out": str(out), "constants": faults.CONSTANTS}))
         argv, env = adapter.worker_cmd(adapter.interpreter(project, meta), job)
         try:
             p = subprocess.run(argv, env=env, capture_output=True, text=True, timeout=max(1.0, deadline - time.perf_counter()))
@@ -178,7 +178,7 @@ def verify(fid: str | None = None, max_chaos: int = 60, quiet: bool = False) -> 
     d = harden_dir(project, fid)
     meta = load_json(d / "meta.json")
     adapter = lang.by_name(meta.get("lang"))
-    hp = d / adapter.hardened_name
+    hp = d / adapter.hardened_file(meta)
     if not hp.exists():
         raise UserError("%s is missing" % os.path.relpath(hp), "verify replays the calls through it", "harden %s" % fid)
     if not quiet:
@@ -189,10 +189,10 @@ def verify(fid: str | None = None, max_chaos: int = 60, quiet: bool = False) -> 
     refused = adapter.refuse_hardened(hp)
     try:
         if refused:
-            raise ReplayFailed({"stage": "accept %s" % adapter.hardened_name, "message": refused})
+            raise ReplayFailed({"stage": "accept %s" % hp.name, "message": refused})
         res = measure(adapter, project, d, meta, max_chaos)
         if sha256_file(hp) != sha:
-            raise ReplayFailed({"stage": "verify %s" % adapter.hardened_name, "message": "the file changed while it was being verified"})
+            raise ReplayFailed({"stage": "verify %s" % hp.name, "message": "the file changed while it was being verified"})
     except ReplayFailed as e:
         res = {"id": fid, "passed": False, "fatal": e.fatal}
     res = scrub(res, project)
@@ -202,7 +202,7 @@ def verify(fid: str | None = None, max_chaos: int = 60, quiet: bool = False) -> 
     res["fault_model"] = {k: faults.DESCRIBE[k] for k in faults.MATRIX + ("mixed",)}
     save_json(d / "verify.json", res)
     if not quiet:
-        print_verify(res, fid, adapter.hardened_name)
+        print_verify(res, fid, hp.name)
     return res
 
 

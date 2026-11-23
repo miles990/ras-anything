@@ -66,7 +66,7 @@ def status() -> dict:
         m = load_json(d / "meta.json")
         if m is None:
             continue
-        hp = d / lang.by_name(m.get("lang")).hardened_name
+        hp = d / lang.by_name(m.get("lang")).hardened_file(m)
         cur = sha256_file(hp) if hp.exists() else None
         if v is None or v.get("fatal"):
             st = ui.warn("not verified" if v is None else "verify error")

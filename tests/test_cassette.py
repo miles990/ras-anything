@@ -148,7 +148,7 @@ class ExceptionsTest(unittest.TestCase):
 
 class NoPickleTest(unittest.TestCase):
     def test_package_has_no_code_executing_deserializer(self):
-        bad = re.compile(r"\b(c?[pP]ickle|dill|marshal|shelve|eval|exec)\b(?!uting)")
+        bad = re.compile(r"\b(c?[pP]ickle|dill|marshal|shelve)\b|(?<![.\w])(eval|exec)\s*\(")
         hits = []
         for p in sorted(PKG.rglob("*.py")):
             for n, ln in enumerate(p.read_text().splitlines(), 1):

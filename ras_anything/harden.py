@@ -50,7 +50,7 @@ def _argv(req: dict) -> str:
 
 def task_md(adapter, fn: dict, meta: dict, calls: list, scan: dict, root: Path, project: Path) -> str:
     fid = fn["id"]
-    tx, hname = adapter.task_texts(fn), adapter.hardened_name
+    tx, hname = adapter.task_texts(fn), adapter.hardened_file(fn)
     budget = meta["budget_s"]
     reqs = {}
     for c in calls:
@@ -60,7 +60,7 @@ def task_md(adapter, fn: dict, meta: dict, calls: list, scan: dict, root: Path, 
             reqs[k] = reqs.get(k, 0) + 1
     samples = []
     for c in calls[:3]:
-        res = ("raises %s.%s: %s" % (c["exc"]["module"], c["exc"]["type"], c["exc"]["msg"])) if "exc" in c \
+        res = ("raises %s: %s" % (cassette.exc_name(c["exc"]), c["exc"]["msg"])) if "exc" in c \
             else cassette.show(c["result"])
         io = "; ".join("%s %s -> %s" % (x["req"]["method"] or "run", (cassette.text(x["req"]["url"], "") or _argv(x["req"]))[:90],
                                          x["out"].get("status", x["out"].get("returncode", "exception")))
@@ -108,7 +108,7 @@ Recorded examples:
 
 1. **Same happy path.** With healthy dependencies, return exactly what the original returned for
    every recorded call (compared with {tx['equal']}). Make the same requests (same method, URL, body); you
-   may add headers (e.g. `Idempotency-Key`) and must pass `timeout=`. Where the original raised,
+   may add headers (e.g. `Idempotency-Key`) and must pass {tx.get('timeout_arg', '`timeout=`')}. Where the original raised,
    raise the same exception type (or a subclass).
 2. **Bounded latency: {budget:g} s per call**, everything included: timeouts, backoff sleeps,
    Retry-After waits. {tx['timeouts']}; a call with no timeout that
@@ -199,7 +199,7 @@ def harden(fid: str | None = None, agent: str | None = None, model: str | None =
     save_local(project, executable=r.data.get("executable"))
     # env and globals are replayed as recorded (project paths in them are already relocatable)
     save_json(d / "meta.json", {**scrub(meta, project), "env": meta["env"], "globals": meta["globals"]})
-    hp = d / adapter.hardened_name
+    hp = d / adapter.hardened_file(meta)
     kept = hp.exists() and not force
     if not kept:
         hp.write_text(adapter.stub(fn, project))

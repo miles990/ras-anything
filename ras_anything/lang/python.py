@@ -319,7 +319,7 @@ class PythonAdapter(LangAdapter):
             return sum(len(ln) for ln in lines[: fi.main_guard_line - 1]), block + eol + eol
         return len(text), (eol if text.endswith(eol) else eol + eol) + eol + block
 
-    def copy_name(self, fid):
+    def copy_name(self, fid, file):
         return safe_name(fid) + ".py"
 
     def runtime_file(self):

@@ -8,12 +8,13 @@ from __future__ import annotations
 
 from ..paths import UserError
 from .base import LangAdapter, program_stem
+from .node import NodeAdapter
 from .python import PythonAdapter
 
-ADAPTERS: list[LangAdapter] = [PythonAdapter()]
+ADAPTERS: list[LangAdapter] = [PythonAdapter(), NodeAdapter()]
 
 # Recognized, but no adapter here yet.
-PLANNED = {"node": "Node.js", "nodejs": "Node.js"}
+PLANNED = {"bun": "Bun", "deno": "Deno"}
 
 _TS = "Node 22.6+ runs TypeScript itself: ras-anything scan -- node app.ts"
 _HINTS = {
@@ -34,7 +35,7 @@ _HINTS = {
 
 def launchers() -> str:
     have = ["%s: %s" % (a.label, a.launchers) for a in ADAPTERS]
-    return " · ".join(have + ["%s: node (next, not in this version)" % x for x in dict.fromkeys(PLANNED.values())])
+    return " · ".join(have)
 
 
 def detect(cmd: list[str]) -> LangAdapter:
@@ -45,8 +46,9 @@ def detect(cmd: list[str]) -> LangAdapter:
     stem = program_stem(cmd[0]) if cmd else ""
     supported = "supported launchers: " + launchers()
     if stem in PLANNED:
-        raise UserError("%s apps aren't supported yet" % PLANNED[stem], supported,
-                        "scan -- " + ADAPTERS[0].example)
+        script = next((a for a in cmd[1:] if a.endswith((".js", ".mjs", ".cjs", ".ts", ".mts", ".cts"))), "app.ts")
+        raise UserError("%s isn't supported yet" % PLANNED[stem], supported + "\n  if the app also runs on Node.js: "
+                        "ras-anything scan -- node %s" % script, "scan -- node " + script)
     hint = _HINTS.get(stem)
     if hint is None and stem.endswith((".py", ".pyw")):
         hint = "start it with its interpreter: ras-anything scan -- python %s" % cmd[0]

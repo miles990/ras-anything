@@ -28,7 +28,7 @@ class DetectTest(unittest.TestCase):
             self.assertEqual(lang.detect(cmd).name, "python", cmd)
 
     def test_unknown_programs_list_what_is_supported(self):
-        for cmd in (["./a.out"], ["ruby", "a.rb"], ["pythonista", "x"], ["uv", "pip", "list"], ["node", "app.js"], ["npx", "tsx", "a.ts"]):
+        for cmd in (["./a.out"], ["ruby", "a.rb"], ["pythonista", "x"], ["uv", "pip", "list"], ["npx", "tsx", "a.ts"]):
             with self.assertRaises(UserError) as cm:
                 lang.detect(cmd)
             self.assertIn("python", cm.exception.impact)
