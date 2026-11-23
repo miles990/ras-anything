@@ -18,6 +18,7 @@ from ras_anything.harden import harden
 from ras_anything.paths import UserError
 from ras_anything.scan import scan
 from ras_anything.verify import verify
+from tests.holdout import skip_unless_holdout
 from tests.test_pipeline import REPO, quiet
 
 HOLDOUT_GO = REPO / "wow" / "work" / "holdout" / "go"
@@ -152,6 +153,7 @@ class GoAdapterUnitTest(unittest.TestCase):
             p.unlink(missing_ok=True)
 
 
+@skip_unless_holdout("go")
 class GoHoldoutPipelineTest(unittest.TestCase):
     def setUp(self):
         self._tmp = tempfile.TemporaryDirectory()

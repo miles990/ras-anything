@@ -15,6 +15,8 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follo
 - `wow/eng.json` and `wow/eng-baseline.json`: W8 engineering measurements and the frozen baseline.
 
 ### Fixed
+- Holdout pipeline tests (`test_ai_pipeline`, `test_go_pipeline`, `test_java_pipeline`) skip with a clear reason when `wow/work/holdout/` is missing (fresh clone or CI).
+- Proposed CI workflow pins Actions to full commit SHAs and sets job-level `permissions: contents: read`.
 - `doctor` crashed with `NameError` when `RAS_ANYTHING_HEALTH_FILE` was set.
 - Import cycle diagnose → enable → verify (`resolve_id` moved to `hardens.py`).
 

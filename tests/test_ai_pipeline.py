@@ -34,6 +34,7 @@ from ras_anything.patterns.ai import (
 )
 from ras_anything.scan import scan
 from ras_anything.verify import verify
+from tests.holdout import skip_unless_holdout
 from tests.test_pipeline import REPO, quiet
 
 HOLDOUT_AI = REPO / "wow" / "work" / "holdout" / "ai"
@@ -381,6 +382,7 @@ class DriftAndSupportAIExampleTest(unittest.TestCase):
             self.assertLess(bad_res["semantic_delta"], 0.0)
 
 
+@skip_unless_holdout("ai")
 class AIHoldoutPipelineTest(unittest.TestCase):
     def setUp(self):
         self._tmp = tempfile.TemporaryDirectory()

@@ -20,6 +20,7 @@ from ras_anything.lang import java_static as static
 from ras_anything.paths import UserError
 from ras_anything.scan import scan
 from ras_anything.verify import verify
+from tests.holdout import skip_unless_holdout
 from tests.test_pipeline import FIX, REPO, Project, quiet
 
 JDK = bool(shutil.which("java") and shutil.which("javac"))
@@ -513,7 +514,8 @@ public class App {
                     os.chdir(cwd)
 
 
-@unittest.skipUnless(JDK and HOLDOUT_JAVA.is_dir(), "needs a JDK and wow/work/holdout/java")
+@unittest.skipUnless(JDK, "needs a JDK")
+@skip_unless_holdout("java")
 class JavaHoldoutPipelineTest(unittest.TestCase):
     GOOD_RAS = r"""
 import java.io.*;
