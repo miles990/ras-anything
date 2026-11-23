@@ -60,7 +60,7 @@
       "ts": "2026-11-23T17:49:44+0800"
     }
   ],
-  "generated_at": "2026-11-23T17:49:57+0800",
+  "generated_at": "2026-11-23T18:28:12+0800",
   "kind": "bundle",
   "project": "support-ai",
   "schema_version": "1.0.0",
@@ -94,7 +94,7 @@
         "rate": 0.1,
         "seeds": 20
       },
-      "generated_at": "2026-11-23T17:49:57+0800",
+      "generated_at": "2026-11-23T18:28:12+0800",
       "kind": "bench",
       "lang": "python",
       "project": "support-ai",
@@ -182,7 +182,7 @@
           }
         ]
       },
-      "generated_at": "2026-11-23T17:49:57+0800",
+      "generated_at": "2026-11-23T18:28:12+0800",
       "kind": "coverage",
       "project": "support-ai",
       "schema_version": "1.0.0"
@@ -396,7 +396,7 @@
           "passed": true
         }
       ],
-      "generated_at": "2026-11-23T17:49:57+0800",
+      "generated_at": "2026-11-23T18:28:12+0800",
       "kind": "report",
       "lang": "python",
       "project": "support-ai",
@@ -517,14 +517,14 @@
           }
         }
       ],
-      "generated_at": "2026-11-23T17:49:57+0800",
+      "generated_at": "2026-11-23T18:28:12+0800",
       "kind": "scan",
       "lang": "python",
       "project": "support-ai",
       "schema_version": "1.0.0"
     },
     "slo": {
-      "generated_at": "2026-11-23T17:49:57+0800",
+      "generated_at": "2026-11-23T18:28:12+0800",
       "kind": "slo",
       "project": "support-ai",
       "schema_version": "1.0.0",
@@ -565,7 +565,7 @@
             "burn_pct": 0.0,
             "error_rate": 0.0,
             "p99_s": 2.6095,
-            "ts": "2026-11-23T17:49:57+0800"
+            "ts": "2026-11-23T18:28:12+0800"
           }
         ],
         "source": "bench",
@@ -647,7 +647,7 @@
           "passed": true
         }
       ],
-      "generated_at": "2026-11-23T17:49:57+0800",
+      "generated_at": "2026-11-23T18:28:12+0800",
       "kind": "status",
       "lang": "python",
       "project": "support-ai",
@@ -758,7 +758,7 @@
           "passed": true
         }
       ],
-      "generated_at": "2026-11-23T17:49:57+0800",
+      "generated_at": "2026-11-23T18:28:12+0800",
       "kind": "verify",
       "lang": "python",
       "project": "support-ai",

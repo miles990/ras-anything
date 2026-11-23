@@ -239,9 +239,16 @@ class InstallAndReleaseTests(unittest.TestCase):
             self.assertNotEqual(refused.returncode, 0)
             self.assertEqual(skill.read_text(encoding="utf-8"), "USER CONTENT\n")
 
-            # Remove unowned blockers and test space-in-HOME venv install cleanly.
-            skill.unlink()
-            shim.unlink()
+            # Refused install must not leave a half-built venv behind.
+            self.assertFalse((home / ".local" / "share" / "ras-anything" / "venv").exists())
+
+            # --force explicitly overwrites unowned skill + shim cleanly.
+            _run(["./install.sh", "--force"], env=env, timeout=360)
+            self.assertIn("ras-anything", _run([str(shim), "--version"], env=env, timeout=30).stdout)
+            _run(["./install.sh", "--uninstall"], env=env, timeout=120)
+            self._assert_uninstalled(home)
+
+            # Also verify clean install in a space-containing HOME from scratch.
             _run(["./install.sh"], env=env, timeout=360)
             ver = _run([str(shim), "--version"], env=env, timeout=30)
             self.assertIn("0.1.0", ver.stdout)

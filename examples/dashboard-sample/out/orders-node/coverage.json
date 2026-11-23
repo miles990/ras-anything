@@ -1,87 +1,87 @@
 {
+  "schema_version": "1.0.0",
+  "kind": "coverage",
+  "generated_at": "2026-11-23T18:28:12+0800",
+  "project": "orders-node",
   "coverage": {
     "adapters": [
       {
-        "ax": true,
-        "boundary": "urllib / requests / httpx / aiohttp / socket / subprocess",
         "lang": "python",
         "status": "complete",
-        "verify": true
+        "boundary": "urllib / requests / httpx / aiohttp / socket / subprocess",
+        "verify": true,
+        "ax": true
       },
       {
-        "ax": true,
-        "boundary": "fetch / http / https / child_process (CJS + ESM + TS)",
         "lang": "node",
         "status": "complete",
-        "verify": true
+        "boundary": "fetch / http / https / child_process (CJS + ESM + TS)",
+        "verify": true,
+        "ax": true
       },
       {
-        "ax": true,
-        "boundary": "net/http / os/exec: AST + rasagent + rasruntime",
         "lang": "go",
         "status": "complete",
-        "verify": true
+        "boundary": "net/http / os/exec: AST + rasagent + rasruntime",
+        "verify": true,
+        "ax": true
       },
       {
-        "ax": false,
-        "boundary": "HttpClient / HttpURLConnection / ProcessBuilder",
         "lang": "java",
         "status": "planned",
-        "verify": false
+        "boundary": "HttpClient / HttpURLConnection / ProcessBuilder",
+        "verify": false,
+        "ax": false
       },
       {
-        "ax": false,
-        "boundary": "HttpClient / Process",
         "lang": "csharp",
         "status": "planned",
-        "verify": false
+        "boundary": "HttpClient / Process",
+        "verify": false,
+        "ax": false
       },
       {
-        "ax": false,
-        "boundary": "curl / file_get_contents / proc_open",
         "lang": "php",
         "status": "planned",
-        "verify": false
+        "boundary": "curl / file_get_contents / proc_open",
+        "verify": false,
+        "ax": false
       },
       {
-        "ax": false,
-        "boundary": "Net::HTTP / Open3",
         "lang": "ruby",
         "status": "planned",
-        "verify": false
+        "boundary": "Net::HTTP / Open3",
+        "verify": false,
+        "ax": false
       },
       {
-        "ax": false,
-        "boundary": "HttpClient / OkHttp / ProcessBuilder",
         "lang": "kotlin",
         "status": "planned",
-        "verify": false
+        "boundary": "HttpClient / OkHttp / ProcessBuilder",
+        "verify": false,
+        "ax": false
       },
       {
-        "ax": false,
-        "boundary": "fetch / Bun.spawn",
         "lang": "bun",
         "status": "planned",
-        "verify": false
+        "boundary": "fetch / Bun.spawn",
+        "verify": false,
+        "ax": false
       },
       {
-        "ax": false,
-        "boundary": "fetch / Deno.Command",
         "lang": "deno",
         "status": "planned",
-        "verify": false
+        "boundary": "fetch / Deno.Command",
+        "verify": false,
+        "ax": false
       },
       {
-        "ax": false,
-        "boundary": "libcurl / popen",
         "lang": "c_cpp",
         "status": "planned",
-        "verify": false
+        "boundary": "libcurl / popen",
+        "verify": false,
+        "ax": false
       }
     ]
-  },
-  "generated_at": "2026-11-23T17:49:57+0800",
-  "kind": "coverage",
-  "project": "orders-node",
-  "schema_version": "1.0.0"
+  }
 }

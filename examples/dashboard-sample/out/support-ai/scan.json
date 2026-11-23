@@ -1,64 +1,64 @@
 {
+  "schema_version": "1.0.0",
+  "kind": "scan",
+  "generated_at": "2026-11-23T18:28:12+0800",
+  "project": "support-ai",
+  "lang": "python",
   "functions": [
     {
-      "exposure": 1.0,
       "id": "support.triage_ticket",
       "lang": "python",
       "risk": 0.8632,
+      "exposure": 1.0,
       "score": 86.3,
       "signals": {
-        "no_logging": "no logging on the failure path",
         "no_timeout": "urlopen() without timeout",
-        "unsafe_retry": "retries a POST with no Idempotency-Key"
+        "unsafe_retry": "retries a POST with no Idempotency-Key",
+        "no_logging": "no logging on the failure path"
       }
     },
     {
-      "exposure": 0.0,
       "id": "app.main",
       "lang": "python",
       "risk": 0.0,
+      "exposure": 0.0,
       "score": 0.0,
       "signals": []
     },
     {
-      "exposure": 0.0,
       "id": "mock_provider.MockProviderHandler.do_POST",
       "lang": "python",
       "risk": 0.0,
+      "exposure": 0.0,
       "score": 0.0,
       "signals": []
     },
     {
-      "exposure": 0.0,
       "id": "mock_provider.MockProviderHandler.log_message",
       "lang": "python",
       "risk": 0.0,
+      "exposure": 0.0,
       "score": 0.0,
       "signals": []
     },
     {
-      "exposure": 0.0,
       "id": "mock_provider.start_server",
       "lang": "python",
       "risk": 0.0,
+      "exposure": 0.0,
       "score": 0.0,
       "signals": []
     },
     {
-      "exposure": 0.0,
       "id": "support.read_optional_note",
       "lang": "python",
       "risk": 0.335,
+      "exposure": 0.0,
       "score": 0.0,
       "signals": {
-        "no_logging": "no logging on the failure path",
-        "swallow": "`except OSError: return None` swallows errors"
+        "swallow": "`except OSError: return None` swallows errors",
+        "no_logging": "no logging on the failure path"
       }
     }
-  ],
-  "generated_at": "2026-11-23T17:49:57+0800",
-  "kind": "scan",
-  "lang": "python",
-  "project": "support-ai",
-  "schema_version": "1.0.0"
+  ]
 }

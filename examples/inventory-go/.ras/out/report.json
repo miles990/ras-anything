@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0.0",
   "kind": "report",
-  "generated_at": "2026-11-23T17:49:57+0800",
+  "generated_at": "2026-11-23T18:28:12+0800",
   "project": "inventory-go",
   "lang": "go",
   "functions": [
@@ -165,7 +165,7 @@
       {
         "lang": "go",
         "status": "complete",
-        "boundary": "net/http / os/exec (AST + rasagent + rasruntime)",
+        "boundary": "net/http / os/exec: AST + rasagent + rasruntime",
         "verify": true,
         "ax": true
       },
@@ -304,7 +304,7 @@
     "mttr_s": null,
     "restore_s": null,
     "orig_detection_rate": 0.0,
-    "hard_detection_rate": 0.2127659574468085,
+    "hard_detection_rate": 0.07092198581560284,
     "hard_diagnosis_accuracy": 0.0
   }
 }

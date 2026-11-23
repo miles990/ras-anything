@@ -60,7 +60,7 @@
       "ts": "2026-11-23T17:49:57+0800"
     }
   ],
-  "generated_at": "2026-11-23T17:49:57+0800",
+  "generated_at": "2026-11-23T18:28:12+0800",
   "kind": "bundle",
   "project": "weather",
   "schema_version": "1.0.0",
@@ -94,7 +94,7 @@
         "rate": 0.1,
         "seeds": 20
       },
-      "generated_at": "2026-11-23T17:49:57+0800",
+      "generated_at": "2026-11-23T18:28:12+0800",
       "kind": "bench",
       "lang": "python",
       "project": "weather",
@@ -182,7 +182,7 @@
           }
         ]
       },
-      "generated_at": "2026-11-23T17:49:57+0800",
+      "generated_at": "2026-11-23T18:28:12+0800",
       "kind": "coverage",
       "project": "weather",
       "schema_version": "1.0.0"
@@ -348,7 +348,7 @@
           "passed": true
         }
       ],
-      "generated_at": "2026-11-23T17:49:57+0800",
+      "generated_at": "2026-11-23T18:28:12+0800",
       "kind": "report",
       "lang": "python",
       "project": "weather",
@@ -474,14 +474,14 @@
           "signals": []
         }
       ],
-      "generated_at": "2026-11-23T17:49:57+0800",
+      "generated_at": "2026-11-23T18:28:12+0800",
       "kind": "scan",
       "lang": "python",
       "project": "weather",
       "schema_version": "1.0.0"
     },
     "slo": {
-      "generated_at": "2026-11-23T17:49:57+0800",
+      "generated_at": "2026-11-23T18:28:12+0800",
       "kind": "slo",
       "project": "weather",
       "schema_version": "1.0.0",
@@ -522,7 +522,7 @@
             "burn_pct": 0.0,
             "error_rate": 0.0,
             "p99_s": 1.2549,
-            "ts": "2026-11-23T17:49:57+0800"
+            "ts": "2026-11-23T18:28:12+0800"
           }
         ],
         "source": "bench",
@@ -579,7 +579,7 @@
           "passed": true
         }
       ],
-      "generated_at": "2026-11-23T17:49:57+0800",
+      "generated_at": "2026-11-23T18:28:12+0800",
       "kind": "status",
       "lang": "python",
       "project": "weather",
@@ -642,7 +642,7 @@
           "passed": true
         }
       ],
-      "generated_at": "2026-11-23T17:49:57+0800",
+      "generated_at": "2026-11-23T18:28:12+0800",
       "kind": "verify",
       "lang": "python",
       "project": "weather",

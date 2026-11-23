@@ -105,7 +105,7 @@
       "ts": "2026-11-23T17:49:57+0800"
     }
   ],
-  "generated_at": "2026-11-23T17:49:57+0800",
+  "generated_at": "2026-11-23T18:28:12+0800",
   "kind": "bundle",
   "project": "orders-node",
   "schema_version": "1.0.0",
@@ -139,7 +139,7 @@
         "rate": 0.1,
         "seeds": 20
       },
-      "generated_at": "2026-11-23T17:49:57+0800",
+      "generated_at": "2026-11-23T18:28:12+0800",
       "kind": "bench",
       "lang": "node",
       "project": "orders-node",
@@ -227,7 +227,7 @@
           }
         ]
       },
-      "generated_at": "2026-11-23T17:49:57+0800",
+      "generated_at": "2026-11-23T18:28:12+0800",
       "kind": "coverage",
       "project": "orders-node",
       "schema_version": "1.0.0"
@@ -522,7 +522,7 @@
           "passed": true
         }
       ],
-      "generated_at": "2026-11-23T17:49:57+0800",
+      "generated_at": "2026-11-23T18:28:12+0800",
       "kind": "report",
       "lang": "node",
       "project": "orders-node",
@@ -539,8 +539,8 @@
       },
       "schema_version": "1.0.0",
       "serviceability": {
-        "hard_detection_rate": 1.0,
-        "hard_diagnosis_accuracy": 0.68,
+        "hard_detection_rate": 0.9946808510638298,
+        "hard_diagnosis_accuracy": 0.6838100289095485,
         "mttd_s": null,
         "mttr_s": null,
         "orig_detection_rate": 0.0,
@@ -660,14 +660,14 @@
           "signals": []
         }
       ],
-      "generated_at": "2026-11-23T17:49:57+0800",
+      "generated_at": "2026-11-23T18:28:12+0800",
       "kind": "scan",
       "lang": "node",
       "project": "orders-node",
       "schema_version": "1.0.0"
     },
     "slo": {
-      "generated_at": "2026-11-23T17:49:57+0800",
+      "generated_at": "2026-11-23T18:28:12+0800",
       "kind": "slo",
       "project": "orders-node",
       "schema_version": "1.0.0",
@@ -708,7 +708,7 @@
             "burn_pct": 1000.0,
             "error_rate": 0.1,
             "p99_s": 4.9689,
-            "ts": "2026-11-23T17:49:57+0800"
+            "ts": "2026-11-23T18:28:12+0800"
           }
         ],
         "source": "bench",
@@ -894,7 +894,7 @@
           "passed": true
         }
       ],
-      "generated_at": "2026-11-23T17:49:57+0800",
+      "generated_at": "2026-11-23T18:28:12+0800",
       "kind": "status",
       "lang": "node",
       "project": "orders-node",
@@ -957,7 +957,7 @@
           "passed": true
         }
       ],
-      "generated_at": "2026-11-23T17:49:57+0800",
+      "generated_at": "2026-11-23T18:28:12+0800",
       "kind": "verify",
       "lang": "node",
       "project": "orders-node",
@@ -1014,7 +1014,7 @@
           "passed": true
         }
       ],
-      "generated_at": "2026-11-23T17:49:57+0800",
+      "generated_at": "2026-11-23T18:28:12+0800",
       "kind": "verify",
       "lang": "node",
       "project": "orders-node",
@@ -1071,7 +1071,7 @@
           "passed": true
         }
       ],
-      "generated_at": "2026-11-23T17:49:57+0800",
+      "generated_at": "2026-11-23T18:28:12+0800",
       "kind": "verify",
       "lang": "node",
       "project": "orders-node",
@@ -1128,7 +1128,7 @@
           "passed": true
         }
       ],
-      "generated_at": "2026-11-23T17:49:57+0800",
+      "generated_at": "2026-11-23T18:28:12+0800",
       "kind": "verify",
       "lang": "node",
       "project": "orders-node",

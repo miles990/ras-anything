@@ -280,8 +280,9 @@ def verify(fid: str | None = None, max_chaos: int = 60, quiet: bool = False) -> 
     if not hp.exists():
         raise UserError("%s is missing" % os.path.relpath(hp), "verify replays the calls through it", "harden %s" % fid)
     if not quiet:
+        _n_faults = len(faults.MATRIX) + (len(ai.AI_FAULTS) if any(k in str(meta.get("dependencies") or "") for k in ("openai", "anthropic", "llm", "chat/completions", "/messages")) else 0)
         ui.headline("verify", "%s %s %d recorded calls %s %d faults + 3 seeded mixes %s virtual clock" % (
-            fid, ui.DOT, meta["recorded"], ui.DOT, len(faults.MATRIX), ui.DOT))
+            fid, ui.DOT, meta["recorded"], ui.DOT, _n_faults, ui.DOT))
     t0 = time.perf_counter()
     sha = sha256_file(hp)  # of the code that is replayed, not of whatever is there afterwards
     refused = adapter.refuse_hardened(hp)

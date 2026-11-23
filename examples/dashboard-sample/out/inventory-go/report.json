@@ -1,310 +1,310 @@
 {
-  "ax": {
-    "hardened_accuracy": 1.0,
-    "leaks": 0,
-    "original_accuracy": 0.3,
-    "records": []
-  },
-  "bench": {
-    "hardened": {
-      "amplification": 0.8388888888888889,
-      "availability": 1.0,
-      "crash_rate": 0.0,
-      "dups": 0,
-      "hang": 0,
-      "hang_rate": 0.0,
-      "identical_rate": 0.95,
-      "p50_s": 0.4113,
-      "p99_s": 2.3903,
-      "wrong": 0
-    },
-    "original": {
-      "amplification": 0.7153846153846154,
-      "availability": 0.05,
-      "crash_rate": 0.8,
-      "dups": 0,
-      "hang": 3,
-      "hang_rate": 0.15,
-      "identical_rate": 0.05,
-      "p50_s": 0.006,
-      "p99_s": 2.0101,
-      "wrong": 0
-    },
-    "rate": 0.1,
-    "seeds": 20
-  },
-  "coverage": {
-    "adapters": [
-      {
-        "ax": true,
-        "boundary": "urllib / requests / httpx / aiohttp / socket / subprocess",
-        "lang": "python",
-        "status": "complete",
-        "verify": true
-      },
-      {
-        "ax": true,
-        "boundary": "fetch / http / https / child_process (CJS + ESM + TS)",
-        "lang": "node",
-        "status": "complete",
-        "verify": true
-      },
-      {
-        "ax": true,
-        "boundary": "net/http / os/exec: AST + rasagent + rasruntime",
-        "lang": "go",
-        "status": "complete",
-        "verify": true
-      },
-      {
-        "ax": false,
-        "boundary": "HttpClient / HttpURLConnection / ProcessBuilder",
-        "lang": "java",
-        "status": "planned",
-        "verify": false
-      },
-      {
-        "ax": false,
-        "boundary": "HttpClient / Process",
-        "lang": "csharp",
-        "status": "planned",
-        "verify": false
-      },
-      {
-        "ax": false,
-        "boundary": "curl / file_get_contents / proc_open",
-        "lang": "php",
-        "status": "planned",
-        "verify": false
-      },
-      {
-        "ax": false,
-        "boundary": "Net::HTTP / Open3",
-        "lang": "ruby",
-        "status": "planned",
-        "verify": false
-      },
-      {
-        "ax": false,
-        "boundary": "HttpClient / OkHttp / ProcessBuilder",
-        "lang": "kotlin",
-        "status": "planned",
-        "verify": false
-      },
-      {
-        "ax": false,
-        "boundary": "fetch / Bun.spawn",
-        "lang": "bun",
-        "status": "planned",
-        "verify": false
-      },
-      {
-        "ax": false,
-        "boundary": "fetch / Deno.Command",
-        "lang": "deno",
-        "status": "planned",
-        "verify": false
-      },
-      {
-        "ax": false,
-        "boundary": "libcurl / popen",
-        "lang": "c_cpp",
-        "status": "planned",
-        "verify": false
-      }
-    ]
-  },
+  "schema_version": "1.0.0",
+  "kind": "report",
+  "generated_at": "2026-11-23T18:28:12+0800",
+  "project": "inventory-go",
+  "lang": "go",
   "functions": [
     {
-      "budget_s": 5.0,
-      "gates": {
-        "availability": true,
-        "dups": true,
-        "happy": true,
-        "no_hang": true,
-        "no_new_crashes": true,
-        "no_wrong": true,
-        "p99": true
-      },
-      "happy": {
-        "equal": 6,
-        "total": 6
-      },
-      "hardened": {
-        "amplification": 1.75,
-        "availability": 1.0,
-        "crash_rate": null,
-        "dups": 0,
-        "hang": 0,
-        "hang_rate": null,
-        "identical_rate": null,
-        "p50_s": 0.024,
-        "p99_s": 3.4478,
-        "wrong": 0
-      },
       "id": "warehouse.AuditTag",
       "lang": "go",
+      "passed": true,
+      "budget_s": 5.0,
+      "happy": {
+        "equal": 6,
+        "total": 6
+      },
       "original": {
-        "amplification": 1.0,
         "availability": 0.31666666666666665,
-        "crash_rate": null,
-        "dups": 0,
-        "hang": 6,
-        "hang_rate": null,
         "identical_rate": null,
+        "crash_rate": null,
+        "hang_rate": null,
+        "wrong": 0,
+        "hang": 6,
+        "dups": 0,
         "p50_s": 0,
         "p99_s": 3.0011,
-        "wrong": 0
-      },
-      "passed": true
-    },
-    {
-      "budget_s": 5.0,
-      "gates": {
-        "availability": true,
-        "dups": true,
-        "happy": true,
-        "no_hang": true,
-        "no_new_crashes": true,
-        "no_wrong": true,
-        "p99": true
-      },
-      "happy": {
-        "equal": 6,
-        "total": 6
+        "amplification": 1.0
       },
       "hardened": {
-        "amplification": 1.95,
         "availability": 1.0,
-        "crash_rate": null,
-        "dups": 0,
-        "hang": 0,
-        "hang_rate": null,
         "identical_rate": null,
-        "p50_s": 0.1619,
-        "p99_s": 3.6079,
-        "wrong": 0
+        "crash_rate": null,
+        "hang_rate": null,
+        "wrong": 0,
+        "hang": 0,
+        "dups": 0,
+        "p50_s": 0.024,
+        "p99_s": 3.4478,
+        "amplification": 1.75
       },
+      "gates": {
+        "happy": true,
+        "no_wrong": true,
+        "no_hang": true,
+        "no_new_crashes": true,
+        "p99": true,
+        "dups": true,
+        "availability": true
+      }
+    },
+    {
       "id": "warehouse.FetchStock",
       "lang": "go",
-      "original": {
-        "amplification": 1.0,
-        "availability": 0.2833333333333333,
-        "crash_rate": null,
-        "dups": 0,
-        "hang": 7,
-        "hang_rate": null,
-        "identical_rate": null,
-        "p50_s": 0,
-        "p99_s": 3.0004,
-        "wrong": 0
-      },
-      "passed": true
-    },
-    {
+      "passed": true,
       "budget_s": 5.0,
-      "gates": {
-        "availability": true,
-        "dups": true,
-        "happy": true,
-        "no_hang": true,
-        "no_new_crashes": true,
-        "no_wrong": true,
-        "p99": true
-      },
       "happy": {
         "equal": 6,
         "total": 6
       },
-      "hardened": {
-        "amplification": 1.85,
-        "availability": 1.0,
-        "crash_rate": null,
-        "dups": 0,
-        "hang": 0,
-        "hang_rate": null,
+      "original": {
+        "availability": 0.2833333333333333,
         "identical_rate": null,
-        "p50_s": 0.0416,
-        "p99_s": 3.4427,
-        "wrong": 0
+        "crash_rate": null,
+        "hang_rate": null,
+        "wrong": 0,
+        "hang": 7,
+        "dups": 0,
+        "p50_s": 0,
+        "p99_s": 3.0004,
+        "amplification": 1.0
       },
+      "hardened": {
+        "availability": 1.0,
+        "identical_rate": null,
+        "crash_rate": null,
+        "hang_rate": null,
+        "wrong": 0,
+        "hang": 0,
+        "dups": 0,
+        "p50_s": 0.1619,
+        "p99_s": 3.6079,
+        "amplification": 1.95
+      },
+      "gates": {
+        "happy": true,
+        "no_wrong": true,
+        "no_hang": true,
+        "no_new_crashes": true,
+        "p99": true,
+        "dups": true,
+        "availability": true
+      }
+    },
+    {
       "id": "warehouse.ReserveStock",
       "lang": "go",
+      "passed": true,
+      "budget_s": 5.0,
+      "happy": {
+        "equal": 6,
+        "total": 6
+      },
       "original": {
-        "amplification": 1.0,
         "availability": 0.35,
-        "crash_rate": null,
-        "dups": 0,
-        "hang": 6,
-        "hang_rate": null,
         "identical_rate": null,
+        "crash_rate": null,
+        "hang_rate": null,
+        "wrong": 0,
+        "hang": 6,
+        "dups": 0,
         "p50_s": 0,
         "p99_s": 3.0002,
-        "wrong": 0
+        "amplification": 1.0
       },
-      "passed": true
+      "hardened": {
+        "availability": 1.0,
+        "identical_rate": null,
+        "crash_rate": null,
+        "hang_rate": null,
+        "wrong": 0,
+        "hang": 0,
+        "dups": 0,
+        "p50_s": 0.0416,
+        "p99_s": 3.4427,
+        "amplification": 1.85
+      },
+      "gates": {
+        "happy": true,
+        "no_wrong": true,
+        "no_hang": true,
+        "no_new_crashes": true,
+        "p99": true,
+        "dups": true,
+        "availability": true
+      }
     }
   ],
-  "generated_at": "2026-11-23T17:49:57+0800",
-  "kind": "report",
-  "lang": "go",
-  "project": "inventory-go",
+  "rollout": {
+    "enabled": {},
+    "canary_pct": 0.0,
+    "shadow": false,
+    "blast_radius_functions": 0
+  },
   "resilience_state": {
     "breakers": {},
     "bulkheads": {},
     "flags": {}
   },
-  "rollout": {
-    "blast_radius_functions": 0,
-    "canary_pct": 0.0,
-    "enabled": {},
-    "shadow": false
-  },
-  "schema_version": "1.0.0",
-  "serviceability": {
-    "hard_detection_rate": 0.2127659574468085,
-    "hard_diagnosis_accuracy": 0.0,
-    "mttd_s": null,
-    "mttr_s": null,
-    "orig_detection_rate": 0.0,
-    "restore_s": null
-  },
-  "slo": {
-    "hardened": {
-      "availability": 1.0,
-      "checks": {
-        "availability": true,
-        "error_rate": true,
-        "p99_s": true
+  "coverage": {
+    "adapters": [
+      {
+        "lang": "python",
+        "status": "complete",
+        "boundary": "urllib / requests / httpx / aiohttp / socket / subprocess",
+        "verify": true,
+        "ax": true
       },
-      "error_budget": 0.05,
-      "error_budget_burn_pct": 0.0,
-      "error_budget_burn_ratio": 0.0,
-      "error_rate": 0.0,
-      "p50_s": 0.4113,
-      "p99_s": 2.3903,
-      "status": "met"
-    },
+      {
+        "lang": "node",
+        "status": "complete",
+        "boundary": "fetch / http / https / child_process (CJS + ESM + TS)",
+        "verify": true,
+        "ax": true
+      },
+      {
+        "lang": "go",
+        "status": "complete",
+        "boundary": "net/http / os/exec: AST + rasagent + rasruntime",
+        "verify": true,
+        "ax": true
+      },
+      {
+        "lang": "java",
+        "status": "planned",
+        "boundary": "HttpClient / HttpURLConnection / ProcessBuilder",
+        "verify": false,
+        "ax": false
+      },
+      {
+        "lang": "csharp",
+        "status": "planned",
+        "boundary": "HttpClient / Process",
+        "verify": false,
+        "ax": false
+      },
+      {
+        "lang": "php",
+        "status": "planned",
+        "boundary": "curl / file_get_contents / proc_open",
+        "verify": false,
+        "ax": false
+      },
+      {
+        "lang": "ruby",
+        "status": "planned",
+        "boundary": "Net::HTTP / Open3",
+        "verify": false,
+        "ax": false
+      },
+      {
+        "lang": "kotlin",
+        "status": "planned",
+        "boundary": "HttpClient / OkHttp / ProcessBuilder",
+        "verify": false,
+        "ax": false
+      },
+      {
+        "lang": "bun",
+        "status": "planned",
+        "boundary": "fetch / Bun.spawn",
+        "verify": false,
+        "ax": false
+      },
+      {
+        "lang": "deno",
+        "status": "planned",
+        "boundary": "fetch / Deno.Command",
+        "verify": false,
+        "ax": false
+      },
+      {
+        "lang": "c_cpp",
+        "status": "planned",
+        "boundary": "libcurl / popen",
+        "verify": false,
+        "ax": false
+      }
+    ]
+  },
+  "bench": {
+    "seeds": 20,
+    "rate": 0.1,
     "original": {
       "availability": 0.05,
-      "checks": {
-        "availability": false,
-        "error_rate": false,
-        "p99_s": true
-      },
-      "error_budget": 0.05,
-      "error_budget_burn_pct": 1900.0,
-      "error_budget_burn_ratio": 19.0,
-      "error_rate": 0.95,
+      "identical_rate": 0.05,
+      "crash_rate": 0.8,
+      "hang_rate": 0.15,
+      "wrong": 0,
+      "hang": 3,
+      "dups": 0,
       "p50_s": 0.006,
       "p99_s": 2.0101,
-      "status": "missed"
+      "amplification": 0.7153846153846154
     },
+    "hardened": {
+      "availability": 1.0,
+      "identical_rate": 0.95,
+      "crash_rate": 0.0,
+      "hang_rate": 0.0,
+      "wrong": 0,
+      "hang": 0,
+      "dups": 0,
+      "p50_s": 0.4113,
+      "p99_s": 2.3903,
+      "amplification": 0.8388888888888889
+    }
+  },
+  "slo": {
     "source": "bench",
     "targets": {
       "availability": 0.95,
-      "error_rate": 0.05,
-      "p99_s": 3.0
+      "p99_s": 3.0,
+      "error_rate": 0.05
+    },
+    "original": {
+      "availability": 0.05,
+      "error_rate": 0.95,
+      "p50_s": 0.006,
+      "p99_s": 2.0101,
+      "error_budget": 0.05,
+      "error_budget_burn_ratio": 19.0,
+      "error_budget_burn_pct": 1900.0,
+      "checks": {
+        "availability": false,
+        "p99_s": true,
+        "error_rate": false
+      },
+      "status": "missed"
+    },
+    "hardened": {
+      "availability": 1.0,
+      "error_rate": 0.0,
+      "p50_s": 0.4113,
+      "p99_s": 2.3903,
+      "error_budget": 0.05,
+      "error_budget_burn_ratio": 0.0,
+      "error_budget_burn_pct": 0.0,
+      "checks": {
+        "availability": true,
+        "p99_s": true,
+        "error_rate": true
+      },
+      "status": "met"
     }
+  },
+  "ax": {
+    "original_accuracy": 0.3,
+    "hardened_accuracy": 1.0,
+    "leaks": 0,
+    "records": []
+  },
+  "serviceability": {
+    "mttd_s": null,
+    "mttr_s": null,
+    "restore_s": null,
+    "orig_detection_rate": 0.0,
+    "hard_detection_rate": 0.07092198581560284,
+    "hard_diagnosis_accuracy": 0.0
   }
 }

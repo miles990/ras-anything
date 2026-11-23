@@ -75,7 +75,7 @@
       "ts": "2026-11-23T17:49:57+0800"
     }
   ],
-  "generated_at": "2026-11-23T17:49:57+0800",
+  "generated_at": "2026-11-23T18:28:12+0800",
   "kind": "bundle",
   "project": "payments",
   "schema_version": "1.0.0",
@@ -109,7 +109,7 @@
         "rate": 0.1,
         "seeds": 20
       },
-      "generated_at": "2026-11-23T17:49:57+0800",
+      "generated_at": "2026-11-23T18:28:12+0800",
       "kind": "bench",
       "lang": "python",
       "project": "payments",
@@ -197,7 +197,7 @@
           }
         ]
       },
-      "generated_at": "2026-11-23T17:49:57+0800",
+      "generated_at": "2026-11-23T18:28:12+0800",
       "kind": "coverage",
       "project": "payments",
       "schema_version": "1.0.0"
@@ -406,7 +406,7 @@
           "passed": true
         }
       ],
-      "generated_at": "2026-11-23T17:49:57+0800",
+      "generated_at": "2026-11-23T18:28:12+0800",
       "kind": "report",
       "lang": "python",
       "project": "payments",
@@ -424,7 +424,7 @@
       "schema_version": "1.0.0",
       "serviceability": {
         "hard_detection_rate": 1.0,
-        "hard_diagnosis_accuracy": 0.6976744186046512,
+        "hard_diagnosis_accuracy": 0.7048372093023256,
         "mttd_s": null,
         "mttr_s": null,
         "orig_detection_rate": 0.0,
@@ -563,14 +563,14 @@
           "signals": []
         }
       ],
-      "generated_at": "2026-11-23T17:49:57+0800",
+      "generated_at": "2026-11-23T18:28:12+0800",
       "kind": "scan",
       "lang": "python",
       "project": "payments",
       "schema_version": "1.0.0"
     },
     "slo": {
-      "generated_at": "2026-11-23T17:49:57+0800",
+      "generated_at": "2026-11-23T18:28:12+0800",
       "kind": "slo",
       "project": "payments",
       "schema_version": "1.0.0",
@@ -611,7 +611,7 @@
             "burn_pct": 1000.0,
             "error_rate": 0.1,
             "p99_s": 4.2391,
-            "ts": "2026-11-23T17:49:57+0800"
+            "ts": "2026-11-23T18:28:12+0800"
           }
         ],
         "source": "bench",
@@ -711,7 +711,7 @@
           "passed": true
         }
       ],
-      "generated_at": "2026-11-23T17:49:57+0800",
+      "generated_at": "2026-11-23T18:28:12+0800",
       "kind": "status",
       "lang": "python",
       "project": "payments",
@@ -774,7 +774,7 @@
           "passed": true
         }
       ],
-      "generated_at": "2026-11-23T17:49:57+0800",
+      "generated_at": "2026-11-23T18:28:12+0800",
       "kind": "verify",
       "lang": "python",
       "project": "payments",
@@ -831,7 +831,7 @@
           "passed": true
         }
       ],
-      "generated_at": "2026-11-23T17:49:57+0800",
+      "generated_at": "2026-11-23T18:28:12+0800",
       "kind": "verify",
       "lang": "python",
       "project": "payments",

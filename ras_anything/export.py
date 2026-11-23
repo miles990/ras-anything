@@ -370,14 +370,16 @@ def sync_out(project: Path) -> dict[str, Path]:
         }
     srv_summary = None
     if srv_list:
-        s0 = srv_list[0]
+        o_det = [s["original"]["detection_rate"] for s in srv_list if (s.get("original") or {}).get("detection_rate") is not None]
+        h_det = [s["hardened"]["detection_rate"] for s in srv_list if (s.get("hardened") or {}).get("detection_rate") is not None]
+        h_acc = [s["hardened"]["diagnosis_accuracy"] for s in srv_list if (s.get("hardened") or {}).get("diagnosis_accuracy") is not None]
         srv_summary = {
             "mttd_s": None,
             "mttr_s": None,
             "restore_s": None,
-            "orig_detection_rate": (s0.get("original") or {}).get("detection_rate"),
-            "hard_detection_rate": (s0.get("hardened") or {}).get("detection_rate"),
-            "hard_diagnosis_accuracy": (s0.get("hardened") or {}).get("diagnosis_accuracy"),
+            "orig_detection_rate": (sum(o_det) / len(o_det)) if o_det else None,
+            "hard_detection_rate": (sum(h_det) / len(h_det)) if h_det else None,
+            "hard_diagnosis_accuracy": (sum(h_acc) / len(h_acc)) if h_acc else None,
         }
     enabled_map = state.get("enabled") or {}
     rollout = {

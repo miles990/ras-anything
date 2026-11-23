@@ -1,57 +1,57 @@
 {
+  "schema_version": "1.0.0",
+  "kind": "verify",
+  "generated_at": "2026-11-23T18:28:12+0800",
+  "project": "orders-node",
+  "lang": "node",
   "functions": [
     {
+      "id": "orders.shippingQuote",
+      "lang": "node",
+      "passed": true,
       "budget_s": 5.0,
-      "gates": {
-        "availability": true,
-        "dups": true,
-        "happy": true,
-        "no_hang": true,
-        "no_new_crashes": true,
-        "no_wrong": true,
-        "p99": true
-      },
       "happy": {
         "equal": 12,
         "total": 12
       },
-      "hardened": {
-        "amplification": 1.875,
-        "availability": 1.0,
-        "crash_rate": null,
-        "dups": 0,
-        "hang": 0,
-        "hang_rate": null,
-        "identical_rate": null,
-        "p50_s": 0.087473,
-        "p99_s": 3.65089,
-        "wrong": 0
-      },
-      "id": "orders.shippingQuote",
-      "lang": "node",
       "original": {
-        "amplification": 1.0,
         "availability": 0.39166666666666666,
-        "crash_rate": null,
-        "dups": 0,
-        "hang": 14,
-        "hang_rate": null,
         "identical_rate": null,
+        "crash_rate": null,
+        "hang_rate": null,
+        "wrong": 23,
+        "hang": 14,
+        "dups": 0,
         "p50_s": 0.000459,
         "p99_s": 60,
-        "wrong": 23
+        "amplification": 1.0
       },
-      "passed": true
+      "hardened": {
+        "availability": 1.0,
+        "identical_rate": null,
+        "crash_rate": null,
+        "hang_rate": null,
+        "wrong": 0,
+        "hang": 0,
+        "dups": 0,
+        "p50_s": 0.087473,
+        "p99_s": 3.65089,
+        "amplification": 1.875
+      },
+      "gates": {
+        "happy": true,
+        "no_wrong": true,
+        "no_hang": true,
+        "no_new_crashes": true,
+        "p99": true,
+        "dups": true,
+        "availability": true
+      }
     }
   ],
-  "generated_at": "2026-11-23T17:49:57+0800",
-  "kind": "verify",
-  "lang": "node",
-  "project": "orders-node",
-  "schema_version": "1.0.0",
   "serviceability": {
+    "orig_detection_rate": 0.0,
     "hard_detection_rate": 0.9787234042553191,
-    "hard_diagnosis_accuracy": 0.6808510638297872,
-    "orig_detection_rate": 0.0
+    "hard_diagnosis_accuracy": 0.6808510638297872
   }
 }

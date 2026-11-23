@@ -90,7 +90,7 @@
       "ts": "2026-11-23T17:49:44+0800"
     }
   ],
-  "generated_at": "2026-11-23T17:49:57+0800",
+  "generated_at": "2026-11-23T18:28:12+0800",
   "kind": "bundle",
   "project": "inventory-go",
   "schema_version": "1.0.0",
@@ -124,7 +124,7 @@
         "rate": 0.1,
         "seeds": 20
       },
-      "generated_at": "2026-11-23T17:49:57+0800",
+      "generated_at": "2026-11-23T18:28:12+0800",
       "kind": "bench",
       "lang": "go",
       "project": "inventory-go",
@@ -212,7 +212,7 @@
           }
         ]
       },
-      "generated_at": "2026-11-23T17:49:57+0800",
+      "generated_at": "2026-11-23T18:28:12+0800",
       "kind": "coverage",
       "project": "inventory-go",
       "schema_version": "1.0.0"
@@ -464,7 +464,7 @@
           "passed": true
         }
       ],
-      "generated_at": "2026-11-23T17:49:57+0800",
+      "generated_at": "2026-11-23T18:28:12+0800",
       "kind": "report",
       "lang": "go",
       "project": "inventory-go",
@@ -481,7 +481,7 @@
       },
       "schema_version": "1.0.0",
       "serviceability": {
-        "hard_detection_rate": 0.2127659574468085,
+        "hard_detection_rate": 0.07092198581560284,
         "hard_diagnosis_accuracy": 0.0,
         "mttd_s": null,
         "mttr_s": null,
@@ -572,14 +572,14 @@
           "signals": []
         }
       ],
-      "generated_at": "2026-11-23T17:49:57+0800",
+      "generated_at": "2026-11-23T18:28:12+0800",
       "kind": "scan",
       "lang": "go",
       "project": "inventory-go",
       "schema_version": "1.0.0"
     },
     "slo": {
-      "generated_at": "2026-11-23T17:49:57+0800",
+      "generated_at": "2026-11-23T18:28:12+0800",
       "kind": "slo",
       "project": "inventory-go",
       "schema_version": "1.0.0",
@@ -620,7 +620,7 @@
             "burn_pct": 0.0,
             "error_rate": 0.0,
             "p99_s": 2.3903,
-            "ts": "2026-11-23T17:49:57+0800"
+            "ts": "2026-11-23T18:28:12+0800"
           }
         ],
         "source": "bench",
@@ -763,7 +763,7 @@
           "passed": true
         }
       ],
-      "generated_at": "2026-11-23T17:49:57+0800",
+      "generated_at": "2026-11-23T18:28:12+0800",
       "kind": "status",
       "lang": "go",
       "project": "inventory-go",
@@ -826,7 +826,7 @@
           "passed": true
         }
       ],
-      "generated_at": "2026-11-23T17:49:57+0800",
+      "generated_at": "2026-11-23T18:28:12+0800",
       "kind": "verify",
       "lang": "go",
       "project": "inventory-go",
@@ -883,7 +883,7 @@
           "passed": true
         }
       ],
-      "generated_at": "2026-11-23T17:49:57+0800",
+      "generated_at": "2026-11-23T18:28:12+0800",
       "kind": "verify",
       "lang": "go",
       "project": "inventory-go",
@@ -940,7 +940,7 @@
           "passed": true
         }
       ],
-      "generated_at": "2026-11-23T17:49:57+0800",
+      "generated_at": "2026-11-23T18:28:12+0800",
       "kind": "verify",
       "lang": "go",
       "project": "inventory-go",

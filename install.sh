@@ -175,6 +175,9 @@ install_with_pipx() {
 }
 
 install_with_venv() {
+  if { [ -e "$SHIM" ] || [ -L "$SHIM" ]; } && ! is_our_shim "$SHIM" && [ "$FORCE" -ne 1 ]; then
+    die "refusing to overwrite existing $SHIM (not an install.sh shim; remove it or re-run with --force)"
+  fi
   py=$(check_python)
   printf 'pipx not found; installing CLI into %s (Python %s)\n' "$VENV_DIR" "$py"
   mkdir -p "$DATA_DIR" "$BIN_DIR"
@@ -183,9 +186,6 @@ install_with_venv() {
   fi
   "$VENV_DIR/bin/python" -m pip install --upgrade --disable-pip-version-check pip setuptools wheel
   "$VENV_DIR/bin/python" -m pip install --force-reinstall --disable-pip-version-check "$ROOT"
-  if { [ -e "$SHIM" ] || [ -L "$SHIM" ]; } && ! is_our_shim "$SHIM" && [ "$FORCE" -ne 1 ]; then
-    die "refusing to overwrite existing $SHIM (not an install.sh shim; remove it or re-run with --force)"
-  fi
   # Invoke python -m ras_anything directly so paths with spaces work even if a pip script shebang wouldn't.
   printf '%s\n' "#!/bin/sh" "$SHIM_MARK" "exec \"${VENV_DIR}/bin/python\" -m ras_anything \"\$@\"" > "$SHIM"
   chmod +x "$SHIM"
@@ -253,7 +253,7 @@ do_uninstall() {
     printf '  left %s in place (not an install.sh shim)\n' "$SHIM"
   fi
 
-  if [ -d "$VENV_DIR" ]; then
+  if [ -f "$MARKER" ] && [ -d "$VENV_DIR" ]; then
     rm -rf "$VENV_DIR"
     printf '  removed venv %s\n' "$VENV_DIR"
   fi
