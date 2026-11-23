@@ -1,0 +1,295 @@
+{
+ "calls": [
+  {
+   "args": [
+    "http://127.0.0.1:35511",
+    "sku-101",
+    7
+   ],
+   "kwargs": {},
+   "result": {
+    "sku": "sku-101",
+    "qty": 7,
+    "order_id": "RES-001"
+   },
+   "dur": 0.000407,
+   "io": [
+    {
+     "req": {
+      "idempotency_key": null,
+      "key": "POST http://127.0.0.1/reserve #a60150f5fb6c",
+      "kind": "http",
+      "method": "POST",
+      "url": "http://127.0.0.1:35511/reserve"
+     },
+     "out": {
+      "body": {
+       "$bytes": "eyJza3UiOiJza3UtMTAxIiwicXR5Ijo3LCJvcmRlcl9pZCI6IlJFUy0wMDEifQo="
+      },
+      "headers": [
+       [
+        "Content-Length",
+        "47"
+       ],
+       [
+        "Content-Type",
+        "text/plain; charset=utf-8"
+       ],
+       [
+        "Date",
+        "Mon, 23 Nov 2026 09:22:56 GMT"
+       ]
+      ],
+      "reason": "200 OK",
+      "status": 200,
+      "url": "http://127.0.0.1:35511/reserve"
+     },
+     "dur": 0.00024867
+    }
+   ]
+  },
+  {
+   "args": [
+    "http://127.0.0.1:35511",
+    "sku-102",
+    2
+   ],
+   "kwargs": {},
+   "result": {
+    "sku": "sku-102",
+    "qty": 2,
+    "order_id": "RES-002"
+   },
+   "dur": 0.00025,
+   "io": [
+    {
+     "req": {
+      "idempotency_key": null,
+      "key": "POST http://127.0.0.1/reserve #c87798956dcf",
+      "kind": "http",
+      "method": "POST",
+      "url": "http://127.0.0.1:35511/reserve"
+     },
+     "out": {
+      "body": {
+       "$bytes": "eyJza3UiOiJza3UtMTAyIiwicXR5IjoyLCJvcmRlcl9pZCI6IlJFUy0wMDIifQo="
+      },
+      "headers": [
+       [
+        "Content-Length",
+        "47"
+       ],
+       [
+        "Content-Type",
+        "text/plain; charset=utf-8"
+       ],
+       [
+        "Date",
+        "Mon, 23 Nov 2026 09:22:56 GMT"
+       ]
+      ],
+      "reason": "200 OK",
+      "status": 200,
+      "url": "http://127.0.0.1:35511/reserve"
+     },
+     "dur": 0.000146361
+    }
+   ]
+  },
+  {
+   "args": [
+    "http://127.0.0.1:35511",
+    "sku-103",
+    11
+   ],
+   "kwargs": {},
+   "result": {
+    "sku": "sku-103",
+    "qty": 11,
+    "order_id": "RES-003"
+   },
+   "dur": 0.000147,
+   "io": [
+    {
+     "req": {
+      "idempotency_key": null,
+      "key": "POST http://127.0.0.1/reserve #dcc5a548cd22",
+      "kind": "http",
+      "method": "POST",
+      "url": "http://127.0.0.1:35511/reserve"
+     },
+     "out": {
+      "body": {
+       "$bytes": "eyJza3UiOiJza3UtMTAzIiwicXR5IjoxMSwib3JkZXJfaWQiOiJSRVMtMDAzIn0K"
+      },
+      "headers": [
+       [
+        "Content-Length",
+        "48"
+       ],
+       [
+        "Content-Type",
+        "text/plain; charset=utf-8"
+       ],
+       [
+        "Date",
+        "Mon, 23 Nov 2026 09:22:56 GMT"
+       ]
+      ],
+      "reason": "200 OK",
+      "status": 200,
+      "url": "http://127.0.0.1:35511/reserve"
+     },
+     "dur": 0.000061765
+    }
+   ]
+  },
+  {
+   "args": [
+    "http://127.0.0.1:35511",
+    "sku-104",
+    5
+   ],
+   "kwargs": {},
+   "result": {
+    "sku": "sku-104",
+    "qty": 5,
+    "order_id": "RES-004"
+   },
+   "dur": 0.000327,
+   "io": [
+    {
+     "req": {
+      "idempotency_key": null,
+      "key": "POST http://127.0.0.1/reserve #39cd844203c4",
+      "kind": "http",
+      "method": "POST",
+      "url": "http://127.0.0.1:35511/reserve"
+     },
+     "out": {
+      "body": {
+       "$bytes": "eyJza3UiOiJza3UtMTA0IiwicXR5Ijo1LCJvcmRlcl9pZCI6IlJFUy0wMDQifQo="
+      },
+      "headers": [
+       [
+        "Content-Length",
+        "47"
+       ],
+       [
+        "Content-Type",
+        "text/plain; charset=utf-8"
+       ],
+       [
+        "Date",
+        "Mon, 23 Nov 2026 09:22:56 GMT"
+       ]
+      ],
+      "reason": "200 OK",
+      "status": 200,
+      "url": "http://127.0.0.1:35511/reserve"
+     },
+     "dur": 0.000190682
+    }
+   ]
+  },
+  {
+   "args": [
+    "http://127.0.0.1:35511",
+    "sku-105",
+    6
+   ],
+   "kwargs": {},
+   "result": {
+    "sku": "sku-105",
+    "qty": 6,
+    "order_id": "RES-005"
+   },
+   "dur": 0.000116,
+   "io": [
+    {
+     "req": {
+      "idempotency_key": null,
+      "key": "POST http://127.0.0.1/reserve #6c89e742d306",
+      "kind": "http",
+      "method": "POST",
+      "url": "http://127.0.0.1:35511/reserve"
+     },
+     "out": {
+      "body": {
+       "$bytes": "eyJza3UiOiJza3UtMTA1IiwicXR5Ijo2LCJvcmRlcl9pZCI6IlJFUy0wMDUifQo="
+      },
+      "headers": [
+       [
+        "Content-Length",
+        "47"
+       ],
+       [
+        "Content-Type",
+        "text/plain; charset=utf-8"
+       ],
+       [
+        "Date",
+        "Mon, 23 Nov 2026 09:22:56 GMT"
+       ]
+      ],
+      "reason": "200 OK",
+      "status": 200,
+      "url": "http://127.0.0.1:35511/reserve"
+     },
+     "dur": 0.000061432
+    }
+   ]
+  },
+  {
+   "args": [
+    "http://127.0.0.1:35511",
+    "sku-106",
+    6
+   ],
+   "kwargs": {},
+   "result": {
+    "sku": "sku-106",
+    "qty": 6,
+    "order_id": "RES-006"
+   },
+   "dur": 0.000247,
+   "io": [
+    {
+     "req": {
+      "idempotency_key": null,
+      "key": "POST http://127.0.0.1/reserve #3ce23a769dd8",
+      "kind": "http",
+      "method": "POST",
+      "url": "http://127.0.0.1:35511/reserve"
+     },
+     "out": {
+      "body": {
+       "$bytes": "eyJza3UiOiJza3UtMTA2IiwicXR5Ijo2LCJvcmRlcl9pZCI6IlJFUy0wMDYifQo="
+      },
+      "headers": [
+       [
+        "Content-Length",
+        "47"
+       ],
+       [
+        "Content-Type",
+        "text/plain; charset=utf-8"
+       ],
+       [
+        "Date",
+        "Mon, 23 Nov 2026 09:22:56 GMT"
+       ]
+      ],
+      "reason": "200 OK",
+      "status": 200,
+      "url": "http://127.0.0.1:35511/reserve"
+     },
+     "dur": 0.000143039
+    }
+   ]
+  }
+ ],
+ "format": "ras-anything-cassette",
+ "lang": "go",
+ "version": 1
+}

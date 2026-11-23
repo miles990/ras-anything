@@ -1,0 +1,45 @@
+{
+  "id": "warehouse.AuditTag",
+  "lang": "go",
+  "module": "warehouse",
+  "qualname": "AuditTag",
+  "name": "AuditTag",
+  "kind": "func",
+  "file": "warehouse/warehouse.go",
+  "first_line": 61,
+  "in_main": false,
+  "cmd": [
+    "go",
+    "run",
+    "."
+  ],
+  "display_cmd": "go run .",
+  "cwd": ".",
+  "env": {},
+  "globals": {},
+  "module_path": "inventorygo",
+  "pkg_dir": "warehouse",
+  "pkg_name": "warehouse",
+  "params": [
+    {
+      "name": "sku",
+      "type": "string"
+    }
+  ],
+  "results": [
+    {
+      "name": "",
+      "type": "string"
+    },
+    {
+      "name": "",
+      "type": "error"
+    }
+  ],
+  "budget_s": 5.0,
+  "recorded": 6,
+  "seen": 6,
+  "skipped": 0,
+  "recorded_at": "2026-11-23T17:22:57+0800",
+  "runtime": "Go 1.27.3"
+}

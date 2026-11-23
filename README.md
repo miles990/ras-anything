@@ -3,6 +3,7 @@
 <p align="center">
   <img src="https://img.shields.io/badge/Python-3.10%2B-2563eb" alt="Python 3.10+">
   <img src="https://img.shields.io/badge/Node.js-18%2B%20(TS%20via%2022.6%2B)-3c873a" alt="Node.js 18+">
+  <img src="https://img.shields.io/badge/Go-1.22%2B-00add8" alt="Go 1.22+">
   <img src="https://img.shields.io/badge/dependencies-none%20(stdlib)-555" alt="stdlib only">
   <img src="https://img.shields.io/badge/Claude%20Code-plugin-d97757" alt="Claude Code plugin">
   <img src="https://img.shields.io/badge/MCP-server-555" alt="MCP server">
@@ -38,6 +39,8 @@ and edit `hardened.py` / `hardened.mjs` yourself.
 ras-anything go --agent claude -- python app.py
 # or
 ras-anything go --agent claude -- node app.mjs
+# or
+ras-anything go --agent claude -- go run .
 ```
 
 `go` leaves the verified swap enabled after `bench` + `report`; inspect `RAS-REPORT.md` or run `ras-anything disable <id>` to roll back.
@@ -113,6 +116,7 @@ caveats are in each example's `REPRODUCE.md`. Every example runs its own local u
 | [weather dashboard](examples/weather) (`fetch_forecast`, urlopen with no timeout) | 32.5% → **100.0%** (120 trials) | 40.0% → **100.0%** | hangs 15% → 0% · p99 run 2.17s → 889ms |
 | [billing run](examples/payments) (`charge` naive POST retry + `render_receipt` subprocess) | charge 76.9% → **100.0%** · render 33.1% → **100.0%** (160 trials each) | 0.0% → **90.0%** | identical 0% → 45% · dups 5 → 0 · hangs 25% → 0% · p99 3.96s → 3.93s |
 | [evening order run](examples/orders-node) (Node.js: `charge` fetch POST, `getItem` fetch, `shippingQuote` http.get, `printLabel` execFile) | charge 78.3% → **100.0%** · getItem 29.2% → **100.0%** · shippingQuote 39.2% → **100.0%** · printLabel 32.5% → **100.0%** (120 trials each) | 0.0% → **90.0%** | identical 0% → 90% · dups 6 → 0 · crashes 75% → 10% · hangs 15% → 0% · p99 4.13s → 4.62s |
+| [inventory restock](examples/inventory-go) (Go: `FetchStock` http.Get, `ReserveStock` http.Post, `AuditTag` exec.Command) | FetchStock 28.3% → **100.0%** · ReserveStock 35.0% → **100.0%** · AuditTag 31.7% → **100.0%** (60 trials each) | 5.0% → **100.0%** | identical 5% → 95% · crashes 80% → 0% · hangs 15% → 0% · dups 0 → 0 · p99 2.01s → 2.39s |
 
 In the billing run, verify counted 38 duplicate charges for the original across its trials and 0 for
 the hardened version. The 10% of bench runs that still fail are the ledger read in `app.main` (Python) or the ledger `fetch` in `app.mjs` (Node), which
@@ -171,7 +175,7 @@ after 2 s. In async code the waits are `asyncio.sleep`, so `asyncio.wait_for` ar
 
 ## What it can't do yet
 
-- Languages now: **Python 3.10+** and **Node.js 18+** (TypeScript via Node 22.6+). Next: Go, then Java, C#, PHP, Ruby, Kotlin, C/C++ (fast-anything's list). `bun`/`deno`/`npx`/`tsx`/`ts-node` are detected; use `node app.ts` for TypeScript.
+- Languages now: **Python 3.10+**, **Node.js 18+** (TypeScript via Node 22.6+), and **Go 1.22+** (`go run .` / `./cmd/...`, `net/http` + `os/exec`). Next: Java, C#, PHP, Ruby, Kotlin, C/C++. `bun`/`deno`/`npx`/`tsx`/`ts-node` are detected; use `node app.ts` for TypeScript.
 - Python: what can be swapped: top-level functions, methods, `@staticmethod`s and `@classmethod`s of top-level classes, sync or `async`. Not: nested functions, generators, properties and other decorated methods, `__special__` methods (except `__call__`), methods that use `super()`, anything in the entry script without an `if __name__ == "__main__"` guard, and async functions in the entry script.
 - Node: exported top-level functions only (ESM `export function` / `export async function` / `export const f = …`, CJS `module.exports` / `exports.x`). Not: unexported helpers, methods on classes, closures that close over mutable module state the recording can't restore.
 - Arguments (for methods that includes `self`) and results must be storable as JSON: plain data, bytes, dates, decimals, and instances of your project's own classes. Locks, loggers, `requests.Session` and `httpx.Client` inside `self` are recreated fresh (custom auth, adapters and transports are not); other live objects, like an `aiohttp.ClientSession` argument, can't be recorded. Aliasing between arguments isn't kept.

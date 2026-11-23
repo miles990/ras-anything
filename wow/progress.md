@@ -70,7 +70,7 @@
 多語言 adapter（對齊 fast-anything 10 種）、v0.1 缺口、Python 邊界擴充、韌性模式目錄（量測保留／淘汰）、可服務性（MTTD/診斷/還原）、SLI/SLO、旗標／熱更新／模組化／飛航記錄器＋replay＋RCA、爆炸半徑（canary/shadow/隔離/fail-safe）、AI 依賴 adapter、AI 時代工具調研、AX 結構化錯誤＋人類閘門、視覺化資料契約、安裝／README／發佈準備、30 秒新手測試。
 
 
-## 接續點（2026-11-23 16:54 台北時間，S 階段完成）
+## 接續點（2026-11-23 17:30 台北時間，C 階段完成）
 
 評審改用 `claude -p --model claude-fable-5-2 --effort high --tools Read`（最多 3 次）。Codex 獨立審查＋測試（未寫被審程式碼）。
 
@@ -97,7 +97,7 @@
 | **P 餘** | V-13 量測保留/淘汰：`docs/PATTERNS.md`、retry amplification、ON vs OFF 數字、TASK.md 指引 | **完成** | adopted：fallback / deadline / idempotency / retry_budget / retry_after / retry / circuit_breaker / attempt_timeout / jitter。opt-in：bulkhead / adaptive_throttle / adaptive_concurrency / hedge。無 rejected。retry storm 可用性 bare 41.0% → stack 88.1%（breaker）；idempotency 重複寫入 76.5 → 0 |
 | **F** `build2f` | V-16.1 旗標、V-16.2 熱更新（切換延遲、0 丟請求）、V-17 canary/shadow/隔離/fail-safe/爆炸半徑 | **完成**（自動 promote 是 `control.analyse` 純函式，尚未接到長跑服務） | |
 | **S** `build2s` | V-8 可服務性（OTel 日誌、health、RUNBOOK、diagnoser、MTTD/診斷/還原）、V-9 SLI/SLO、V-16.4 飛航記錄器+replay+RCA、V-18 AX 結構化錯誤+人類閘門 | **完成** | 355 tests OK（`adba2d1`、`f80aaa6`＋範例/文件收尾）；weather/payments/orders-node `.ras/slo.json`＋`RUNBOOK.md` 已重生成；`payments`/`orders-node` 舊範例 `logEvent` 仍印原始 `err` URL/路徑待 C/I 後一併清 |
-| **C** `build2c` | Go adapter + `examples/inventory-go/` 實測＋holdout 拒壞加固 | 未開始 | |
+| **C** `build2c` | Go adapter + `examples/inventory-go/` 實測＋holdout 拒壞加固 | **完成** | `examples/inventory-go/` verify（FetchStock 28.3%→100.0%、ReserveStock 35.0%→100.0%、AuditTag 31.7%→100.0%，0 leaks）、bench 20 seeds **5.0% → 100.0%**（identical 5%→95%、crashes 80%→0%、hangs 15%→0%、dups 0→0、SLO 4/4 met）、holdout 4/4 壞加固全拒、360 tests OK |
 | **E** `build2e` | V-14 AI 依賴 adapter + `examples/support-ai/`（本機 mock，API $0）、V-15 生態決策寫入 docs/AI.md | 未開始 | |
 | **V** `build2v` | V-19 視覺化資料契約（docs/schema、`.ras/out`、export、MCP、dashboard-sample） | 未開始 | |
 | **I** `build2i` | V-6 `./install.sh`+`make install`、雙用途 README、skill 複製到 ~/.claude 與 ~/.codex、MCP/plugin 驗證、V-11 `docs/RELEASE.md`（不公開、不上架） | 未開始 | |
@@ -108,4 +108,4 @@
 
 HEAD：見最新 main。工作樹應保持可推。中間產物在 `wow/work/`。
 
-接續備註（2026-11-23 16:54 台北時間）：S（`build2s`：V-8/V-9/V-16.4/V-18，Python + Node）已完成並推上 `main`（355 tests OK，`phases.done` 已記 `build2s 355`）。`wow/work/orchestrate.sh` 仍暫停（`wow/work/STOP` 保留）。下一個：C（`build2c` Go adapter＋`examples/inventory-go/`）、然後 E/V/I/D、Codex、Fable。
+接續備註（2026-11-23 17:30 台北時間）：S 階段兩項缺口已補齊（`29a6af3`，356 tests OK），C（`build2c`：Go adapter + `examples/inventory-go/` + holdout 拒壞加固）已完成並推上 `main`（360 tests OK，`phases.done` 已記 `build2c 360`）。`wow/work/orchestrate.sh` 仍暫停（`wow/work/STOP` 保留）。下一個：E（`build2e` AI 依賴 adapter＋`examples/support-ai/`）、然後 V/I/D、Codex、Fable。

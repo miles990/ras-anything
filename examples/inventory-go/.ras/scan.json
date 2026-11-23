@@ -1,0 +1,275 @@
+{
+  "version": 1,
+  "lang": "go",
+  "cmd": [
+    "go",
+    "run",
+    "."
+  ],
+  "display_cmd": "go run .",
+  "cwd": ".",
+  "root": ".",
+  "created": "2026-11-23T17:22:54+0800",
+  "clean": {
+    "wall_s": 0.011,
+    "stdout_sha256": "d1ec6be84cc1888f49b01b1b633943131e6296309eed5137e87e11b48d9967ef",
+    "boundary_calls": 18
+  },
+  "chaos": {
+    "seeds": 10,
+    "rate": 0.25,
+    "outage_rate": 0.05,
+    "runs": [
+      {
+        "seed": 1,
+        "outcome": "crash",
+        "exit": 1,
+        "wall_s": 0.004,
+        "faults": 1,
+        "uncaught": null
+      },
+      {
+        "seed": 2,
+        "outcome": "crash",
+        "exit": 1,
+        "wall_s": 0.004,
+        "faults": 1,
+        "uncaught": null
+      },
+      {
+        "seed": 3,
+        "outcome": "crash",
+        "exit": 1,
+        "wall_s": 0.007,
+        "faults": 1,
+        "uncaught": null
+      },
+      {
+        "seed": 4,
+        "outcome": "hang",
+        "exit": 70,
+        "wall_s": 2.005,
+        "faults": 1,
+        "uncaught": {
+          "hang": true,
+          "msg": "boundary call with no timeout hung (chaos)",
+          "type": "ChaosHang",
+          "where": "warehouse.FetchStock"
+        }
+      },
+      {
+        "seed": 5,
+        "outcome": "crash",
+        "exit": 1,
+        "wall_s": 0.007,
+        "faults": 1,
+        "uncaught": null
+      },
+      {
+        "seed": 6,
+        "outcome": "crash",
+        "exit": 1,
+        "wall_s": 0.157,
+        "faults": 2,
+        "uncaught": null
+      },
+      {
+        "seed": 7,
+        "outcome": "crash",
+        "exit": 1,
+        "wall_s": 0.004,
+        "faults": 1,
+        "uncaught": null
+      },
+      {
+        "seed": 8,
+        "outcome": "hang",
+        "exit": 70,
+        "wall_s": 2.01,
+        "faults": 1,
+        "uncaught": {
+          "hang": true,
+          "msg": "boundary call with no timeout hung (chaos)",
+          "type": "ChaosHang",
+          "where": "warehouse.FetchStock"
+        }
+      },
+      {
+        "seed": 9,
+        "outcome": "crash",
+        "exit": 1,
+        "wall_s": 0.005,
+        "faults": 1,
+        "uncaught": null
+      },
+      {
+        "seed": 10,
+        "outcome": "hang",
+        "exit": 70,
+        "wall_s": 2.006,
+        "faults": 1,
+        "uncaught": {
+          "hang": true,
+          "msg": "boundary call with no timeout hung (chaos)",
+          "type": "ChaosHang",
+          "where": "warehouse.AuditTag"
+        }
+      }
+    ]
+  },
+  "functions": [
+    {
+      "id": "warehouse.ReserveStock",
+      "module": "warehouse",
+      "qualname": "ReserveStock",
+      "name": "ReserveStock",
+      "kind": "func",
+      "async": false,
+      "line": 42,
+      "in_main": false,
+      "signals": {
+        "no_timeout": "outbound call without timeout",
+        "write_no_key": "non-idempotent request without Idempotency-Key",
+        "no_retry": "no retry on transient errors"
+      },
+      "static_risk": 0.592,
+      "refused": null,
+      "arg_ok": true,
+      "ret_ok": true,
+      "file": "warehouse/warehouse.go",
+      "first_line": 42,
+      "calls": 6,
+      "boundary": 6,
+      "boundary_kinds": {
+        "http": 6
+      },
+      "gen": null,
+      "chaos": {
+        "runs": 1,
+        "failed": 1,
+        "outcomes": {
+          "crash": 1
+        }
+      },
+      "dynamic_risk": 1.0,
+      "risk": 0.8368,
+      "exposure": 0.3333,
+      "hardenable": true,
+      "verdict": "harden it",
+      "score": 27.9,
+      "why": "app failed in 1/1 chaos runs that hit it (crash 1) \u00b7 outbound call without timeout \u00b7 no retry on transient errors \u00b7 non-idempotent request without Idempotency-Key"
+    },
+    {
+      "id": "warehouse.AuditTag",
+      "module": "warehouse",
+      "qualname": "AuditTag",
+      "name": "AuditTag",
+      "kind": "func",
+      "async": false,
+      "line": 61,
+      "in_main": false,
+      "signals": {
+        "no_timeout": "outbound call without timeout",
+        "no_retry": "no retry on transient errors"
+      },
+      "static_risk": 0.52,
+      "refused": null,
+      "arg_ok": true,
+      "ret_ok": true,
+      "file": "warehouse/warehouse.go",
+      "first_line": 61,
+      "calls": 6,
+      "boundary": 6,
+      "boundary_kinds": {
+        "subprocess": 6
+      },
+      "gen": null,
+      "chaos": {
+        "runs": 6,
+        "failed": 6,
+        "outcomes": {
+          "crash": 5,
+          "hang": 1
+        }
+      },
+      "dynamic_risk": 1.0,
+      "risk": 0.808,
+      "exposure": 0.3333,
+      "hardenable": true,
+      "verdict": "harden it",
+      "score": 26.9,
+      "why": "app failed in 6/6 chaos runs that hit it (crash 5, hang 1) \u00b7 outbound call without timeout \u00b7 no retry on transient errors"
+    },
+    {
+      "id": "warehouse.FetchStock",
+      "module": "warehouse",
+      "qualname": "FetchStock",
+      "name": "FetchStock",
+      "kind": "func",
+      "async": false,
+      "line": 24,
+      "in_main": false,
+      "signals": {
+        "no_timeout": "outbound call without timeout",
+        "no_retry": "no retry on transient errors"
+      },
+      "static_risk": 0.52,
+      "refused": null,
+      "arg_ok": true,
+      "ret_ok": true,
+      "file": "warehouse/warehouse.go",
+      "first_line": 24,
+      "calls": 6,
+      "boundary": 6,
+      "boundary_kinds": {
+        "http": 6
+      },
+      "gen": null,
+      "chaos": {
+        "runs": 4,
+        "failed": 4,
+        "outcomes": {
+          "hang": 2,
+          "crash": 2
+        }
+      },
+      "dynamic_risk": 1.0,
+      "risk": 0.808,
+      "exposure": 0.3333,
+      "hardenable": true,
+      "verdict": "harden it",
+      "score": 26.9,
+      "why": "app failed in 4/4 chaos runs that hit it (crash 2, hang 2) \u00b7 outbound call without timeout \u00b7 no retry on transient errors"
+    },
+    {
+      "id": "main.startWarehouseServer",
+      "module": "main",
+      "qualname": "startWarehouseServer",
+      "name": "startWarehouseServer",
+      "kind": "func",
+      "async": false,
+      "line": 15,
+      "in_main": false,
+      "signals": {},
+      "static_risk": 0.0,
+      "refused": null,
+      "arg_ok": true,
+      "ret_ok": true,
+      "file": "main.go",
+      "first_line": 15,
+      "calls": 1,
+      "boundary": 0,
+      "boundary_kinds": {},
+      "gen": null,
+      "chaos": null,
+      "dynamic_risk": null,
+      "risk": 0.0,
+      "exposure": 0.0,
+      "hardenable": false,
+      "verdict": "makes no dependency calls",
+      "score": 0.0,
+      "why": ""
+    }
+  ],
+  "elapsed_s": 6.73
+}

@@ -1,0 +1,205 @@
+{
+ "calls": [
+  {
+   "args": [
+    "sku-101"
+   ],
+   "kwargs": {},
+   "result": "BIN-sku-101",
+   "dur": 0.001259,
+   "io": [
+    {
+     "req": {
+      "argv": [
+       "sh",
+       "-c",
+       "printf '{\"tag\":\"BIN-sku-101\"}'"
+      ],
+      "key": "run sh -c printf '{\"tag\":\"BIN-sku-101\"}'",
+      "kind": "subprocess",
+      "method": "RUN",
+      "url": ""
+     },
+     "out": {
+      "returncode": 0,
+      "stderr": {
+       "$bytes": ""
+      },
+      "stdout": {
+       "$bytes": "eyJ0YWciOiJCSU4tc2t1LTEwMSJ9"
+      }
+     },
+     "dur": 0.001102905
+    }
+   ]
+  },
+  {
+   "args": [
+    "sku-102"
+   ],
+   "kwargs": {},
+   "result": "BIN-sku-102",
+   "dur": 0.000614,
+   "io": [
+    {
+     "req": {
+      "argv": [
+       "sh",
+       "-c",
+       "printf '{\"tag\":\"BIN-sku-102\"}'"
+      ],
+      "key": "run sh -c printf '{\"tag\":\"BIN-sku-102\"}'",
+      "kind": "subprocess",
+      "method": "RUN",
+      "url": ""
+     },
+     "out": {
+      "returncode": 0,
+      "stderr": {
+       "$bytes": ""
+      },
+      "stdout": {
+       "$bytes": "eyJ0YWciOiJCSU4tc2t1LTEwMiJ9"
+      }
+     },
+     "dur": 0.000553411
+    }
+   ]
+  },
+  {
+   "args": [
+    "sku-103"
+   ],
+   "kwargs": {},
+   "result": "BIN-sku-103",
+   "dur": 0.000499,
+   "io": [
+    {
+     "req": {
+      "argv": [
+       "sh",
+       "-c",
+       "printf '{\"tag\":\"BIN-sku-103\"}'"
+      ],
+      "key": "run sh -c printf '{\"tag\":\"BIN-sku-103\"}'",
+      "kind": "subprocess",
+      "method": "RUN",
+      "url": ""
+     },
+     "out": {
+      "returncode": 0,
+      "stderr": {
+       "$bytes": ""
+      },
+      "stdout": {
+       "$bytes": "eyJ0YWciOiJCSU4tc2t1LTEwMyJ9"
+      }
+     },
+     "dur": 0.000446522
+    }
+   ]
+  },
+  {
+   "args": [
+    "sku-104"
+   ],
+   "kwargs": {},
+   "result": "BIN-sku-104",
+   "dur": 0.000589,
+   "io": [
+    {
+     "req": {
+      "argv": [
+       "sh",
+       "-c",
+       "printf '{\"tag\":\"BIN-sku-104\"}'"
+      ],
+      "key": "run sh -c printf '{\"tag\":\"BIN-sku-104\"}'",
+      "kind": "subprocess",
+      "method": "RUN",
+      "url": ""
+     },
+     "out": {
+      "returncode": 0,
+      "stderr": {
+       "$bytes": ""
+      },
+      "stdout": {
+       "$bytes": "eyJ0YWciOiJCSU4tc2t1LTEwNCJ9"
+      }
+     },
+     "dur": 0.000538798
+    }
+   ]
+  },
+  {
+   "args": [
+    "sku-105"
+   ],
+   "kwargs": {},
+   "result": "BIN-sku-105",
+   "dur": 0.000769,
+   "io": [
+    {
+     "req": {
+      "argv": [
+       "sh",
+       "-c",
+       "printf '{\"tag\":\"BIN-sku-105\"}'"
+      ],
+      "key": "run sh -c printf '{\"tag\":\"BIN-sku-105\"}'",
+      "kind": "subprocess",
+      "method": "RUN",
+      "url": ""
+     },
+     "out": {
+      "returncode": 0,
+      "stderr": {
+       "$bytes": ""
+      },
+      "stdout": {
+       "$bytes": "eyJ0YWciOiJCSU4tc2t1LTEwNSJ9"
+      }
+     },
+     "dur": 0.000687065
+    }
+   ]
+  },
+  {
+   "args": [
+    "sku-106"
+   ],
+   "kwargs": {},
+   "result": "BIN-sku-106",
+   "dur": 0.00071,
+   "io": [
+    {
+     "req": {
+      "argv": [
+       "sh",
+       "-c",
+       "printf '{\"tag\":\"BIN-sku-106\"}'"
+      ],
+      "key": "run sh -c printf '{\"tag\":\"BIN-sku-106\"}'",
+      "kind": "subprocess",
+      "method": "RUN",
+      "url": ""
+     },
+     "out": {
+      "returncode": 0,
+      "stderr": {
+       "$bytes": ""
+      },
+      "stdout": {
+       "$bytes": "eyJ0YWciOiJCSU4tc2t1LTEwNiJ9"
+      }
+     },
+     "dur": 0.000643142
+    }
+   ]
+  }
+ ],
+ "format": "ras-anything-cassette",
+ "lang": "go",
+ "version": 1
+}

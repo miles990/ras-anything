@@ -1,0 +1,289 @@
+{
+ "calls": [
+  {
+   "args": [
+    "http://127.0.0.1:35427",
+    "sku-101"
+   ],
+   "kwargs": {},
+   "result": {
+    "sku": "sku-101",
+    "available": 3,
+    "reorder": 10
+   },
+   "dur": 0.000663,
+   "io": [
+    {
+     "req": {
+      "idempotency_key": null,
+      "key": "GET http://127.0.0.1/stock/sku-101",
+      "kind": "http",
+      "method": "GET",
+      "url": "http://127.0.0.1:35427/stock/sku-101"
+     },
+     "out": {
+      "body": {
+       "$bytes": "eyJza3UiOiJza3UtMTAxIiwiYXZhaWxhYmxlIjozLCJyZW9yZGVyIjoxMH0K"
+      },
+      "headers": [
+       [
+        "Content-Length",
+        "45"
+       ],
+       [
+        "Content-Type",
+        "text/plain; charset=utf-8"
+       ],
+       [
+        "Date",
+        "Mon, 23 Nov 2026 09:22:55 GMT"
+       ]
+      ],
+      "reason": "200 OK",
+      "status": 200,
+      "url": "http://127.0.0.1:35427/stock/sku-101"
+     },
+     "dur": 0.000426259
+    }
+   ]
+  },
+  {
+   "args": [
+    "http://127.0.0.1:35427",
+    "sku-102"
+   ],
+   "kwargs": {},
+   "result": {
+    "sku": "sku-102",
+    "available": 8,
+    "reorder": 10
+   },
+   "dur": 0.000303,
+   "io": [
+    {
+     "req": {
+      "idempotency_key": null,
+      "key": "GET http://127.0.0.1/stock/sku-102",
+      "kind": "http",
+      "method": "GET",
+      "url": "http://127.0.0.1:35427/stock/sku-102"
+     },
+     "out": {
+      "body": {
+       "$bytes": "eyJza3UiOiJza3UtMTAyIiwiYXZhaWxhYmxlIjo4LCJyZW9yZGVyIjoxMH0K"
+      },
+      "headers": [
+       [
+        "Content-Length",
+        "45"
+       ],
+       [
+        "Content-Type",
+        "text/plain; charset=utf-8"
+       ],
+       [
+        "Date",
+        "Mon, 23 Nov 2026 09:22:55 GMT"
+       ]
+      ],
+      "reason": "200 OK",
+      "status": 200,
+      "url": "http://127.0.0.1:35427/stock/sku-102"
+     },
+     "dur": 0.000199714
+    }
+   ]
+  },
+  {
+   "args": [
+    "http://127.0.0.1:35427",
+    "sku-103"
+   ],
+   "kwargs": {},
+   "result": {
+    "sku": "sku-103",
+    "available": 1,
+    "reorder": 12
+   },
+   "dur": 0.000236,
+   "io": [
+    {
+     "req": {
+      "idempotency_key": null,
+      "key": "GET http://127.0.0.1/stock/sku-103",
+      "kind": "http",
+      "method": "GET",
+      "url": "http://127.0.0.1:35427/stock/sku-103"
+     },
+     "out": {
+      "body": {
+       "$bytes": "eyJza3UiOiJza3UtMTAzIiwiYXZhaWxhYmxlIjoxLCJyZW9yZGVyIjoxMn0K"
+      },
+      "headers": [
+       [
+        "Content-Length",
+        "45"
+       ],
+       [
+        "Content-Type",
+        "text/plain; charset=utf-8"
+       ],
+       [
+        "Date",
+        "Mon, 23 Nov 2026 09:22:55 GMT"
+       ]
+      ],
+      "reason": "200 OK",
+      "status": 200,
+      "url": "http://127.0.0.1:35427/stock/sku-103"
+     },
+     "dur": 0.000147211
+    }
+   ]
+  },
+  {
+   "args": [
+    "http://127.0.0.1:35427",
+    "sku-104"
+   ],
+   "kwargs": {},
+   "result": {
+    "sku": "sku-104",
+    "available": 5,
+    "reorder": 10
+   },
+   "dur": 0.000158,
+   "io": [
+    {
+     "req": {
+      "idempotency_key": null,
+      "key": "GET http://127.0.0.1/stock/sku-104",
+      "kind": "http",
+      "method": "GET",
+      "url": "http://127.0.0.1:35427/stock/sku-104"
+     },
+     "out": {
+      "body": {
+       "$bytes": "eyJza3UiOiJza3UtMTA0IiwiYXZhaWxhYmxlIjo1LCJyZW9yZGVyIjoxMH0K"
+      },
+      "headers": [
+       [
+        "Content-Length",
+        "45"
+       ],
+       [
+        "Content-Type",
+        "text/plain; charset=utf-8"
+       ],
+       [
+        "Date",
+        "Mon, 23 Nov 2026 09:22:55 GMT"
+       ]
+      ],
+      "reason": "200 OK",
+      "status": 200,
+      "url": "http://127.0.0.1:35427/stock/sku-104"
+     },
+     "dur": 0.000098668
+    }
+   ]
+  },
+  {
+   "args": [
+    "http://127.0.0.1:35427",
+    "sku-105"
+   ],
+   "kwargs": {},
+   "result": {
+    "sku": "sku-105",
+    "available": 2,
+    "reorder": 8
+   },
+   "dur": 0.000157,
+   "io": [
+    {
+     "req": {
+      "idempotency_key": null,
+      "key": "GET http://127.0.0.1/stock/sku-105",
+      "kind": "http",
+      "method": "GET",
+      "url": "http://127.0.0.1:35427/stock/sku-105"
+     },
+     "out": {
+      "body": {
+       "$bytes": "eyJza3UiOiJza3UtMTA1IiwiYXZhaWxhYmxlIjoyLCJyZW9yZGVyIjo4fQo="
+      },
+      "headers": [
+       [
+        "Content-Length",
+        "44"
+       ],
+       [
+        "Content-Type",
+        "text/plain; charset=utf-8"
+       ],
+       [
+        "Date",
+        "Mon, 23 Nov 2026 09:22:55 GMT"
+       ]
+      ],
+      "reason": "200 OK",
+      "status": 200,
+      "url": "http://127.0.0.1:35427/stock/sku-105"
+     },
+     "dur": 0.000094673
+    }
+   ]
+  },
+  {
+   "args": [
+    "http://127.0.0.1:35427",
+    "sku-106"
+   ],
+   "kwargs": {},
+   "result": {
+    "sku": "sku-106",
+    "available": 4,
+    "reorder": 10
+   },
+   "dur": 0.000248,
+   "io": [
+    {
+     "req": {
+      "idempotency_key": null,
+      "key": "GET http://127.0.0.1/stock/sku-106",
+      "kind": "http",
+      "method": "GET",
+      "url": "http://127.0.0.1:35427/stock/sku-106"
+     },
+     "out": {
+      "body": {
+       "$bytes": "eyJza3UiOiJza3UtMTA2IiwiYXZhaWxhYmxlIjo0LCJyZW9yZGVyIjoxMH0K"
+      },
+      "headers": [
+       [
+        "Content-Length",
+        "45"
+       ],
+       [
+        "Content-Type",
+        "text/plain; charset=utf-8"
+       ],
+       [
+        "Date",
+        "Mon, 23 Nov 2026 09:22:55 GMT"
+       ]
+      ],
+      "reason": "200 OK",
+      "status": 200,
+      "url": "http://127.0.0.1:35427/stock/sku-106"
+     },
+     "dur": 0.000171062
+    }
+   ]
+  }
+ ],
+ "format": "ras-anything-cassette",
+ "lang": "go",
+ "version": 1
+}

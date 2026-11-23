@@ -1,0 +1,22 @@
+{
+  "breakers": {},
+  "functions": {
+    "warehouse.AuditTag": {
+      "calls": 6,
+      "gave_up": 0,
+      "raised": 0
+    },
+    "warehouse.FetchStock": {
+      "calls": 6,
+      "gave_up": 0,
+      "raised": 0
+    },
+    "warehouse.ReserveStock": {
+      "calls": 6,
+      "gave_up": 0,
+      "raised": 0
+    }
+  },
+  "status": "ok",
+  "updated": "2026-11-23T09:23:49Z"
+}

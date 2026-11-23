@@ -1,0 +1,694 @@
+{
+  "lang": "go",
+  "cmd": [
+    "go",
+    "run",
+    "."
+  ],
+  "display_cmd": "go run .",
+  "ids": [
+    "warehouse.FetchStock",
+    "warehouse.ReserveStock",
+    "warehouse.AuditTag"
+  ],
+  "seeds": 20,
+  "rate": 0.1,
+  "outage_rate": 0.05,
+  "time_scale": 0.05,
+  "hang_cap_s": 2.0,
+  "degraded_markers": [],
+  "clean_outputs_equal": true,
+  "summary": {
+    "original": {
+      "runs": 20,
+      "correct": 1,
+      "degraded": 0,
+      "wrong": 0,
+      "crash": 16,
+      "hang": 3,
+      "availability": 0.05,
+      "crash_rate": 0.8,
+      "hang_rate": 0.15,
+      "wrong_rate": 0.0,
+      "p50_wall": 0.006,
+      "p99_wall": 2.0101,
+      "identical_rate": 0.05,
+      "dups": 0,
+      "faults": 21,
+      "failures_by_place": {
+        "hang in warehouse.AuditTag": 1,
+        "hang in warehouse.FetchStock": 1,
+        "hang in warehouse.ReserveStock": 1
+      },
+      "amplification": 0.7153846153846154,
+      "outage_amplification": 1.0,
+      "outage_calls": 7,
+      "clean_per_call": 0.6666666666666666,
+      "clean_wall": 0.011
+    },
+    "hardened": {
+      "runs": 20,
+      "correct": 19,
+      "degraded": 1,
+      "wrong": 0,
+      "crash": 0,
+      "hang": 0,
+      "availability": 1.0,
+      "crash_rate": 0.0,
+      "hang_rate": 0.0,
+      "wrong_rate": 0.0,
+      "p50_wall": 0.4113,
+      "p99_wall": 2.3903,
+      "identical_rate": 0.95,
+      "dups": 0,
+      "faults": 99,
+      "failures_by_place": {},
+      "amplification": 0.8388888888888889,
+      "outage_amplification": 3.0,
+      "outage_calls": 14,
+      "clean_per_call": 0.6666666666666666,
+      "clean_wall": 0.0125
+    }
+  },
+  "runs": {
+    "original": [
+      {
+        "seed": 1,
+        "outcome": "crash",
+        "exit": 1,
+        "wall_s": 0.0048,
+        "fallbacks": 0,
+        "faults": 1,
+        "attempts": 3,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 2,
+        "outcome": "hang",
+        "exit": 70,
+        "wall_s": 2.0096,
+        "fallbacks": 0,
+        "faults": 1,
+        "attempts": 12,
+        "dups": 0,
+        "uncaught": {
+          "hang": true,
+          "msg": "boundary call with no timeout hung (chaos)",
+          "type": "ChaosHang",
+          "where": "warehouse.AuditTag"
+        }
+      },
+      {
+        "seed": 3,
+        "outcome": "correct",
+        "exit": 0,
+        "wall_s": 0.0132,
+        "fallbacks": 0,
+        "faults": 0,
+        "attempts": 18,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 4,
+        "outcome": "crash",
+        "exit": 1,
+        "wall_s": 0.0047,
+        "fallbacks": 0,
+        "faults": 1,
+        "attempts": 3,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 5,
+        "outcome": "crash",
+        "exit": 1,
+        "wall_s": 0.0036,
+        "fallbacks": 0,
+        "faults": 1,
+        "attempts": 1,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 6,
+        "outcome": "crash",
+        "exit": 1,
+        "wall_s": 0.1622,
+        "fallbacks": 0,
+        "faults": 2,
+        "attempts": 13,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 7,
+        "outcome": "crash",
+        "exit": 1,
+        "wall_s": 0.0041,
+        "fallbacks": 0,
+        "faults": 1,
+        "attempts": 1,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 8,
+        "outcome": "hang",
+        "exit": 70,
+        "wall_s": 2.01,
+        "fallbacks": 0,
+        "faults": 1,
+        "attempts": 10,
+        "dups": 0,
+        "uncaught": {
+          "hang": true,
+          "msg": "boundary call with no timeout hung (chaos)",
+          "type": "ChaosHang",
+          "where": "warehouse.FetchStock"
+        }
+      },
+      {
+        "seed": 9,
+        "outcome": "crash",
+        "exit": 1,
+        "wall_s": 0.0044,
+        "fallbacks": 0,
+        "faults": 1,
+        "attempts": 3,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 10,
+        "outcome": "crash",
+        "exit": 1,
+        "wall_s": 0.0091,
+        "fallbacks": 0,
+        "faults": 1,
+        "attempts": 14,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 11,
+        "outcome": "crash",
+        "exit": 1,
+        "wall_s": 0.0031,
+        "fallbacks": 0,
+        "faults": 1,
+        "attempts": 1,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 12,
+        "outcome": "crash",
+        "exit": 1,
+        "wall_s": 0.0045,
+        "fallbacks": 0,
+        "faults": 1,
+        "attempts": 3,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 13,
+        "outcome": "hang",
+        "exit": 70,
+        "wall_s": 2.0101,
+        "fallbacks": 0,
+        "faults": 1,
+        "attempts": 11,
+        "dups": 0,
+        "uncaught": {
+          "hang": true,
+          "msg": "boundary call with no timeout hung (chaos)",
+          "type": "ChaosHang",
+          "where": "warehouse.ReserveStock"
+        }
+      },
+      {
+        "seed": 14,
+        "outcome": "crash",
+        "exit": 1,
+        "wall_s": 0.0064,
+        "fallbacks": 0,
+        "faults": 1,
+        "attempts": 5,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 15,
+        "outcome": "crash",
+        "exit": 1,
+        "wall_s": 0.0043,
+        "fallbacks": 0,
+        "faults": 1,
+        "attempts": 2,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 16,
+        "outcome": "crash",
+        "exit": 1,
+        "wall_s": 0.0068,
+        "fallbacks": 0,
+        "faults": 1,
+        "attempts": 10,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 17,
+        "outcome": "crash",
+        "exit": 1,
+        "wall_s": 0.0042,
+        "fallbacks": 0,
+        "faults": 1,
+        "attempts": 3,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 18,
+        "outcome": "crash",
+        "exit": 1,
+        "wall_s": 0.0059,
+        "fallbacks": 0,
+        "faults": 1,
+        "attempts": 5,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 19,
+        "outcome": "crash",
+        "exit": 1,
+        "wall_s": 0.1584,
+        "fallbacks": 0,
+        "faults": 2,
+        "attempts": 10,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 20,
+        "outcome": "crash",
+        "exit": 1,
+        "wall_s": 0.006,
+        "fallbacks": 0,
+        "faults": 1,
+        "attempts": 5,
+        "dups": 0,
+        "uncaught": null
+      }
+    ],
+    "hardened": [
+      {
+        "seed": 1,
+        "outcome": "correct",
+        "exit": 0,
+        "wall_s": 0.4431,
+        "fallbacks": 0,
+        "faults": 9,
+        "attempts": 27,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 2,
+        "outcome": "correct",
+        "exit": 0,
+        "wall_s": 0.0403,
+        "fallbacks": 0,
+        "faults": 1,
+        "attempts": 19,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 3,
+        "outcome": "correct",
+        "exit": 0,
+        "wall_s": 0.0124,
+        "fallbacks": 0,
+        "faults": 0,
+        "attempts": 18,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 4,
+        "outcome": "correct",
+        "exit": 0,
+        "wall_s": 1.2194,
+        "fallbacks": 0,
+        "faults": 6,
+        "attempts": 24,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 5,
+        "outcome": "correct",
+        "exit": 0,
+        "wall_s": 0.4885,
+        "fallbacks": 0,
+        "faults": 10,
+        "attempts": 28,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 6,
+        "outcome": "correct",
+        "exit": 0,
+        "wall_s": 0.4113,
+        "fallbacks": 0,
+        "faults": 4,
+        "attempts": 21,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 7,
+        "outcome": "correct",
+        "exit": 0,
+        "wall_s": 0.4062,
+        "fallbacks": 0,
+        "faults": 4,
+        "attempts": 21,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 8,
+        "outcome": "correct",
+        "exit": 0,
+        "wall_s": 0.0548,
+        "fallbacks": 0,
+        "faults": 2,
+        "attempts": 20,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 9,
+        "outcome": "correct",
+        "exit": 0,
+        "wall_s": 0.4299,
+        "fallbacks": 0,
+        "faults": 6,
+        "attempts": 24,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 10,
+        "outcome": "correct",
+        "exit": 0,
+        "wall_s": 1.0153,
+        "fallbacks": 0,
+        "faults": 1,
+        "attempts": 19,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 11,
+        "outcome": "correct",
+        "exit": 0,
+        "wall_s": 1.5869,
+        "fallbacks": 0,
+        "faults": 9,
+        "attempts": 26,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 12,
+        "outcome": "degraded",
+        "exit": 0,
+        "wall_s": 0.3297,
+        "fallbacks": 1,
+        "faults": 5,
+        "attempts": 21,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 13,
+        "outcome": "correct",
+        "exit": 0,
+        "wall_s": 0.0394,
+        "fallbacks": 0,
+        "faults": 1,
+        "attempts": 19,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 14,
+        "outcome": "correct",
+        "exit": 0,
+        "wall_s": 0.2778,
+        "fallbacks": 0,
+        "faults": 3,
+        "attempts": 21,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 15,
+        "outcome": "correct",
+        "exit": 0,
+        "wall_s": 1.3271,
+        "fallbacks": 0,
+        "faults": 10,
+        "attempts": 28,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 16,
+        "outcome": "correct",
+        "exit": 0,
+        "wall_s": 0.2712,
+        "fallbacks": 0,
+        "faults": 4,
+        "attempts": 22,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 17,
+        "outcome": "correct",
+        "exit": 0,
+        "wall_s": 2.3903,
+        "fallbacks": 0,
+        "faults": 13,
+        "attempts": 31,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 18,
+        "outcome": "correct",
+        "exit": 0,
+        "wall_s": 1.1789,
+        "fallbacks": 0,
+        "faults": 3,
+        "attempts": 20,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 19,
+        "outcome": "correct",
+        "exit": 0,
+        "wall_s": 0.306,
+        "fallbacks": 0,
+        "faults": 4,
+        "attempts": 21,
+        "dups": 0,
+        "uncaught": null
+      },
+      {
+        "seed": 20,
+        "outcome": "correct",
+        "exit": 0,
+        "wall_s": 0.2201,
+        "fallbacks": 0,
+        "faults": 4,
+        "attempts": 22,
+        "dups": 0,
+        "uncaught": null
+      }
+    ]
+  },
+  "functions": {
+    "original": {
+      "warehouse.AuditTag": {
+        "calls": 37,
+        "ok": 32,
+        "fallback": 0,
+        "raised": 5,
+        "attempts": 0,
+        "outage_calls": 0,
+        "outage_attempts": 0,
+        "p99": 3.131e-06
+      },
+      "warehouse.FetchStock": {
+        "calls": 50,
+        "ok": 44,
+        "fallback": 0,
+        "raised": 6,
+        "attempts": 50,
+        "outage_calls": 5,
+        "outage_attempts": 5,
+        "p99": 0.150520287
+      },
+      "warehouse.ReserveStock": {
+        "calls": 43,
+        "ok": 38,
+        "fallback": 0,
+        "raised": 5,
+        "attempts": 43,
+        "outage_calls": 2,
+        "outage_attempts": 2,
+        "p99": 0.151018143
+      }
+    },
+    "hardened": {
+      "warehouse.AuditTag": {
+        "calls": 120,
+        "ok": 119,
+        "fallback": 1,
+        "raised": 0,
+        "attempts": 0,
+        "outage_calls": 0,
+        "outage_attempts": 0,
+        "p99": 4.36e-07
+      },
+      "warehouse.FetchStock": {
+        "calls": 120,
+        "ok": 120,
+        "fallback": 0,
+        "raised": 0,
+        "attempts": 155,
+        "outage_calls": 10,
+        "outage_attempts": 30,
+        "p99": 1.000771393
+      },
+      "warehouse.ReserveStock": {
+        "calls": 120,
+        "ok": 120,
+        "fallback": 0,
+        "raised": 0,
+        "attempts": 147,
+        "outage_calls": 4,
+        "outage_attempts": 12,
+        "p99": 1.001282187
+      }
+    }
+  },
+  "first_wrong": null,
+  "serviceability": {
+    "original": {
+      "cases": 19,
+      "detected": 16,
+      "detection_rate": 0.8421052631578947,
+      "lines_to_diagnosis_p50": 1,
+      "ttd_ms_p50": null
+    },
+    "hardened": {
+      "cases": 19,
+      "detected": 19,
+      "detection_rate": 1.0,
+      "lines_to_diagnosis_p50": 1,
+      "ttd_ms_p50": null
+    }
+  },
+  "leaks": [],
+  "host": {
+    "machine": "x86_64",
+    "system": "Linux",
+    "release": "6.12.113+",
+    "python": "3.13.5",
+    "runtime": "Go 1.27.3",
+    "cpus": 8,
+    "node": null
+  },
+  "fault_model": {
+    "timeout": "no answer: caller's timeout fires; with no timeout it hangs (POST/PUT still reach the server)",
+    "refused": "connection refused",
+    "http5xx": "HTTP 503 (subprocess: exit 75 EX_TEMPFAIL)",
+    "http429": "HTTP 429 with Retry-After: 1",
+    "slow": "+3 s latency, then the correct answer",
+    "truncated": "body (or stdout) cut in half"
+  },
+  "created": "2026-11-23T17:23:49+0800",
+  "slo": {
+    "schema_version": "1.0.0",
+    "kind": "slo",
+    "source": "bench",
+    "targets": {
+      "availability": 0.95,
+      "p99_s": 3.0,
+      "error_rate": 0.05
+    },
+    "original": {
+      "availability": 0.05,
+      "error_rate": 0.95,
+      "p50_s": 0.006,
+      "p99_s": 2.0101,
+      "error_budget": 0.05,
+      "error_budget_burn_ratio": 19.0,
+      "error_budget_burn_pct": 1900.0,
+      "checks": {
+        "availability": false,
+        "p99_s": true,
+        "error_rate": false
+      },
+      "status": "missed"
+    },
+    "hardened": {
+      "availability": 1.0,
+      "error_rate": 0.0,
+      "p50_s": 0.4113,
+      "p99_s": 2.3903,
+      "error_budget": 0.05,
+      "error_budget_burn_ratio": 0.0,
+      "error_budget_burn_pct": 0.0,
+      "checks": {
+        "availability": true,
+        "p99_s": true,
+        "error_rate": true
+      },
+      "status": "met"
+    },
+    "serviceability": {
+      "original": {
+        "cases": 19,
+        "detected": 16,
+        "detection_rate": 0.8421052631578947,
+        "lines_to_diagnosis_p50": 1,
+        "ttd_ms_p50": null
+      },
+      "hardened": {
+        "cases": 19,
+        "detected": 19,
+        "detection_rate": 1.0,
+        "lines_to_diagnosis_p50": 1,
+        "ttd_ms_p50": null
+      }
+    },
+    "ax": null,
+    "created": "2026-11-23T17:23:49+0800"
+  }
+}
