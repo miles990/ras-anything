@@ -455,6 +455,9 @@ def report(title: str | None = None, slo_spec: str | None = None, quiet: bool = 
     md.write_text(markdown(title, data), encoding="utf-8")
     svg.write_text(card_svg(title, data), encoding="utf-8")
     runbook = write_runbooks(project, title, data)
+    from . import export as _export
+    _export.emit_event(project, "report.generated", {"title": title})
+    _export.sync_out(project)
     if not quiet:
         ui.headline("report", title)
         b = data["bench"]

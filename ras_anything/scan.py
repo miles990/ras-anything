@@ -108,6 +108,9 @@ def scan(cmd: list[str], seeds: int = 5, rate: float = 0.25, cwd: Path | None = 
     result = scrub(result, cwd)
     save_local(cwd, cmd=typed, portable=stored, executable=clean.data.get("executable"))
     save_json(ras_dir(cwd) / "scan.json", result)
+    from . import export as _export
+    _export.emit_event(cwd, "scan.completed", {"functions": len(functions), "lang": adapter.name})
+    _export.sync_out(cwd)
     (ras_dir(cwd) / "clean.stdout").write_text(clean.stdout)
     if not quiet:
         print_scan(result, adapter)

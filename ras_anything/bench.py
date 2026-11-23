@@ -185,6 +185,13 @@ def bench(cmd: list[str] | None = None, seeds: int = 20, rate: float = 0.1, mark
     slo_res = slo.evaluate(project=project, bench=res, targets=slo_spec, save=True)
     res["slo"] = slo_res
     save_json(project / ".ras" / "bench.json", res)
+    from . import export as _export
+    _export.emit_event(project, "bench.completed", {
+        "seeds": seeds,
+        "availability_original": ((res.get("summary") or {}).get("original") or {}).get("availability"),
+        "availability_hardened": ((res.get("summary") or {}).get("hardened") or {}).get("availability"),
+    })
+    _export.sync_out(project)
     if not quiet:
         print_bench(res)
     return res

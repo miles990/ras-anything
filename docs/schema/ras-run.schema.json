@@ -1,0 +1,222 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/miles990/ras-anything/docs/schema/ras-run.schema.json",
+  "title": "ras-anything Run & Snapshot Contract",
+  "type": "object",
+  "required": ["schema_version", "kind", "generated_at", "project"],
+  "additionalProperties": true,
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+    },
+    "kind": {
+      "type": "string",
+      "enum": ["scan", "verify", "bench", "slo", "report", "status", "replay", "coverage", "patterns", "bundle"]
+    },
+    "generated_at": {
+      "type": "string",
+      "minLength": 10
+    },
+    "project": {
+      "type": "string",
+      "minLength": 1
+    },
+    "lang": {
+      "type": "string"
+    },
+    "slo": {
+      "type": "object",
+      "properties": {
+        "source": { "type": "string" },
+        "targets": {
+          "type": "object",
+          "properties": {
+            "availability": { "type": "number", "minimum": 0, "maximum": 1 },
+            "p99_s": { "type": "number", "minimum": 0 },
+            "error_rate": { "type": "number", "minimum": 0, "maximum": 1 }
+          }
+        },
+        "original": { "$ref": "#/$defs/sloSide" },
+        "hardened": { "$ref": "#/$defs/sloSide" },
+        "series": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["ts", "availability", "p99_s", "error_rate", "burn_pct"],
+            "properties": {
+              "ts": { "type": "string" },
+              "availability": { "type": "number", "minimum": 0, "maximum": 1 },
+              "p99_s": { "type": "number", "minimum": 0 },
+              "error_rate": { "type": "number", "minimum": 0, "maximum": 1 },
+              "burn_pct": { "type": "number", "minimum": 0 }
+            }
+          }
+        }
+      }
+    },
+    "functions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "lang"],
+        "properties": {
+          "id": { "type": "string" },
+          "lang": { "type": "string" },
+          "passed": { "type": "boolean" },
+          "budget_s": { "type": "number", "minimum": 0 },
+          "happy": {
+            "type": "object",
+            "properties": {
+              "equal": { "type": "integer", "minimum": 0 },
+              "total": { "type": "integer", "minimum": 0 }
+            }
+          },
+          "original": { "$ref": "#/$defs/metricsSide" },
+          "hardened": { "$ref": "#/$defs/metricsSide" },
+          "gates": { "type": "object" },
+          "ai": { "$ref": "#/$defs/aiSummary" }
+        }
+      }
+    },
+    "bench": {
+      "type": "object",
+      "properties": {
+        "seeds": { "type": "integer", "minimum": 0 },
+        "rate": { "type": "number", "minimum": 0, "maximum": 1 },
+        "original": { "$ref": "#/$defs/metricsSide" },
+        "hardened": { "$ref": "#/$defs/metricsSide" }
+      }
+    },
+    "patterns": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "verdict"],
+        "properties": {
+          "name": { "type": "string" },
+          "verdict": { "type": "string", "enum": ["adopted", "opt-in", "rejected"] },
+          "off_availability": { "type": "number", "minimum": 0, "maximum": 1 },
+          "on_availability": { "type": "number", "minimum": 0, "maximum": 1 },
+          "amplification": { "type": "number", "minimum": 0 }
+        }
+      }
+    },
+    "resilience_state": {
+      "type": "object",
+      "properties": {
+        "breakers": { "type": "object" },
+        "bulkheads": { "type": "object" },
+        "flags": { "type": "object" }
+      }
+    },
+    "rollout": {
+      "type": "object",
+      "properties": {
+        "enabled": { "type": "object" },
+        "canary_pct": { "type": "number", "minimum": 0, "maximum": 100 },
+        "shadow": { "type": "boolean" },
+        "blast_radius_functions": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "incidents": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "trace_id"],
+        "properties": {
+          "id": { "type": "string" },
+          "trace_id": { "type": "string" },
+          "function_id": { "type": "string" },
+          "cause": { "type": "string" },
+          "rca_steps": { "type": "array", "items": { "type": "string" } },
+          "reproduced": { "type": "boolean" }
+        }
+      }
+    },
+    "ax": {
+      "type": "object",
+      "properties": {
+        "original_accuracy": { "type": "number", "minimum": 0, "maximum": 1 },
+        "hardened_accuracy": { "type": "number", "minimum": 0, "maximum": 1 },
+        "leaks": { "type": "integer", "minimum": 0 },
+        "records": { "type": "array" }
+      }
+    },
+    "ai": { "$ref": "#/$defs/aiSummary" },
+    "serviceability": {
+      "type": "object",
+      "properties": {
+        "mttd_s": { "type": ["number", "null"] },
+        "mttr_s": { "type": ["number", "null"] },
+        "restore_s": { "type": ["number", "null"] },
+        "orig_detection_rate": { "type": ["number", "null"] },
+        "hard_detection_rate": { "type": ["number", "null"] },
+        "hard_diagnosis_accuracy": { "type": ["number", "null"] }
+      }
+    },
+    "coverage": {
+      "type": "object",
+      "properties": {
+        "adapters": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["lang", "status"],
+            "properties": {
+              "lang": { "type": "string" },
+              "status": { "type": "string", "enum": ["complete", "partial", "planned"] },
+              "boundary": { "type": "string" },
+              "verify": { "type": "boolean" },
+              "ax": { "type": "boolean" }
+            }
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "metricsSide": {
+      "type": "object",
+      "properties": {
+        "availability": { "type": "number", "minimum": 0, "maximum": 1 },
+        "identical_rate": { "type": ["number", "null"] },
+        "crash_rate": { "type": ["number", "null"] },
+        "hang_rate": { "type": ["number", "null"] },
+        "wrong": { "type": "integer", "minimum": 0 },
+        "hang": { "type": "integer", "minimum": 0 },
+        "dups": { "type": "integer", "minimum": 0 },
+        "p50_s": { "type": ["number", "null"] },
+        "p99_s": { "type": ["number", "null"] },
+        "amplification": { "type": ["number", "null"] }
+      }
+    },
+    "sloSide": {
+      "type": "object",
+      "properties": {
+        "availability": { "type": "number", "minimum": 0, "maximum": 1 },
+        "p99_s": { "type": ["number", "null"] },
+        "error_rate": { "type": "number", "minimum": 0, "maximum": 1 },
+        "error_budget_burn_pct": { "type": "number", "minimum": 0 },
+        "status": { "type": "string", "enum": ["met", "missed"] }
+      }
+    },
+    "aiSummary": {
+      "type": ["object", "null"],
+      "properties": {
+        "original": { "type": ["object", "null"] },
+        "hardened": {
+          "type": ["object", "null"],
+          "properties": {
+            "semantic_success_rate": { "type": ["number", "null"] },
+            "injection_resistance": { "type": ["number", "null"] },
+            "cost_per_success_usd": { "type": ["number", "null"] },
+            "total_cost_usd": { "type": ["number", "null"] },
+            "retry_cost_amplification": { "type": ["number", "null"] },
+            "loop_guard_trips": { "type": "integer", "minimum": 0 }
+          }
+        }
+      }
+    }
+  }
+}

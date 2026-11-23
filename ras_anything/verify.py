@@ -302,6 +302,12 @@ def verify(fid: str | None = None, max_chaos: int = 60, quiet: bool = False) -> 
         fm.update(ai.AI_FAULT_DESCRIBE)
     res["fault_model"] = fm
     save_json(d / "verify.json", res)
+    if not res.get("fatal"):
+        from . import export as _export
+        _export.emit_event(project, "verify.passed" if res.get("passed") else "verify.failed",
+                           {"availability": (res.get("hardened") or {}).get("availability")},
+                           severity="INFO" if res.get("passed") else "WARN", function_id=fid)
+        _export.sync_out(project)
     if not quiet:
         print_verify(res, fid, hp.name)
     return res

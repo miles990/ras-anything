@@ -24,6 +24,7 @@ prove it on recorded calls, and swap them in reversibly.
   report [--slo SPEC]    RAS-REPORT.md + ras-card.svg + docs/RUNBOOK.md + .ras/slo.json
   replay [id] [--list]   deterministically replay a recorded incident + write RCA
   drift --model M        replay recorded AI evals against model M (+ --export-promptfoo)
+  export --format FMT    export .ras/out data as json | ndjson | prom | otlp-json
   flag list|get|set|delete  OpenFeature/flagd flags (`.ras/flags.json`), hot-reloaded
   status · doctor · mcp
 """
@@ -93,6 +94,10 @@ def parser() -> argparse.ArgumentParser:
     dr.add_argument("--provider-url", help="optional OpenAI-compatible URL to call")
     dr.add_argument("--export-promptfoo", help="write promptfoo YAML config to path")
     dr.add_argument("--threshold", type=float, default=0.05, help="allowed semantic drop (default 0.05)")
+
+    ex = sub.add_parser("export", help="export .ras/out telemetry (json | ndjson | prom | otlp-json)")
+    ex.add_argument("--format", default="json", choices=["json", "ndjson", "prom", "otlp-json"])
+    ex.add_argument("--out", help="optional output file path")
 
     g = sub.add_parser("go", help="scan → harden → verify → enable → bench → report (-- <cmd>)")
     g.add_argument("--agent", required=True, help="claude | codex | any shell command that reads the task on stdin")
@@ -176,6 +181,10 @@ def main(argv=None) -> int:
 
             return 0 if drift(a.model, eval_ref=a.eval_ref, provider_url=a.provider_url,
                               export_promptfoo_path=a.export_promptfoo, threshold=a.threshold).get("passed") else 1
+        elif c == "export":
+            from .export import export_data
+
+            sys.stdout.write(export_data(fmt=a.format, out_path=a.out))
         elif c == "go":
             from .go import go
 

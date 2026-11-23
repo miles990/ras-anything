@@ -299,6 +299,10 @@ def replay(incident_id: str | None = None, project: Path | None = None, quiet: b
     out_dir = project / ".ras" / "out"
     if (project / ".ras").is_dir():
         save_json(out_dir / ("replay-%s.json" % iid), rca)
+        from . import export as _export
+        _export.emit_event(project, "replay.completed", {"incident": iid, "reproduced": bool(rca.get("reproduced"))},
+                           trace_id=rca.get("trace_id"), function_id=fid)
+        _export.sync_out(project)
         inc_md = inc_path.with_suffix(".rca.md")
         inc_md.write_text(_rca_markdown(rca), encoding="utf-8")
 

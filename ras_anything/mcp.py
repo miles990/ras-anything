@@ -39,6 +39,11 @@ TOOLS = {
     "ras_flag": ("List, get, set or delete flags in .ras/flags.json (hot-reloaded in running processes).",
                  {**_cwd, "argv": {"type": "array", "items": {"type": "string"},
                                    "description": "flag args, e.g. set ras.pattern.retry off, or list"}}, []),
+    "ras_export": ("Export .ras/out snapshots and telemetry as json, ndjson, prom, or otlp-json.",
+                   {**_cwd, "format": {"type": "string", "enum": ["json", "ndjson", "prom", "otlp-json"]}}, []),
+    "ras_events": ("Read .ras/out/events.ndjson incrementally using a sequence cursor.",
+                   {**_cwd, "since": {"type": "integer", "description": "sequence cursor (default 0)"},
+                    "limit": {"type": "integer", "description": "max events to return (default 200)"}}, []),
 }
 
 
@@ -47,6 +52,9 @@ def _argv(name: str, a: dict) -> list[str]:
     argv = [cmd]
     if cmd == "flag":
         argv += list(a.get("argv") or ["list"])
+        return argv
+    if cmd == "export":
+        argv += ["--format", str(a.get("format") or "json")]
         return argv
     if cmd == "replay":
         if a.get("list"):
@@ -74,6 +82,14 @@ def _argv(name: str, a: dict) -> list[str]:
 def call_tool(name: str, args: dict) -> dict:
     if name not in TOOLS:
         return {"content": [{"type": "text", "text": "unknown tool %s" % name}], "isError": True}
+    if name == "ras_events":
+        from pathlib import Path
+        from .export import read_events, sync_out
+        cwd = Path(args.get("cwd") or os.getcwd())
+        if (cwd / ".ras").is_dir():
+            sync_out(cwd)
+        res = read_events(cwd, since=int(args.get("since") or 0), limit=int(args.get("limit") or 200))
+        return {"content": [{"type": "text", "text": json.dumps(res, indent=2, sort_keys=True)}], "isError": False}
     argv = _argv(name, args)
     env = dict(os.environ, NO_COLOR="1")
     env.pop("FORCE_COLOR", None)

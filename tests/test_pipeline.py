@@ -302,7 +302,7 @@ class McpTest(unittest.TestCase):
         self.assertEqual(r_bad["result"]["protocolVersion"], mcp.PROTOCOL)
         tools = mcp.handle({"jsonrpc": "2.0", "id": 2, "method": "tools/list"})["result"]["tools"]
         self.assertEqual({t["name"] for t in tools}, {"ras_scan", "ras_harden", "ras_verify", "ras_enable",
-                                                       "ras_disable", "ras_bench", "ras_report", "ras_status", "ras_replay", "ras_flag"})
+                                                       "ras_disable", "ras_bench", "ras_report", "ras_status", "ras_replay", "ras_flag", "ras_export", "ras_events"})
         self.assertIsNone(mcp.handle({"jsonrpc": "2.0", "method": "notifications/initialized"}))
 
 

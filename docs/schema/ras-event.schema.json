@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/miles990/ras-anything/docs/schema/ras-event.schema.json",
+  "title": "ras-anything Timeline Event Contract (NDJSON)",
+  "type": "object",
+  "required": ["schema_version", "kind", "seq", "ts", "event_type"],
+  "additionalProperties": true,
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+    },
+    "kind": {
+      "type": "string",
+      "enum": ["event"]
+    },
+    "seq": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "ts": {
+      "type": "string",
+      "minLength": 10
+    },
+    "event_type": {
+      "type": "string",
+      "minLength": 1
+    },
+    "severity": {
+      "type": "string",
+      "enum": ["DEBUG", "INFO", "WARN", "ERROR"]
+    },
+    "trace_id": {
+      "type": ["string", "null"]
+    },
+    "function_id": {
+      "type": ["string", "null"]
+    },
+    "dependency": {
+      "type": ["string", "null"]
+    },
+    "data": {
+      "type": "object"
+    }
+  }
+}
