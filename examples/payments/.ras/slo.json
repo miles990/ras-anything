@@ -1,0 +1,58 @@
+{
+  "schema_version": "1.0.0",
+  "kind": "slo",
+  "source": "bench",
+  "targets": {
+    "availability": 0.99,
+    "p99_s": 5.0,
+    "error_rate": 0.01
+  },
+  "original": {
+    "availability": 0.0,
+    "error_rate": 1.0,
+    "p50_s": 1.801,
+    "p99_s": 3.9522,
+    "error_budget": 0.01,
+    "error_budget_burn_ratio": 100.0,
+    "error_budget_burn_pct": 10000.0,
+    "checks": {
+      "availability": false,
+      "p99_s": true,
+      "error_rate": false
+    },
+    "status": "missed"
+  },
+  "hardened": {
+    "availability": 0.9,
+    "error_rate": 0.1,
+    "p50_s": 1.3541,
+    "p99_s": 4.1635,
+    "error_budget": 0.01,
+    "error_budget_burn_ratio": 10.0,
+    "error_budget_burn_pct": 1000.0,
+    "checks": {
+      "availability": false,
+      "p99_s": true,
+      "error_rate": false
+    },
+    "status": "missed"
+  },
+  "serviceability": {
+    "original": {
+      "cases": 20,
+      "detected": 17,
+      "detection_rate": 0.85,
+      "lines_to_diagnosis_p50": null,
+      "ttd_ms_p50": null
+    },
+    "hardened": {
+      "cases": 20,
+      "detected": 20,
+      "detection_rate": 1.0,
+      "lines_to_diagnosis_p50": null,
+      "ttd_ms_p50": null
+    }
+  },
+  "ax": null,
+  "created": "2026-11-23T16:49:36+0800"
+}

@@ -118,6 +118,8 @@
         "exc_type": null,
         "cause_type": null,
         "structured": false,
+        "problem": null,
+        "stderr": "",
         "state": null,
         "attempts": [
           {
@@ -128,7 +130,8 @@
             "failed": true,
             "idem": null,
             "method": "POST",
-            "nonidempotent": true
+            "nonidempotent": true,
+            "outage": false
           },
           {
             "key": "POST http://127.0.0.1/v1/charges #f15f01e98119",
@@ -138,7 +141,8 @@
             "failed": false,
             "idem": null,
             "method": "POST",
-            "nonidempotent": true
+            "nonidempotent": true,
+            "outage": false
           }
         ],
         "class": "hang",
@@ -147,7 +151,7 @@
       },
       "hardened": {
         "outcome": "return",
-        "latency": 3.70848,
+        "latency": 3.679642,
         "matches": true,
         "is_fallback": false,
         "miss": null,
@@ -158,6 +162,8 @@
         "exc_type": null,
         "cause_type": null,
         "structured": false,
+        "problem": null,
+        "stderr": "{\"Timestamp\": \"1795423728210418944\", \"SeverityText\": \"WARN\", \"SeverityNumber\": 13, \"EventName\": \"ras.dependency.failure\", \"TraceId\": \"cd8ecccea90e8da05288239bfbd0159a\", \"SpanId\": \"ec09cdb46fa41b48\", \"Body\": \"charges failed: timeout (attempt 1)\", \"Resource\": {\"service.name\": \"worker.py\"}, \"Attributes\": {\"error.type\": \"URLError\", \"ras.fault\": \"timeout\", \"exception.message\": \"<urlopen error timed out>\", \"server.address\": \"127.0.0.1\", \"server.port\": 43085, \"url.path\": \"/v1/charges\", \"url.template\": \"/v1/charges\", \"http.request.method\": \"POST\", \"ras.dependency\": \"charges\", \"http.request.resend_count\": 0, \"ras.duration_s\": 3.5, \"code.function\": \"billing.charge\"}}\n{\"Timestamp\": \"1795423728210418944\", \"SeverityText\": \"INFO\", \"SeverityNumber\": 9, \"EventName\": \"ras.retry\", \"TraceId\": \"cd8ecccea90e8da05288239bfbd0159a\", \"SpanId\": \"ec09cdb46fa41b48\", \"Body\": \"retry 1 in 0.168s\", \"Resource\": {\"service.name\": \"worker.py\"}, \"Attributes\": {\"http.request.resend_count\": 1, \"ras.retry.delay_s\": 0.168, \"ras.dependency\": \"charges\", \"code.function\": \"billing.charge\"}}\n{\"Timestamp\": \"1795423728390060544\", \"SeverityText\": \"INFO\", \"SeverityNumber\": 9, \"EventName\": \"ras.dependency.recovered\", \"TraceId\": \"cd8ecccea90e8da05288239bfbd0159a\", \"SpanId\": \"ec09cdb46fa41b48\", \"Body\": \"answered on attempt 2\", \"Resource\": {\"service.name\": \"worker.py\"}, \"Attributes\": {\"url.template\": \"/v1/charges\", \"http.request.method\": \"POST\", \"ras.dependency\": \"charges\", \"http.request.resend_count\": 1, \"code.function\": \"billing.charge\"}}\n",
         "state": null,
         "attempts": [
           {
@@ -168,7 +174,8 @@
             "failed": true,
             "idem": "charge-INV-1001",
             "method": "POST",
-            "nonidempotent": true
+            "nonidempotent": true,
+            "outage": false
           },
           {
             "key": "POST http://127.0.0.1/v1/charges #f15f01e98119",
@@ -178,7 +185,8 @@
             "failed": false,
             "idem": "charge-INV-1001",
             "method": "POST",
-            "nonidempotent": true
+            "nonidempotent": true,
+            "outage": false
           }
         ],
         "class": "ok",
@@ -196,6 +204,8 @@
     "error": 0,
     "hang": 20,
     "miss": 0,
+    "attempts": 289,
+    "amplification": 1.80625,
     "availability": 0.76875,
     "p50": 0.506062,
     "p99": 13.502909,
@@ -212,13 +222,104 @@
     "error": 0,
     "hang": 0,
     "miss": 0,
+    "attempts": 288,
+    "amplification": 1.8,
     "availability": 1.0,
-    "p50": 0.170801,
+    "p50": 0.195867,
     "p99": 4.5,
     "max": 4.5,
     "dups": 0,
     "logged_failures": 1.0,
     "structured_errors": null
+  },
+  "outage": {
+    "healthy": {
+      "calls": 10,
+      "gap_s": 0.5
+    },
+    "down": {
+      "calls": 40,
+      "gap_s": 0.5
+    },
+    "recovered": {
+      "calls": 90,
+      "gap_s": 1.0
+    },
+    "original": {
+      "calls": 40,
+      "attempts": 120,
+      "ok": 0,
+      "degraded": 0,
+      "wrong": 40,
+      "error": 0,
+      "hang": 0,
+      "miss": 0,
+      "amplification": 3.0,
+      "healthy_per_call": 1.0,
+      "max_latency": 1.5,
+      "recovered_after_s": 0.0,
+      "dups": 0
+    },
+    "hardened": {
+      "calls": 40,
+      "attempts": 120,
+      "ok": 0,
+      "degraded": 40,
+      "wrong": 0,
+      "error": 0,
+      "hang": 0,
+      "miss": 0,
+      "amplification": 3.0,
+      "healthy_per_call": 1.0,
+      "max_latency": 0.569519,
+      "recovered_after_s": 0.0,
+      "dups": 0
+    }
+  },
+  "serviceability": {
+    "original": {
+      "runs": 129,
+      "detection_rate": 0.0,
+      "diagnosis_accuracy": 0.0,
+      "ttd_ms_p50": null,
+      "lines_to_diagnosis_p50": null,
+      "restore_s": null
+    },
+    "hardened": {
+      "runs": 129,
+      "detection_rate": 1.0,
+      "diagnosis_accuracy": 0.6976744186046512,
+      "ttd_ms_p50": null,
+      "lines_to_diagnosis_p50": 1,
+      "restore_s": null
+    }
+  },
+  "ax": {
+    "observed": {
+      "original": null,
+      "hardened": null
+    },
+    "catalog": {
+      "cases": 10,
+      "original": {
+        "cases": 10,
+        "accuracy": 0.3,
+        "mean_tokens": 42.2,
+        "mean_steps": 2.9,
+        "leaks": 40
+      },
+      "hardened": {
+        "cases": 10,
+        "accuracy": 1.0,
+        "mean_tokens": 105.8,
+        "mean_steps": 1.0,
+        "leaks": 0
+      }
+    },
+    "leaks": [
+      "ip",
+      "url"
+    ]
   },
   "gates": {
     "happy": true,
@@ -231,10 +332,10 @@
   },
   "passed": true,
   "fallback": "callable",
-  "elapsed_s": 0.19,
+  "elapsed_s": 0.64,
   "hardened_sha256": "bf773e849ada07b84d650a91238e0acd7d435b75faae4643d38c09f7cc523de0",
-  "verified_at": "2026-11-23T12:40:10+0800",
-  "wall_s": 0.19,
+  "verified_at": "2026-11-23T16:48:34+0800",
+  "wall_s": 0.64,
   "fault_model": {
     "timeout": "no answer: caller's timeout fires; with no timeout it hangs (POST/PUT still reach the server)",
     "refused": "connection refused",

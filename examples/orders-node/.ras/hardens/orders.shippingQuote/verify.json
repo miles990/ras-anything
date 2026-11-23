@@ -115,6 +115,8 @@
     "error": 36,
     "hang": 14,
     "miss": 0,
+    "attempts": 120,
+    "amplification": 1.0,
     "availability": 0.39166666666666666,
     "p50": 0.000459,
     "p99": 60,
@@ -131,13 +133,119 @@
     "error": 0,
     "hang": 0,
     "miss": 0,
+    "attempts": 225,
+    "amplification": 1.875,
     "availability": 1.0,
-    "p50": 0.083532,
-    "p99": 3.51989,
-    "max": 4.448531,
+    "p50": 0.087473,
+    "p99": 3.65089,
+    "max": 4.425531,
     "dups": 0,
     "logged_failures": null,
     "structured_errors": null
+  },
+  "outage": {
+    "healthy": {
+      "calls": 10,
+      "gap_s": 0.5
+    },
+    "down": {
+      "calls": 40,
+      "gap_s": 0.5
+    },
+    "recovered": {
+      "calls": 90,
+      "gap_s": 1.0
+    },
+    "original": {
+      "calls": 40,
+      "attempts": 40,
+      "ok": 0,
+      "degraded": 0,
+      "wrong": 0,
+      "error": 40,
+      "hang": 0,
+      "miss": 0,
+      "amplification": 1.0,
+      "healthy_per_call": 1.0,
+      "max_latency": 0,
+      "recovered_after_s": 0.0,
+      "dups": 0
+    },
+    "hardened": {
+      "calls": 40,
+      "attempts": 200,
+      "ok": 0,
+      "degraded": 0,
+      "wrong": 0,
+      "error": 40,
+      "hang": 0,
+      "miss": 0,
+      "amplification": 5.0,
+      "healthy_per_call": 1.0,
+      "max_latency": 1.231,
+      "recovered_after_s": 0.0,
+      "dups": 0
+    }
+  },
+  "serviceability": {
+    "original": {
+      "runs": 94,
+      "detection_rate": 0.0,
+      "diagnosis_accuracy": 0.0,
+      "ttd_ms_p50": null,
+      "lines_to_diagnosis_p50": null,
+      "restore_s": null
+    },
+    "hardened": {
+      "runs": 94,
+      "detection_rate": 0.9787234042553191,
+      "diagnosis_accuracy": 0.6808510638297872,
+      "ttd_ms_p50": null,
+      "lines_to_diagnosis_p50": 1,
+      "restore_s": null
+    }
+  },
+  "ax": {
+    "observed": {
+      "original": {
+        "cases": 50,
+        "original": {
+          "cases": 50,
+          "accuracy": 0.0,
+          "mean_tokens": 1.0,
+          "mean_steps": 3.0,
+          "leaks": 0
+        },
+        "hardened": {
+          "cases": 50,
+          "accuracy": 0.0,
+          "mean_tokens": 1.0,
+          "mean_steps": 3.0,
+          "leaks": 0
+        }
+      },
+      "hardened": null
+    },
+    "catalog": {
+      "cases": 10,
+      "original": {
+        "cases": 10,
+        "accuracy": 0.3,
+        "mean_tokens": 42.2,
+        "mean_steps": 2.9,
+        "leaks": 40
+      },
+      "hardened": {
+        "cases": 10,
+        "accuracy": 1.0,
+        "mean_tokens": 105.8,
+        "mean_steps": 1.0,
+        "leaks": 0
+      }
+    },
+    "leaks": [
+      "ip"
+    ]
   },
   "gates": {
     "happy": true,
@@ -150,10 +258,10 @@
   },
   "passed": true,
   "fallback": null,
-  "elapsed_s": 0.22,
+  "elapsed_s": 0.65,
   "hardened_sha256": "89a84e3150a9cbf728d5fec43d1f2799487c9560905cf4facf6d78051c637f88",
-  "verified_at": "2026-11-23T13:40:12+0800",
-  "wall_s": 0.22,
+  "verified_at": "2026-11-23T16:49:38+0800",
+  "wall_s": 0.65,
   "fault_model": {
     "timeout": "no answer: caller's timeout fires; with no timeout it hangs (POST/PUT still reach the server)",
     "refused": "connection refused",

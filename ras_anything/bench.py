@@ -161,7 +161,7 @@ def bench(cmd: list[str] | None = None, seeds: int = 20, rate: float = 0.1, mark
                     bench_leaks.extend(ax.scan_leaks(err))
         n_d = len(diags)
         det = sum(1 for d in diags if d.get("detected"))
-        lines_list = sorted(d["lines_to_diagnosis"] for d in diags if d.get("lines_to_diagnosis") is not None)
+        lines_list = sorted(d["lines_read"] for d in diags if d.get("lines_read") is not None)
         ttd_list = sorted(d["ttd_ms"] for d in diags if d.get("ttd_ms") is not None)
         srv_bench[v] = {
             "cases": n_d,

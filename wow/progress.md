@@ -70,7 +70,7 @@
 多語言 adapter（對齊 fast-anything 10 種）、v0.1 缺口、Python 邊界擴充、韌性模式目錄（量測保留／淘汰）、可服務性（MTTD/診斷/還原）、SLI/SLO、旗標／熱更新／模組化／飛航記錄器＋replay＋RCA、爆炸半徑（canary/shadow/隔離/fail-safe）、AI 依賴 adapter、AI 時代工具調研、AX 結構化錯誤＋人類閘門、視覺化資料契約、安裝／README／發佈準備、30 秒新手測試。
 
 
-## 接續點（2026-11-23 14:09 台北時間，HEAD `bdbc197`）
+## 接續點（2026-11-23 16:54 台北時間，S 階段完成）
 
 評審改用 `claude -p --model claude-fable-5-2 --effort high --tools Read`（最多 3 次）。Codex 獨立審查＋測試（未寫被審程式碼）。
 
@@ -89,13 +89,14 @@
 | V-13 量測保留/淘汰 + retry amplification | `cc78a58`：`docs/PATTERNS.md`、`examples/patterns-lab/`、`ras-anything bench --patterns`；seeds 1001–1020 |
 | V-16.1/16.2 + V-17 flags / 熱更新 / canary / shadow / 隔離 / fail-safe | `docs/FLAGS.md`、`examples/flags-hot/`（p50 0.0001s、p99 0.0002s、dropped 0）、`ras-anything flag`、`enable --canary/--shadow`；322 tests OK |
 | Holdout 答案卷（多語言+AI fixtures） | gitignored `wow/work/holdout/`（INDEX-v02.md 已核實跑過） |
+| **S** `build2s` V-8/V-9/V-16.4/V-18 | `adba2d1` `f80aaa6` + 本輪收尾；355 tests OK；weather SLO `missed→met`（6000%→0% burn）、DORA `restore_s=0.1023s`、blind replay `8/8` 重現（`87.5%` RCA）、AX catalog `30%→100%`（0 leaks） |
 
 ### 未完成（按階段；完成一項就 commit+push，並更新本表）
 | 階段 | 規格 | 狀態 | 下一步 |
 |---|---|---|---|
 | **P 餘** | V-13 量測保留/淘汰：`docs/PATTERNS.md`、retry amplification、ON vs OFF 數字、TASK.md 指引 | **完成** | adopted：fallback / deadline / idempotency / retry_budget / retry_after / retry / circuit_breaker / attempt_timeout / jitter。opt-in：bulkhead / adaptive_throttle / adaptive_concurrency / hedge。無 rejected。retry storm 可用性 bare 41.0% → stack 88.1%（breaker）；idempotency 重複寫入 76.5 → 0 |
 | **F** `build2f` | V-16.1 旗標、V-16.2 熱更新（切換延遲、0 丟請求）、V-17 canary/shadow/隔離/fail-safe/爆炸半徑 | **完成**（自動 promote 是 `control.analyse` 純函式，尚未接到長跑服務） | |
-| **S** `build2s` | V-8 可服務性（OTel 日誌、health、RUNBOOK、diagnoser、MTTD/診斷/還原）、V-9 SLI/SLO、V-16.4 飛航記錄器+replay+RCA、V-18 AX 結構化錯誤+人類閘門 | 未開始 | |
+| **S** `build2s` | V-8 可服務性（OTel 日誌、health、RUNBOOK、diagnoser、MTTD/診斷/還原）、V-9 SLI/SLO、V-16.4 飛航記錄器+replay+RCA、V-18 AX 結構化錯誤+人類閘門 | **完成** | 355 tests OK（`adba2d1`、`f80aaa6`＋範例/文件收尾）；weather/payments/orders-node `.ras/slo.json`＋`RUNBOOK.md` 已重生成；`payments`/`orders-node` 舊範例 `logEvent` 仍印原始 `err` URL/路徑待 C/I 後一併清 |
 | **C** `build2c` | Go adapter + `examples/inventory-go/` 實測＋holdout 拒壞加固 | 未開始 | |
 | **E** `build2e` | V-14 AI 依賴 adapter + `examples/support-ai/`（本機 mock，API $0）、V-15 生態決策寫入 docs/AI.md | 未開始 | |
 | **V** `build2v` | V-19 視覺化資料契約（docs/schema、`.ras/out`、export、MCP、dashboard-sample） | 未開始 | |
@@ -107,4 +108,4 @@
 
 HEAD：見最新 main。工作樹應保持可推。中間產物在 `wow/work/`。
 
-接續備註（2026-11-23 15:30 台北時間）：P 餘已推 `cc78a58`；F（旗標／熱更新／canary／shadow／隔離／fail-safe）已測完待推。`wow/work/orchestrate.sh` 仍暫停。下一個：S（可服務性／SLO／飛航記錄器／AX）、然後 C/E/V/I/D、Codex、Fable。
+接續備註（2026-11-23 16:54 台北時間）：S（`build2s`：V-8/V-9/V-16.4/V-18，Python + Node）已完成並推上 `main`（355 tests OK，`phases.done` 已記 `build2s 355`）。`wow/work/orchestrate.sh` 仍暫停（`wow/work/STOP` 保留）。下一個：C（`build2c` Go adapter＋`examples/inventory-go/`）、然後 E/V/I/D、Codex、Fable。

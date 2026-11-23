@@ -6,7 +6,7 @@ import os
 import time
 from pathlib import Path
 
-from . import faults, slo, ui
+from . import cassette, faults, slo, ui
 from .paths import UserError, find_project, load_json
 
 
@@ -319,11 +319,15 @@ def markdown(title: str, data: dict) -> str:
     return "\n".join(out)
 
 
-def _fn_runbook(x: dict) -> str:
+def _fn_runbook(x: dict, project: Path | None = None) -> str:
     fid = x["id"]
     m = x["meta"]
     v = x["verify"]
     deps = v.get("dependencies") or m.get("dependencies") or []
+    if not deps and project is not None:
+        cp = project / ".ras" / "hardens" / fid / "calls.json"
+        if cp.is_file():
+            deps = cassette.dependencies(cassette.load(cp), project)
     lines = [
         "# Runbook: `%s`" % fid,
         "",
@@ -389,7 +393,7 @@ def write_runbooks(project: Path, title: str, data: dict) -> Path:
     for x in hs:
         rb = project / ".ras" / "hardens" / x["id"] / "RUNBOOK.md"
         rb.parent.mkdir(parents=True, exist_ok=True)
-        rb.write_text(_fn_runbook(x), encoding="utf-8")
+        rb.write_text(_fn_runbook(x, project), encoding="utf-8")
 
     lines = [
         "# %s — Operations Runbook" % title,

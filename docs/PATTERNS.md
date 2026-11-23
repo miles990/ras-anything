@@ -330,3 +330,13 @@ A module in `ras_anything/patterns/` with a `PATTERN` and a `Layer`, its name in
 `lang/node_agent/patterns/`. Contract tests (`tests/test_patterns.py`, `tests/test_patterns_parity.py`) cover it: alone it
 passes results and errors through, any module can be missing, same registry in both languages. Then
 `ras-anything bench --patterns` gives its verdict, and a test fails until the module states it.
+
+## Structured errors (RFC 9457) and human gates (AX)
+
+Hardened code and agent callers share a machine-readable failure contract (`ras_anything/patterns/problem.py` and `ras_anything/lang/node_agent/patterns/problem.cjs`), designed so an upstream agent can decide its next step without scraping raw tracebacks or seeing leaked secrets:
+
+- **`RasError(message, cause=..., dependency=..., context=...)`** (Python) / **`new RasError(message, { cause, dependency, context })`** (Node) builds a `.problem` dict aligned with RFC 9457:
+  - `type`: `urn:ras-anything:problem:<cause>` (10 causes: `timeout`, `unavailable`, `rate_limited`, `quota`, `invalid_request`, `auth`, `conflict`, `dependency_bug`, `approval_required`, `unknown`)
+  - `title`, `status`, `detail` (PII/secret/path-masked via `mask()`), `retryable`, `retry_after_s`, `next_action` (`retry_later` | `change_params` | `use_fallback` | `escalate` | `stop`), `trace_id`, `dependency`, `fault_class`, `needs_human_authorization`
+- **`require_approval(action, target, amount=None)`** / **`requireApproval(action, target, { amount })`** checks `.ras/approvals.json` (or `RAS_ANYTHING_APPROVALS`). When an irreversible operation lacks explicit authorization, it raises `ApprovalRequired` with `next_action: "escalate"` and `needs_human_authorization: true`.
+- **Measured AX benchmark** (`ras_anything/ax.py`, 10-cause catalog): deterministic policy-agent next-action accuracy rose from **30.0%** (2.9 mean steps, 40 PII/secret/internal leaks) on plain tracebacks to **100.0%** (1.0 mean step, **0** leaks) on `RasError.problem`.

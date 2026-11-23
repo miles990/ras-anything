@@ -161,6 +161,14 @@ seeded mixes (p=0.3 per attempt). `bench` and `scan` draw faults live from a has
 attempt. In live runs injected waits are scaled ×0.05 (2 s at most), and a call with no timeout counts as hung
 after 2 s. In async code the waits are `asyncio.sleep`, so `asyncio.wait_for` around a call cuts them.
 
+## Serviceability, SLO & forensics
+
+- **OTel JSON diagnostics & W3C `traceparent`**: runtime events emit OpenTelemetry-shaped JSON logs on `stderr` with PII/secret masking (`mask()`), dependency attribution, and W3C `traceparent` headers.
+- **Health, status & runbooks**: `ras-anything status` surfaces `.ras/health.json` (or `health()` in-process), `.ras/slo.json`, and `.ras/incidents/`. `ras-anything report` auto-generates `docs/RUNBOOK.md` and per-function `.ras/hardens/<id>/RUNBOOK.md` ([guide](docs/RUNBOOK.md)).
+- **SLI / SLO & error-budget burn**: `bench --slo availability=99.0,p99=1s,error_rate=1%` and `report --slo ...` compute availability, p99 latency, error rate, and error-budget burn in `.ras/slo.json`. On the `weather` example (20 live-chaos seeds), hardening moves SLO status from `missed` (6000% burn, 40.0% availability) to `met` (0% burn, 100.0% availability).
+- **Flight recorder & deterministic `replay`**: failures write bounded, redacted incident snapshots to `.ras/incidents/<id>.json`. `ras-anything replay <id>` reproduces them on the virtual clock and writes `.ras/out/replay-<id>.json` and `.rca.md` (tested across both Python and Node in `tests/test_forensics.py`).
+- **Agent experience (RFC 9457) & human gates**: `RasError.problem` emits RFC 9457 structured errors with masked detail and `next_action`, plus `require_approval` / `requireApproval` gates for irreversible actions ([details](docs/PATTERNS.md)). On the 10-cause catalog benchmark, deterministic policy-agent accuracy improves from **30.0%** (40 leaks) to **100.0%** (**0** leaks).
+
 ## What it can't do yet
 
 - Languages now: **Python 3.10+** and **Node.js 18+** (TypeScript via Node 22.6+). Next: Go, then Java, C#, PHP, Ruby, Kotlin, C/C++ (fast-anything's list). `bun`/`deno`/`npx`/`tsx`/`ts-node` are detected; use `node app.ts` for TypeScript.
@@ -191,7 +199,7 @@ start with `python`, `python3`, `pypy`, `py`, or `uv`/`poetry`/`pipenv`/`pdm`/`h
 ## Agents
 
 - **Claude Code plugin**: `/plugin marketplace add miles990/ras-anything`, then `/plugin install ras-anything@ras-anything` and `/ras-anything:ras python app.py` (or `node app.mjs`).
-- **MCP server** (stdlib, stdio JSON-RPC): `claude mcp add ras-anything -- ras-anything mcp`. 8 tools: `ras_scan`, `ras_harden`, `ras_verify`, `ras_enable`, `ras_disable`, `ras_bench`, `ras_report`, `ras_status`.
+- **MCP server** (stdlib, stdio JSON-RPC): `claude mcp add ras-anything -- ras-anything mcp`. 10 tools: `ras_scan`, `ras_harden`, `ras_verify`, `ras_enable`, `ras_disable`, `ras_bench`, `ras_report`, `ras_status`, `ras_replay`, `ras_flag`.
 - **Skill**: [`skills/ras-anything`](skills/ras-anything/SKILL.md) teaches any agent the loop.
 - `--agent claude` runs `claude -p --permission-mode acceptEdits` (edits plus `ras-anything verify` allowed) in the harden folder with `TASK.md` on stdin; `--agent codex` runs `codex exec --full-auto`. Anything else is run as a shell command with the task on stdin. `go` gives the agent one retry with the verify failure appended.
 

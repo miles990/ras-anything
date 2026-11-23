@@ -238,7 +238,7 @@ def measure(adapter, project: Path, d: Path, meta: dict, max_chaos: int) -> dict
         "id": meta["id"], "lang": adapter.name, "budget_s": budget, "recorded": len(calls), "happy": happy,
         "chaos": {"calls": len(usable[:max_chaos]), "scenarios": scenarios, "by_scenario": rows, "first_failure": first_bad,
                   "first_original_dup": first_dup, "new_crashes": crashes},
-        "original": o, "hardened": h, "outage": outage, "dependencies": deps,
+        "original": o, "hardened": h, "outage": outage,
         "serviceability": serviceability, "ax": ax_eval,
         "gates": gates, "passed": all(gates.values()), "fallback": raw["fallback"],
         "elapsed_s": round(time.perf_counter() - t0, 2),

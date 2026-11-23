@@ -116,6 +116,8 @@
         "exc_type": null,
         "cause_type": null,
         "structured": false,
+        "problem": null,
+        "stderr": "",
         "state": null,
         "attempts": [
           {
@@ -126,7 +128,8 @@
             "failed": true,
             "idem": null,
             "method": "POST",
-            "nonidempotent": true
+            "nonidempotent": true,
+            "outage": false
           },
           {
             "key": "POST http://127.0.0.1/v1/charges #0a9ac13abd3a",
@@ -136,7 +139,8 @@
             "failed": false,
             "idem": null,
             "method": "POST",
-            "nonidempotent": true
+            "nonidempotent": true,
+            "outage": false
           }
         ],
         "class": "hang",
@@ -145,7 +149,7 @@
       },
       "hardened": {
         "outcome": "return",
-        "latency": 3.51254,
+        "latency": 3.59154,
         "matches": true,
         "is_fallback": false,
         "miss": null,
@@ -156,6 +160,8 @@
         "exc_type": null,
         "cause_type": null,
         "structured": false,
+        "problem": null,
+        "stderr": "{\"Timestamp\":\"1795423800061000000\",\"SeverityText\":\"WARN\",\"SeverityNumber\":13,\"EventName\":\"ras.dependency.failure\",\"TraceId\":\"4f5c9a1d089b80e21c1b494f2a302ab2\",\"SpanId\":\"9561f0e92b17d7bd\",\"Body\":\"charges failed: timeout (attempt 1)\",\"Resource\":{\"service.name\":\"worker.cjs\"},\"Attributes\":{\"error.type\":23,\"ras.fault\":\"timeout\",\"exception.message\":\"The operation was aborted due to timeout\",\"url.template\":\"/v1/charges\",\"http.request.method\":\"POST\",\"ras.dependency\":\"charges\",\"http.request.resend_count\":0,\"ras.duration_s\":3.5,\"code.function\":\"orders.charge\"}}\n{\"Timestamp\":\"1795423800061000000\",\"SeverityText\":\"INFO\",\"SeverityNumber\":9,\"EventName\":\"ras.retry\",\"TraceId\":\"4f5c9a1d089b80e21c1b494f2a302ab2\",\"SpanId\":\"9561f0e92b17d7bd\",\"Body\":\"retry 1 in 0.089s\",\"Resource\":{\"service.name\":\"worker.cjs\"},\"Attributes\":{\"http.request.resend_count\":1,\"ras.retry.delay_s\":0.089,\"ras.dependency\":\"charges\",\"code.function\":\"orders.charge\"}}\n{\"Timestamp\":\"1795423800153000000\",\"SeverityText\":\"INFO\",\"SeverityNumber\":9,\"EventName\":\"ras.dependency.recovered\",\"TraceId\":\"4f5c9a1d089b80e21c1b494f2a302ab2\",\"SpanId\":\"9561f0e92b17d7bd\",\"Body\":\"answered on attempt 2\",\"Resource\":{\"service.name\":\"worker.cjs\"},\"Attributes\":{\"url.template\":\"/v1/charges\",\"http.request.method\":\"POST\",\"ras.dependency\":\"charges\",\"http.request.resend_count\":1,\"code.function\":\"orders.charge\"}}\n",
         "state": null,
         "attempts": [
           {
@@ -166,7 +172,8 @@
             "failed": true,
             "idem": "charge-ORD-2001",
             "method": "POST",
-            "nonidempotent": true
+            "nonidempotent": true,
+            "outage": false
           },
           {
             "key": "POST http://127.0.0.1/v1/charges #0a9ac13abd3a",
@@ -176,7 +183,8 @@
             "failed": false,
             "idem": "charge-ORD-2001",
             "method": "POST",
-            "nonidempotent": true
+            "nonidempotent": true,
+            "outage": false
           }
         ],
         "class": "ok",
@@ -194,6 +202,8 @@
     "error": 0,
     "hang": 14,
     "miss": 0,
+    "attempts": 222,
+    "amplification": 1.85,
     "availability": 0.7833333333333333,
     "p50": 0.3011,
     "p99": 10.30254,
@@ -210,13 +220,104 @@
     "error": 0,
     "hang": 0,
     "miss": 0,
+    "attempts": 234,
+    "amplification": 1.95,
     "availability": 1.0,
-    "p50": 0.094662,
-    "p99": 3.5951,
-    "max": 3.60846,
+    "p50": 0.09846,
+    "p99": 3.59154,
+    "max": 3.77446,
     "dups": 0,
     "logged_failures": null,
     "structured_errors": null
+  },
+  "outage": {
+    "healthy": {
+      "calls": 10,
+      "gap_s": 0.5
+    },
+    "down": {
+      "calls": 40,
+      "gap_s": 0.5
+    },
+    "recovered": {
+      "calls": 90,
+      "gap_s": 1.0
+    },
+    "original": {
+      "calls": 40,
+      "attempts": 120,
+      "ok": 0,
+      "degraded": 0,
+      "wrong": 40,
+      "error": 0,
+      "hang": 0,
+      "miss": 0,
+      "amplification": 3.0,
+      "healthy_per_call": 1.0,
+      "max_latency": 0.9,
+      "recovered_after_s": 0.0,
+      "dups": 0
+    },
+    "hardened": {
+      "calls": 40,
+      "attempts": 200,
+      "ok": 0,
+      "degraded": 40,
+      "wrong": 0,
+      "error": 0,
+      "hang": 0,
+      "miss": 0,
+      "amplification": 5.0,
+      "healthy_per_call": 1.0,
+      "max_latency": 1.231,
+      "recovered_after_s": 0.0,
+      "dups": 0
+    }
+  },
+  "serviceability": {
+    "original": {
+      "runs": 100,
+      "detection_rate": 0.0,
+      "diagnosis_accuracy": 0.0,
+      "ttd_ms_p50": null,
+      "lines_to_diagnosis_p50": null,
+      "restore_s": null
+    },
+    "hardened": {
+      "runs": 100,
+      "detection_rate": 1.0,
+      "diagnosis_accuracy": 0.68,
+      "ttd_ms_p50": null,
+      "lines_to_diagnosis_p50": 1,
+      "restore_s": null
+    }
+  },
+  "ax": {
+    "observed": {
+      "original": null,
+      "hardened": null
+    },
+    "catalog": {
+      "cases": 10,
+      "original": {
+        "cases": 10,
+        "accuracy": 0.3,
+        "mean_tokens": 42.2,
+        "mean_steps": 2.9,
+        "leaks": 40
+      },
+      "hardened": {
+        "cases": 10,
+        "accuracy": 1.0,
+        "mean_tokens": 105.8,
+        "mean_steps": 1.0,
+        "leaks": 0
+      }
+    },
+    "leaks": [
+      "ip",
+      "url"
+    ]
   },
   "gates": {
     "happy": true,
@@ -229,10 +330,10 @@
   },
   "passed": true,
   "fallback": "callable",
-  "elapsed_s": 0.22,
+  "elapsed_s": 0.71,
   "hardened_sha256": "005f32d54363a271037e148dc0c96bc370e1bf4d099e9d1845d8c04c41a65cad",
-  "verified_at": "2026-11-23T13:41:16+0800",
-  "wall_s": 0.22,
+  "verified_at": "2026-11-23T16:49:36+0800",
+  "wall_s": 0.71,
   "fault_model": {
     "timeout": "no answer: caller's timeout fires; with no timeout it hangs (POST/PUT still reach the server)",
     "refused": "connection refused",
