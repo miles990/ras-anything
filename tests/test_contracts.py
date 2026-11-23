@@ -158,3 +158,37 @@ class DoctorStatusRegression(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class LanguageSwitch(unittest.TestCase):
+    """A language is a component: it can be switched off by name without editing code (docs/adr/0003)."""
+
+    def test_off_by_name(self):
+        from ras_anything import lang
+
+        self.assertEqual(lang.switched_off(" java, go ,"), {"java", "go"})
+        self.assertEqual(lang.switched_off(""), set())
+        names = [a.name for a in lang.enabled(lang.ALL_ADAPTERS, {"java"})]
+        self.assertNotIn("java", names)
+        self.assertIn("python", names)
+
+    def test_env_switch_in_a_fresh_process(self):
+        import os
+        import subprocess
+        import sys
+
+        env = dict(os.environ, RAS_ANYTHING_LANGUAGES_OFF="go")
+        out = subprocess.run([sys.executable, "-c", "from ras_anything import lang; print(','.join(a.name for a in lang.ADAPTERS))"],
+                             env=env, capture_output=True, text=True, check=True).stdout.strip().split(",")
+        self.assertNotIn("go", out)
+        self.assertIn("python", out)
+
+
+class EveryLanguageModuleIsDiscovered(unittest.TestCase):
+    """Each lang/<module>.py that defines an adapter is found by discover(): python, node, golang, java today."""
+
+    def test_modules(self):
+        from ras_anything import lang
+
+        modules = {type(a).__module__.rsplit(".", 1)[-1] for a in lang.BUILTIN}
+        self.assertTrue({"python", "node", "golang"} <= modules, modules)

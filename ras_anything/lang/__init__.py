@@ -1,9 +1,10 @@
 """Language adapters and which one a command belongs to.
 
-To add a language: write lang/<name>.py with a LangAdapter subclass and an agent that follows
-docs/ARCHITECTURE.md, and list it in ADAPTERS (CONTRIBUTING.md has the checklist). A language can also live in a
-package of its own: it registers its adapter class under the entry-point group
+To add a language: write lang/<name>.py with a LangAdapter subclass and lang/<name>_agent/ that follows
+docs/ARCHITECTURE.md; discover() finds it, nothing here lists it (CONTRIBUTING.md has the checklist). A language can
+also live in a package of its own: it registers its adapter class under the entry-point group
 contracts.LANGUAGE_ENTRY_POINT_GROUP and ras-anything finds it without any change here (docs/adr/0002).
+RAS_ANYTHING_LANGUAGES_OFF=java,go switches languages off by name (docs/adr/0003).
 """
 
 from __future__ import annotations
@@ -63,7 +64,20 @@ def plugins(group: str = LANGUAGE_ENTRY_POINT_GROUP) -> list[LangAdapter]:
     return found
 
 
-ADAPTERS: list[LangAdapter] = BUILTIN + plugins()
+def switched_off(env: str | None = None) -> set[str]:
+    """Language names turned off with RAS_ANYTHING_LANGUAGES_OFF (comma-separated)."""
+    import os
+
+    raw = os.environ.get("RAS_ANYTHING_LANGUAGES_OFF", "") if env is None else env
+    return {n.strip() for n in raw.split(",") if n.strip()}
+
+
+def enabled(adapters: list[LangAdapter], off: set[str]) -> list[LangAdapter]:
+    return [a for a in adapters if a.name not in off]
+
+
+ALL_ADAPTERS: list[LangAdapter] = BUILTIN + plugins()
+ADAPTERS: list[LangAdapter] = enabled(ALL_ADAPTERS, switched_off())
 
 # Recognized, but no adapter here yet.
 PLANNED = {"bun": "Bun", "deno": "Deno"}
