@@ -23,6 +23,7 @@ from ras_anything.verify import verify
 from tests.test_pipeline import FIX, REPO, Project, quiet
 
 JDK = bool(shutil.which("java") and shutil.which("javac"))
+HOLDOUT_JAVA = REPO / "wow" / "work" / "holdout" / "java"
 CMD = ["java", "-Xmx200m", "-Dx=y", "-cp", "classes", "shop.Main", "one"]
 
 HEAD = """package shop;
@@ -462,6 +463,149 @@ class ShippingExampleTest(unittest.TestCase):
                 self.assertEqual(v[k]["availability"], json.loads((self.EX / ".ras/hardens/shipping.Labels.labelCode/verify.json").read_text())[k]["availability"])
         finally:
             p.close()
+
+
+
+@unittest.skipUnless(JDK, "needs a JDK")
+class MavenGradleLayoutTest(unittest.TestCase):
+    """Maven (target/classes) and Gradle (build/classes/java/main) compiled classpaths with src/main/java layout."""
+
+    APP = """package com.acme;
+import com.sun.net.httpserver.HttpServer;
+import java.net.*;
+import java.net.http.*;
+public class App {
+    static String fetch(String base) throws Exception {
+        HttpClient c = HttpClient.newHttpClient();
+        var r = c.send(HttpRequest.newBuilder(URI.create(base + "/ok")).GET().build(), HttpResponse.BodyHandlers.ofString());
+        if (r.statusCode() != 200) throw new java.io.IOException("http " + r.statusCode());
+        return r.body();
+    }
+    public static void main(String[] args) throws Exception {
+        var s = HttpServer.create(new InetSocketAddress("127.0.0.1", 0), 0);
+        s.createContext("/ok", x -> { byte[] b = "hello".getBytes(); x.sendResponseHeaders(200, b.length); x.getResponseBody().write(b); x.close(); });
+        s.start();
+        try { System.out.println(fetch("http://127.0.0.1:" + s.getAddress().getPort())); } finally { s.stop(0); }
+    }
+}
+"""
+
+    def test_maven_and_gradle_class_dirs(self):
+        for marker, out_rel in (("pom.xml", "target/classes"), ("build.gradle", "build/classes/java/main")):
+            with tempfile.TemporaryDirectory() as td:
+                proj = Path(td)
+                src = proj / "src" / "main" / "java" / "com" / "acme" / "App.java"
+                src.parent.mkdir(parents=True)
+                src.write_text(self.APP, encoding="utf-8")
+                (proj / marker).write_text("// layout marker\n", encoding="utf-8")
+                (proj / out_rel).mkdir(parents=True)
+                subprocess.run(["javac", "-d", str(proj / out_rel), str(src)], check=True, capture_output=True)
+                cwd = os.getcwd()
+                os.chdir(proj)
+                try:
+                    with quiet():
+                        sc = scan(["java", "-cp", out_rel, "com.acme.App"], seeds=1, quiet=True)
+                        h = harden("com.acme.App.fetch", quiet=True)
+                    self.assertEqual(sc["lang"], "java")
+                    self.assertEqual(sc["functions"][0]["id"], "com.acme.App.fetch")
+                    self.assertEqual(h["recorded"], 1)
+                finally:
+                    os.chdir(cwd)
+
+
+@unittest.skipUnless(JDK and HOLDOUT_JAVA.is_dir(), "needs a JDK and wow/work/holdout/java")
+class JavaHoldoutPipelineTest(unittest.TestCase):
+    GOOD_RAS = r"""
+import java.io.*;
+import java.net.URI;
+import java.net.http.*;
+import java.time.Duration;
+import java.util.Map;
+import _ras_hardened.RasRt;
+
+final class Hardened {
+    private static final RasRt.Policy BEANS = RasRt.policy("beans")
+            .deadline(Duration.ofMillis(2400)).attemptTimeout(Duration.ofMillis(1200)).attempts(4);
+    private static final RasRt.Policy ROASTS = RasRt.policy("roasts")
+            .deadline(Duration.ofMillis(2400)).attemptTimeout(Duration.ofMillis(1200)).attempts(4);
+
+    static Result target(String base, String item) throws Exception {
+        HttpClient c = HttpClient.newHttpClient();
+        int stock = BEANS.call(a -> {
+            var res = RasRt.check(c.send(a.apply(HttpRequest.newBuilder(URI.create(base + "/beans/" + item))).GET().build(), HttpResponse.BodyHandlers.ofString()));
+            if (res.statusCode() != 200) throw new IllegalArgumentException("HTTP " + res.statusCode());
+            @SuppressWarnings("unchecked")
+            Map<String, Object> m = (Map<String, Object>) RasRt.parseJson(res.body());
+            return ((Long) m.get("available")).intValue();
+        });
+        int n = Math.max(0, 10 - stock);
+        String body = "{\"item\":\"" + item + "\",\"quantity\":" + n + "}";
+        String oid = ROASTS.call("POST", RasRt.idempotencyKey("roast", item, n), a -> {
+            var res = RasRt.check(c.send(a.apply(HttpRequest.newBuilder(URI.create(base + "/roasts"))).POST(HttpRequest.BodyPublishers.ofString(body)).build(), HttpResponse.BodyHandlers.ofString()));
+            if (res.statusCode() != 200) throw new IOException("POST HTTP " + res.statusCode());
+            @SuppressWarnings("unchecked")
+            Map<String, Object> m = (Map<String, Object>) RasRt.parseJson(res.body());
+            return (String) m.get("id");
+        });
+        return new Result(item, stock, n, oid);
+    }
+}
+"""
+
+    def setUp(self):
+        self._tmp = tempfile.TemporaryDirectory()
+        self.proj = Path(self._tmp.name) / "holdout_java"
+        shutil.copytree(HOLDOUT_JAVA, self.proj)
+        for c in self.proj.glob("*.class"):
+            c.unlink()
+        self._cwd = os.getcwd()
+        os.chdir(self.proj)
+
+    def tearDown(self):
+        os.chdir(self._cwd)
+        self._tmp.cleanup()
+
+    def test_holdout_positive_and_four_bad_hardenings_rejected(self):
+        orig_sha = hashlib.sha256((self.proj / "App.java").read_bytes()).hexdigest()
+        with quiet():
+            sc = scan(["java", "App.java"], seeds=2, quiet=True)
+        self.assertEqual(sc["lang"], "java")
+        self.assertEqual(sc["functions"][0]["id"], "App.target")
+        with quiet():
+            h = harden("App.target", quiet=True)
+        self.assertEqual(h["recorded"], 1)
+        hp = self.proj / ".ras" / "hardens" / "App.target" / "hardened.java"
+
+        hp.write_text(self.GOOD_RAS, encoding="utf-8")
+        with quiet():
+            vg = verify("App.target", quiet=True)
+        self.assertTrue(vg["passed"], vg.get("fatal") or vg.get("gates"))
+        self.assertEqual(vg["ax"]["leaks"], [])
+        self.assertGreater(vg["hardened"]["availability"], vg["original"]["availability"])
+
+        with quiet():
+            enable("App.target", quiet=True)
+        r_en = subprocess.run(["java", "App.java"], cwd=self.proj, capture_output=True, text=True, check=True)
+        r_dis = subprocess.run(["java", "App.java"], cwd=self.proj, env={**os.environ, "RAS_ANYTHING_DISABLE": "1"},
+                               capture_output=True, text=True, check=True)
+        self.assertEqual(r_en.stdout.strip(), r_dis.stdout.strip())
+        with quiet():
+            dis = disable("App.target", quiet=True)
+        self.assertTrue(dis["restored"])
+        self.assertEqual(hashlib.sha256((self.proj / "App.java").read_bytes()).hexdigest(), orig_sha)
+
+        bads = {
+            "swallow": ("no_wrong", "static Result target(String b, String i) throws Exception { return swallow(b, i); }"),
+            "retryPost": ("dups", "static Result target(String b, String i) throws Exception { return retryPost(b, i); }"),
+            "changeOutput": ("happy", "static Result target(String b, String i) throws Exception { return changeOutput(b, i); }"),
+            "fakeFallback": ("no_wrong", "static Result target(String b, String i) throws Exception { return fakeFallback(b, i); }"),
+        }
+        for name, (gate, body) in bads.items():
+            hp.write_text("final class Hardened {\n    " + body + "\n}\n", encoding="utf-8")
+            with quiet():
+                vb = verify("App.target", quiet=True)
+            self.assertFalse(vb["passed"], f"holdout {name} unexpectedly passed")
+            self.assertFalse(vb["gates"][gate], f"holdout {name} expected {gate}=False, got {vb['gates']}")
 
 
 if __name__ == "__main__":

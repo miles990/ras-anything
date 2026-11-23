@@ -101,12 +101,29 @@
 | **E** `build2e` | V-14 AI 依賴 adapter + `examples/support-ai/`（本機 mock，API $0）、V-15 生態決策寫入 docs/AI.md | **完成** | `examples/support-ai/` verify（`support.triage_ticket` 9.9%→100.0%，semantic 9.9%→100.0%，injection 100.0%，cost/ok $0.000188→$0.000055，0 leaks）、bench 20 seeds **50.0% → 100.0%**（crashes 40%→0%、hangs 10%→0%、SLO 4/4 met）、`drift` `small→backup` PASS（100%）、`docs/AI.md`（V-14/V-15）、Node parity、holdout 5/5 壞加固全拒、367 tests OK |
 | **V** `build2v` | V-19 視覺化資料契約（docs/schema、`.ras/out`、export、MCP、dashboard-sample） | **部分完成（核心契約可用）** | `docs/schema/`（draft 2020-12 `ras-run`/`ras-event` + `README.md`）、`.ras/out/` 寫出、`ras-anything export`（`json`/`ndjson`/`prom`/`otlp-json`）、MCP `ras_export` + `ras_events`、`examples/dashboard-sample/` + `docs/cards/dashboard-sample.png`（已修服務性跨函式彙總 `7.1%` 與 SLO Target 欄）。佔位保留項：`mttd_s`/`mttr_s`/`restore_s`、`breakers`/`bulkheads`、`ax.records` 仍為空值，events 目前寫出 4 種里程碑事件 |
 | **I** `build2i` | V-6 `./install.sh`+`make install`、雙用途 README、skill 複製到 ~/.claude 與 ~/.codex、MCP/plugin 驗證、V-11 `docs/RELEASE.md`（不公開、不上架） | **完成** | `./install.sh`／`make install`（pipx 或 `~/.local/share/ras-anything` venv + `~/.local/bin` shim，冪等、`--uninstall`）；skill 複製到 `~/.claude/skills` 與 `~/.codex/skills` 並在乾淨暫存 HOME 驗證兩邊讀得到；MCP `initialize` + 12 tools 啟動通過；plugin 清單可載入（未對外上架）；`docs/RELEASE.md` 只寫流程（Alex gate，未公開、未 `twine upload`）；本機 `twine check` sdist+wheel **PASSED**（wheel 含 node_agent 與 go_agent）；證據 `wow/proof/install-clean-home.md`；383 tests OK |
-| **D** `build2d` | 其餘 fast-anything 語言：Java、C#、PHP、Ruby、Kotlin、bun/deno、C/C++（各 adapter+範例+測試+holdout；做不完要在覆蓋表寫原因與下一步） | 未開始 | |
+| **D** `build2d` | 其餘 fast-anything 語言：Java、Kotlin/JVM、C#/.NET 8+、PHP 8.1+、Ruby 3.3+、Bun/Deno 2+、C、C++、R（各 adapter+範例+測試+holdout；做不完要在覆蓋表寫原因與下一步） | **進行中（Java 完成）** | `build2d-java` 完成（`ecd9852` + holdout 4/4 拒收 + Maven/Gradle 目錄測試）：`examples/shipping-java/` verify `fetchRate` 31.7%→100.0% / `bookShipment` 38.3%→100.0% / `labelCode` 35.0%→98.3%（0 leaks）、bench 20 seeds **0.0% → 100.0%**（identical 0%→100%、crashes 95%→0%、hangs 5%→0%、dups 0→0、p99 2.66s→3.25s）、enable/disable 逐位元組還原；其餘語言未開始（見下方覆蓋表） |
 | **W3** V-10 | 新手 30 秒／首次結果計時（只給 README 的盲測 agent） | **完成** | `12.10s`（`0` 次猜錯，讀 `README.md` → `ras-anything scan -- python app.py`），證據 `wow/proof/w3-blind-timer.md`（haiku 盲測，CLI 已預裝） |
 | **審查** | Codex 獨立跑測試+兩邊範例+安裝+嘗試破壞；判決 SHIP/FIX-FIRST；修 P0/P1 再跑一次 | **完成** | r1 `FIX-FIRST`（2 P0 + 1 P1 + 1 P2，已於 `cab2582` 全修）；r2 驗證 4 項全修＋3 項對抗繞過全拒＋381 tests OK，唯餘 1 P2 `agent.log` 路徑已於 `2071425` 修畢並補測試 |
 | **評審** | Fable 5-2（`--model claude-fable-5-2 --effort high --tools Read`）最多 3 次 | **完成** | `fable-v02-r1` 與 `fable-v02-r2` 皆評 **達成**（7/7 關通過附保留，無阻塞項），並已依 r2 補齊 `verify.py` AI 故障數、setuptools>=77、`install-clean-home.md` 重產、383 tests OK |
 
 HEAD：見最新 main。工作樹應保持可推。中間產物在 `wow/work/`。
+
+### 語言覆蓋表（對齊 fast-anything Languages 表）
+| 語言（fast-anything 版本下限） | 狀態 | 支援／不支援啟動方式與邊界 | 實測證據／無法支援原因與下一步 |
+|---|---|---|---|
+| Python 3.10+ | **完成** | `python`、`uv`/`poetry`/`pipenv`/`pdm`/`hatch`/`rye run`；`urllib`、`requests`、`httpx`、`aiohttp`、`subprocess`、`socket.create_connection`、AI HTTP | `examples/weather`、`examples/payments`、`examples/support-ai` |
+| JS/TS（Node 22+） | **完成** | `node`（CJS/ESM/TS）；`fetch`、`http`/`https`、`child_process`、AI HTTP | `examples/orders-node`；`npx`/`tsx`/`ts-node` 偵測提示改用 `node` |
+| JS/TS（Bun / Deno 2+） | **planned（已偵測）** | 僅偵測並提示改用 `node app.ts`；未接 `Bun.spawn` / `Deno.Command` | Stage D 待做 |
+| Go 1.22+ | **完成** | `go run .` / `go run ./cmd/...` / 編譯執行檔；`net/http`、`os/exec` | `examples/inventory-go`（5.0%→100.0%）、holdout 4/4 拒收 |
+| Java 22+（`java App.java`、Maven、Gradle） | **完成（`java App.java` / `-cp` / `-jar`）；Maven/Gradle 直接啟動未支援** | 支援 `java App.java`、`java -cp DIR Main`（含 `src/main/java` + `target/classes` / `build/classes/java/main`）、`java -jar app.jar`（實測 OpenJDK 21.0.13，adapter 檢查 ≥17）；`HttpClient`、`HttpURLConnection`、`ProcessBuilder`/`Runtime.exec`。**不支援直接執行 `mvn`/`mvnw`/`gradle`/`gradlew`**：僅偵測並提示先編譯再以 `java -cp` 啟動 | `examples/shipping-java`（0.0%→100.0%）、holdout 4/4 拒收；Maven/Gradle 直接啟動未實作原因：本機未安裝 `mvn`/`gradle` 且未接外部依賴 JAR 解析與 Gradle daemon 注入；下一步：若環境補齊 `mvn`/`gradle`，加入 dependency classpath 解析與 wrapper 子程序/daemon 接管 |
+| Kotlin/JVM | **planned** | 預計 `HttpClient` / `OkHttp` / `ProcessBuilder` | Stage D 待做 |
+| C# / .NET 8+ | **planned** | 預計 `HttpClient` / `Process` | Stage D 待做 |
+| PHP 8.1+ | **planned** | 預計 `curl` / `file_get_contents` / `proc_open` | Stage D 待做 |
+| Ruby 3.3+ | **planned** | 預計 `Net::HTTP` / `Open3` | Stage D 待做 |
+| C | **planned** | 預計 `libcurl` / `popen` | Stage D 待做 |
+| C++ | **planned** | 預計 `libcurl` / `popen` | Stage D 待做 |
+| R | **planned** | 預計 `httr2` / `curl` / `system2` | Stage D 待做（新增對齊 fast-anything Languages 表） |
+
 
 ### v0.2 核心範圍贏面表（Python / Node / Go + AI；Stage D 刻意延後）
 | 關 | 狀態 | 關鍵證據 |

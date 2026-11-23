@@ -839,11 +839,12 @@ public final class Agent {
             }
             idle = quiescent() ? idle + 1 : 0;
             if (idle < 3) continue;
-            idle = 0;
             if (clock.pump(deadline < 0 ? Long.MAX_VALUE : deadline)) {
+                idle = 0;
                 if (clock.now() - t.start > nanos(hangCapS * 20)) hangNow(t, "the call kept running");
                 continue;
             }
+            if (!clock.hasEvents() && idle < 40) continue;
             if (deadline < 0) vhang("waiting for a future that never completes");
             clock.advanceTo(deadline);
             throw new TimeoutException();

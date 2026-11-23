@@ -270,21 +270,23 @@ The visualization contract for `.ras/out/` is in [docs/schema/](docs/schema/READ
 | language | status | how to launch | boundaries intercepted |
 |---|---|---|---|
 | Python 3.10+ | complete | `python` / `python3` / `pypy` / `py`, or `uv`/`poetry`/`pipenv`/`pdm`/`hatch`/`rye run` | `urllib`, `requests`, `httpx`, `aiohttp`, `subprocess`, `socket.create_connection`; OpenAI-/Anthropic-shaped AI HTTP |
-| Node.js 18+ (TypeScript via Node 22.6+ type stripping) | complete | `node` (flags such as `--import` / `--experimental-strip-types` are fine) | `fetch`, `http` / `https`, `child_process` (CJS + ESM + TS); OpenAI-/Anthropic-shaped AI HTTP |
+| JS/TS: Node 22+ (runtime 18+; TS via Node 22.6+) | complete | `node` (flags such as `--import` / `--experimental-strip-types` are fine) | `fetch`, `http` / `https`, `child_process` (CJS + ESM + TS); OpenAI-/Anthropic-shaped AI HTTP |
+| JS/TS: Bun / Deno 2+ | detected, not yet run | start with `node` for TypeScript today | `fetch` / `Bun.spawn` or `Deno.Command` (planned) |
 | Go 1.22+ | complete | `go run .` / `go run ./cmd/...` or a compiled binary | `net/http`, `os/exec` |
-| Java 17+ (JDK) | complete (static methods) | `java App.java`, `java -cp DIR Main` or `java -jar app.jar` (JVM options are fine); quickstart: `ras-anything scan -- java -cp out shop.Main` | `HttpClient`, `HttpURLConnection`, `ProcessBuilder` / `Runtime.exec` |
-| C# | planned | — | `HttpClient` / `Process` |
-| PHP | planned | — | `curl` / `file_get_contents` / `proc_open` |
-| Ruby | planned | — | `Net::HTTP` / `Open3` |
-| Kotlin | planned | — | `HttpClient` / `OkHttp` / `ProcessBuilder` |
-| Bun / Deno | detected, not yet run | start with `node` for TypeScript today | `fetch` / `Bun.spawn` or `Deno.Command` (planned) |
-| C / C++ | planned | — | `libcurl` / `popen` |
+| Java 22+ (runtime enforces 17+; tested on OpenJDK 21) | complete (static methods; `mvn`/`gradle` direct launch not supported) | `java App.java`, `java -cp DIR Main` (incl. Maven `target/classes` / Gradle `build/classes/java/main` after compile), or `java -jar app.jar` (`mvn`/`gradle` detected with hint) | `HttpClient`, `HttpURLConnection`, `ProcessBuilder` / `Runtime.exec` |
+| Kotlin/JVM | planned | — | `HttpClient` / `OkHttp` / `ProcessBuilder` |
+| C# / .NET 8+ | planned | — | `HttpClient` / `Process` |
+| PHP 8.1+ | planned | — | `curl` / `file_get_contents` / `proc_open` |
+| Ruby 3.3+ | planned | — | `Net::HTTP` / `Open3` |
+| C | planned | — | `libcurl` / `popen` |
+| C++ | planned | — | `libcurl` / `popen` |
+| R | planned | — | `httr2` / `curl` / `system2` |
 
-`bun` / `deno` / `npx` / `tsx` / `ts-node` are detected and currently refused with a clear next step; use `node app.ts` for TypeScript. Anything else gets an error saying what to run instead.
+`bun` / `deno` / `npx` / `tsx` / `ts-node` and `mvn` / `mvnw` / `gradle` / `gradlew` are detected and currently refused with a clear next step (for TypeScript use `node app.ts`; for Maven/Gradle compile first and run `java -cp target/classes Main` or `build/classes/java/main Main`). Anything else gets an error saying what to run instead.
 
 ## Next languages
 
-C#, PHP, Ruby, Kotlin, Bun/Deno and C/C++ are the remaining fast-anything parity targets (stage D). Each needs an adapter, a measured example, tests, and a holdout that rejects bad hardening. Until then the coverage table above is the source of truth.
+C# (.NET 8+), PHP 8.1+, Ruby 3.3+, Kotlin/JVM, Bun/Deno 2+, C, C++, and R are the remaining fast-anything parity targets (stage D). Each needs an adapter, a measured example, tests, and a holdout that rejects bad hardening. Until then the coverage table above is the source of truth.
 
 ## Tests
 

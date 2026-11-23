@@ -25,6 +25,7 @@ ALL_LANGUAGES = (
     ("bun", "planned", "fetch / Bun.spawn", False, False),
     ("deno", "planned", "fetch / Deno.Command", False, False),
     ("c_cpp", "planned", "libcurl / popen", False, False),
+    ("r", "planned", "httr2 / curl / system2", False, False),
 )
 
 

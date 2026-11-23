@@ -17,6 +17,10 @@ final class VClock {
         queue.clear();
     }
 
+    synchronized boolean hasEvents() {
+        return !queue.isEmpty();
+    }
+
     synchronized Event schedule(long at, Runnable run) {
         Event e = new Event(Math.max(at, now), seq++, run);
         queue.add(e);

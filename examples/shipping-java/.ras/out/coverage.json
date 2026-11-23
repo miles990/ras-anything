@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0.0",
   "kind": "coverage",
-  "generated_at": "2026-11-23T19:32:15+0800",
+  "generated_at": "2026-11-23T19:47:26+0800",
   "project": "shipping-java",
   "coverage": {
     "adapters": [
@@ -79,6 +79,13 @@
         "lang": "c_cpp",
         "status": "planned",
         "boundary": "libcurl / popen",
+        "verify": false,
+        "ax": false
+      },
+      {
+        "lang": "r",
+        "status": "planned",
+        "boundary": "httr2 / curl / system2",
         "verify": false,
         "ax": false
       }

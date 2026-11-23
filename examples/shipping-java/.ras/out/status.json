@@ -1,69 +1,14 @@
 {
   "schema_version": "1.0.0",
   "kind": "status",
-  "generated_at": "2026-11-23T19:32:15+0800",
+  "generated_at": "2026-11-23T19:47:26+0800",
   "project": "shipping-java",
   "lang": "java",
   "rollout": {
-    "enabled": {
-      "shipping.Carrier.fetchRate": {
-        "lang": "java",
-        "file": "src/shipping/Carrier.java",
-        "offset": 1786,
-        "inserted": "\n    // ras-anything:start shipping.Carrier.fetchRate;\n    // Hardened by ras-anything; verified 2026-11-23 on 6 recorded calls\n    // (availability under faults 31.7% -> 100.0%).\n    // Undo: `ras-anything disable shipping.Carrier.fetchRate`. RAS_ANYTHING_DISABLE=1 runs the original.\n    static final class _Ras_fetchRate {\n        // A slow (3 s) answer still fits one attempt, and a hung one leaves room for a second.\n        private static final shipping._ras_hardened.RasRt.Policy RATES = shipping._ras_hardened.RasRt.policy(\"carrier-rates\")\n                .deadline(java.time.Duration.ofMillis(4500)).attemptTimeout(java.time.Duration.ofMillis(3300)).attempts(4);\n\n        // No RAS_FALLBACK: callers book and bill at this rate, so a made-up or stale one is worse than an error.\n        static Rate fetchRate(String base, Parcel p) throws IOException, InterruptedException {\n            URI uri = URI.create(base + \"/v1/rates?zip=\" + p.zip() + \"&grams=\" + p.grams());\n            try {\n                return RATES.call(a -> {\n                    HttpResponse<String> res = shipping._ras_hardened.RasRt.check(send(a, uri));\n                    if (res.statusCode() != 200) throw new IOException(\"rates answered \" + res.statusCode());\n                    return rate(shipping._ras_hardened.RasRt.parseJson(res.body())); // strict: a cut-off body is retried\n                });\n            } catch (shipping._ras_hardened.RasRt.RasError e) { // gave up, already logged; still an IOException to callers\n                throw new shipping._ras_hardened.RasRt.RasIOException(e.getMessage(), e.getCause(), \"carrier-rates\");\n            } catch (IOException | InterruptedException | RuntimeException e) {\n                throw e;\n            } catch (Exception e) { // Policy.call declares Exception; nothing here throws another checked one\n                throw new IOException(e);\n            }\n        }\n\n        /** One attempt. The request's timeout ends at the headers, so the wait for the body is bounded as well. */\n        private static HttpResponse<String> send(shipping._ras_hardened.RasRt.Attempt a, URI uri) throws Exception {\n            java.util.concurrent.CompletableFuture<HttpResponse<String>> res =\n                    HTTP.sendAsync(a.apply(HttpRequest.newBuilder(uri)).build(), HttpResponse.BodyHandlers.ofString());\n            try {\n                return res.get(a.timeout().toNanos(), java.util.concurrent.TimeUnit.NANOSECONDS);\n            } catch (java.util.concurrent.ExecutionException e) {\n                throw e.getCause() instanceof Exception cause ? cause : e;\n            } finally {\n                res.cancel(true); // gave up waiting: drop the connection (no effect once answered)\n            }\n        }\n\n        /** A complete answer without a usable rate is the carrier's bug: an error, not retried. */\n        private static Rate rate(Object body) throws IOException {\n            if (body instanceof Map<?, ?> m && m.get(\"service\") instanceof String service\n                    && m.get(\"cents\") instanceof Long cents && cents >= 0 && cents <= Integer.MAX_VALUE)\n                return new Rate(service, cents.intValue());\n            throw new shipping._ras_hardened.RasRt.RasIOException(\"rates answered without a usable rate\", null, \"carrier-rates\");\n        }\n    }\n\n    static Rate fetchRate(String base, Parcel p) throws IOException, InterruptedException {\n        if (shipping._ras_hardened.RasRt.disabled(\"shipping.Carrier.fetchRate\")) return _ras_orig_fetchRate(base, p);\n        return shipping._ras_hardened.RasRt.<Rate, RuntimeException>observe(\"shipping.Carrier.fetchRate\", new String[][] {{\"rates\", \"http\"}}, () -> _Ras_fetchRate.fetchRate(base, p));\n    }\n    // ras-anything:end shipping.Carrier.fetchRate;\n",
-        "sha_before": "743dcbf828c16616b5a75b5e2ac2b530f967883c3f96df3f0b11b0aba53a3e82",
-        "file_sha_before": "743dcbf828c16616b5a75b5e2ac2b530f967883c3f96df3f0b11b0aba53a3e82",
-        "sha_after": "52cd772a3bb764c93aff282ed1ad4822e5319458f76b9243adb0cbabbe9fa066",
-        "hardened_sha256": "8bc9b11e438372f4dc4e37f58e0734efcc41ab4f0ca7cd0c3aa993006ef25278",
-        "copy": "src/shipping/_ras_hardened/shipping__Carrier__fetchRate.java.txt",
-        "patches": [
-          [
-            "    static Rate fetchRate(String base, Parcel p) throws IOException, InterruptedException {",
-            "    static Rate _ras_orig_fetchRate(String base, Parcel p) throws IOException, InterruptedException {"
-          ]
-        ],
-        "enabled_at": "2026-11-23T19:31:16+0800"
-      },
-      "shipping.Carrier.bookShipment": {
-        "lang": "java",
-        "file": "src/shipping/Carrier.java",
-        "offset": 5564,
-        "inserted": "\n    // ras-anything:start shipping.Carrier.bookShipment;\n    // Hardened by ras-anything; verified 2026-11-23 on 6 recorded calls\n    // (availability under faults 38.3% -> 100.0%).\n    // Undo: `ras-anything disable shipping.Carrier.bookShipment`. RAS_ANYTHING_DISABLE=1 runs the original.\n    static final class _Ras_bookShipment {\n        // A slow (3 s) answer still fits one attempt, and a hung one leaves room for a second.\n        private static final shipping._ras_hardened.RasRt.Policy SHIPMENTS = shipping._ras_hardened.RasRt.policy(\"carrier-shipments\")\n                .deadline(java.time.Duration.ofMillis(4500)).attemptTimeout(java.time.Duration.ofMillis(3300)).attempts(4);\n\n        // No RAS_FALLBACK: without the carrier's tracking number there is no booking to report.\n        static Booking bookShipment(String base, Parcel p, Rate r) throws IOException, InterruptedException {\n            URI uri = URI.create(base + \"/v1/shipments\");\n            String body = String.format(\"{\\\"order\\\": \\\"%s\\\", \\\"zip\\\": \\\"%s\\\", \\\"service\\\": \\\"%s\\\"}\", p.order(), p.zip(), r.service());\n            // A lost answer may be a booking already made (and charged): every attempt, and a later rerun, carries this key.\n            String key = shipping._ras_hardened.RasRt.idempotencyKey(\"shipment\", p.order(), p.zip(), r.service());\n            try {\n                return SHIPMENTS.call(\"POST\", key, a -> {\n                    HttpResponse<String> res = shipping._ras_hardened.RasRt.check(send(a, uri, body));\n                    if (res.statusCode() != 201) throw new IOException(\"shipments answered \" + res.statusCode());\n                    return booking(p, shipping._ras_hardened.RasRt.parseJson(res.body())); // strict: a cut-off body is asked for again\n                });\n            } catch (shipping._ras_hardened.RasRt.RasError e) { // gave up, already logged; still an IOException to callers\n                throw new shipping._ras_hardened.RasRt.RasIOException(e.getMessage(), e.getCause(), \"carrier-shipments\");\n            } catch (IOException | InterruptedException | RuntimeException e) {\n                throw e;\n            } catch (Exception e) { // Policy.call declares Exception; nothing here throws another checked one\n                throw new IOException(e);\n            }\n        }\n\n        /** One attempt. The request's timeout ends at the headers, so the wait for the body is bounded as well. */\n        private static HttpResponse<String> send(shipping._ras_hardened.RasRt.Attempt a, URI uri, String body) throws Exception {\n            HttpRequest req = a.apply(HttpRequest.newBuilder(uri)) // Idempotency-Key and timeout\n                    .header(\"Content-Type\", \"application/json\")\n                    .POST(HttpRequest.BodyPublishers.ofString(body))\n                    .build();\n            java.util.concurrent.CompletableFuture<HttpResponse<String>> res = HTTP.sendAsync(req, HttpResponse.BodyHandlers.ofString());\n            try {\n                return res.get(a.timeout().toNanos(), java.util.concurrent.TimeUnit.NANOSECONDS);\n            } catch (java.util.concurrent.ExecutionException e) {\n                throw e.getCause() instanceof Exception cause ? cause : e;\n            } finally {\n                res.cancel(true); // gave up waiting: drop the connection (no effect once answered)\n            }\n        }\n\n        /** A complete answer without a tracking number is the carrier's bug: an error, not retried. */\n        private static Booking booking(Parcel p, Object body) throws IOException {\n            if (body instanceof Map<?, ?> m && m.get(\"tracking\") instanceof String tracking && !tracking.isBlank())\n                return new Booking(p.order(), tracking);\n            throw new shipping._ras_hardened.RasRt.RasIOException(\"shipments answered without a tracking number\", null, \"carrier-shipments\");\n        }\n    }\n\n    static Booking bookShipment(String base, Parcel p, Rate r) throws IOException, InterruptedException {\n        if (shipping._ras_hardened.RasRt.disabled(\"shipping.Carrier.bookShipment\")) return _ras_orig_bookShipment(base, p, r);\n        return shipping._ras_hardened.RasRt.<Booking, RuntimeException>observe(\"shipping.Carrier.bookShipment\", new String[][] {{\"shipments\", \"http\"}}, () -> _Ras_bookShipment.bookShipment(base, p, r));\n    }\n    // ras-anything:end shipping.Carrier.bookShipment;\n",
-        "sha_before": "52cd772a3bb764c93aff282ed1ad4822e5319458f76b9243adb0cbabbe9fa066",
-        "file_sha_before": "743dcbf828c16616b5a75b5e2ac2b530f967883c3f96df3f0b11b0aba53a3e82",
-        "sha_after": "1eb223220b753963399928de5455896a63a7e7b9bb0df65c71f5d92b2c5b6862",
-        "hardened_sha256": "21cc3920ccc291d0ee0f8ca2112624e7bbef41df8b73f676fcff45c4e9e0a7ff",
-        "copy": "src/shipping/_ras_hardened/shipping__Carrier__bookShipment.java.txt",
-        "patches": [
-          [
-            "    static Booking bookShipment(String base, Parcel p, Rate r) throws IOException, InterruptedException {",
-            "    static Booking _ras_orig_bookShipment(String base, Parcel p, Rate r) throws IOException, InterruptedException {"
-          ]
-        ],
-        "enabled_at": "2026-11-23T19:31:16+0800"
-      },
-      "shipping.Labels.labelCode": {
-        "lang": "java",
-        "file": "src/shipping/Labels.java",
-        "offset": 651,
-        "inserted": "\n    // ras-anything:start shipping.Labels.labelCode;\n    // Hardened by ras-anything; verified 2026-11-23 on 6 recorded calls\n    // (availability under faults 35.0% -> 98.3%).\n    // Undo: `ras-anything disable shipping.Labels.labelCode`. RAS_ANYTHING_DISABLE=1 runs the original.\n    static final class _Ras_labelCode {\n        // No RAS_FALLBACK: a made-up label code would be printed on a parcel, so a give-up is a structured error.\n        private static final String TOOL = \"label-tool\";\n\n        // Computing a label changes nothing, so it can be repeated. A slow run (3 s) fits in one attempt, and a hung one leaves time for a second.\n        private static final shipping._ras_hardened.RasRt.Policy LABELS = shipping._ras_hardened.RasRt.policy(TOOL).deadline(java.time.Duration.ofMillis(4500)).attemptTimeout(java.time.Duration.ofMillis(3300)).attempts(4);\n\n        // \"<checksum> <bytes>\\n\": the newline comes last, so output without it was cut off.\n        private static final java.util.regex.Pattern OUTPUT = java.util.regex.Pattern.compile(\"(\\\\d+) \\\\d+\\\\R\");\n\n        static String labelCode(String tracking) throws IOException, InterruptedException {\n            try {\n                return LABELS.call(a -> codeIn(shipping._ras_hardened.RasRt.run(a, \"sh\", \"tools/label.sh\", tracking)));\n            } catch (shipping._ras_hardened.RasRt.RasError e) {\n                // Already logged by the policy. Callers know this function's failures as IOException.\n                throw new shipping._ras_hardened.RasRt.RasIOException(e.getMessage(), e.getCause(), TOOL);\n            } catch (IOException | InterruptedException | RuntimeException e) {\n                throw e;\n            } catch (Exception e) { // Policy.call declares it; nothing above throws another checked exception\n                throw new IOException(e);\n            }\n        }\n\n        private static String codeIn(shipping._ras_hardened.RasRt.Result r) throws IOException {\n            if (r.code != 0) throw new IOException(\"label tool exited \" + r.code);\n            java.util.regex.Matcher m = OUTPUT.matcher(r.stdout);\n            if (!m.matches()) throw new shipping._ras_hardened.RasRt.BadBodyException(\"label tool output is incomplete\");\n            return m.group(1);\n        }\n    }\n\n    static String labelCode(String tracking) throws IOException, InterruptedException {\n        if (shipping._ras_hardened.RasRt.disabled(\"shipping.Labels.labelCode\")) return _ras_orig_labelCode(tracking);\n        return shipping._ras_hardened.RasRt.<String, RuntimeException>observe(\"shipping.Labels.labelCode\", new String[][] {{\"label.sh\", \"subprocess\"}}, () -> _Ras_labelCode.labelCode(tracking));\n    }\n    // ras-anything:end shipping.Labels.labelCode;\n",
-        "sha_before": "b05a345b928cfb01616a58061dbe98f63acfc2f6bb0d8a8631b9eb5260b22ce8",
-        "file_sha_before": "b05a345b928cfb01616a58061dbe98f63acfc2f6bb0d8a8631b9eb5260b22ce8",
-        "sha_after": "69fd0cdc7bf3d45da8fca2668ee07ff754064e93b392d4c24491b257a1b8f400",
-        "hardened_sha256": "6df5eae18951c4dcbe190cf223b7e984ceb661231c6fedd1cedd7429f540d02b",
-        "copy": "src/shipping/_ras_hardened/shipping__Labels__labelCode.java.txt",
-        "patches": [
-          [
-            "    static String labelCode(String tracking) throws IOException, InterruptedException {",
-            "    static String _ras_orig_labelCode(String tracking) throws IOException, InterruptedException {"
-          ]
-        ],
-        "enabled_at": "2026-11-23T19:31:16+0800"
-      }
-    },
-    "canary_pct": 100.0,
+    "enabled": {},
+    "canary_pct": 0.0,
     "shadow": false,
-    "blast_radius_functions": 3
+    "blast_radius_functions": 0
   },
   "resilience_state": {
     "breakers": {},
