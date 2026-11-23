@@ -1,5 +1,5 @@
 
-===== 2026-11-23 03:40:06  claude -p --permission-mode acceptEdits --allowedTools 'Read,Edit,Write,Glob,Grep,Bash(ras-anything verify:*),Bash(ras-anything status:*)' --add-dir /workspace/ras-anything/examples/weather --model opus
+===== 2026-11-23 03:40:06  claude -p --permission-mode acceptEdits --allowedTools 'Read,Edit,Write,Glob,Grep,Bash(ras-anything verify:*),Bash(ras-anything status:*)' --add-dir . --model opus
 `ras-anything verify weather.fetch_forecast` prints **PASS** on the first run. The only file I changed is `hardened.py`.
 
 | gate | original | hardened |

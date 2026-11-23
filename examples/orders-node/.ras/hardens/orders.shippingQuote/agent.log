@@ -1,5 +1,5 @@
 
-===== 2026-11-23 13:39:04  claude -p --permission-mode acceptEdits --allowedTools 'Read,Edit,Write,Glob,Grep,Bash(ras-anything verify:*),Bash(ras-anything status:*)' --add-dir /workspace/ras-anything/examples/orders-node --model opus
+===== 2026-11-23 13:39:04  claude -p --permission-mode acceptEdits --allowedTools 'Read,Edit,Write,Glob,Grep,Bash(ras-anything verify:*),Bash(ras-anything status:*)' --add-dir . --model opus
 `ras-anything verify orders.shippingQuote` prints **PASS**, and I edited only `hardened.mjs` in the task folder. Nothing is enabled.
 
 | gate | original | hardened |

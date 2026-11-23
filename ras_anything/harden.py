@@ -268,4 +268,6 @@ def run_agent(agent: str, d: Path, project: Path, model: str | None = None, extr
         p = subprocess.run(cmd, shell=shell, cwd=str(d), input=prompt, text=True, stdout=log, stderr=subprocess.STDOUT,
                            env=env, timeout=3600)
         log.write("\n===== exit %d after %.0fs\n" % (p.returncode, time.perf_counter() - t0))
+    log_path = d / "agent.log"
+    log_path.write_text(scrub(log_path.read_text(encoding="utf-8", errors="replace"), project), encoding="utf-8")
     return p.returncode

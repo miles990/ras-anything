@@ -207,5 +207,15 @@ class SchemaExportTests(unittest.TestCase):
             self.assertNotIn("Traceback", r2.stderr)
             self.assertIn("corrupt JSON", r2.stdout + r2.stderr)
 
+
+    def test_no_private_workspace_or_home_paths_in_examples_or_cards(self):
+        for base in (ROOT / "examples", ROOT / "docs" / "cards"):
+            for p in sorted(base.rglob("*")):
+                if not p.is_file() or p.suffix in (".png", ".pyc") or ".ras/runs/" in p.as_posix() or "__pycache__" in p.parts:
+                    continue
+                txt = p.read_text(encoding="utf-8", errors="ignore")
+                self.assertNotIn("/workspace/", txt, f"private /workspace/ path in {p}")
+                self.assertNotIn("/home/", txt, f"private /home/ path in {p}")
+
 if __name__ == "__main__":
     unittest.main()

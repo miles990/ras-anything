@@ -1,5 +1,5 @@
 
-===== 2026-11-23 03:41:13  claude -p --permission-mode acceptEdits --allowedTools 'Read,Edit,Write,Glob,Grep,Bash(ras-anything verify:*),Bash(ras-anything status:*)' --add-dir /workspace/ras-anything/examples/payments --model opus
+===== 2026-11-23 03:41:13  claude -p --permission-mode acceptEdits --allowedTools 'Read,Edit,Write,Glob,Grep,Bash(ras-anything verify:*),Bash(ras-anything status:*)' --add-dir . --model opus
 `ras-anything verify billing.charge` printed **PASS** on the first run. I only changed `hardened.py`. Nothing was enabled, and the original source, `calls.pkl` and `meta.json` weren't touched.
 
 | gate | original | hardened |

@@ -1,7 +1,7 @@
 
-===== 2026-11-23 13:27:48  claude -p --permission-mode acceptEdits --allowedTools 'Read,Edit,Write,Glob,Grep,Bash(ras-anything verify:*),Bash(ras-anything status:*)' --add-dir /workspace/ras-anything/examples/orders-node --model opus
+===== 2026-11-23 13:27:48  claude -p --permission-mode acceptEdits --allowedTools 'Read,Edit,Write,Glob,Grep,Bash(ras-anything verify:*),Bash(ras-anything status:*)' --add-dir . --model opus
 
-===== 2026-11-23 13:38:23  claude -p --permission-mode acceptEdits --allowedTools 'Read,Edit,Write,Glob,Grep,Bash(ras-anything verify:*),Bash(ras-anything status:*)' --add-dir /workspace/ras-anything/examples/orders-node --model opus
+===== 2026-11-23 13:38:23  claude -p --permission-mode acceptEdits --allowedTools 'Read,Edit,Write,Glob,Grep,Bash(ras-anything verify:*),Bash(ras-anything status:*)' --add-dir . --model opus
 `ras-anything verify orders.getItem` prints **PASS**. I edited only `hardened.mjs` and enabled nothing.
 
 | gate | original | hardened |
