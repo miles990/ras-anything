@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:ras-anything:schema:flags:1",
+  "title": "ras-anything .ras/flags.json (OpenFeature flagd-compatible subset)",
+  "description": "The file people (ras-anything flag set, or by hand) and agents (MCP ras_flag, or by hand) both edit. Saved sorted and indented so git diff shows each side's changes. See docs/FLAGS.md.",
+  "type": "object",
+  "required": ["flags"],
+  "properties": {
+    "$schemaVersion": {"type": ["integer", "string"]},
+    "$schema": {"type": "string"},
+    "flags": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["state", "variants", "defaultVariant"],
+        "properties": {
+          "state": {"enum": ["ENABLED", "DISABLED"]},
+          "variants": {"type": "object"},
+          "defaultVariant": {"type": "string"},
+          "targeting": {"type": "object"}
+        }
+      }
+    }
+  }
+}

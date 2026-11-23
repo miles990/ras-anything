@@ -1,0 +1,22 @@
+{
+  "$schemaVersion": 1,
+  "flags": {
+    "ras.pattern.retry": {
+      "state": "ENABLED",
+      "variants": {
+        "on": true,
+        "off": false
+      },
+      "defaultVariant": "off"
+    },
+    "ras.enable.weather.fetch_forecast": {
+      "state": "ENABLED",
+      "variants": {
+        "off": 0,
+        "on": 100,
+        "value": 5
+      },
+      "defaultVariant": "value"
+    }
+  }
+}

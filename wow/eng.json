@@ -1,0 +1,168 @@
+{
+ "roots": [
+  "ras_anything"
+ ],
+ "exclude": [
+  "ras_anything/lang/*_agent/*"
+ ],
+ "layers": [
+  [
+   "ras_anything.cli",
+   "ras_anything.mcp",
+   "ras_anything.__main__"
+  ],
+  [
+   "ras_anything.go",
+   "ras_anything.scan",
+   "ras_anything.harden",
+   "ras_anything.verify",
+   "ras_anything.enable",
+   "ras_anything.bench",
+   "ras_anything.report",
+   "ras_anything.replay",
+   "ras_anything.drift",
+   "ras_anything.diagnose",
+   "ras_anything.doctor",
+   "ras_anything.export",
+   "ras_anything.lab",
+   "ras_anything.slo",
+   "ras_anything.ax",
+   "ras_anything.judge",
+   "ras_anything.runner",
+   "ras_anything.hardens"
+  ],
+  [
+   "ras_anything.lang"
+  ],
+  [
+   "ras_anything.agents"
+  ],
+  [
+   "ras_anything.signals",
+   "ras_anything.cassette",
+   "ras_anything.ai"
+  ],
+  [
+   "ras_anything.faults",
+   "ras_anything.flags",
+   "ras_anything.control"
+  ],
+  [
+   "ras_anything.runtime",
+   "ras_anything.patterns"
+  ],
+  [
+   "ras_anything.paths",
+   "ras_anything.ui",
+   "ras_anything.contracts",
+   "ras_anything"
+  ]
+ ],
+ "independent": [
+  [
+   [
+    "ras_anything.lang.python",
+    "ras_anything.lang.python_static"
+   ],
+   [
+    "ras_anything.lang.node",
+    "ras_anything.lang.node_static"
+   ],
+   [
+    "ras_anything.lang.golang",
+    "ras_anything.lang.go_static",
+    "ras_anything.lang.go_verify"
+   ],
+   [
+    "ras_anything.lang.java",
+    "ras_anything.lang.java_static",
+    "ras_anything.lang.java_verify"
+   ]
+  ]
+ ],
+ "lang": "python",
+ "entry": [
+  "ras_anything/cli.py",
+  "ras_anything/__main__.py",
+  "ras_anything/mcp.py"
+ ],
+ "core": [
+  "ras_anything/runtime.py",
+  "ras_anything/patterns/policy.py",
+  "ras_anything/contracts.py",
+  "ras_anything/paths.py",
+  "ras_anything/lang/base.py",
+  "ras_anything/lang/__init__.py",
+  "ras_anything/patterns/__init__.py",
+  "ras_anything/cli.py",
+  "ras_anything/mcp.py",
+  "ras_anything/export.py"
+ ],
+ "shells": [
+  "ras_anything.cli",
+  "ras_anything.mcp",
+  "ras_anything.__main__"
+ ],
+ "library": "ras_anything.runtime",
+ "libraryPath": ".",
+ "components": [
+  {
+   "kind": "language adapter",
+   "dir": "ras_anything/lang",
+   "match": "^(?!base\\.|.*_(static|verify)\\.).*\\.py$",
+   "discovery": "auto",
+   "tests": "tests",
+   "toggle": "RAS_ANYTHING_LANGUAGES_OFF=<name>"
+  },
+  {
+   "kind": "resilience pattern",
+   "dir": "ras_anything/patterns",
+   "match": "^(?!policy\\.|problem\\.|recorder\\.).*\\.py$",
+   "discovery": "auto",
+   "tests": "tests",
+   "toggle": "ras-anything flag set ras.pattern.<name> off"
+  }
+ ],
+ "change": {
+  "scenarios": [
+   {
+    "name": "add export format cloudevents (fc0f734)",
+    "range": "fc0f734^..fc0f734",
+    "extensionDirs": [
+     "ras_anything/export.py",
+     "ras_anything/contracts.py",
+     "README.md",
+     "docs/**",
+     "tests/**"
+    ]
+   }
+  ]
+ },
+ "coedit": {
+  "text": [
+   {
+    "file": "docs/examples/flags.json",
+    "schema": "docs/schema/ras-flags.schema.json"
+   }
+  ],
+  "review": [
+   "CHANGELOG.md",
+   "docs/adr"
+  ]
+ },
+ "rel": {
+  "projects": [
+   "examples/weather"
+  ]
+ },
+ "common": {
+  "sharedRuntime": [
+   "wow",
+   "wow-*",
+   "@wow/*"
+  ]
+ },
+ "thresholds": {
+  "maxFanOut": 12
+ }
+}

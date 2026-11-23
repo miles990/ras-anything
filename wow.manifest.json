@@ -1,0 +1,133 @@
+{
+  "$schema": "urn:wow:schema:manifest:1",
+  "manifestVersion": "1",
+  "name": "ras-anything",
+  "version": "0.1.0",
+  "description": "Find the functions that break when dependencies misbehave, harden only those, prove it on recorded calls, and swap them in reversibly.",
+  "license": "MIT",
+  "homepage": "https://github.com/miles990/ras-anything",
+  "entrypoints": {
+    "cli": {
+      "command": [
+        "ras-anything"
+      ],
+      "jsonFlag": "--json",
+      "errorsAsProblemJson": true
+    },
+    "mcp": {
+      "transport": "stdio",
+      "command": [
+        "ras-anything",
+        "mcp"
+      ]
+    },
+    "skill": "skills/ras-anything/SKILL.md",
+    "plugin": ".claude-plugin/plugin.json"
+  },
+  "skills": [
+    {
+      "id": "export",
+      "name": "Export measured results",
+      "description": "Every .ras/out snapshot (scan, verify, bench, SLO, report, status) plus the event timeline as one JSON bundle.",
+      "tags": [
+        "reliability",
+        "availability",
+        "slo",
+        "telemetry",
+        "wow:evidence"
+      ],
+      "outputModes": [
+        "application/json"
+      ],
+      "cli": [
+        "export",
+        "--format",
+        "json"
+      ],
+      "mcpTool": "ras_export",
+      "output": {
+        "mediaType": "application/json",
+        "schema": "docs/schema/ras-run.schema.json",
+        "schemaVersion": "1.0.0"
+      },
+      "evidence": {
+        "availability": "/snapshots/report/bench/hardened/availability",
+        "slo": "/snapshots/slo/slo/hardened/status",
+        "verified": "/snapshots/report/functions/0/passed"
+      }
+    },
+    {
+      "id": "events",
+      "name": "Event timeline",
+      "description": "Faults, breaker transitions, canary steps, promotions and rollbacks as CloudEvents 1.0, one JSON object per line.",
+      "tags": [
+        "events",
+        "cloudevents",
+        "telemetry"
+      ],
+      "outputModes": [
+        "application/cloudevents+json"
+      ],
+      "cli": [
+        "export",
+        "--format",
+        "cloudevents"
+      ],
+      "mcpTool": "ras_export"
+    },
+    {
+      "id": "scan",
+      "name": "Scan under chaos",
+      "description": "Run the app clean and under seeded dependency faults; rank functions by risk x exposure x hardenability.",
+      "tags": [
+        "chaos",
+        "reliability"
+      ],
+      "inputModes": [
+        "text/x-shell-command"
+      ],
+      "mcpTool": "ras_scan"
+    },
+    {
+      "id": "verify",
+      "name": "Verify a hardened function",
+      "description": "Replay recorded calls on a virtual clock: happy path must be identical, then the fault matrix, original vs hardened.",
+      "tags": [
+        "reliability",
+        "verification"
+      ],
+      "mcpTool": "ras_verify"
+    },
+    {
+      "id": "status",
+      "name": "Project status",
+      "description": "What is scanned, hardened, verified and enabled; flags, health, SLO and the next step.",
+      "tags": [
+        "status"
+      ],
+      "mcpTool": "ras_status"
+    }
+  ],
+  "errors": {
+    "mediaType": "application/problem+json",
+    "typeBase": "urn:ras-anything:problem:"
+  },
+  "events": {
+    "format": "cloudevents-1.0+json",
+    "source": "urn:ras-anything:project:<name>",
+    "types": [
+      "dev.ras-anything.scan.completed",
+      "dev.ras-anything.verify.passed",
+      "dev.ras-anything.bench.completed"
+    ],
+    "cli": [
+      "export",
+      "--format",
+      "cloudevents"
+    ]
+  },
+  "conformsTo": {
+    "wow-common": "1.0",
+    "wow-interop": "1.0"
+  }
+}
