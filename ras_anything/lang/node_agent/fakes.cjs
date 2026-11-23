@@ -154,7 +154,7 @@ class FakeClientRequest extends Writable {
     this.headersSent = true;
     cb();
     if (!this._headers.has("content-length") && this._chunks.length) this.setHeader("Content-Length", this._chunks.reduce((n, c) => n + c.length, 0));
-    this._send(this, Buffer.concat(this._chunks));
+    process.nextTick(() => this.destroyed || this._send(this, Buffer.concat(this._chunks))); // (req.setTimeout may follow http.get())
   }
 
   onCancel(fn) {

@@ -282,6 +282,8 @@ class Faulting {
   }
 }
 
+const earliest = (s, known) => (known && (s === null || known.s < s) ? known.s : s);
+
 let handler = new Watcher();
 let busy = false; // inside an original that calls another patched function
 
@@ -413,11 +415,13 @@ function httpPatch(protocol, name, getter) {
     function send(fake, body) {
       const headers = Object.fromEntries(Object.entries(fake.getHeaders()).map(([k, v]) => [k, String(v)]));
       const r = httpReq("http", fake.method, url.href, body, headers);
+      const known = timeoutOf(options.signal);
       const ctl = {
         where: null, timer: null,
-        get timeoutS() { return fake.timeoutMs === null ? null : fake.timeoutMs / 1000; },
+        get timeoutS() { return earliest(fake.timeoutMs === null ? null : fake.timeoutMs / 1000, known); },
         get cancelled() { return fake.destroyed; },
         fire() {
+          if (known && (fake.timeoutMs === null || known.s * 1000 < fake.timeoutMs)) return known.fire();
           clearTimeout(ctl.timer);
           fake.emit("timeout");
         },
@@ -526,10 +530,11 @@ function launch(file, args, options, req, live) {
   child.pid = 4_000_000;
   const { signal } = options;
   const timedOut = () => child.kill(options.killSignal ?? "SIGTERM");
+  const known = timeoutOf(signal);
   const ctl = {
-    where: null, timeoutS: req.timeout,
+    where: null, timeoutS: earliest(req.timeout, known),
     get cancelled() { return child.done; },
-    fire: timedOut,
+    fire: () => (known && (req.timeout === null || known.s < req.timeout) ? known.fire() : timedOut()),
     onCancel: (fn) => child.onCancel(fn),
     outcome: () => ({ returncode: null, signal: child.signalCode ?? "SIGTERM", stdout: Buffer.alloc(0), stderr: Buffer.alloc(0) }),
   };
