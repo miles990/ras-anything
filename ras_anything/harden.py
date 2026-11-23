@@ -115,7 +115,9 @@ Recorded examples:
    hangs is a hard fail. Budget the attempts so worst case stays under {budget:g} s.
 3. **Retry only transient failures**: timeouts, connection errors, HTTP 408/425/429/500/502/503/504
    (honour `Retry-After`), {tx['transient']}. Exponential
-   backoff with full jitter. **Never retry other 4xx** or programming errors.
+   backoff with full jitter. **Never retry other 4xx** or programming errors. Retries must not
+   multiply an outage: use a `Policy` (below), whose retry budget and circuit breaker cap them;
+   verify reports the attempts per call under faults and with the dependency down.
 4. **Idempotency.** Never send a POST/PUT/PATCH/DELETE twice unless every attempt carries the same
    `Idempotency-Key` header, derived deterministically from the logical operation (e.g. the invoice
    id), not random per attempt. A timed-out POST may already have taken effect.

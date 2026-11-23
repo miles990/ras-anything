@@ -54,6 +54,7 @@ __all__ = [
     "remaining_s",
     "is_transient",
     "dependency_failed",
+    "not_accepted",
     "log_event",
     "trace_id",
     "new_trace_id",
@@ -295,10 +296,16 @@ def is_transient(exc: BaseException) -> bool:
     return False
 
 
-def dependency_failed(exc: BaseException) -> bool:
-    """Does this error say the dependency is in trouble? (what breakers and throttles count: transient errors,
-    but not our own deadline running out before the dependency was asked)"""
+def not_accepted(exc: BaseException) -> bool:
+    """Did the dependency not take this request? (what throttles and concurrency limits count: transient errors, but
+    not our own deadline running out before the dependency was asked)"""
     return is_transient(exc) and not isinstance(exc, DeadlineExceeded)
+
+
+def dependency_failed(exc: BaseException) -> bool:
+    """Is the dependency in trouble? (what circuit breakers count: not_accepted, except a 429: it is up, and asks us to
+    come back later)"""
+    return not_accepted(exc) and _http_status(exc) != 429
 
 
 def note(e: BaseException, text: str) -> None:

@@ -17,7 +17,7 @@ class AdaptiveConcurrency:
     accepts multiplies the limit by `backoff` (at most once per limit's worth of calls), within [min, max]."""
 
     def __init__(self, initial: float = 20.0, min_limit: float = 1.0, max_limit: float = 200.0, backoff: float = 0.7,
-                 name: str = "dependency", count=rt.dependency_failed):
+                 name: str = "dependency", count=rt.not_accepted):
         self.initial, self.min_limit, self.max_limit, self.backoff = float(initial), float(min_limit), float(max_limit), backoff
         self.name, self.count = name, count
         self._lock = threading.Lock()
@@ -87,7 +87,8 @@ class AdaptiveConcurrencyLayer(Layer):
 
 
 PATTERN = Pattern(
-    name="adaptive_concurrency", title="Adaptive concurrency limit (AIMD)", order=100, verdict=OPT_IN, why="",
+    name="adaptive_concurrency", title="Adaptive concurrency limit (AIMD)", order=100, verdict=OPT_IN,
+    hint="learns how many calls may be in flight.",
     params={"initial": 20.0, "min_limit": 1.0, "max_limit": 200.0, "backoff": 0.7}, layer=AdaptiveConcurrencyLayer,
     exports=("AdaptiveConcurrency", "ConcurrencyLimitError"),
     refs=("Netflix concurrency-limits (AIMD)", "Google SRE ch.22: limit in-flight requests", "Release It! 2e: Governor, Create Back Pressure"))

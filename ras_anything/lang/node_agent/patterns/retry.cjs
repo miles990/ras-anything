@@ -35,7 +35,7 @@ function stepper({ attempts = 3, baseMs = 100, capMs = 2000, budgetMs, retryOn =
       const ra = retryAfter(err);
       if (ra !== null) delay = Math.max(delay, ra * 1000);
       if (core.nowMs() + delay >= end) return null;
-      if (retryBudget && !retryBudget.trySpend()) return null;
+      if (retryBudget && ra === null && !retryBudget.trySpend()) return null;
       onRetry?.(n, err, delay);
       return delay;
     },
@@ -46,8 +46,8 @@ function stepper({ attempts = 3, baseMs = 100, capMs = 2000, budgetMs, retryOn =
  *
  *  Backoff is full jitter, at least the server's Retry-After. timeoutMs bounds each attempt (pass `signal` on),
  *  budgetMs the whole, and so does a withDeadline() around it: attempts are cut to what is left and no wait crosses it.
- *  With a retryBudget (RetryBudget, shared by all calls of a dependency) a retry also needs a token. The last error is
- *  rethrown as is. */
+ *  With a retryBudget (RetryBudget, shared by all calls of a dependency) a retry also needs a token, unless the server
+ *  itself asked for it with Retry-After. The last error is rethrown as is. */
 async function retry(fn, options = {}) {
   const { timeoutMs } = options;
   const step = stepper(options);
@@ -90,9 +90,10 @@ class RetryLayer extends core.Layer {
       } catch (e) {
         if (n >= p.attempts || !call.repeatable || !(retryOn(e) || call.retryRules.some((r) => r(e)))) throw e;
         delay = jitter(n, p.baseMs, p.capMs, p.fullJitter);
+        call.invited = false;
         for (const rule of call.delayRules) delay = rule(e, delay);
         if (call.deadline !== null && core.nowMs() + delay >= call.deadline) throw e;
-        if (!call.retryGates.every((gate) => gate())) throw e;
+        if (!call.invited && !call.retryGates.every((gate) => gate())) throw e;
       }
       yield ["sleep", delay];
     }

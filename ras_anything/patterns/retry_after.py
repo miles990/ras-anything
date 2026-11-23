@@ -33,14 +33,22 @@ def retry_after_s(exc: BaseException) -> float | None:
 
 
 class RetryAfterLayer(Layer):
-    """Makes the retry layer's wait at least what the server asked for (a wait past the deadline ends the call)."""
+    """Makes the retry layer's wait at least what the server asked for (a wait past the deadline ends the call). Such
+    a retry is the server's own plan, so it doesn't need a token of the retry budget."""
 
     def run(self, call, inner):
-        call.delay_rules.append(lambda e, delay: max(delay, rt.retry_after_s(e) or 0.0))
+        def rule(e, delay):
+            asked = rt.retry_after_s(e)
+            call.invited = asked is not None
+            return delay if asked is None else max(delay, asked)
+
+        call.delay_rules.append(rule)
         return (yield from inner(call))
 
 
 PATTERN = Pattern(
-    name="retry_after", title="Honour Retry-After (429/503)", order=60, verdict=ADOPTED, why="", params={},
+    name="retry_after", title="Honour Retry-After (429/503)", order=60, verdict=ADOPTED,
+    hint="waits as long as a 429/503 asks, or gives up at once if that is past the deadline. Nothing to do.",
+    params={},
     layer=RetryAfterLayer, exports=("retry_after_s",),
     refs=("RFC 9110 section 10.2.3", "AWS REL05-BP02: Throttle requests", "Polly v8: retry ShouldRetryAfterHeader"))

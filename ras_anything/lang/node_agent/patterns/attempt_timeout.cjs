@@ -11,7 +11,9 @@ function attemptTimeout(ms) {
   return ms === undefined ? left : Math.min(ms, left);
 }
 
-/** Sets attempt.timeoutMs; the async driver enforces it, synchronous code gives it to the boundary call. */
+/** Sets attempt.timeoutMs; the async driver enforces it, synchronous code gives it to the boundary call. An attempt that ran
+ *  out of time with less than half of its timeout left by the deadline ends in DeadlineExceeded: that says the caller was
+ *  late, nothing about the dependency. */
 class AttemptTimeoutLayer extends core.Layer {
   * run(call, inner) {
     const before = call.timeoutMs;
@@ -21,8 +23,15 @@ class AttemptTimeoutLayer extends core.Layer {
       if (left <= 0) throw new core.DeadlineExceeded(`no time left for an attempt of ${this.dependency}`);
       call.timeoutMs = Math.min(call.timeoutMs, left);
     }
+    const given = call.timeoutMs;
+    const start = core.nowMs();
     try {
       return yield* inner(call);
+    } catch (e) {
+      if (given < this.params.timeoutMs / 2 && core.nowMs() - start >= given * 0.99 && core.isTransient(e)) {
+        throw Object.assign(new core.DeadlineExceeded(`the deadline left only ${Math.round(given)} ms for an attempt of ${this.dependency}`), { cause: e });
+      }
+      throw e;
     } finally {
       call.timeoutMs = before;
     }

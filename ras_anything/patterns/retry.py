@@ -16,7 +16,8 @@ def retry(fn, *, attempts: int = 3, base: float = 0.1, cap: float = 2.0, budget_
     server's Retry-After when it sent one. `budget_s` bounds the total time, and so does a
     deadline() around it: a retry whose wait would cross either is not attempted, and
     attempt_timeout() inside fn is cut to what is left. With a
-    `retry_budget` (RetryBudget, shared by all calls of a dependency) a retry also needs a token.
+    `retry_budget` (RetryBudget, shared by all calls of a dependency) a retry also needs a token,
+    unless the server itself asked for it with Retry-After.
     The last error is re-raised unchanged (same type), with a note listing the attempts.
     `retry_on` is a predicate or a tuple of exception types. `sleep` defaults to time.sleep looked
     up at call time.
@@ -96,7 +97,7 @@ def _backoff(attempts, base, cap, budget_s, retry_on, on_retry, retry_budget):
         if left is not None and delay >= left:
             rt.note(e, "ras retry: stopped after %d attempt(s), the deadline comes first" % n)
             return None
-        if retry_budget is not None and not retry_budget.try_spend():
+        if retry_budget is not None and ra is None and not retry_budget.try_spend():
             rt.note(e, "ras retry: stopped after %d attempt(s), retry budget used up" % n)
             return None
         if on_retry is not None:
@@ -119,20 +120,23 @@ class RetryLayer(Layer):
                 if n >= p["attempts"] or not call.repeatable or not (retry_on(e) or any(r(e) for r in call.retry_rules)):
                     raise
                 delay = jitter(n, p["base_s"], p["cap_s"], p["full_jitter"])
+                call.invited = False
                 for rule in call.delay_rules:
                     delay = rule(e, delay)
                 if call.deadline is not None and rt._now() + delay >= call.deadline:
                     rt.note(e, "ras retry: stopped after %d attempt(s), the deadline comes first" % n)
                     raise
-                if not all(gate() for gate in call.retry_gates):
+                if not call.invited and not all(gate() for gate in call.retry_gates):
                     rt.note(e, "ras retry: stopped after %d attempt(s), retry budget used up" % n)
                     raise
             yield ("sleep", delay)
 
 
 PATTERN = Pattern(
-    name="retry", title="Retry with backoff and full jitter", order=70, verdict=ADOPTED, why="",
+    name="retry", title="Retry with backoff and full jitter", order=70, verdict=ADOPTED,
+    hint="transient errors only, exponential backoff, full jitter.",
     params={"attempts": 3, "base_s": 0.1, "cap_s": 2.0, "full_jitter": True, "retry_on": None},
     layer=RetryLayer, exports=("retry", "aretry", "is_transient"),
-    refs=("AWS Builders' Library: Timeouts, retries, and backoff with jitter", "Google SRE ch.22: at most three attempts per request",
+    refs=("AWS Builders' Library: Timeouts, retries, and backoff with jitter", "AWS Architecture Blog: Exponential Backoff And Jitter (full jitter)",
+          "Google SRE ch.21: at most three attempts per request",
           "AWS REL05-BP03: Control and limit retry calls", "resilience4j / Polly v8 / Failsafe: Retry"))

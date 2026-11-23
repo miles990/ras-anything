@@ -20,6 +20,7 @@ prove it on recorded calls, and swap them in reversibly.
   verify [id]            replay: happy path must be identical, then the fault matrix vs the original
   enable / disable [id]  swap the hardened function in / out (one marked block, byte-for-byte undo)
   bench [-- <cmd>]       whole-app runs under live chaos, original vs hardened, interleaved
+  bench --patterns       every resilience pattern on vs off under simulated trouble (docs/PATTERNS.md)
   report                 RAS-REPORT.md + ras-card.svg (measured numbers only)
   status · doctor · mcp
 """
@@ -60,6 +61,8 @@ def parser() -> argparse.ArgumentParser:
 
     b = sub.add_parser("bench", help="whole-app runs under live chaos, original vs hardened (-- <cmd>)")
     b.add_argument("--seeds", type=int, default=20)
+    b.add_argument("--patterns", action="store_true", help="measure the resilience patterns instead, each on vs off, in the pattern lab")
+    b.add_argument("--out", help="with --patterns: folder for results.json and RESULTS.md (default .ras/patterns-lab)")
     b.add_argument("--rate", type=float, default=0.1, help="fault probability per dependency attempt (default 0.1)")
     b.add_argument("--degraded-marker", action="append", dest="markers",
                    help="text that marks a deliberately degraded output line (repeatable)")
@@ -111,6 +114,13 @@ def main(argv=None) -> int:
 
             disable(a.id)
         elif c == "bench":
+            if a.patterns:
+                from pathlib import Path
+
+                from . import lab
+
+                lab.run(a.seeds, Path(a.out) if a.out else None)
+                return 0
             from .bench import bench
 
             bench(cmd or None, seeds=a.seeds, rate=a.rate, markers=a.markers)

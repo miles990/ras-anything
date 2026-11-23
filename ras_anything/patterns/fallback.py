@@ -80,7 +80,8 @@ class FallbackLayer(Layer):
 
 
 PATTERN = Pattern(
-    name="fallback", title="Fallback hierarchy (stale cache, degraded value)", order=10, verdict=ADOPTED, why="",
+    name="fallback", title="Fallback hierarchy (stale cache, degraded value)", order=10, verdict=ADOPTED,
+    hint="a read given a cache key is answered from the last good answer while that is young enough; set `degraded` for a declared value. Only where callers can live with that answer.",
     params={"stale_ttl_s": 60.0, "max_entries": 1000, "degraded": None, "when": None}, layer=FallbackLayer,
     exports=("StaleCache",),
     refs=("AWS REL05-BP01: graceful degradation", "Google SRE ch.22: degraded responses", "RFC 5861: stale-if-error",

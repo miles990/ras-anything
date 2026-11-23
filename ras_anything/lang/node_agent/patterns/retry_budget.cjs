@@ -9,7 +9,7 @@ class RetryBudget {
   #tokens;
   #at;
 
-  constructor({ ratio = 0.1, minPerS = 1, burst = 10 } = {}) {
+  constructor({ ratio = 0.1, minPerS = 2, burst = 10 } = {}) {
     Object.assign(this, { ratio, minPerS, burst });
     this.reset();
     core.track(this);
@@ -59,5 +59,5 @@ class RetryBudgetLayer extends core.Layer {
   }
 }
 
-const PATTERN = { name: "retry_budget", order: 50, verdict: core.ADOPTED, params: { ratio: 0.1, minPerS: 1, burst: 10 }, Layer: RetryBudgetLayer };
+const PATTERN = { name: "retry_budget", order: 50, verdict: core.ADOPTED, params: { ratio: 0.1, minPerS: 2, burst: 10 }, Layer: RetryBudgetLayer };
 module.exports = { PATTERN, RetryBudget };

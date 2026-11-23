@@ -47,7 +47,9 @@ class IdempotencyLayer(Layer):
 
 
 PATTERN = Pattern(
-    name="idempotency", title="Idempotency-Key per logical operation", order=40, verdict=ADOPTED, why="", params={"quoted": True},
+    name="idempotency", title="Idempotency-Key per logical operation", order=40, verdict=ADOPTED,
+    hint="a write is repeated only if the call has an idempotency key; every attempt sends it (send the attempt's headers). 409 is asked again, 422 never.",
+    params={"quoted": True},
     layer=IdempotencyLayer, exports=("idempotency_key", "is_idempotency_conflict", "is_idempotency_mismatch"),
     refs=("IETF draft-ietf-httpapi-idempotency-key-header", "AWS Builders' Library: Making retries safe with idempotent APIs",
           "RFC 9110 section 9.2.2: idempotent methods"))

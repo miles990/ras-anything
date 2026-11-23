@@ -86,12 +86,13 @@
 | V-4 Python httpx/aiohttp/socket＋methods/async | `c9387c6`；weather/payments 再量測 |
 | V-2/V-3 Node.js/TS adapter + `examples/orders-node/` 實測 | `d1fc117` `e2c827c` `4da9986` `09ee610`；verify 四函式皆到 100%；bench **0.0% → 90.0%**（20 seeds，dups 6→0） |
 | V-13/V-16.3 patterns-as-plugins（Python+Node，12 模組，parity 測試） | `17db78c` `bdbc197` |
+| V-13 量測保留/淘汰 + retry amplification | `docs/PATTERNS.md`、`examples/patterns-lab/`、`ras-anything bench --patterns`；seeds 1001–1020；307 tests OK |
 | Holdout 答案卷（多語言+AI fixtures） | gitignored `wow/work/holdout/`（INDEX-v02.md 已核實跑過） |
 
 ### 未完成（按階段；完成一項就 commit+push，並更新本表）
 | 階段 | 規格 | 狀態 | 下一步 |
 |---|---|---|---|
-| **P 餘** | V-13 量測保留/淘汰：`docs/PATTERNS.md`、retry amplification、ON vs OFF 數字、TASK.md 指引 | **進行中**（build2p，plugins 已推；缺目錄與量測） | 等 build2p 寫完並推；若中斷則補這份文件與實驗 |
+| **P 餘** | V-13 量測保留/淘汰：`docs/PATTERNS.md`、retry amplification、ON vs OFF 數字、TASK.md 指引 | **完成** | adopted：fallback / deadline / idempotency / retry_budget / retry_after / retry / circuit_breaker / attempt_timeout / jitter。opt-in：bulkhead / adaptive_throttle / adaptive_concurrency / hedge。無 rejected。retry storm 可用性 bare 41.0% → stack 88.1%（breaker）；idempotency 重複寫入 76.5 → 0 |
 | **F** `build2f` | V-16.1 旗標、V-16.2 熱更新（切換延遲、0 丟請求）、V-17 canary/shadow/隔離/fail-safe/爆炸半徑 | 未開始 | 等 P 餘完成後啟動 |
 | **S** `build2s` | V-8 可服務性（OTel 日誌、health、RUNBOOK、diagnoser、MTTD/診斷/還原）、V-9 SLI/SLO、V-16.4 飛航記錄器+replay+RCA、V-18 AX 結構化錯誤+人類閘門 | 未開始 | |
 | **C** `build2c` | Go adapter + `examples/inventory-go/` 實測＋holdout 拒壞加固 | 未開始 | |
@@ -103,4 +104,6 @@
 | **審查** | Codex 獨立跑測試+兩邊範例+安裝+嘗試破壞；判決 SHIP/FIX-FIRST；修 P0/P1 再跑一次 | 未開始 | 建造全部可審範圍後 |
 | **評審** | Fable 5-2（`--model claude-fable-5-2 --effort high --tools Read`）最多 3 次 | 未開始 | Codex 後 |
 
-HEAD：`bdbc197`。工作樹應保持可推。中間產物在 `wow/work/`。
+HEAD：見最新 main（P 餘完成後更新）。工作樹應保持可推。中間產物在 `wow/work/`。
+
+接續備註（2026-11-23 15:08 台北時間）：前一個 `build2p` wow-agent 卡在 `pgrep -f "bench --patterns"` 自我匹配、實驗已完成未 commit；已接手修 `lab.fill`（空 placeholder 會吞掉下一節）、補 `docs/PATTERNS.md`、測試後再推。編排腳本 `wow/work/orchestrate.sh` 已暫停，F 階段尚未開始。

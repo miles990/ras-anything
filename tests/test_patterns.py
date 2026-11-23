@@ -213,6 +213,21 @@ class AttemptTimeoutTest(VirtualCase):
         self.assertEqual([a.timeout_s for a in d.attempts], [2.0, 1.0])
         self.assertEqual(self.clock.elapsed(), 3.0)
 
+    def test_a_short_attempt_at_the_end_of_the_deadline_is_not_the_dependencys_failure(self):
+        pol = Policy("d", **only(deadline={"timeout_s": 2.5}, retry={"base_s": 0}, attempt_timeout={"timeout_s": 2.0}, circuit_breaker={"fail_threshold": 2}))
+        for _ in range(3):  # each call: one whole attempt, one of 0.5 s
+            d = Dep(forever=10)
+            self.assertRaises(TimeoutError, pol.call, d)
+            pol.call(Dep())
+        self.assertEqual(pol.layer("circuit_breaker").breaker.state, "closed")
+        d = Dep(10, 10)
+        with self.assertRaises(DeadlineExceeded):
+            pol.call(d)
+        self.assertEqual([a.timeout_s for a in d.attempts], [2.0, 0.5])
+        with deadline(1.2):  # more than half a timeout counts
+            self.assertRaises(CircuitOpenError, Policy("d", **only(retry={"base_s": 0}, attempt_timeout={"timeout_s": 0.4}, circuit_breaker={"fail_threshold": 2})).call,
+                              Dep(forever=10))
+
     def test_standalone(self):
         self.assertIsNone(attempt_timeout())
         self.assertEqual(attempt_timeout(3), 3)
@@ -366,6 +381,19 @@ class RetryBudgetTest(VirtualCase):
         self.assertEqual(attempts(), 800)
         self.assertLessEqual(attempts(retry_budget={"ratio": 0.1, "min_per_s": 0, "burst": 10}), 200 + 10 + 20)
 
+    def test_a_retry_the_server_asked_for_is_free(self):
+        none = {"ratio": 0.0, "min_per_s": 0.0, "burst": 0.0}
+        for on, attempts in ((dict(retry_after=True), 2), ({}, 1)):
+            d = Dep(http_error(429, retry_after=1))
+            with contextlib.suppress(urllib.error.HTTPError):
+                Policy("d", **only(retry=True, retry_budget=none, **on)).call(d)
+            self.assertEqual(len(d.attempts), attempts)
+        d = Dep(http_error(503, retry_after=1), DOWN)
+        self.assertRaises(ConnectionRefusedError, Policy("d", **only(retry=True, retry_after=True, retry_budget=none)).call, d)
+        self.assertEqual(len(d.attempts), 2)  # the second failure named no time: that retry needs a token
+        d = Dep(http_error(429, retry_after=1))
+        self.assertEqual(retry(d, retry_budget=RetryBudget(**none)), "ok")
+
     def test_shared_by_calls_of_the_retry_helper(self):
         b = RetryBudget(ratio=0, min_per_s=0, burst=3)
         d = Dep(forever=DOWN)
@@ -488,6 +516,13 @@ class CircuitBreakerTest(VirtualCase):
         cb.release(probe)
         self.assertEqual(cb.state, "closed")
 
+    def test_a_429_is_not_an_outage(self):
+        cb = CircuitBreaker(fail_threshold=1)
+        self.fail(cb, 5, http_error(429, 1))
+        self.assertEqual(cb.state, "closed")
+        self.fail(cb, 1, http_error(503))
+        self.assertEqual(cb.state, "open")
+
     def test_own_deadline_is_not_the_dependencys_failure(self):
         cb = CircuitBreaker(fail_threshold=1)
         self.fail(cb, 3, DeadlineExceeded("ours"))
@@ -569,6 +604,15 @@ class AdaptiveThrottleTest(VirtualCase):
                 t.call(d)
         self.assertLess(len(d.attempts), 50)
         self.assertGreater(len(d.attempts), 1)
+
+    def test_a_burst_in_flight_is_no_rejection_and_a_429_is(self):
+        t = AdaptiveThrottle()
+        for _ in range(100):
+            t.acquire()
+        self.assertEqual(t.reject_probability(), 0.0)
+        for _ in range(100):
+            t.release(http_error(429))
+        self.assertGreater(t.reject_probability(), 0.9)
 
     def test_an_answer_is_an_accept_even_if_it_is_a_404(self):
         t = AdaptiveThrottle()

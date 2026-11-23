@@ -182,7 +182,9 @@ after 2 s. In async code the waits are `asyncio.sleep`, so `asyncio.wait_for` ar
 
 The pipeline (ranking, gates, bench, report) is language-neutral and talks JSON to a small agent inside
 your app's process; everything language-specific sits behind one adapter interface. The interface, the
-wire formats and the cassette format are in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md). Commands may
+wire formats and the cassette format are in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md). Which resilience
+patterns are on by default, and the measured ON vs OFF numbers, are in [docs/PATTERNS.md](docs/PATTERNS.md)
+(`ras-anything bench --patterns`). Commands may
 start with `python`, `python3`, `pypy`, `py`, or `uv`/`poetry`/`pipenv`/`pdm`/`hatch`/`rye run`, or with
 `node` (and flags such as `--import` / `--experimental-strip-types`). Anything else gets an error saying what to run instead.
 
@@ -193,9 +195,9 @@ start with `python`, `python3`, `pypy`, `py`, or `uv`/`poetry`/`pipenv`/`pdm`/`h
 - **Skill**: [`skills/ras-anything`](skills/ras-anything/SKILL.md) teaches any agent the loop.
 - `--agent claude` runs `claude -p --permission-mode acceptEdits` (edits plus `ras-anything verify` allowed) in the harden folder with `TASK.md` on stdin; `--agent codex` runs `codex exec --full-auto`. Anything else is run as a shell command with the task on stdin. `go` gives the agent one retry with the verify failure appended.
 
-Hardened code may use `ras_anything.runtime`: `retry` / `aretry` (full-jitter backoff, honours `Retry-After`,
-total time budget, re-raises the original error), `is_transient`, `call_with_timeout`,
-`CircuitBreaker`, `RasError` (cause, context, trace id) and `log_event` (a JSON line on stderr).
+Hardened code may use `ras_anything.runtime.Policy` (and the same `Policy` in Node's `_runtime.cjs`): a stack
+of measured patterns. Adopted ones are on by default; opt-in ones (bulkhead, adaptive throttle, adaptive
+concurrency, hedging) you switch on yourself. See [docs/PATTERNS.md](docs/PATTERNS.md).
 
 ## Tests
 

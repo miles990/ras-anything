@@ -40,7 +40,9 @@ class Policy {
     const call = new core.Call(this.dependency, options);
     const on = this.layers.filter((x) => registry.hooks.isOn(this.dependency, x.name, x.on)).map((x) => x.layer);
     function* attempt(c) {
-      const a = { attempt: ++c.attempts, timeoutMs: c.timeoutMs ?? undefined, idempotencyKey: c.carryKey, headers: { ...c.headers } };
+      let t = c.timeoutMs ?? undefined;
+      if (t === undefined && c.deadline !== null) t = Math.max(1, c.deadline - core.nowMs()); // no attempt timeout: what is left of the whole
+      const a = { attempt: ++c.attempts, timeoutMs: t, idempotencyKey: c.carryKey, headers: { ...c.headers } };
       return yield ["call", a, ends(c)];
     }
     const chain = (i) => (i === on.length ? attempt : (c) => on[i].run(c, chain(i + 1)));

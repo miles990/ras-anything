@@ -139,8 +139,9 @@ class CircuitBreakerLayer(Layer):
 
 
 PATTERN = Pattern(
-    name="circuit_breaker", title="Circuit breaker", order=80, verdict=ADOPTED, why="",
-    params={"fail_threshold": 5, "cooldown_s": 5.0, "failure_rate": 0.5, "window": 50, "min_calls": 20, "half_open_probes": 1},
+    name="circuit_breaker", title="Circuit breaker", order=80, verdict=ADOPTED,
+    hint="fails fast (a RejectedError) while the dependency is down, probes once per cooldown. A 429 doesn't open it. Nothing to do.",
+    params={"fail_threshold": 5, "cooldown_s": 1.0, "failure_rate": 0.5, "window": 50, "min_calls": 20, "half_open_probes": 1},
     layer=CircuitBreakerLayer, exports=("CircuitBreaker", "CircuitOpenError"),
     refs=("Release It! 2e: Circuit Breaker", "resilience4j: CircuitBreaker (sliding window, half-open calls)", "Polly v8: circuit breaker",
           "AWS REL05-BP01: graceful degradation"))

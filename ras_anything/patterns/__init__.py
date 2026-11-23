@@ -33,7 +33,7 @@ class Pattern:
     title: str
     order: int      # position in a policy: lower is further out
     verdict: str    # adopted (on unless switched off) | opt-in | rejected; measured, see docs/PATTERNS.md
-    why: str        # one line, the reason for the verdict
+    hint: str       # one line for whoever writes hardened code
     params: dict    # parameter -> default, as a Policy takes them
     layer: type     # Layer subclass
     refs: tuple = ()
@@ -78,6 +78,7 @@ class Call:
     headers: dict = field(default_factory=dict)  # every attempt should send these
     carry_key: str | None = None        # the key attempts really send (idempotency layer)
     retry_gates: list = field(default_factory=list)   # () -> bool: may one more attempt be made?
+    invited: bool = False               # the last failure said when to come back (retry_after layer): no gate is asked
     delay_rules: list = field(default_factory=list)   # (exc, delay_s) -> delay_s
     retry_rules: list = field(default_factory=list)   # (exc) -> bool: also worth a retry
 

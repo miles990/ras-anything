@@ -50,6 +50,8 @@ STORIES = {
         ["call", ["refused", "ok"], {"method": "POST"}], ["call", ["refused", "ok"], {"method": "POST", "key": "k1"}],
         ["call", ["409", "409", "ok"], {"method": "PUT", "key": "k2"}], ["call", ["409", "ok"], {"method": "DELETE"}],
         ["call", ["422", "ok"], {"method": "POST", "key": "k3"}]]),
+    "retry after, invited": (dict(OFF, retry_budget={"ratio": 0.0, "min_per_s": 0.0, "burst": 1.0}, retry_after=True, retry={"attempts": 4, "base_s": 0.01, "full_jitter": False}), [
+        ["call", ["429:1", "503:1", "refused", "refused", "ok"], {}], ["call", ["refused", "ok"], {}], ["call", ["429:1", "ok"], {}]]),
     "retry after": (dict(OFF, retry={"attempts": 3, "base_s": 0.01, "full_jitter": False}, retry_after=True, deadline={"timeout_s": 4.0}), [
         ["call", ["429:2", "ok"], {}], ["call", ["503:30", "ok"], {}], ["call", ["429:3", "429:3", "ok"], {}]]),
     "retry budget": (dict(OFF, retry={"attempts": 4, "base_s": 0.01, "full_jitter": False}, retry_budget={"ratio": 0.5, "min_per_s": 1.0, "burst": 2.0}), [
@@ -66,6 +68,8 @@ STORIES = {
     "deadline and attempt timeout": (dict(OFF, deadline={"timeout_s": 5.0}, attempt_timeout={"timeout_s": 2.0},
                                           retry={"attempts": 9, "base_s": 0.01, "full_jitter": False}), [
         ["call", ["slow:1", "ok"], {}], ["call", ["slow:3", "ok"], {}], ["call", ["slow:60"] * 9, {}]]),
+    "a cut attempt": (dict(OFF, deadline={"timeout_s": 2.5}, attempt_timeout={"timeout_s": 2.0}, retry={"attempts": 2, "base_s": 0.01, "full_jitter": False},
+                           circuit_breaker={"fail_threshold": 2}), [["call", ["slow:60"] * 2, {}], ["check", "breaker"], ["call", ["slow:60"] * 2, {}], ["check", "breaker"]]),
     "fallback hierarchy": (dict(OFF, fallback={"stale_ttl_s": 60.0, "degraded": {"level": "degraded"}}), [
         ["call", ["ok"], {"cache": "a"}], ["wait", 59.0], ["call", ["refused"], {"cache": "a"}], ["call", ["refused"], {"cache": "b"}],
         ["call", ["404"], {"cache": "a"}], ["wait", 2.0], ["call", ["refused"], {"cache": "a"}], ["call", ["refused"], {}]]),
@@ -315,7 +319,7 @@ class NodeContractTest(unittest.TestCase):
             process.exit(0);
           })();"""
         self.assertEqual(json.loads(node(code, str(AGENT / "runtime.cjs")).stdout),
-                         ["TimeoutError", True, True, True, True, "DeadlineExceeded", "DeadlineExceeded", "DeadlineExceeded", None, [True, True]])
+                         ["DeadlineExceeded", True, True, True, True, "DeadlineExceeded", "DeadlineExceeded", "DeadlineExceeded", None, [True, True]])
 
     def test_hedge_aborts_the_loser_and_is_for_reads(self):
         code = """

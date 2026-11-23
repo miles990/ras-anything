@@ -16,7 +16,7 @@ from pathlib import Path
 from .. import signals
 from ..paths import UserError, load_local, resolve_in_project, safe_name
 from . import node_static as static
-from .base import LangAdapter, program_stem
+from .base import LangAdapter, pattern_list, program_stem
 
 AGENT_DIR = Path(__file__).resolve().parent / "node_agent"
 MIN_VERSION = (22, 15)  # module.registerHooks and require(esm); Node 23 from 23.5
@@ -63,6 +63,26 @@ def probe(exe: str) -> dict:
 
 def too_old(info: dict) -> bool:
     return not (info.get("hooks") and info.get("esm"))
+
+
+def camel(name: str) -> str:
+    return re.sub(r"_(\w)", lambda m: m.group(1).upper(), name)
+
+
+def js_param(name: str, value):
+    """A pattern parameter as the Node runtime has it: seconds (*_s) are milliseconds (*Ms) there."""
+    if name.endswith("_s") and not name.endswith("per_s"):
+        return camel(name[:-2]) + "Ms", value * 1000
+    return camel(name), value
+
+
+EXAMPLE_ASYNC = """// one attempt; its time is already cut to what is left of the deadline
+const once = async ({ signal, headers }) => (await raiseForStatus(await fetch(url, { signal, headers, method, body }))).json();
+
+await shop.call(once);                                                                            // a read
+await shop.call(once, { method: "POST", idempotencyKey: idempotencyKey("charge", order.id, cents) }); // a write"""
+EXAMPLE_SYNC = """// one attempt; its time is already cut to what is left of the deadline
+shop.callSync(({ timeoutMs }) => JSON.parse(execFileSync(cmd, args, { timeout: timeoutMs })), { method: "RUN" });"""
 
 
 def is_ts(path: str) -> bool:
@@ -195,8 +215,7 @@ class NodeAdapter(LangAdapter):
         fi, f = self._loaded(fn, project)
         uses = fi.uses(f)
         helpers = ["// not exported by the module, so this file has its own copy\n" + fi.function_text(h) for h in uses["helpers"]]
-        sync = not fn.get("async")
-        rt = ["isTransient", "logEvent", "raiseForStatus", "RasError", "retrySync" if sync else "retry"] + (["scope"] if uses["scope"] else [])
+        rt = ["idempotencyKey", "isTransient", "logEvent", "Policy", "raiseForStatus", "RasError", "RejectedError"] + (["scope"] if uses["scope"] else [])
         imports = [fi.rebased(*rng) for rng in sorted(uses["imports"])]
         lines = ["// Hardened %s, written for ras-anything (see TASK.md). Swapped in by `ras-anything enable`." % fn["id"],
                  "// Paths are relative to _ras_hardened/ next to the module: that is where enable puts this file.", ""]
@@ -263,8 +282,24 @@ class NodeAdapter(LangAdapter):
             "timeout_arg": "a timeout (`signal` / `timeout`)",
             "helpers": """## Helpers (`./_runtime.cjs`, Node built-ins only; times are in milliseconds)
 
-- `await retry(fn, {attempts = 3, baseMs = 100, capMs = 2000, timeoutMs, budgetMs, retryOn = isTransient})`: calls
-  `fn({attempt, signal})`; full-jitter backoff, honours Retry-After. `timeoutMs` bounds each attempt (pass `signal` on),
+Use one `Policy` per dependency, at module level. It composes the patterns that earned their place by measurement
+(ras-anything's docs/PATTERNS.md), in a fixed order:
+
+```js
+const shop = new Policy("shop-api", { deadline: { timeoutMs: 4700 }, attemptTimeout: { timeoutMs: 3400 },
+  retry: { attempts: 4, retryOn: (e) => isTransient(e) || e instanceof SyntaxError } });
+
+%(example)s
+```
+
+%(patterns)s
+
+An option named after a pattern sets its parameters (an object) or switches it off (`false`). When the policy gives up
+it throws the last error, or a `RejectedError` without a request (open circuit): catch both to degrade, log it, and
+return the fallback or throw a `RasError`. Nested policies, `withTimeout` and `retry` inside share the deadline.
+
+- `await retry(fn, {attempts = 3, baseMs = 100, capMs = 2000, timeoutMs, budgetMs, retryOn = isTransient})`: only the
+  retry part, when a policy doesn't fit; calls `fn({attempt, signal})`; full-jitter backoff, honours Retry-After. `timeoutMs` bounds each attempt (pass `signal` on),
   `budgetMs` the whole (attempts are cut to what is left). Rethrows the last error unchanged.
 - `retrySync(fn, {...same})`: for synchronous functions; `fn({attempt, timeoutMs})`, give `timeoutMs` to the call.
 - `await raiseForStatus(res)`: fetch doesn't reject on 4xx/5xx. Returns `res` when status < 400, else throws an `HttpError`
@@ -272,16 +307,16 @@ class NodeAdapter(LangAdapter):
 - `isTransient(err)`: the transient rule from point 3 (not unparsable bodies: add `SyntaxError` yourself when a 2xx body
   fails to parse, e.g. `retryOn: (e) => isTransient(e) || e instanceof SyntaxError`).
 - `await withTimeout((signal) => ..., ms)`: for anything; rejects with a `TimeoutError`.
-- `new CircuitBreaker({failThreshold, cooldownMs})`: `await .call(fn, ...args)`; throws `CircuitOpenError` while open.
 - `new RasError(message, {cause, context})`: structured error with a trace id. `logEvent(event, {...})`: one JSON line on stderr.
 - `scope("<id>")`: the module-level names listed in the stub, live from the original module.
 
-`%s` must stay loadable with `require()`: no top-level `await`. Keep the imports' relative paths as they are in the
+`%(file)s` must stay loadable with `require()`: no top-level `await`. Keep the imports' relative paths as they are in the
 stub (they count from `_ras_hardened/`). Harness modules (`node:module`, `node:vm`, `node:worker_threads`, ...) are refused.
-In a body that arrives cut in half, `JSON.parse` / `res.json()` throws a `SyntaxError`.%s%s
-""" % (self.hardened_file(fn),
-       "\nA timed-out `fetch` keeps no promise pending: always pass the `signal`; a promise that never settles is a hang." if not sync else "",
-       "\nThis function is synchronous: it must stay synchronous." if sync else ""),
+In a body that arrives cut in half, `JSON.parse` / `res.json()` throws a `SyntaxError`.%(more)s
+""" % {"file": self.hardened_file(fn), "example": EXAMPLE_SYNC if sync else EXAMPLE_ASYNC,
+       "patterns": pattern_list(lambda k, v: "%s: %s" % (js_param(k, v)[0], "%g" % js_param(k, v)[1]), camel),
+       "more": "\nThis function is synchronous: it must stay synchronous." if sync else
+               "\nA timed-out `fetch` keeps no promise pending: always pass the `signal`; a promise that never settles is a hang."},
         }
 
     # ---------------------------------------------------------------- record / replay
@@ -380,6 +415,19 @@ In a body that arrives cut in half, `JSON.parse` / `res.json()` throws a `Syntax
 
     def runtime_modules(self):
         return [(p, p.name) for p in sorted((AGENT_DIR / "patterns").glob("*.cjs"))]
+
+    def lab_cmd(self, job):
+        exe = shutil.which("node")
+        info = probe(exe) if exe else {"error": "not found"}
+        if "error" in info or too_old(info):
+            return None
+        return [exe, str(AGENT_DIR / "lab.cjs"), str(job)], dict(os.environ)
+
+    def lab_params(self, patterns):
+        return {camel(k): {p: w for p, w in (js_param(*x) for x in v.items())} if isinstance(v, dict) else v for k, v in patterns.items()}
+
+    def lab_line(self, line, patterns):
+        return line.replace("{}", json.dumps(self.lab_params(patterns)))
 
     # ---------------------------------------------------------------- people
 

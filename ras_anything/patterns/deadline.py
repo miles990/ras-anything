@@ -21,6 +21,8 @@ class DeadlineLayer(Layer):
 
 
 PATTERN = Pattern(
-    name="deadline", title="Total deadline, propagated", order=20, verdict=ADOPTED, why="", params={"timeout_s": 4.8},
+    name="deadline", title="Total deadline, propagated", order=20, verdict=ADOPTED,
+    hint="the whole call, waits included. Passed on to nested policies and timeouts. Set it just under the latency budget.",
+    params={"timeout_s": 4.8},
     layer=DeadlineLayer, exports=("deadline", "remaining_s", "DeadlineExceeded"),
     refs=("Google SRE ch.22: deadline propagation", "Release It! 2e: Timeouts, Fail Fast", "Polly v8: total request timeout"))

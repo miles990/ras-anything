@@ -67,7 +67,9 @@ class BulkheadLayer(Layer):
 
 
 PATTERN = Pattern(
-    name="bulkhead", title="Bulkhead (concurrency cap)", order=30, verdict=OPT_IN, why="", params={"max_concurrent": 10},
+    name="bulkhead", title="Bulkhead (concurrency cap)", order=30, verdict=OPT_IN,
+    hint="at most so many calls at a time; full = reject at once. Needs sizing.",
+    params={"max_concurrent": 10},
     layer=BulkheadLayer, exports=("Bulkhead", "BulkheadFullError"),
     refs=("Release It! 2e: Bulkheads, Fail Fast", "resilience4j: Bulkhead (semaphore)", "Polly v8: concurrency limiter",
           "AWS REL05-BP04: Fail fast and limit queues"))

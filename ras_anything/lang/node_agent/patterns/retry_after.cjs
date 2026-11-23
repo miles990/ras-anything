@@ -13,10 +13,15 @@ function retryAfterS(err) {
   return Number.isNaN(at) ? null : Math.max(0, (at - Date.now()) / 1000);
 }
 
-/** Makes the retry layer's wait at least what the server asked for (a wait past the deadline ends the call). */
+/** Makes the retry layer's wait at least what the server asked for (a wait past the deadline ends the call). Such a retry
+ *  is the server's own plan, so it doesn't need a token of the retry budget. */
 class RetryAfterLayer extends core.Layer {
   * run(call, inner) {
-    call.delayRules.push((e, delay) => Math.max(delay, (retryAfterS(e) ?? 0) * 1000));
+    call.delayRules.push((e, delay) => {
+      const asked = retryAfterS(e);
+      call.invited = asked !== null;
+      return asked === null ? delay : Math.max(delay, asked * 1000);
+    });
     return yield* inner(call);
   }
 }

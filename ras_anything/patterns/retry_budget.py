@@ -14,7 +14,7 @@ class RetryBudget:
     So over any stretch of time: retries <= burst + ratio x requests + min_per_s x seconds. When the
     dependency is fine nobody notices; when it is down, retries stop multiplying the load."""
 
-    def __init__(self, ratio: float = 0.1, min_per_s: float = 1.0, burst: float = 10.0):
+    def __init__(self, ratio: float = 0.1, min_per_s: float = 2.0, burst: float = 10.0):
         self.ratio, self.min_per_s, self.burst = ratio, min_per_s, burst
         self._lock = threading.Lock()
         self.reset()
@@ -63,7 +63,8 @@ class RetryBudgetLayer(Layer):
 
 
 PATTERN = Pattern(
-    name="retry_budget", title="Retry budget (token bucket)", order=50, verdict=ADOPTED, why="",
-    params={"ratio": 0.1, "min_per_s": 1.0, "burst": 10.0}, layer=RetryBudgetLayer, exports=("RetryBudget",),
+    name="retry_budget", title="Retry budget (token bucket)", order=50, verdict=ADOPTED,
+    hint="retries are capped at a share of the calls plus a trickle, so an outage isn't multiplied. Nothing to do.",
+    params={"ratio": 0.1, "min_per_s": 2.0, "burst": 10.0}, layer=RetryBudgetLayer, exports=("RetryBudget",),
     refs=("Google SRE ch.21: per-client retry budget (10%)", "AWS Builders' Library: token bucket for retries",
           "Finagle RetryBudget", "AWS REL05-BP03: Control and limit retry calls"))

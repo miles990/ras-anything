@@ -212,9 +212,7 @@ async function runJob(job) {
     const args = codec.dec(call.args);
     const me = `trial ${++seq}`;
     clock.reset();
-    if (t.gap_s) clock.t += t.gap_s * 1000; // one of a sequence: time passes in between, and what the code learned stays
-    else runtime.resetState();
-    clock.start = clock.t;
+    if (!t.gap_s) runtime.resetState(); // (one of a sequence: what the code learned stays)
     handler.begin(me, call.io, t.plan);
     let s = t.seed >>> 0;
     Math.random = () => {
@@ -254,9 +252,11 @@ async function runJob(job) {
         end.outcome = "hang";
       }
       if (end.outcome !== "hang") { // what it still does in the background counts too, its time doesn't
-        const until = clock.elapsed() + 30;
-        await drive(clock, () => crash !== null || clock.timers.size === 0, until);
+        const gap = t.gap_s ?? 30; // in a sequence the next call comes gap_s later
+        const next = clock.t + gap * 1000;
+        await drive(clock, () => crash !== null || clock.timers.size === 0, clock.elapsed() + gap);
         await tick();
+        if (t.gap_s) clock.t = next;
       }
     } finally {
       process.stderr.write = stderrWrite;

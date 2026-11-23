@@ -18,7 +18,7 @@ from pathlib import Path
 from .. import signals
 from ..paths import PKG_DIR, UserError, load_local, resolve_in_project, safe_name
 from . import python_static as static
-from .base import LangAdapter, program_stem
+from .base import LangAdapter, pattern_list, program_stem
 
 AGENT_DIR = PKG_DIR / "agents" / "python"
 INJECT_DIR = AGENT_DIR / "_inject"
@@ -205,8 +205,7 @@ class PythonAdapter(LangAdapter):
             "",
             *imports,
             "",
-            "from ras_anything.runtime import RasError, CircuitBreaker, call_with_timeout, is_transient, log_event, %s" % (
-                "aretry" if fn.get("async") else "retry"),
+            "from ras_anything.runtime import Policy, RasError, RejectedError, idempotency_key, is_transient, log_event",
         ]
         if from_mod:
             lines.append("from %s import %s  # module-level names the original uses" % (mod, ", ".join(from_mod)))
@@ -257,16 +256,38 @@ class PythonAdapter(LangAdapter):
             "equal": "`==`",
             "helpers": """## Helpers (`from ras_anything.runtime import ...`, standard library only)
 
-- `retry(fn, *, attempts=3, base=0.1, cap=2.0, budget_s=None, retry_on=is_transient)`: calls `fn()`;
-  full-jitter backoff, honours Retry-After, stops before crossing `budget_s`, re-raises the last
-  error unchanged. `retry_on` may be a predicate or a tuple of exception types.
+Use one `Policy` per dependency, at module level. It composes the patterns that earned their place by measurement
+(ras-anything's docs/PATTERNS.md), in a fixed order:
+
+```python
+shop = Policy("shop-api", deadline={"timeout_s": 4.7}, attempt_timeout={"timeout_s": 3.4},
+              retry={"attempts": 4, "retry_on": lambda e: is_transient(e) or isinstance(e, ValueError)})
+
+def once(a):  # one attempt; a.timeout_s is already cut to what is left of the deadline
+    req = urllib.request.Request(url, data=body, headers={"Content-Type": "application/json", **a.headers})
+    with urlopen(req, timeout=a.timeout_s) as r:
+        return json.loads(r.read())
+
+%(call)s(once)                                                    # a read
+%(call)s(once, method="POST", idempotency_key=idempotency_key("charge", order_id, cents))   # a write
+```
+
+%(patterns)s
+
+A keyword named after a pattern sets its parameters (a dict) or switches it off (`False`). When the policy gives up it
+raises the last error, or a `RejectedError` without a request (open circuit): catch both to degrade, log it, and
+return the fallback or raise a `RasError`. Nested policies and `attempt_timeout(s)` inside share the deadline.
+
+- `retry(fn, *, attempts=3, base=0.1, cap=2.0, budget_s=None, retry_on=is_transient)`: only the retry part, when a
+  policy doesn't fit; calls `fn()`; full-jitter backoff, honours Retry-After, stops before crossing `budget_s`,
+  re-raises the last error unchanged. `retry_on` may be a predicate or a tuple of exception types.
 - `is_transient(exc)`: the transient rule from point 3 (not truncated bodies: add `ValueError` /
   `json.JSONDecodeError` yourself when a 2xx body fails to parse).
 - `call_with_timeout(fn, timeout_s, *args)`: for code that has no timeout parameter.
-- `CircuitBreaker(fail_threshold, cooldown_s)`: `.call(fn, *args)`; raises `CircuitOpenError` while open.
 - `RasError(message, *, cause=None, context=None)`: structured error with a trace id.
 - `log_event(event, **fields)`: one JSON line on stderr.
-""" + ("""- `await aretry(fn, ...)`: `retry` for an async `fn` (same arguments; waits with `asyncio.sleep`). Use
+""" % {"call": "await shop.acall" if fn.get("async") else "shop.call",
+       "patterns": pattern_list(lambda k, v: "%s=%g" % (k, v))} + ("""- `await aretry(fn, ...)`: `retry` for an async `fn` (same arguments; waits with `asyncio.sleep`). Use
   `asyncio.wait_for(...)` for overall timeouts, and never block the event loop (`time.sleep`, `urlopen`).
 """ if fn.get("async") else ""),
         }
@@ -327,6 +348,13 @@ class PythonAdapter(LangAdapter):
 
     def runtime_modules(self):
         return [(p, p.name) for p in sorted((PKG_DIR / "patterns").glob("*.py"))]
+
+    def lab_cmd(self, job):
+        env = dict(os.environ, PYTHONPATH=str(PKG_DIR.parent), PYTHONHASHSEED="0")
+        return [sys.executable, "-m", "ras_anything.agents.python.lab", str(job)], env
+
+    def lab_line(self, line, patterns):
+        return line.replace("{}", repr(patterns))
 
     # ---------------------------------------------------------------- people
 

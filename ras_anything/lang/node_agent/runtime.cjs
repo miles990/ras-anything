@@ -105,7 +105,7 @@ for (const name of registry.NAMES) {
   }
 }
 
-const { RejectedError, DeadlineExceeded, dependencyFailed, withTimeout, withDeadline, remainingMs, traceId, newTraceId, withTrace, sleep, sleepSync,
+const { RejectedError, DeadlineExceeded, dependencyFailed, notAccepted, withTimeout, withDeadline, remainingMs, traceId, newTraceId, withTrace, sleep, sleepSync,
   seed, resetState, TRANSIENT_HTTP } = core;
 const { retry, retrySync, RetryBudget, retryAfterS, attemptTimeout, CircuitBreaker, CircuitOpenError, Bulkhead, BulkheadFullError, AdaptiveThrottle,
   ThrottledError, AdaptiveConcurrency, ConcurrencyLimitError, hedge, StaleCache, idempotencyKey, isIdempotencyConflict,
@@ -114,5 +114,5 @@ const { retry, retrySync, RetryBudget, retryAfterS, attemptTimeout, CircuitBreak
 module.exports = { RasError, RejectedError, DeadlineExceeded, HttpError, Policy, retry, retrySync, RetryBudget, withTimeout, withDeadline, remainingMs,
   attemptTimeout, withFallback, CircuitBreaker, CircuitOpenError, Bulkhead, BulkheadFullError, AdaptiveThrottle, ThrottledError,
   AdaptiveConcurrency, ConcurrencyLimitError, hedge, StaleCache, idempotencyKey, isIdempotencyConflict, isIdempotencyMismatch,
-  isTransient, dependencyFailed, raiseForStatus, retryAfterS, logEvent, traceId, newTraceId, withTrace, sleep, sleepSync, seed, resetState,
+  isTransient, dependencyFailed, notAccepted, raiseForStatus, retryAfterS, logEvent, traceId, newTraceId, withTrace, sleep, sleepSync, seed, resetState,
   scope, enable, TRANSIENT_HTTP };

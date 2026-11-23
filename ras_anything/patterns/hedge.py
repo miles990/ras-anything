@@ -93,6 +93,7 @@ class HedgeLayer(Layer):
 
 
 PATTERN = Pattern(
-    name="hedge", title="Hedged requests (reads)", order=110, verdict=OPT_IN, why="",
+    name="hedge", title="Hedged requests (reads)", order=110, verdict=OPT_IN,
+    hint="a second attempt of a slow read. Costs extra load.",
     params={"delay_s": 1.0, "min_delay_s": 0.01, "quantile": 0.95, "max_hedges": 1}, layer=HedgeLayer, exports=("hedge", "ahedge"),
-    refs=("Dean & Barroso, The Tail at Scale: hedged requests", "Polly v8: hedging", "Failsafe: Hedge", "gRPC hedging (retry throttling applies)"))
+    refs=("Dean & Barroso, The Tail at Scale: hedged requests", "Polly v8: hedging", "gRPC: request hedging"))

@@ -142,10 +142,16 @@ function isTransient(err) {
   return false;
 }
 
-/** Does this error say the dependency is in trouble? (what breakers and throttles count: transient errors, but
- *  not our own deadline running out before the dependency was asked) */
-function dependencyFailed(err) {
+/** Did the dependency not take this request? (what throttles and concurrency limits count: transient errors, but not
+ *  our own deadline running out before the dependency was asked) */
+function notAccepted(err) {
   return isTransient(err) && !(err instanceof DeadlineExceeded);
+}
+
+/** Is the dependency in trouble? (what circuit breakers count: notAccepted, except a 429: it is up, and asks us to
+ *  come back later) */
+function dependencyFailed(err) {
+  return notAccepted(err) && httpStatus(err) !== 429;
 }
 
 /** The HTTP status an error carries, or null. */
@@ -240,7 +246,7 @@ class Layer {
 class Call {
   constructor(dependency, { method = "GET", idempotencyKey = null, cacheKey = null } = {}) {
     Object.assign(this, { dependency, method, idempotencyKey, cacheKey, deadline: null, timeoutMs: null, attempts: 0, headers: {}, carryKey: null,
-      retryGates: [], delayRules: [], retryRules: [] });
+      retryGates: [], invited: false, delayRules: [], retryRules: [] });
   }
 
   get safe() {
@@ -297,5 +303,5 @@ class Guard {
 }
 
 module.exports = { TRANSIENT_HTTP, seed, random, newTraceId, traceId, withTrace, inTrace, track, resetState, RasError, RejectedError, DeadlineExceeded,
-  logEvent, isTransient, dependencyFailed, httpStatus, nowMs, sleep, sleepSync, remainingMs, runUntil, withDeadline, withTimeout,
+  logEvent, isTransient, dependencyFailed, notAccepted, httpStatus, nowMs, sleep, sleepSync, remainingMs, runUntil, withDeadline, withTimeout,
   ADOPTED, OPT_IN, REJECTED, SAFE_METHODS, Layer, Call, Guard };

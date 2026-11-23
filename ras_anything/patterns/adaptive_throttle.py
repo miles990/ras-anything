@@ -15,10 +15,11 @@ class ThrottledError(rt.RejectedError):
 
 class AdaptiveThrottle:
     """Rejects a request with probability max(0, (requests - k * accepts) / (requests + 1)), both counted over
-    the last window_s seconds. `requests` counts every attempt asked for, also the ones rejected here;
-    `accepts` the ones the dependency answered (`count` says which errors mean it didn't)."""
+    the last window_s seconds. `requests` counts every attempt asked for, also the ones rejected here, once its
+    outcome is known (a burst still in flight is no rejection); `accepts` the ones the dependency took (`count` says
+    which errors mean it didn't)."""
 
-    def __init__(self, k: float = 2.0, window_s: float = 120.0, name: str = "dependency", count=rt.dependency_failed):
+    def __init__(self, k: float = 2.0, window_s: float = 120.0, name: str = "dependency", count=rt.not_accepted):
         self.k, self.window_s, self.name, self.count = k, window_s, name, count
         self._lock = threading.Lock()
         self.reset()
@@ -47,18 +48,21 @@ class AdaptiveThrottle:
     def acquire(self) -> None:
         """Ask for one attempt; ThrottledError when it is shed."""
         p = self.reject_probability()
-        with self._lock:
-            self._bucket()[1] += 1
-            self.requests += 1
         if p > 0.0 and rt._rng.random() < p:
+            self._count(0)
             raise ThrottledError("shedding load to %s" % self.name, context={"reject_probability": round(p, 3)})
 
     def release(self, error: BaseException | None = None) -> None:
         """Say how the attempt ended."""
-        if error is None or not self.count(error):
-            with self._lock:
-                self._bucket()[2] += 1
-                self.accepts += 1
+        self._count(1 if error is None or not self.count(error) else 0)
+
+    def _count(self, accepted: int) -> None:
+        with self._lock:
+            b = self._bucket()
+            b[1] += 1
+            b[2] += accepted
+            self.requests += 1
+            self.accepts += accepted
 
     def call(self, fn, *args, **kwargs):
         self.acquire()
@@ -99,7 +103,8 @@ class AdaptiveThrottleLayer(Layer):
 
 
 PATTERN = Pattern(
-    name="adaptive_throttle", title="Adaptive throttling / load shedding", order=90, verdict=OPT_IN, why="",
+    name="adaptive_throttle", title="Adaptive throttling / load shedding", order=90, verdict=OPT_IN,
+    hint="sheds requests in proportion to rejections.",
     params={"k": 2.0, "window_s": 120.0}, layer=AdaptiveThrottleLayer, exports=("AdaptiveThrottle", "ThrottledError"),
     refs=("Google SRE ch.21: client-side throttling", "AWS Builders' Library: Using load shedding to avoid overload",
           "Release It! 2e: Shed Load, Create Back Pressure"))

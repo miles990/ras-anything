@@ -20,6 +20,18 @@ def program_stem(program: str) -> str:
     return name[:-4] if name.endswith(".exe") else name
 
 
+def pattern_list(show, spell=lambda name: name) -> str:
+    """The adopted patterns (and no others) for TASK.md, outermost first; show(parameter, default) writes one parameter."""
+    from .. import patterns
+
+    out = []
+    for p in patterns.all_patterns():
+        if p.default_on:
+            shown = [show(k, v) for k, v in p.params.items() if v is not None and not isinstance(v, bool)]
+            out.append("- `%s`%s: %s" % (spell(p.name), " (%s)" % ", ".join("`%s`" % x for x in shown) if shown else "", p.hint))
+    return "\n".join(out)
+
+
 class LangAdapter(ABC):
     name = ""            # stored in scan.json / meta.json / calls.json, e.g. "python"
     label = ""           # for people, e.g. "Python"
@@ -142,6 +154,19 @@ class LangAdapter(ABC):
     def runtime_modules(self) -> list[tuple[Path, str]]:
         """(file, name in the folder `patterns` next to the vendored runtime): the pattern modules it loads."""
         return []
+
+    def lab_cmd(self, job: Path) -> tuple[list[str], dict] | None:
+        """Command and environment of the pattern lab's worker (ras_anything/lab.py), or None if this language's
+        runtime has no patterns, or can't run here."""
+        return None
+
+    def lab_params(self, patterns: dict) -> dict:
+        """Policy arguments as this language's runtime spells them."""
+        return patterns
+
+    def lab_line(self, line: str, patterns: dict) -> str:
+        """`line` ("PATTERNS = {}  # ras-lab") declaring these patterns instead."""
+        raise NotImplementedError
 
     # ---------------------------------------------------------------- people
 

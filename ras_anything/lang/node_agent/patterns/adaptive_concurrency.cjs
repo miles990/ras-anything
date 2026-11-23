@@ -16,7 +16,7 @@ class AdaptiveConcurrency extends core.Guard {
   #ended = 0;
   #cutAt = 0; // calls ended when the limit was last cut
 
-  constructor({ initial = 20, minLimit = 1, maxLimit = 200, backoff = 0.7, name = "dependency", count = core.dependencyFailed } = {}) {
+  constructor({ initial = 20, minLimit = 1, maxLimit = 200, backoff = 0.7, name = "dependency", count = core.notAccepted } = {}) {
     super();
     Object.assign(this, { initial, minLimit, maxLimit, backoff, name, count, inFlight: 0 });
     this.reset();

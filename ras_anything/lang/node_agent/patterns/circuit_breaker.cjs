@@ -97,5 +97,5 @@ class CircuitBreakerLayer extends core.Layer {
 }
 
 const PATTERN = { name: "circuit_breaker", order: 80, verdict: core.ADOPTED,
-  params: { failThreshold: 5, cooldownMs: 5000, failureRate: 0.5, window: 50, minCalls: 20, halfOpenProbes: 1 }, Layer: CircuitBreakerLayer };
+  params: { failThreshold: 5, cooldownMs: 1000, failureRate: 0.5, window: 50, minCalls: 20, halfOpenProbes: 1 }, Layer: CircuitBreakerLayer };
 module.exports = { PATTERN, CircuitBreaker, CircuitOpenError };

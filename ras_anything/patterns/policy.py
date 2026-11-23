@@ -68,7 +68,10 @@ class Policy:
         on = [x for name, configured, x in self.layers if is_on(self.dependency, name, configured)]
 
         def attempt(c):
-            return (yield ("call", Attempt(next(c.numbers), c.timeout_s, c.carry_key, c.headers), _ends(c)))
+            t = c.timeout_s
+            if t is None and c.deadline is not None:  # no attempt timeout: what is left of the whole
+                t = max(0.001, c.deadline - rt._now())
+            return (yield ("call", Attempt(next(c.numbers), t, c.carry_key, c.headers), _ends(c)))
 
         def chain(i):
             return attempt if i == len(on) else lambda c: on[i].run(c, chain(i + 1))
