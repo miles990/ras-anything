@@ -568,6 +568,44 @@ class MethodTest(Case):
         self.assertIn("super()", fns["lib.Sub.get"]["verdict"])
         self.assertIn("@property", fns["lib.Client.status"]["verdict"])
 
+    def test_method_of_a_class_in_the_entry_script(self):
+        p = self.project("", "Api().send(Order(i))")
+        app = (p.dir / "app.py").read_text().replace("import lib", textwrap.dedent("""
+            import dataclasses, json, urllib.request
+
+
+            @dataclasses.dataclass
+            class Order:
+                id: int
+
+
+            class Api:
+                def send(self, order):
+                    with urllib.request.urlopen(os.environ["API"] + "/o%d" % order.id) as r:
+                        return Order(len(json.loads(r.read())["path"]))
+            """))
+        (p.dir / "app.py").write_text(app.replace("print(", "print(type(Api().send(Order(i))) is Order, "))
+        fid = "app.Api.send"
+        with quiet():
+            scan([sys.executable, "app.py"], seeds=1, quiet=True)
+            harden(fid, quiet=True)
+        v = self.verify(p, fid, '''
+            import json, os, urllib.request
+            from ras_anything.runtime import is_transient, retry
+            from app import Order
+
+            def send(self, order):
+                def once():
+                    with urllib.request.urlopen(os.environ["API"] + "/o%d" % order.id, timeout=0.8) as r:
+                        return Order(len(json.loads(r.read())["path"]))
+                return retry(once, attempts=5, base=0.05, cap=0.3, budget_s=4, retry_on=lambda e: is_transient(e) or isinstance(e, ValueError))
+            ''')
+        self.assertTrue(v["passed"], v.get("fatal") or v["gates"])
+        with quiet():
+            enable(fid, quiet=True)
+        on = subprocess.run([sys.executable, "app.py"], capture_output=True, text=True)
+        self.assertEqual(on.stdout, "True Order(id=3)\n" * 4, on.stderr)
+
     def test_a_method_must_leave_self_as_the_original_does(self):
         p = self.project(CLIENT, "lib.Client('n').get(i)")
         with quiet():

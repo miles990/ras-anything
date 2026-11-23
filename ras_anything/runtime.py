@@ -202,6 +202,8 @@ def is_transient(exc: BaseException) -> bool:
     if isinstance(exc, urllib.error.URLError):
         return isinstance(exc.reason, (OSError, socket.timeout)) or "timed out" in str(exc.reason)
     mod = type(exc).__module__ or ""
+    if mod.startswith("asyncio") and type(exc).__name__ == "TimeoutError":  # its own class before Python 3.11
+        return True
     if mod.startswith("requests"):
         name = type(exc).__name__
         return name in {"ConnectionError", "Timeout", "ConnectTimeout", "ReadTimeout", "ChunkedEncodingError"}

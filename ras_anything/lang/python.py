@@ -310,7 +310,7 @@ class PythonAdapter(LangAdapter):
             bind = "    %s = _ras_fn" % name
         return _BLOCK.format(start=start, end=end, fid=fid, date=vres.get("verified_at", "?")[:10], total=vres["happy"]["total"],
                              before=100 * vres["original"]["availability"], after=100 * vres["hardened"]["availability"],
-                             copy=copy_rel, mod=safe_name(fid), name=name, bind=bind)
+                             copy=copy_rel, module=meta["module"], mod=safe_name(fid), name=name, bind=bind)
 
     def insertion(self, path, text, block, eol):
         fi = static.FileInfo(str(path))
@@ -380,6 +380,8 @@ def _ras_anything_load():
             sys.modules.setdefault("ras_anything", types.ModuleType("ras_anything"))
             sys.modules["ras_anything.runtime"] = m = importlib.util.module_from_spec(rt)
             rt.loader.exec_module(m)
+        if __name__ == "__main__":  # `from {module} import ...` in the hardened code means this very module
+            sys.modules.setdefault({module!r}, sys.modules["__main__"])
         path = os.path.join(here, {copy!r})
         spec = importlib.util.spec_from_file_location("_ras_hardened.{mod}", path)
         mod = importlib.util.module_from_spec(spec)
