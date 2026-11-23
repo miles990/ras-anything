@@ -39,7 +39,7 @@ That installs the CLI, copies the agent skill, and prints the MCP / plugin add c
 Other ways to get the CLI (skills still need `./install.sh`, or a manual copy of `skills/ras-anything/`):
 
 ```sh
-pipx install git+https://github.com/miles990/ras-anything   # private repo: needs GitHub access; do not publish
+pipx install git+https://github.com/miles990/ras-anything
 # or, from a clone, into the current environment:
 pip install -e .
 ```
