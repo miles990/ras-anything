@@ -6,6 +6,9 @@ Changing one of these is a contract change: bump the schema version or note it i
 
 from __future__ import annotations
 
+# Emitted documents carry this (MAJOR.MINOR.PATCH). Bump according to docs/schema/README.md.
+SCHEMA_VERSION = "1.1.0"
+
 # `ras-anything export --format`: names come from ras_anything.exporters (one module each).
 # Loaded on first use so this module stays import-light (docs/adr/0002).
 

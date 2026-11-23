@@ -208,6 +208,25 @@ class SchemaExportTests(unittest.TestCase):
             self.assertIn("corrupt JSON", r2.stdout + r2.stderr)
 
 
+    def test_sync_out_keeps_snapshot_timestamps_when_payload_is_unchanged(self):
+        import time
+
+        with tempfile.TemporaryDirectory() as td:
+            proj = Path(td)
+            shutil.copytree(ROOT / "examples" / "support-ai" / ".ras", proj / ".ras")
+            shutil.rmtree(proj / ".ras" / "out", ignore_errors=True)
+            export.sync_out(proj)
+            first = {p.name: p.read_bytes() for p in (proj / ".ras" / "out").glob("*.json")}
+            self.assertTrue(first)
+            report = json.loads((proj / ".ras" / "out" / "report.json").read_text(encoding="utf-8"))
+            self.assertEqual(report["schema_version"], export.SCHEMA_VERSION)
+            self.assertEqual(export.SCHEMA_VERSION, "1.1.0")
+            time.sleep(1.05)
+            export.sync_out(proj)
+            export.export_data(proj, fmt="json")
+            second = {p.name: p.read_bytes() for p in (proj / ".ras" / "out").glob("*.json")}
+            self.assertEqual(first, second)
+
     def test_no_private_workspace_or_home_paths_in_examples_or_cards(self):
         for base in (ROOT / "examples", ROOT / "docs" / "cards"):
             for p in sorted(base.rglob("*")):

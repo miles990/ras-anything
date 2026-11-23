@@ -11,10 +11,19 @@ Versioned JSON Schemas (Draft `2020-12`) for `.ras/out/` snapshots, append-only 
 
 ## `schema_version` Compatibility Rules
 
-Every emitted document carries `schema_version` (`MAJOR.MINOR.PATCH`, currently **`1.0.0`**) and `kind`:
+Every emitted document carries `schema_version` (`MAJOR.MINOR.PATCH`, currently **`1.1.0`** (`ras_anything.contracts.SCHEMA_VERSION`)) and `kind`:
 1. **`PATCH` (`1.0.x`)**: documentation or tightening clarifications with no breaking payload changes.
 2. **`MINOR` (`1.x.0`)**: backward-compatible additive fields or new optional `kind` values; UIs/collectors ignoring unknown properties remain compatible.
 3. **`MAJOR` (`2.0.0`)**: breaking field renames, removals, or semantic unit changes (`seconds` vs `ms`, `0..1` ratios vs `0..100` percents).
+
+## Changelog
+
+### 1.1.0 (2026-11-23)
+- Additive optional field `coverage.adapters[].enabled` (`false` when the language is switched off with `RAS_ANYTHING_LANGUAGES_OFF`). Collectors that ignore unknown properties stay compatible with 1.0.0 documents.
+- `schema_version` is defined once in `ras_anything.contracts.SCHEMA_VERSION`; every emitter (export, replay, SLO, incidents, OTLP) reads it from there.
+
+### 1.0.0
+- Initial snapshot (`ras-run`) and event (`ras-event`) contracts.
 
 ## Stable `.ras/out/` File Layout
 

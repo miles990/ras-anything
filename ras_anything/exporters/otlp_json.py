@@ -6,6 +6,8 @@ import json
 import time
 from pathlib import Path
 
+from ..contracts import SCHEMA_VERSION
+
 FORMAT = "otlp-json"
 ORDER = 40
 
@@ -18,8 +20,6 @@ def render(project, od, bundle, snapshots, events) -> str:
 
 
 def _otlp_json(project: Path, bundle: dict, events: list[dict]) -> dict:
-    from ..export import SCHEMA_VERSION
-
     now_ns = str(int(time.time() * 1e9))
     rep = bundle.get("report") or {}
     metrics = []

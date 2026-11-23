@@ -6,6 +6,7 @@ import time
 from pathlib import Path
 
 from . import ui
+from .contracts import SCHEMA_VERSION
 from .paths import UserError, load_json, save_json
 
 DEFAULT_TARGETS = {
@@ -143,7 +144,7 @@ def evaluate(project: Path | None = None, bench: dict | None = None, hardens: li
         return None
 
     res = {
-        "schema_version": "1.0.0",
+        "schema_version": SCHEMA_VERSION,
         "kind": "slo",
         "source": source,
         "targets": t,

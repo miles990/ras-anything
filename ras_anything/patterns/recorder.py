@@ -20,6 +20,7 @@ import time
 from collections import deque
 
 from .. import runtime as rt
+from ..contracts import SCHEMA_VERSION
 
 RING, BEFORE, PER_KIND, PER_PROCESS, KEEP_FILES = 64, 20, 5, 100, 200
 _ring: deque = deque(maxlen=RING)
@@ -176,7 +177,7 @@ def _dump(ctx, trigger, outcome, error, result):
               for e in list(_ring) if e["fid"] == ctx.fid][-BEFORE:]
     iid = "inc-%s-%s-%s" % (time.strftime("%Y%m%dT%H%M%S", time.gmtime(wall)), re.sub(r"[^A-Za-z0-9_.-]", "_", ctx.fid)[:60], ctx.span_id[:8])
     doc = {
-        "schema_version": "1.0.0", "kind": "incident", "id": iid, "created": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(wall)), "lang": "python",
+        "schema_version": SCHEMA_VERSION, "kind": "incident", "id": iid, "created": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(wall)), "lang": "python",
         "service": rt._SERVICE, "pid": os.getpid(), "function": ctx.fid, "trigger": trigger, "trace_id": ctx.trace_id, "span_id": ctx.span_id,
         "parent_span_id": ctx.parent, "seed": ctx.seed, "started": round(ctx.ts, 3), "duration_s": round(now - ctx.t0, 3),
         "inputs": redact(bound(ctx.fn, ctx.args, ctx.kwargs)), "input_hash": input_hash(ctx.fn, ctx.args, ctx.kwargs),

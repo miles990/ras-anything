@@ -8,11 +8,9 @@ import time
 from pathlib import Path
 
 from . import lang as lang_mod
-from .contracts import EXPORT_FORMATS
+from .contracts import EXPORT_FORMATS, SCHEMA_VERSION
 from .exporters import RENDERERS
 from .paths import UserError, find_project, load_json, plain_path, save_json, scrub
-
-SCHEMA_VERSION = "1.0.0"
 
 ALL_LANGUAGES = (
     ("python", "complete", "urllib / requests / httpx / aiohttp / socket / subprocess", True, True),
@@ -126,6 +124,8 @@ def out_dir(project: Path) -> Path:
 
 
 def emit_run(project: Path, kind: str, payload: dict, suffix: str | None = None) -> Path:
+    """Write a versioned snapshot. If the payload (everything except generated_at) is unchanged, the
+    existing file is left alone so re-exporting does not churn timestamps."""
     doc = {
         "schema_version": SCHEMA_VERSION,
         "kind": kind,
@@ -136,6 +136,9 @@ def emit_run(project: Path, kind: str, payload: dict, suffix: str | None = None)
     doc = scrub(doc, project)
     fname = f"{kind}-{_safe_name(suffix)}.json" if suffix else f"{kind}.json"
     p = plain_path(out_dir(project) / fname, project, "export file", kind="file", must_exist=False)
+    existing = load_json(p)
+    if existing and {k: v for k, v in existing.items() if k != "generated_at"} == {k: v for k, v in doc.items() if k != "generated_at"}:
+        return p
     save_json(p, doc)
     return p
 
@@ -313,21 +316,27 @@ def sync_out(project: Path) -> dict[str, Path]:
 
     if slo_doc:
         sh = slo_doc.get("hardened") or {}
-        written["slo"] = emit_run(project, "slo", {
-            "slo": {
-                "source": slo_doc.get("source", "bench"),
-                "targets": slo_doc.get("targets") or {},
-                "original": slo_doc.get("original") or {},
-                "hardened": sh,
-                "series": [{
-                    "ts": _iso_now(),
-                    "availability": float(sh.get("availability") or 0.0),
-                    "p99_s": float(sh.get("p99_s") or 0.0),
-                    "error_rate": float(sh.get("error_rate") or 0.0),
-                    "burn_pct": float(sh.get("error_budget_burn_pct") or 0.0),
-                }] if sh else [],
-            },
-        })
+        slo_body = {
+            "source": slo_doc.get("source", "bench"),
+            "targets": slo_doc.get("targets") or {},
+            "original": slo_doc.get("original") or {},
+            "hardened": sh,
+        }
+        prev_slo = (load_json(out_dir(project) / "slo.json") or {}).get("slo") or {}
+        prev_head = {k: prev_slo.get(k) for k in ("source", "targets", "original", "hardened")}
+        if sh and prev_head == slo_body and prev_slo.get("series"):
+            series = prev_slo["series"]  # keep the stamped point so a re-export does not rewrite ts
+        elif sh:
+            series = [{
+                "ts": _iso_now(),
+                "availability": float(sh.get("availability") or 0.0),
+                "p99_s": float(sh.get("p99_s") or 0.0),
+                "error_rate": float(sh.get("error_rate") or 0.0),
+                "burn_pct": float(sh.get("error_budget_burn_pct") or 0.0),
+            }]
+        else:
+            series = []
+        written["slo"] = emit_run(project, "slo", {"slo": {**slo_body, "series": series}})
 
     # Incidents -> replay-<id>.json
     inc_dir = project / ".ras" / "incidents"

@@ -9,6 +9,7 @@ import time
 from pathlib import Path
 
 from . import cassette, diagnose, lang, ui, verify
+from .contracts import SCHEMA_VERSION
 from .paths import UserError, find_project, harden_dir, load_json, save_json, scrub
 
 _FAULT_MAP = {
@@ -272,7 +273,7 @@ def replay(incident_id: str | None = None, project: Path | None = None, quiet: b
     diagnose_s = round(time.perf_counter() - t0, 4)
 
     rca = {
-        "schema_version": "1.0.0",
+        "schema_version": SCHEMA_VERSION,
         "kind": "replay",
         "incident_id": iid,
         "function": fid,
