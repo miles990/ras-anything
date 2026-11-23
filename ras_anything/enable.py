@@ -11,7 +11,7 @@ from pathlib import Path
 from . import cassette, lang, ui
 from .paths import (UserError, find_project, harden_dir, load_json, plain_path, rel_to_project, save_json, sha256_file,
                     write_file)
-from .verify import resolve_id
+from .hardens import resolve_id
 
 
 COPY_DIR = "_ras_hardened"

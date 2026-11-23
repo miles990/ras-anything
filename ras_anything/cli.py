@@ -25,10 +25,11 @@ prove it on recorded calls, and swap them in reversibly.
   report [--slo SPEC]    RAS-REPORT.md + ras-card.svg + docs/RUNBOOK.md + .ras/slo.json
   replay [id] [--list]   deterministically replay a recorded incident + write RCA
   drift --model M        replay recorded AI evals against model M (+ --export-promptfoo)
-  export --format FMT    export .ras/out data as json | ndjson | prom | otlp-json
+  export --format FMT    export .ras/out data as {formats}
   flag list|get|set|delete  OpenFeature/flagd flags (`.ras/flags.json`), hot-reloaded
   status · doctor · mcp
 """
+USAGE = USAGE.replace("{formats}", " | ".join(EXPORT_FORMATS))
 
 
 def _split(argv):

@@ -14,29 +14,11 @@ import time
 from pathlib import Path
 
 from . import ai, ax, cassette, diagnose, faults, judge, lang, ui
+from .hardens import resolve_id  # noqa: F401  (moved; importable from here as before)
 from .paths import UserError, find_project, harden_dir, load_json, save_json, scrub, sha256_file
 
 CLASSES = ("ok", "degraded", "error", "wrong", "hang")
 TIMEOUT_S = 900
-
-
-def resolve_id(project: Path, fid: str | None) -> str:
-    base = project / ".ras" / "hardens"
-    have = sorted(p.name for p in base.iterdir() if (p / "meta.json").exists()) if base.is_dir() else []
-    if fid:
-        if fid not in have:
-            raise UserError("%s hasn't been hardened yet" % fid, "known: " + (", ".join(have) or "none"),
-                            "harden %s" % fid)
-        return fid
-    if not have:
-        raise UserError("nothing hardened yet", "verify checks the hardened code in .ras/hardens/<id>/", "harden")
-    if len(have) > 1:
-        def changed(h):
-            a = lang.by_name((load_json(base / h / "meta.json") or {}).get("lang"))
-            f = base / h / a.hardened_file(load_json(base / h / "meta.json") or {})
-            return f.stat().st_mtime if f.exists() else 0
-        return max(have, key=changed)
-    return have[0]
 
 
 class ReplayFailed(Exception):
