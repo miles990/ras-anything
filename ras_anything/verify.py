@@ -13,7 +13,7 @@ import tempfile
 import time
 from pathlib import Path
 
-from . import cassette, faults, judge, lang, ui
+from . import ax, cassette, diagnose, faults, judge, lang, ui
 from .paths import UserError, find_project, harden_dir, load_json, save_json, scrub, sha256_file
 
 CLASSES = ("ok", "degraded", "error", "wrong", "hang")
@@ -51,7 +51,7 @@ def replay(adapter, project: Path, d: Path, meta: dict, trials: list[dict], dead
         job, out = Path(tmp) / "job.json", Path(tmp) / "out.json"
         job.write_text(json.dumps({
             "protocol": 1, "lang": adapter.name, "project": str(project), "meta": meta, "cassette": str(d / "calls.json"),
-            "hardened": str(d / adapter.hardened_file(meta)), "trials": trials, "out": str(out), "constants": faults.CONSTANTS}))
+            "hardened": str(d / adapter.hardened_file(meta)), "dependencies": meta.get("dependencies") or [], "trials": trials, "out": str(out), "constants": faults.CONSTANTS}))
         argv, env = adapter.worker_cmd(adapter.interpreter(project, meta), job)
         try:
             p = subprocess.run(argv, env=env, capture_output=True, text=True, timeout=max(1.0, deadline - time.perf_counter()))
@@ -136,6 +136,8 @@ def measure(adapter, project: Path, d: Path, meta: dict, max_chaos: int) -> dict
     except (cassette.BadCassette, OSError) as e:
         raise ReplayFailed({"stage": "read calls.json", "message": "%s (record again: harden %s)" % (e, meta["id"])})
     keys = [judge.keys_of(c, project) for c in calls]
+    deps = meta.get("dependencies") or cassette.dependencies(calls, project)
+    meta = {**meta, "dependencies": deps}
     deadline = time.perf_counter() + TIMEOUT_S
     t0 = time.perf_counter()
 
@@ -190,12 +192,55 @@ def measure(adapter, project: Path, d: Path, meta: dict, max_chaos: int) -> dict
     outage = measure_outage(adapter, project, d, meta, calls, keys, usable, deadline)
     if outage:
         first_bad = first_bad or outage.pop("first_failure", None)
+    # (d) V-8 serviceability + V-18 agent experience on faulted trials ----------------------------
+    raw_o_list = raw2["results"][0::2]
+    raw_h_list = raw2["results"][1::2]
+    scored_o, scored_h = [], []
+    orig_ax_cases, hard_ax_cases = [], []
+    ax_leaks = []
+    for s, ro, rh, jo, jh in zip(specs, raw_o_list, raw_h_list, sides["original"], sides["hardened"]):
+        att_fail = next((a for a in (ro.get("attempts") or []) if a.get("fault")), None) or next(
+            (a for a in (rh.get("attempts") or []) if a.get("fault")), None)
+        t_fault = s["plan"].get("fault") or (att_fail.get("fault") if att_fail else None)
+        t_dep = s["plan"].get("key") or (att_fail.get("key") if att_fail else None)
+        if t_fault is not None or jo["class"] != "ok" or jh["class"] != "ok":
+            do = diagnose.diagnose(ro.get("stderr") or "")
+            dh = diagnose.diagnose(rh.get("stderr") or "")
+            scored_o.append(diagnose.score_diagnosis(do, t_dep, t_fault))
+            scored_h.append(diagnose.score_diagnosis(dh, t_dep, t_fault))
+        if ro.get("outcome") in ("raise", "hang"):
+            orig_ax_cases.append({"surface": ro.get("problem") or ro.get("exc") or (ro.get("stderr") or ""),
+                                  "expected": ax.expected_action(diagnose._norm_fault(t_fault) if t_fault else None)})
+        if rh.get("problem"):
+            ax_leaks.extend(ax.scan_leaks(rh["problem"]))
+            hard_ax_cases.append({"surface": rh["problem"],
+                                  "expected": ax.expected_action(diagnose._norm_fault(t_fault) if t_fault else None)})
+        elif rh.get("outcome") in ("raise", "hang"):
+            hard_ax_cases.append({"surface": rh.get("exc") or (rh.get("stderr") or ""),
+                                  "expected": ax.expected_action(diagnose._norm_fault(t_fault) if t_fault else None)})
+        if rh.get("stderr"):
+            ax_leaks.extend(ax.scan_leaks(rh["stderr"]))
+    serviceability = {
+        "original": diagnose.summarize_serviceability(scored_o),
+        "hardened": diagnose.summarize_serviceability(scored_h),
+    }
+    ax_eval = {
+        "observed": {
+            "original": ax.evaluate_surfaces(orig_ax_cases) if orig_ax_cases else None,
+            "hardened": ax.evaluate_surfaces(hard_ax_cases) if hard_ax_cases else None,
+        },
+        "catalog": ax.catalog_benchmark(),
+        "leaks": sorted(set(ax_leaks)),
+    }
+
     gates = judge.gates(happy, o, h, crashes, budget, outage)
     return {
         "id": meta["id"], "lang": adapter.name, "budget_s": budget, "recorded": len(calls), "happy": happy,
         "chaos": {"calls": len(usable[:max_chaos]), "scenarios": scenarios, "by_scenario": rows, "first_failure": first_bad,
                   "first_original_dup": first_dup, "new_crashes": crashes},
-        "original": o, "hardened": h, "outage": outage, "gates": gates, "passed": all(gates.values()), "fallback": raw["fallback"],
+        "original": o, "hardened": h, "outage": outage, "dependencies": deps,
+        "serviceability": serviceability, "ax": ax_eval,
+        "gates": gates, "passed": all(gates.values()), "fallback": raw["fallback"],
         "elapsed_s": round(time.perf_counter() - t0, 2),
     }
 
@@ -280,6 +325,17 @@ def print_verify(res: dict, fid: str, hname: str) -> None:
     if h.get("logged_failures") is not None or o.get("logged_failures") is not None:
         rows.append(["failures logged w/ trace id", ui.pct(o.get("logged_failures"), 0),
                      ui.pct(h.get("logged_failures"), 0), ui.dim("info")])
+    srv = res.get("serviceability") or {}
+    if srv.get("hardened") and srv["hardened"].get("runs"):
+        so, sh = srv.get("original") or {}, srv["hardened"]
+        rows.append(["root-cause diagnosis (logs)", ui.pct(so.get("diagnosis_accuracy"), 0),
+                     ui.pct(sh.get("diagnosis_accuracy"), 0),
+                     ui.dim("lines-to-diag %s → %s" % (so.get("lines_to_diagnosis_p50") or "—", sh.get("lines_to_diagnosis_p50") or "—"))])
+    axr = res.get("ax") or {}
+    if axr.get("catalog"):
+        co, ch = axr["catalog"]["original"], axr["catalog"]["hardened"]
+        rows.append(["agent next-action accuracy", ui.pct(co["accuracy"], 0), ui.pct(ch["accuracy"], 0),
+                     ui.dim("leaks: %d" % len(axr.get("leaks") or []))])
     print(ui.table(["gate", "original", "hardened", ""], rows, "lrrl"))
     print(ui.dim("  %d trials each: %d calls × %d fault scenarios · availability = (ok + degraded) / trials" % (
         h["trials"], res["chaos"]["calls"], len(res["chaos"]["scenarios"]))))

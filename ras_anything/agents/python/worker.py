@@ -127,6 +127,8 @@ def plan_of(p):
         return faults.Down()
     if p["type"] == "first":
         return faults.FirstAttempt(p["fault"], target_key=p.get("key"))
+    if p["type"] == "schedule":
+        return faults.Schedule(p.get("faults") or [], target_key=p.get("key"), repeat=p.get("repeat", True))
     if p["type"] == "seeded":
         return faults.Seeded(p["seed"], p["rate"], p["outage_rate"], salt=p.get("salt", ""))
     raise ValueError("unknown plan %r" % (p["type"],))
@@ -180,6 +182,8 @@ def run_job(job: dict) -> dict:
     except BaseException:
         raise Fatal("import %s" % os.path.basename(job["hardened"]), traceback.format_exc(limit=6))
     fallback = getattr(hmod, "RAS_FALLBACK", None)
+    deps = job.get("dependencies") or cassette.dependencies(calls)
+    watched = runtime.observed(meta["id"], hardened, deps, original)
 
     runtime.VIRTUAL_CLOCK = clock
     clock.install()
@@ -187,7 +191,7 @@ def run_job(job: dict) -> dict:
 
     def trial(t):
         call = calls[t["call"]]
-        fn = hardened if t["side"] == "hardened" else original
+        fn = watched if t["side"] == "hardened" else original
         args, kwargs = codec.dec(call["args"]), codec.dec(call["kwargs"])
         handler.begin(call["io"], plan_of(t["plan"]))
         random.seed(t["seed"])
@@ -240,6 +244,8 @@ def run_job(job: dict) -> dict:
             "exc_type": None if exc is None else type(exc).__name__,
             "cause_type": None if cause is None else type(cause).__name__,
             "structured": exc is not None and (isinstance(exc, runtime.RasError) or cause is not None),
+            "problem": exc.problem if isinstance(exc, runtime.RasError) else None,
+            "stderr": err.getvalue()[:8000],
             "state": _state(codec, meta, args, kwargs) if t["plan"]["type"] == "none" else None,
             "attempts": [{k: a[k] for k in ("key", "n", "fault", "reached", "failed", "idem", "method", "nonidempotent", "outage")}
                          for a in handler.attempts],

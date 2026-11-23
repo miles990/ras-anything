@@ -375,6 +375,7 @@ In a body that arrives cut in half, `JSON.parse` / `res.json()` throws a `Syntax
             "      id: %s, name: %s, original: %s,%s" % (json.dumps(fid), json.dumps(meta["name"]), acc, "" if esm else " module,"),
             "      load: () => load(%s)," % json.dumps("./" + copy_rel),
             "      names: %s," % static.scope_object(meta["scope"]),
+            "      dependencies: %s," % json.dumps(meta.get("dependencies") or []),
             "    });", "  } catch (e) { // keep the app running on the original, loudly",
             "    process.stderr.write(`ras-anything: hardened %s not loaded, running the original: ${e}\\n`);" % fid,
             "  }", "}", end, ""]

@@ -1,4 +1,4 @@
-"""report: RAS-REPORT.md + ras-card.svg from measured results only."""
+"""report: RAS-REPORT.md + ras-card.svg + docs/RUNBOOK.md + .ras/slo.json from measured results only."""
 
 from __future__ import annotations
 
@@ -6,7 +6,7 @@ import os
 import time
 from pathlib import Path
 
-from . import faults, ui
+from . import faults, slo, ui
 from .paths import UserError, find_project, load_json
 
 
@@ -26,7 +26,7 @@ def _runtime(host: dict) -> str:
     return host.get("runtime") or "Python %s" % host.get("python", "")
 
 
-def collect(project: Path) -> dict:
+def collect(project: Path, slo_spec: str | None = None, save_slo: bool = False) -> dict:
     bench = load_json(project / ".ras" / "bench.json")
     scan = load_json(project / ".ras" / "scan.json")
     hardens = []
@@ -37,12 +37,65 @@ def collect(project: Path) -> dict:
             hardens.append({"id": d.name, "verify": v, "meta": m})
     if bench is None and not hardens:
         raise UserError("nothing measured yet", "report only shows numbers from verify and bench", "verify")
-    return {"bench": bench, "scan": scan, "hardens": hardens}
+    slo_doc = slo.evaluate(project=project, bench=bench, hardens=hardens, targets=slo_spec, save=save_slo)
+    return {"bench": bench, "scan": scan, "hardens": hardens, "slo": slo_doc}
+
+
+def _agg_serviceability(data: dict) -> dict | None:
+    b = data.get("bench") or {}
+    hs = data.get("hardens") or []
+    srv_list = [x["verify"].get("serviceability") for x in hs if (x["verify"].get("serviceability") or {}).get("hardened", {}).get("runs")]
+    if srv_list:
+        o_det = [s["original"]["detection_rate"] for s in srv_list if s.get("original", {}).get("detection_rate") is not None]
+        h_det = [s["hardened"]["detection_rate"] for s in srv_list if s.get("hardened", {}).get("detection_rate") is not None]
+        o_acc = [s["original"]["diagnosis_accuracy"] for s in srv_list if s.get("original", {}).get("diagnosis_accuracy") is not None]
+        h_acc = [s["hardened"]["diagnosis_accuracy"] for s in srv_list if s.get("hardened", {}).get("diagnosis_accuracy") is not None]
+        o_ln = [s["original"]["lines_to_diagnosis_p50"] for s in srv_list if s.get("original", {}).get("lines_to_diagnosis_p50") is not None]
+        h_ln = [s["hardened"]["lines_to_diagnosis_p50"] for s in srv_list if s.get("hardened", {}).get("lines_to_diagnosis_p50") is not None]
+        return {
+            "source": "verify",
+            "cases": sum(s["hardened"]["runs"] for s in srv_list),
+            "orig_detection": sum(o_det) / len(o_det) if o_det else None,
+            "hard_detection": sum(h_det) / len(h_det) if h_det else None,
+            "orig_accuracy": sum(o_acc) / len(o_acc) if o_acc else None,
+            "hard_accuracy": sum(h_acc) / len(h_acc) if h_acc else None,
+            "orig_lines": sorted(o_ln)[len(o_ln) // 2] if o_ln else None,
+            "hard_lines": sorted(h_ln)[len(h_ln) // 2] if h_ln else None,
+            "bench": b.get("serviceability"),
+        }
+    if b.get("serviceability"):
+        bs = b["serviceability"]
+        return {
+            "source": "bench",
+            "cases": (bs.get("hardened") or {}).get("cases", 0),
+            "orig_detection": (bs.get("original") or {}).get("detection_rate"),
+            "hard_detection": (bs.get("hardened") or {}).get("detection_rate"),
+            "orig_accuracy": None,
+            "hard_accuracy": None,
+            "orig_lines": (bs.get("original") or {}).get("lines_to_diagnosis_p50"),
+            "hard_lines": (bs.get("hardened") or {}).get("lines_to_diagnosis_p50"),
+            "bench": bs,
+        }
+    return None
+
+
+def _agg_ax(data: dict) -> dict | None:
+    hs = data.get("hardens") or []
+    axs = [x["verify"].get("ax") for x in hs if x["verify"].get("ax")]
+    b = data.get("bench") or {}
+    leaks = list(b.get("leaks") or [])
+    for a in axs:
+        leaks.extend(a.get("leaks") or [])
+    if not axs:
+        return None
+    cat = axs[-1].get("catalog")
+    obs_list = [a["observed"] for a in axs if a.get("observed") and (a["observed"].get("original") or a["observed"].get("hardened"))]
+    return {"catalog": cat, "observed": obs_list[0] if obs_list else None, "leaks": sorted(set(leaks))}
 
 
 def card_svg(title: str, data: dict) -> str:
     b = data["bench"]
-    W, H = 800, 334
+    W = 800
     sans = "system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif"
     mono = "ui-monospace,SFMono-Regular,Menlo,Consolas,monospace"
     if b:
@@ -70,6 +123,16 @@ def card_svg(title: str, data: dict) -> str:
     eq = sum(x["verify"]["happy"]["equal"] for x in data["hardens"])
     tot = sum(x["verify"]["happy"]["total"] for x in data["hardens"])
     rows.append(("recorded calls, same result", "", "%d/%d" % (eq, tot) if tot else "—"))
+    s = data.get("slo")
+    if s and s.get("hardened"):
+        t_avail = _p(s["targets"]["availability"], 1)
+        rows.append(("SLO (%s avail)" % t_avail,
+                     s["original"]["status"],
+                     s["hardened"]["status"]))
+    srv = _agg_serviceability(data)
+    if srv and srv.get("hard_accuracy") is not None:
+        rows.append(("log diagnosis accuracy", _p(srv.get("orig_accuracy")), _p(srv.get("hard_accuracy"))))
+
     host = (b or {}).get("host") or {}
     caption1 = "Faults: timeout/hang, refused, HTTP 503, 429 + Retry-After, slow, truncated body, outage · " + rate
     caption2 = "%s · %s %s, %s · %s · measured by ras-anything" % (
@@ -93,6 +156,10 @@ def card_svg(title: str, data: dict) -> str:
         else:
             metrics.append(f'<text x="768" y="{y}" font-family="{mono}" font-size="12" text-anchor="end" fill="#e6edf3">{_x(c)}</text>')
         y += 25
+    div_y = max(274, y + 4)
+    cap1_y = div_y + 20
+    cap2_y = div_y + 38
+    H = div_y + 60
     return f'''<svg xmlns="http://www.w3.org/2000/svg" width="{W}" height="{H}" viewBox="0 0 {W} {H}" role="img" aria-label="{_x(title)}: {_x(metric)} {_p(before, 1)} to {_p(after, 1)}">
   <title>{_x(title)}: {_x(metric)} {_p(before, 1)} → {_p(after, 1)}</title>
   <rect width="{W}" height="{H}" rx="14" fill="#0d1117"/>
@@ -106,11 +173,11 @@ def card_svg(title: str, data: dict) -> str:
   <line x1="{bx}" y1="144" x2="{bx}" y2="206" stroke="#484f58"/>
   <text x="{bx}" y="222" font-family="{mono}" font-size="10" fill="#6e7681" text-anchor="middle">0%</text>
   <text x="{bx + bw}" y="222" font-family="{mono}" font-size="10" fill="#6e7681" text-anchor="middle">100%</text>
-  <line x1="516" y1="80" x2="516" y2="246" stroke="#21262d"/>
+  <line x1="516" y1="80" x2="516" y2="{div_y - 16}" stroke="#21262d"/>
   {"".join(metrics)}
-  <line x1="32" y1="274" x2="768" y2="274" stroke="#21262d"/>
-  <text x="32" y="294" font-family="{sans}" font-size="11" fill="#8b949e">{_x(caption1)}</text>
-  <text x="32" y="312" font-family="{sans}" font-size="11" fill="#8b949e">{_x(caption2)}</text>
+  <line x1="32" y1="{div_y}" x2="768" y2="{div_y}" stroke="#21262d"/>
+  <text x="32" y="{cap1_y}" font-family="{sans}" font-size="11" fill="#8b949e">{_x(caption1)}</text>
+  <text x="32" y="{cap2_y}" font-family="{sans}" font-size="11" fill="#8b949e">{_x(caption2)}</text>
 </svg>
 '''
 
@@ -180,12 +247,59 @@ def markdown(title: str, data: dict) -> str:
             out.append("|---|---|---|---|---|---|")
             for x in ox:
                 v = x["verify"]
-                a, b = v["outage"]["original"], v["outage"]["hardened"]
-                back = ["never" if s["recovered_after_s"] is None else "%g s" % round(s["recovered_after_s"], 1) for s in (a, b)]
+                a, b2 = v["outage"]["original"], v["outage"]["hardened"]
+                back = ["never" if s["recovered_after_s"] is None else "%g s" % round(s["recovered_after_s"], 1) for s in (a, b2)]
                 out.append("| `%s` | %s → %s | %s → %s | %s → **%s** | %d → %d of %d | %s → %s |" % (
-                    x["id"], _n(a["healthy_per_call"]), _n(b["healthy_per_call"]), _n(v["original"]["amplification"]), _n(v["hardened"]["amplification"]),
-                    _n(a["amplification"]), _n(b["amplification"]), a["ok"] + a["degraded"], b["ok"] + b["degraded"], b["calls"], *back))
+                    x["id"], _n(a["healthy_per_call"]), _n(b2["healthy_per_call"]), _n(v["original"]["amplification"]), _n(v["hardened"]["amplification"]),
+                    _n(a["amplification"]), _n(b2["amplification"]), a["ok"] + a["degraded"], b2["ok"] + b2["degraded"], b2["calls"], *back))
             out.append("")
+
+    # V-9 SLI / SLO & Error-Budget Burn
+    s = data.get("slo")
+    if s and (s.get("original") or s.get("hardened")):
+        t = s["targets"]
+        so, sh = s["original"], s["hardened"]
+        out.append("## SLI / SLO & error-budget burn\n")
+        out.append("Configured targets (`.ras/slo.json`, source: `%s`): availability ≥ **%s**, p99 ≤ **%s**, error rate ≤ **%s**.\n" % (
+            s.get("source", "verify"), _p(t["availability"], 1), ui.secs(t["p99_s"]), _p(t["error_rate"], 1)))
+        out.append("| SLI / SLO metric | original | hardened | target |\n|---|---:|---:|---:|")
+        out.append("| availability | %s | %s | ≥ %s |" % (_p(so["availability"], 1), _p(sh["availability"], 1), _p(t["availability"], 1)))
+        out.append("| p99 latency | %s | %s | ≤ %s |" % (ui.secs(so["p99_s"]), ui.secs(sh["p99_s"]), ui.secs(t["p99_s"])))
+        out.append("| error rate | %s | %s | ≤ %s |" % (_p(so["error_rate"], 1), _p(sh["error_rate"], 1), _p(t["error_rate"], 1)))
+        out.append("| error-budget burn | %.0f%% | %.0f%% | ≤ 100%% |" % (
+            so["error_budget_burn_pct"], sh["error_budget_burn_pct"]))
+        out.append("| SLO verdict | %s | **%s** | met |\n" % (
+            "✓ met" if so["status"] == "met" else "✗ missed",
+            "✓ met" if sh["status"] == "met" else "✗ missed"))
+
+    # V-8 Serviceability
+    srv = _agg_serviceability(data)
+    if srv:
+        out.append("## Serviceability (OTel JSON logs & diagnostics)\n")
+        out.append("Measured by running the log-only diagnoser over captured faulted-run `stderr` (OTel JSON log records with W3C `traceparent`). "
+                   "See [docs/RUNBOOK.md](docs/RUNBOOK.md) for log queries, health snapshot, incident replay (`ras-anything replay`), and rollback.\n")
+        out.append("| serviceability metric | original | hardened |\n|---|---:|---:|")
+        out.append("| fault detection rate (from logs) | %s | %s |" % (_p(srv.get("orig_detection"), 1), _p(srv.get("hard_detection"), 1)))
+        out.append("| root-cause diagnosis accuracy (dep + fault) | %s | %s |" % (_p(srv.get("orig_accuracy"), 1), _p(srv.get("hard_accuracy"), 1)))
+        out.append("| median lines to diagnosis | %s | %s |" % (
+            srv["orig_lines"] if srv.get("orig_lines") is not None else "unavailable",
+            srv["hard_lines"] if srv.get("hard_lines") is not None else "unavailable"))
+        out.append("| time to restore (bad-enable rollback fixture) | unavailable | unavailable |\n")
+
+    # V-18 Agent Experience (AX)
+    ax_data = _agg_ax(data)
+    if ax_data:
+        out.append("## Agent experience (RFC 9457 structured errors)\n")
+        out.append("Measured with the deterministic policy agent against plain exception text vs RFC 9457 `RasError.problem` objects, plus PII/secret leak scanning.\n")
+        cat = ax_data.get("catalog")
+        if cat:
+            co, ch = cat["original"], cat["hardened"]
+            out.append("| AX benchmark (10-cause catalog) | plain error | RFC 9457 `Problem` |\n|---|---:|---:|")
+            out.append("| next-action accuracy | %s | **%s** |" % (_p(co["accuracy"], 1), _p(ch["accuracy"], 1)))
+            out.append("| mean tokens to decide | %s | %s |" % (_n(co["mean_tokens"]), _n(ch["mean_tokens"])))
+            out.append("| mean decision steps | %s | %s |" % (_n(co["mean_steps"]), _n(ch["mean_steps"])))
+            out.append("| PII / secret leaks scanned | — | **%d** |\n" % len(ax_data.get("leaks") or []))
+
     out.append("## Fault model\n")
     out.append("| fault | effect at the boundary |\n|---|---|")
     for k in faults.MATRIX + ("mixed",):
@@ -199,26 +313,136 @@ def markdown(title: str, data: dict) -> str:
                    % (100 * b["outage_rate"], b["time_scale"], b["hang_cap_s"]))
         host = b.get("host") or {}
         out.append("Host: %s %s %s, %s CPUs, %s · %s\n" % (host.get("system"), host.get("release"), host.get("machine"),
-                                                                 host.get("cpus"), _runtime(host), b["created"]))
+                                                                host.get("cpus"), _runtime(host), b["created"]))
     out.append("Undo: `ras-anything disable <id>` removes the swap byte for byte; `RAS_ANYTHING_DISABLE=1` runs the originals.\n")
     out.append("<sub>Made with ras-anything · design inspired by [fast-anything](https://github.com/EL4CTEO/fast-anything) (MIT)</sub>\n")
     return "\n".join(out)
 
 
-def report(title: str | None = None, quiet: bool = False) -> dict:
+def _fn_runbook(x: dict) -> str:
+    fid = x["id"]
+    m = x["meta"]
+    v = x["verify"]
+    deps = v.get("dependencies") or m.get("dependencies") or []
+    lines = [
+        "# Runbook: `%s`" % fid,
+        "",
+        "- **Language:** %s" % m.get("lang", "python"),
+        "- **Module / file:** `%s`" % m.get("file", "?"),
+        "- **Latency budget:** `%ss`" % m.get("budget_s", "?"),
+        "- **Verify verdict:** %s (`%s → %s` availability under faults)" % (
+            "PASS" if v.get("passed") else "FAIL",
+            _p(v["original"]["availability"], 1), _p(v["hardened"]["availability"], 1)),
+        "",
+        "## Dependencies",
+        "",
+    ]
+    if deps:
+        lines.append("| name | kind | method | route |")
+        lines.append("|---|---|---|---|")
+        for d in deps:
+            lines.append("| `%s` | `%s` | `%s` | `%s` |" % (
+                d.get("name", "?"), d.get("kind", "?"), d.get("method", "—"), d.get("route", "—")))
+    else:
+        lines.append("_No external dependencies recorded._")
+    lines += [
+        "",
+        "## Faults handled & patterns",
+        "",
+        "Hardened function verified against: %s." % ", ".join("`%s`" % s for s in (v.get("chaos") or {}).get("scenarios", [])),
+        "",
+        "## Log query (OTel JSON on `stderr`)",
+        "",
+        "```bash",
+        "# Filter structured JSON records for this function or failing dependency",
+        "jq 'select(.attributes[\"dependency.name\"] != null or .severity_text == \"ERROR\")' app.stderr.log",
+        "# Correlate across hops using W3C traceparent / trace_id",
+        "jq 'select(.trace_id == \"<32-hex-trace-id>\")' app.stderr.log",
+        "```",
+        "",
+        "## Health, breaker state & incident replay",
+        "",
+        "- Live health & SLO check: `ras-anything status` (reads `.ras/health.json` or `$RAS_ANYTHING_HEALTH_FILE`, `.ras/slo.json`, and `.ras/incidents/`).",
+        "- Breaker open means upstream failures crossed the threshold; calls fail fast (`circuit_open` / `degraded`) until cooldown expires and a half-open probe succeeds.",
+        "- Flight-recorder incidents: `ras-anything replay --list` then `ras-anything replay <incident-id>` for deterministic virtual-clock reproduction and RCA.",
+        "",
+        "## Instant rollback",
+        "",
+        "```bash",
+        "ras-anything disable %s   # byte-for-byte source restore" % fid,
+        "# OR without touching files:",
+        "RAS_ANYTHING_DISABLE=1 <your-app-command>",
+        "```",
+        "",
+        "## Evidence links",
+        "",
+        "- Verification results: `.ras/hardens/%s/verify.json`" % fid,
+        "- Report: `RAS-REPORT.md`",
+        "- SLO status: `.ras/slo.json`",
+        "",
+    ]
+    return "\n".join(lines)
+
+
+def write_runbooks(project: Path, title: str, data: dict) -> Path:
+    hs = data.get("hardens") or []
+    for x in hs:
+        rb = project / ".ras" / "hardens" / x["id"] / "RUNBOOK.md"
+        rb.parent.mkdir(parents=True, exist_ok=True)
+        rb.write_text(_fn_runbook(x), encoding="utf-8")
+
+    lines = [
+        "# %s — Operations Runbook" % title,
+        "",
+        "Auto-generated by `ras-anything report` from measured verify/bench/SLO artifacts.",
+        "",
+        "## Quick triage",
+        "",
+        "1. Run `ras-anything status` to inspect enabled swaps, `.ras/health.json`, `.ras/slo.json`, and recorded incidents.",
+        "2. Inspect structured OTel JSON logs on `stderr` by `trace_id`, `attributes[\"dependency.name\"]`, and `attributes[\"fault.class\"]`.",
+        "3. Reproduce any captured incident deterministically: `ras-anything replay --list` then `ras-anything replay <incident-id>`.",
+        "4. Roll back immediately if needed: `ras-anything disable <id>` (byte-for-byte restore) or set `RAS_ANYTHING_DISABLE=1`.",
+        "",
+        "## Hardened functions",
+        "",
+    ]
+    for x in hs:
+        lines.append("- [`%s`](../.ras/hardens/%s/RUNBOOK.md) — verify %s (`%s → %s`)" % (
+            x["id"], x["id"], "PASS" if x["verify"].get("passed") else "FAIL",
+            _p(x["verify"]["original"]["availability"], 1), _p(x["verify"]["hardened"]["availability"], 1)))
+    lines += [
+        "",
+        "## Evidence",
+        "",
+        "- [RAS-REPORT.md](../RAS-REPORT.md)",
+        "- [.ras/slo.json](../.ras/slo.json)",
+        "",
+    ]
+    docs_dir = project / "docs"
+    docs_dir.mkdir(exist_ok=True)
+    out_rb = docs_dir / "RUNBOOK.md"
+    out_rb.write_text("\n".join(lines), encoding="utf-8")
+    return out_rb
+
+
+def report(title: str | None = None, slo_spec: str | None = None, quiet: bool = False) -> dict:
     project = find_project()
-    data = collect(project)
+    data = collect(project, slo_spec=slo_spec, save_slo=True)
     title = title or project.name
     md, svg = project / "RAS-REPORT.md", project / "ras-card.svg"
-    md.write_text(markdown(title, data))
-    svg.write_text(card_svg(title, data))
+    md.write_text(markdown(title, data), encoding="utf-8")
+    svg.write_text(card_svg(title, data), encoding="utf-8")
+    runbook = write_runbooks(project, title, data)
     if not quiet:
         ui.headline("report", title)
         b = data["bench"]
         if b:
             o, h = b["summary"]["original"], b["summary"]["hardened"]
             print("  app availability under faults %s %s %s" % (ui.pct(o["availability"]), ui.ARROW, ui.bold(ui.good(ui.pct(h["availability"])))))
+        if data.get("slo"):
+            slo.print_slo(data["slo"])
         print("  %s %s" % (ui.good(ui.OK), os.path.relpath(md)))
         print("  %s %s" % (ui.good(ui.OK), os.path.relpath(svg)))
+        print("  %s %s" % (ui.good(ui.OK), os.path.relpath(runbook)))
         ui.next_hint("status")
-    return {"markdown": str(md), "svg": str(svg)}
+    return {"markdown": str(md), "svg": str(svg), "runbook": str(runbook), "slo": str(project / ".ras" / "slo.json")}

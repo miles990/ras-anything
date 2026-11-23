@@ -21,7 +21,8 @@ prove it on recorded calls, and swap them in reversibly.
   enable / disable [id]  swap the hardened function in / out (one marked block, byte-for-byte undo)
   bench [-- <cmd>]       whole-app runs under live chaos, original vs hardened, interleaved
   bench --patterns       every resilience pattern on vs off under simulated trouble (docs/PATTERNS.md)
-  report                 RAS-REPORT.md + ras-card.svg (measured numbers only)
+  report [--slo SPEC]    RAS-REPORT.md + ras-card.svg + docs/RUNBOOK.md + .ras/slo.json
+  replay [id] [--list]   deterministically replay a recorded incident + write RCA
   flag list|get|set|delete  OpenFeature/flagd flags (`.ras/flags.json`), hot-reloaded
   status · doctor · mcp
 """
@@ -69,9 +70,15 @@ def parser() -> argparse.ArgumentParser:
     b.add_argument("--rate", type=float, default=0.1, help="fault probability per dependency attempt (default 0.1)")
     b.add_argument("--degraded-marker", action="append", dest="markers",
                    help="text that marks a deliberately degraded output line (repeatable)")
+    b.add_argument("--slo", help="SLO targets, e.g. availability=99.0,p99=1s,error_rate=1%%")
 
     r = sub.add_parser("report", help="RAS-REPORT.md + ras-card.svg")
     r.add_argument("--title", help="project name on the card (default: folder name)")
+    r.add_argument("--slo", help="SLO targets, e.g. availability=99.0,p99=1s,error_rate=1%%")
+
+    rp = sub.add_parser("replay", help="replay a recorded incident from .ras/incidents/ + write RCA")
+    rp.add_argument("id", nargs="?", help="incident id or path (defaults to latest)")
+    rp.add_argument("--list", action="store_true", help="list recorded incidents")
 
     fl = sub.add_parser("flag", help="list, get, set or delete flags in .ras/flags.json (hot-reloaded)")
     fl.add_argument("rest", nargs=argparse.REMAINDER, help="list | get NAME | set NAME on|off|--canary N|--shadow|--disabled | delete NAME")
@@ -128,11 +135,18 @@ def main(argv=None) -> int:
                 return 0
             from .bench import bench
 
-            bench(cmd or None, seeds=a.seeds, rate=a.rate, markers=a.markers)
+            bench(cmd or None, seeds=a.seeds, rate=a.rate, markers=a.markers, slo_spec=a.slo)
         elif c == "report":
             from .report import report
 
-            report(a.title)
+            report(a.title, slo_spec=a.slo)
+        elif c == "replay":
+            from . import replay as _replay
+
+            if a.list:
+                _replay.print_list()
+            else:
+                _replay.replay(a.id)
         elif c == "flag":
             from .flags import run as flag_run
 

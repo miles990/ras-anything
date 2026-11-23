@@ -116,5 +116,37 @@ def status() -> dict:
                 print("           %s = %s" % (k, v["value"]))
     except Exception:
         pass
+    # Health snapshot
+    hfile = os.environ.get("RAS_ANYTHING_HEALTH_FILE")
+    hpath = Path(hfile) if hfile else (project / ".ras" / "health.json")
+    health_snap = load_json(hpath) if hpath.is_file() else None
+    out["health"] = health_snap
+    if isinstance(health_snap, dict):
+        print()
+        st_lbl = ui.good(health_snap.get("status", "ok")) if health_snap.get("status") == "ok" else ui.warn(str(health_snap.get("status", "degraded")))
+        print("  health   %s  %s" % (st_lbl, ui.dim("updated %s" % (health_snap.get("updated") or "")[:19])))
+        for dep_name, dep_st in (health_snap.get("dependencies") or {}).items():
+            print("           %s: %s" % (dep_name, dep_st.get("state") or dep_st.get("status") or "?"))
+    # SLO status
+    slo_doc = load_json(project / ".ras" / "slo.json")
+    out["slo"] = slo_doc
+    if isinstance(slo_doc, dict) and slo_doc.get("hardened"):
+        hs = slo_doc["hardened"]
+        met = hs.get("status") == "met"
+        lbl = ui.good(ui.OK + " met") if met else ui.bad(ui.FAIL + " missed")
+        print()
+        print("  slo      %s  %s" % (lbl, ui.dim("avail %.1f%% / target %.1f%% · burn %.0f%%" % (
+            100.0 * (hs.get("availability") or 0.0),
+            100.0 * slo_doc.get("targets", {}).get("availability", 0.99),
+            hs.get("error_budget_burn_pct") or 0.0))))
+    # Recorded incidents
+    from . import replay as _replay
+    incs = _replay.list_incidents(project)
+    out["incidents"] = incs
+    if incs:
+        print()
+        print("  incidents  %d recorded · latest %s (%s %s)" % (
+            len(incs), incs[0]["id"], incs[0].get("dependency") or "?", incs[0].get("fault") or "?"))
+        nxt = nxt or ("replay %s" % incs[0]["id"])
     ui.next_hint(nxt or "report")
     return out

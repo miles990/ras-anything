@@ -39,6 +39,14 @@ function faultOf(p) {
       return n === 0 ? p.fault : null;
     };
   }
+  if (p.type === "schedule") {
+    const list = Array.isArray(p.faults) ? p.faults : [];
+    const rep = p.repeat !== false;
+    return (key, n) => {
+      if (!list.length || (p.key !== null && p.key !== undefined && key !== p.key)) return null;
+      return n < list.length ? list[n] : rep ? list.at(-1) : null;
+    };
+  }
   if (p.type === "seeded") {
     const { seed, rate, outage_rate: outage = 0, salt = "" } = p;
     return (key, n) => {

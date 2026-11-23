@@ -195,6 +195,8 @@ async function runJob(job) {
     throw new Fatal(`import ${path.basename(job.hardened)}`, e);
   }
   const fallback = mod.RAS_FALLBACK ?? null;
+  try { require("./patterns/recorder.cjs").mute(true); } catch {}
+  const deps = Array.isArray(job.dependencies) ? job.dependencies : [];
 
   let crash = null; // an error nothing handled: it would end a real process
   let wake = () => {};
@@ -239,7 +241,7 @@ async function runJob(job) {
     try {
       await current.run(me, async () => {
         try {
-          const r = runtime.withTrace(() => fn(...args));
+          const r = runtime.withTrace(() => (t.side === "hardened" ? runtime.observe(meta.id, deps, hardened, null, args) : fn(...args)));
           if (r !== null && typeof r === "object" && typeof r.then === "function") r.then((v) => settle("return", v), (e) => settle("raise", e));
           else settle("return", r);
         } catch (e) {
@@ -287,6 +289,8 @@ async function runJob(job) {
       exc: error === null ? null : `${typeName(error)}: ${String(error?.message ?? error).slice(0, 200)}`,
       exc_type: error === null ? null : bugType(error), cause_type: cause === null ? null : bugType(cause),
       structured: error !== null && (error instanceof runtime.RasError || cause !== null),
+      problem: error instanceof runtime.RasError ? error.problem : null,
+      stderr: logged.slice(0, 8000),
       state: t.plan.type === "none" ? { args: digest(args) } : null,
       attempts: handler.attempts.map(({ key, n, fault, reached, failed, idem, method, nonidempotent, outage }) =>
         ({ key, n, fault, reached, failed, idem, method, nonidempotent, outage })),

@@ -324,12 +324,12 @@ return the fallback or raise a `RasError`. Nested policies and `attempt_timeout(
         qual = meta["qualname"]
         if "." in qual:
             cls, name = qual.split(".", 1)
-            inner = "_ras_swap(%r, %s.%s, _ras_fn)" % (fid, cls, name)
+            inner = "_ras_swap(%r, %s.%s, _ras_fn, %r)" % (fid, cls, name, meta.get("dependencies") or [])
             wrap = "%s(%s)" % (meta["kind"], inner) if meta["kind"] in ("staticmethod", "classmethod") else inner
             bind = "    %s.%s = %s" % (cls, name, wrap)
         else:
             name = qual
-            bind = "    %s = _ras_swap(%r, %s, _ras_fn)" % (name, fid, name)
+            bind = "    %s = _ras_swap(%r, %s, _ras_fn, %r)" % (name, fid, name, meta.get("dependencies") or [])
         return _BLOCK.format(start=start, end=end, fid=fid, date=vres.get("verified_at", "?")[:10], total=vres["happy"]["total"],
                              before=100 * vres["original"]["availability"], after=100 * vres["hardened"]["availability"],
                              copy=copy_rel, module=meta["module"], mod=safe_name(fid), name=name, bind=bind)
@@ -430,7 +430,7 @@ if _ras_fn is not None:
     try:
         from ras_anything.runtime import swap as _ras_swap
     except Exception:
-        def _ras_swap(fid, original, hardened):
+        def _ras_swap(fid, original, hardened, *a, **kw):
             return hardened
 {bind}
     del _ras_swap

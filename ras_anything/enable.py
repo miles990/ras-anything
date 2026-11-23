@@ -8,7 +8,7 @@ import shutil
 import time
 from pathlib import Path
 
-from . import lang, ui
+from . import cassette, lang, ui
 from .paths import (UserError, find_project, harden_dir, load_json, plain_path, rel_to_project, save_json, sha256_file,
                     write_file)
 from .verify import resolve_id
@@ -62,7 +62,13 @@ def enable(fid: str | None = None, quiet: bool = False, canary: str | None = Non
     sha_before = hashlib.sha256(raw).hexdigest()
     text = raw.decode("utf-8")
     eol = "\r\n" if "\r\n" in text else "\n"
-    blk = adapter.block(fid, meta, "%s/%s" % (COPY_DIR, copy_abs.name), vres)
+    meta_blk = dict(meta)
+    if "dependencies" not in meta_blk and (d / "calls.json").exists():
+        try:
+            meta_blk["dependencies"] = cassette.dependencies(cassette.load(d / "calls.json"), project)
+        except Exception:
+            meta_blk["dependencies"] = []
+    blk = adapter.block(fid, meta_blk, "%s/%s" % (COPY_DIR, copy_abs.name), vres)
     if eol == "\r\n":
         blk = blk.replace("\n", "\r\n")
     patches = adapter.patches(src_path, text, meta)

@@ -8,7 +8,7 @@ import shlex
 import time
 from pathlib import Path
 
-from . import faults, lang, ui
+from . import ax, diagnose, faults, lang, slo, ui
 from .judge import classify_run, duplicates
 from .paths import UserError, find_project, harden_dir, load_json, portable_cmd, resolve_in_project, runnable_cmd, save_json, scrub
 from .runner import run
@@ -42,7 +42,7 @@ def _pctl(xs, q):
 
 
 def bench(cmd: list[str] | None = None, seeds: int = 20, rate: float = 0.1, markers: list[str] | None = None,
-          quiet: bool = False) -> dict:
+          slo_spec: str | None = None, quiet: bool = False) -> dict:
     project = find_project()
     scan = load_json(project / ".ras" / "scan.json") or {}
     stored = portable_cmd(cmd or scan.get("cmd") or [], project)
@@ -67,7 +67,8 @@ def bench(cmd: list[str] | None = None, seeds: int = 20, rate: float = 0.1, mark
     cmd = adapter.resolve(typed, cwd)
     root = resolve_in_project(scan.get("root") or ".", project) if scan.get("root") else adapter.project_root(cmd, cwd)
     base_cfg = {"mode": "bench", "rate": rate, "outage_rate": 0.05, "scale": 0.05, "hang_s": 2.0, "targets": targets}
-    variants = {"original": {"RAS_ANYTHING_DISABLE": "1"}, "hardened": {"RAS_ANYTHING_DISABLE": "0"}}
+    inc_env = os.environ.get("RAS_ANYTHING_INCIDENTS", "off")
+    variants = {"original": {"RAS_ANYTHING_DISABLE": "1", "RAS_ANYTHING_INCIDENTS": inc_env}, "hardened": {"RAS_ANYTHING_DISABLE": "0", "RAS_ANYTHING_INCIDENTS": inc_env}}
     if not quiet:
         ui.headline("bench", "%s %s %d seeds × original/hardened, interleaved %s live chaos %s per attempt" % (
             shown, ui.DOT, seeds, ui.DOT, ui.pct(rate, 0)))
@@ -105,7 +106,7 @@ def bench(cmd: list[str] | None = None, seeds: int = 20, rate: float = 0.1, mark
                    "fallbacks": fbs,
                    "faults": sum(1 for a in att if a.get("fault")), "attempts": len(att), "dups": duplicates(att),
                    "uncaught": d.get("uncaught")}
-            raw_runs.append((v, rec, r.stdout))
+            raw_runs.append((v, rec, r.stdout, r.stderr or ""))
             runs[v].append(rec)
             for fid, st in (d.get("stats") or {}).items():
                 agg = stats[v].setdefault(fid, {"calls": 0, "ok": 0, "fallback": 0, "raised": 0, "attempts": 0, "outage_calls": 0,
@@ -129,7 +130,7 @@ def bench(cmd: list[str] | None = None, seeds: int = 20, rate: float = 0.1, mark
                   cell(line["hardened"]), ui.dim("%2d fault%s" % (line["hardened"]["faults"], " " if line["hardened"]["faults"] == 1 else "s")),
                   ui.warn(" dup %d→%d" % (line["original"]["dups"], line["hardened"]["dups"]))
                   if line["original"]["dups"] or line["hardened"]["dups"] else ""), flush=True)
-    for v, rec, stdout in raw_runs:
+    for v, rec, stdout, _stderr in raw_runs:
         if v == "original" and rec["outcome"] == "wrong" and rec["exit"] == 0 and stdout in degraded_stdouts:
             rec["outcome"] = "degraded"
     summary = {}
@@ -149,10 +150,31 @@ def bench(cmd: list[str] | None = None, seeds: int = 20, rate: float = 0.1, mark
     for v in stats:
         for st in stats[v].values():
             st["p99"] = max(st["p99"]) if st["p99"] else None
+    srv_bench = {}
+    bench_leaks = []
+    for v in variants:
+        diags = [diagnose.diagnose(err) for vv, rec, _out, err in raw_runs
+                 if vv == v and (rec["faults"] > 0 or rec["outcome"] != "correct")]
+        if v == "hardened":
+            for vv, _rec, _out, err in raw_runs:
+                if vv == "hardened" and err:
+                    bench_leaks.extend(ax.scan_leaks(err))
+        n_d = len(diags)
+        det = sum(1 for d in diags if d.get("detected"))
+        lines_list = sorted(d["lines_to_diagnosis"] for d in diags if d.get("lines_to_diagnosis") is not None)
+        ttd_list = sorted(d["ttd_ms"] for d in diags if d.get("ttd_ms") is not None)
+        srv_bench[v] = {
+            "cases": n_d,
+            "detected": det,
+            "detection_rate": (det / n_d) if n_d else None,
+            "lines_to_diagnosis_p50": lines_list[len(lines_list) // 2] if lines_list else None,
+            "ttd_ms_p50": ttd_list[len(ttd_list) // 2] if ttd_list else None,
+        }
     res = {
         "lang": adapter.name, "cmd": stored, "display_cmd": shown, "ids": ids, "seeds": seeds, "rate": rate, "outage_rate": 0.05,
         "time_scale": 0.05, "hang_cap_s": 2.0, "degraded_markers": markers, "clean_outputs_equal": same_clean,
         "summary": summary, "runs": runs, "functions": stats, "first_wrong": first_wrong_diff,
+        "serviceability": srv_bench, "leaks": sorted(set(bench_leaks)),
         "host": {"machine": platform.machine(), "system": platform.system(), "release": platform.release(),
                  "python": platform.python_version(),
                  "runtime": adapter.runtime_label(clean["original"].data), "cpus": os.cpu_count(), "node": platform.node()[:0] or None},
@@ -160,6 +182,8 @@ def bench(cmd: list[str] | None = None, seeds: int = 20, rate: float = 0.1, mark
         "created": time.strftime("%Y-%m-%dT%H:%M:%S%z"),
     }
     res = scrub(res, project)
+    slo_res = slo.evaluate(project=project, bench=res, targets=slo_spec, save=True)
+    res["slo"] = slo_res
     save_json(project / ".ras" / "bench.json", res)
     if not quiet:
         print_bench(res)
@@ -216,6 +240,8 @@ def print_bench(res: dict) -> None:
         fw = res["first_wrong"]
         print(ui.warn("  first hardened wrong output (seed %s, faults=%s): %r (expected %r)" % (
             fw["seed"], fw["faults"], fw["actual"][:120], fw["expected"][:120])))
+    if res.get("slo"):
+        slo.print_slo(res["slo"])
     if not res["clean_outputs_equal"]:
         print(ui.bad("  ✗ the hardened app prints different output with no faults: fix before shipping"))
     ui.next_hint("report")

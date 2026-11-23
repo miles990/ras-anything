@@ -33,6 +33,9 @@ TOOLS = {
                    "degraded_marker": {"type": "string", "description": "text marking a deliberately degraded output line"}}, []),
     "ras_report": ("Write RAS-REPORT.md and ras-card.svg from measured results.", {**_cwd}, []),
     "ras_status": ("Show scan, hardened functions, verify state, what is enabled, flags and the next step.", {**_cwd}, []),
+    "ras_replay": ("Replay a recorded incident from .ras/incidents/ on the virtual clock and write RCA (or list incidents).",
+                   {**_cwd, "id": {"type": "string", "description": "incident id (optional; omit for latest)"},
+                    "list": {"type": "boolean", "description": "list recorded incidents instead of replaying"}}, []),
     "ras_flag": ("List, get, set or delete flags in .ras/flags.json (hot-reloaded in running processes).",
                  {**_cwd, "argv": {"type": "array", "items": {"type": "string"},
                                    "description": "flag args, e.g. set ras.pattern.retry off, or list"}}, []),
@@ -44,6 +47,12 @@ def _argv(name: str, a: dict) -> list[str]:
     argv = [cmd]
     if cmd == "flag":
         argv += list(a.get("argv") or ["list"])
+        return argv
+    if cmd == "replay":
+        if a.get("list"):
+            argv.append("--list")
+        elif a.get("id"):
+            argv.append(a["id"])
         return argv
     if a.get("id") and cmd in ("harden", "verify", "enable", "disable"):
         argv.append(a["id"])

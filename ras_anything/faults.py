@@ -87,6 +87,23 @@ class FirstAttempt(Plan):
         return self.kind == "outage" and n < OUTAGE_K and self.target_key in (None, key)
 
 
+class Schedule(Plan):
+    """Injects an explicit sequence of faults per attempt (for deterministic incident replay)."""
+
+    def __init__(self, faults: list[str], target_key: str | None = None, repeat: bool = True):
+        self.faults = list(faults)
+        self.target_key = target_key
+        self.repeat = repeat
+        self.name = "schedule"
+
+    def fault(self, key, n, nonidempotent=False):
+        if not self.faults or (self.target_key is not None and key != self.target_key):
+            return None
+        if n < len(self.faults):
+            return self.faults[n]
+        return self.faults[-1] if self.repeat else None
+
+
 class Seeded(Plan):
     """Each attempt faults with probability `rate` (kind uniform over KINDS); with probability
     `outage_rate` a request key starts with an OUTAGE_K-attempt outage."""

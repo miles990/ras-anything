@@ -16,7 +16,9 @@ from __future__ import annotations
 
 import base64
 import json
+import os
 from pathlib import Path
+from urllib.parse import urlsplit
 
 FORMAT = "ras-anything-cassette"
 VERSION = 1
@@ -92,3 +94,27 @@ def text(j, project) -> str:
         mark, s = j["$proj"]
         return s.replace(mark, str(project))
     return str(j)
+
+
+def dependencies(calls: list, project=None) -> list[dict]:
+    """Distinct dependencies seen in recorded calls, formatted for runtime.observed / observe."""
+    seen: dict[tuple, dict] = {}
+    for c in calls or ():
+        for x in c.get("io") or ():
+            req = x.get("req") or {}
+            kind = req.get("kind") or ("http" if req.get("url") else "subprocess")
+            if req.get("url"):
+                url = text(req["url"], project) if project is not None else str(req["url"])
+                u = urlsplit(url)
+                route = u.path or "/"
+                segs = [seg for seg in route.split("/") if seg]
+                name = segs[-1] if segs else (u.hostname or "http")
+                method = req.get("method") or "GET"
+                k = ("http", method, route)
+                seen.setdefault(k, {"name": name, "kind": "http", "method": method, "route": route, "program": None})
+            elif req.get("argv"):
+                prog = os.path.basename(text(req["argv"][0], project) if project is not None else str(req["argv"][0]))
+                method = req.get("method") or "RUN"
+                k = ("subprocess", method, prog)
+                seen.setdefault(k, {"name": prog, "kind": "subprocess", "method": method, "route": None, "program": prog})
+    return sorted(seen.values(), key=lambda d: (-len(d.get("route") or ""), d["name"], d["method"] or ""))
