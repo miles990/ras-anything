@@ -8,7 +8,7 @@ import time
 from pathlib import Path
 
 from . import lang as lang_mod
-from .paths import UserError, find_project, load_json, save_json, scrub
+from .paths import UserError, find_project, load_json, plain_path, save_json, scrub
 
 SCHEMA_VERSION = "1.0.0"
 
@@ -116,7 +116,8 @@ def _safe_name(s: str) -> str:
 
 
 def out_dir(project: Path) -> Path:
-    d = project / ".ras" / "out"
+    plain_path(project / ".ras", project, ".ras directory", kind="dir", must_exist=False)
+    d = plain_path(project / ".ras" / "out", project, ".ras/out directory", kind="dir", must_exist=False)
     d.mkdir(parents=True, exist_ok=True)
     return d
 
@@ -131,7 +132,7 @@ def emit_run(project: Path, kind: str, payload: dict, suffix: str | None = None)
     }
     doc = scrub(doc, project)
     fname = f"{kind}-{_safe_name(suffix)}.json" if suffix else f"{kind}.json"
-    p = out_dir(project) / fname
+    p = plain_path(out_dir(project) / fname, project, "export file", kind="file", must_exist=False)
     save_json(p, doc)
     return p
 
@@ -140,7 +141,7 @@ def emit_event(project: Path, event_type: str, data: dict | None = None, *,
                severity: str = "INFO", trace_id: str | None = None,
                function_id: str | None = None, dependency: str | None = None,
                ts: str | None = None) -> dict:
-    p = out_dir(project) / "events.ndjson"
+    p = plain_path(out_dir(project) / "events.ndjson", project, "events stream", kind="file", must_exist=False)
     seq = 1
     if p.is_file():
         lines = [ln for ln in p.read_text(encoding="utf-8").splitlines() if ln.strip()]
@@ -646,6 +647,8 @@ def export_data(project: Path | None = None, fmt: str = "json", out_path: Path |
 
     if out_path:
         dest = Path(out_path)
+        if dest.is_symlink():
+            raise UserError(f"refusing to write --out {dest}: it is a symlink", "export will not follow symlinks", "export")
         dest.parent.mkdir(parents=True, exist_ok=True)
         dest.write_text(text, encoding="utf-8")
     return text

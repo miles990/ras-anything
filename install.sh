@@ -14,10 +14,11 @@ set -eu
 
 usage() {
   cat <<'USAGE'
-Usage: ./install.sh [--uninstall]
+Usage: ./install.sh [--force] [--uninstall]
 
   (no args)       Install or refresh the ras-anything CLI and agent skills.
                   Idempotent: re-running upgrades the same layout in place.
+  --force         Overwrite an existing skill or ~/.local/bin/ras-anything not created by this installer.
   --uninstall     Remove the CLI (pipx package or venv+shim) and the skill
                   copies this script installed. Other skills are left alone.
   -h, --help      Show this help.
@@ -70,18 +71,27 @@ check_python() {
   printf '%s\n' "$py"
 }
 
+FORCE=0
+
 is_our_shim() {
-  [ -f "$1" ] && grep -q "$SHIM_MARK" "$1"
+  [ ! -L "$1" ] && [ -f "$1" ] && grep -q "$SHIM_MARK" "$1"
 }
 
 skill_is_ours() {
-  [ -f "$1/$SKILL_MARK" ] || [ -f "$1/SKILL.md" ]
+  [ -f "$1/$SKILL_MARK" ]
 }
 
 copy_skill() {
   src=$1
   dest=$2
   [ -f "$src/SKILL.md" ] || die "skill source missing: $src/SKILL.md"
+  if [ -e "$dest/SKILL.md" ] || [ -L "$dest/SKILL.md" ]; then
+    if ! skill_is_ours "$dest" && [ "$FORCE" -ne 1 ]; then
+      if ! cmp -s "$src/SKILL.md" "$dest/SKILL.md" 2>/dev/null; then
+        die "refusing to overwrite existing skill at $dest/SKILL.md (not installed by ras-anything; remove it or re-run with --force)"
+      fi
+    fi
+  fi
   mkdir -p "$dest"
   # Refresh contents without deleting unexpected user files in the dest dir.
   cp -f "$src/SKILL.md" "$dest/SKILL.md"
@@ -173,8 +183,11 @@ install_with_venv() {
   fi
   "$VENV_DIR/bin/python" -m pip install --upgrade --disable-pip-version-check pip setuptools wheel
   "$VENV_DIR/bin/python" -m pip install --force-reinstall --disable-pip-version-check "$ROOT"
-  # The shim body is generated without a nested heredoc so this file is easy to embed.
-  printf '%s\n' "#!/bin/sh" "$SHIM_MARK" "exec \"${VENV_DIR}/bin/ras-anything\" \"\$@\"" > "$SHIM"
+  if { [ -e "$SHIM" ] || [ -L "$SHIM" ]; } && ! is_our_shim "$SHIM" && [ "$FORCE" -ne 1 ]; then
+    die "refusing to overwrite existing $SHIM (not an install.sh shim; remove it or re-run with --force)"
+  fi
+  # Invoke python -m ras_anything directly so paths with spaces work even if a pip script shebang wouldn't.
+  printf '%s\n' "#!/bin/sh" "$SHIM_MARK" "exec \"${VENV_DIR}/bin/python\" -m ras_anything \"\$@\"" > "$SHIM"
   chmod +x "$SHIM"
   printf 'venv\n' > "$MARKER"
   printf '%s\n' "$ROOT" >> "$MARKER"
@@ -253,9 +266,19 @@ do_uninstall() {
   printf 'Uninstall complete.\n'
 }
 
-case "${1:-}" in
-  ""|--install) do_install ;;
-  --uninstall) do_uninstall ;;
-  -h|--help) usage ;;
-  *) die "unknown argument: $1 (try --help)" ;;
+ACTION=install
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --install) ACTION=install ;;
+    --uninstall) ACTION=uninstall ;;
+    --force) FORCE=1 ;;
+    -h|--help) usage; exit 0 ;;
+    *) die "unknown argument: $1 (try --help)" ;;
+  esac
+  shift
+done
+
+case "$ACTION" in
+  install) do_install ;;
+  uninstall) do_uninstall ;;
 esac

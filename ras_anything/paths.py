@@ -50,6 +50,12 @@ def load_json(path: Path, default=None):
         return json.loads(Path(path).read_text())
     except FileNotFoundError:
         return default
+    except json.JSONDecodeError as e:
+        raise UserError(
+            "corrupt JSON in %s: %s" % (path, e.msg),
+            "cannot read project state cleanly",
+            "fix or remove %s and re-run" % path,
+        ) from e
 
 
 def save_json(path: Path, data) -> None:

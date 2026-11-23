@@ -374,8 +374,12 @@ def print_verify(res: dict, fid: str, hname: str) -> None:
         rows.append(["agent next-action accuracy", ui.pct(co["accuracy"], 0), ui.pct(ch["accuracy"], 0),
                      ui.dim("leaks: %d" % len(axr.get("leaks") or []))])
     print(ui.table(["gate", "original", "hardened", ""], rows, "lrrl"))
-    print(ui.dim("  %d trials each: %d calls × %d fault scenarios · availability = (ok + degraded) / trials" % (
-        h["trials"], res["chaos"]["calls"], len(res["chaos"]["scenarios"]))))
+    _nc, _ns = res["chaos"]["calls"], len(res["chaos"]["scenarios"])
+    if h["trials"] == _nc * _ns:
+        _desc = "%d trials each: %d calls × %d fault scenarios" % (h["trials"], _nc, _ns)
+    else:
+        _desc = "%d trials each (%d calls across %d fault scenarios, incl. per-key isolation)" % (h["trials"], _nc, _ns)
+    print(ui.dim("  %s · availability = (ok + degraded) / trials" % _desc))
     print(ui.dim("  wrong = neither the real answer nor the declared fallback · hang = no timeout, or over budget"))
     if res.get("outage"):
         print(ui.dim("  dependency down: %d calls in a row, nothing reset in between · attempts per call = retry amplification" % res["outage"]["down"]["calls"]))

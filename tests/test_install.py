@@ -217,6 +217,37 @@ class InstallAndReleaseTests(unittest.TestCase):
                 _run(["./install.sh", "--uninstall"], env=env, timeout=120, check=False)
                 self._assert_uninstalled(home)
 
+
+    def test_unowned_skill_and_shim_are_protected_and_spaces_in_home_work(self):
+        with tempfile.TemporaryDirectory(prefix="ras-protect-") as td:
+            home = Path(td) / "user home"
+            skill = home / ".claude" / "skills" / "ras-anything" / "SKILL.md"
+            skill.parent.mkdir(parents=True)
+            skill.write_text("USER CONTENT\n", encoding="utf-8")
+            shim = home / ".local" / "bin" / "ras-anything"
+            shim.parent.mkdir(parents=True)
+            shim.write_text("#!/bin/sh\necho user\n", encoding="utf-8")
+            env = _clean_env(home, with_pipx=False)
+
+            # Uninstall must NOT delete an unowned skill or unowned shim.
+            _run(["./install.sh", "--uninstall"], env=env, timeout=60)
+            self.assertEqual(skill.read_text(encoding="utf-8"), "USER CONTENT\n")
+            self.assertTrue(shim.is_file())
+
+            # Install must refuse to clobber unowned files without --force.
+            refused = _run(["./install.sh"], env=env, timeout=120, check=False)
+            self.assertNotEqual(refused.returncode, 0)
+            self.assertEqual(skill.read_text(encoding="utf-8"), "USER CONTENT\n")
+
+            # Remove unowned blockers and test space-in-HOME venv install cleanly.
+            skill.unlink()
+            shim.unlink()
+            _run(["./install.sh"], env=env, timeout=360)
+            ver = _run([str(shim), "--version"], env=env, timeout=30)
+            self.assertIn("0.1.0", ver.stdout)
+            _run(["./install.sh", "--uninstall"], env=env, timeout=120)
+            self._assert_uninstalled(home)
+
     def _assert_install_ok(self, home: Path, env: dict, completed: subprocess.CompletedProcess) -> None:
         shim = home / ".local" / "bin" / "ras-anything"
         self.assertTrue(shim.is_file(), f"missing shim; stdout={completed.stdout}\nstderr={completed.stderr}")

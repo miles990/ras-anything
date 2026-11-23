@@ -176,5 +176,36 @@ class SchemaExportTests(unittest.TestCase):
                     os.environ["PYTHONPATH"] = old_pp
 
 
+
+    def test_export_refuses_symlink_escape_and_reports_corrupt_json_cleanly(self):
+        with tempfile.TemporaryDirectory() as td:
+            proj = Path(td) / "proj"
+            outside = Path(td) / "outside"
+            (proj / ".ras").mkdir(parents=True)
+            outside.mkdir()
+            sentinel = outside / "status.json"
+            sentinel.write_text("DO NOT OVERWRITE\n", encoding="utf-8")
+            (proj / ".ras" / "out").symlink_to(outside)
+
+            env = dict(os.environ, PYTHONPATH=str(ROOT))
+            r = subprocess.run(
+                [sys.executable, "-m", "ras_anything", "export", "--format", "json"],
+                cwd=str(proj), env=env, capture_output=True, text=True,
+            )
+            self.assertNotEqual(r.returncode, 0)
+            self.assertNotIn("Traceback", r.stderr)
+            self.assertEqual(sentinel.read_text(encoding="utf-8"), "DO NOT OVERWRITE\n")
+
+            # Corrupt JSON produces UserError (exit 1, no Traceback)
+            (proj / ".ras" / "out").unlink()
+            (proj / ".ras" / "scan.json").write_text("{", encoding="utf-8")
+            r2 = subprocess.run(
+                [sys.executable, "-m", "ras_anything", "export", "--format", "json"],
+                cwd=str(proj), env=env, capture_output=True, text=True,
+            )
+            self.assertEqual(r2.returncode, 1)
+            self.assertNotIn("Traceback", r2.stderr)
+            self.assertIn("corrupt JSON", r2.stdout + r2.stderr)
+
 if __name__ == "__main__":
     unittest.main()
